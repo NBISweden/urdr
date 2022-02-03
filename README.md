@@ -19,7 +19,7 @@ git clone https://github.com/NBISweden/ops-redmine
 cd ops-redmine
 ```
 
-Then follow the instructions in the project´s README.md.
+Then follow the instructions in the project's `README.md` file.
 
 # Setup
 
