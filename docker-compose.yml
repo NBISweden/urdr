@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  urdr:
+      image: urdr
+      build:
+        context: ./
+        dockerfile: Dockerfile
+      container_name: urdr
+      restart: unless-stopped
