@@ -26,6 +26,6 @@ Then follow the instructions in the project´s README.md.
 To start the development servers please run:
 
 ```
-cd ops-redmine; docker-compose -f docker-compose-dev up -d
+cd ops-redmine; docker-compose -f docker-compose-dev.yml up -d; cd ..
 docker-compose  up
 ```
