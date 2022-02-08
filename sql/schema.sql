@@ -14,6 +14,8 @@
 -- FIXME: The "user_id" datatype is currently unknown, so we assume that
 --        it is INTEGER in the schema below.
 
+BEGIN;
+
 DROP TABLE IF EXISTS preference;
 CREATE TABLE preference (
 	preference_id INTEGER
@@ -76,3 +78,5 @@ INSERT INTO preference (name, value) VALUES
 
 INSERT INTO preference (name, value) VALUES
 	("input", "daily");	-- or "weekly"
+
+COMMIT;
