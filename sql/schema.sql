@@ -11,9 +11,10 @@
 --
 -- See also https://sqlite.org/docs.html
 
--- FIXME: The datatype for the fields whose names start with "redmine_"
---      are currently unknown, so we assume that they are INTEGER in the
---      schema below.
+-- FIXME:
+-- The datatype for the fields whose names start with "redmine_" are
+-- currently unknown, so we assume that they are INTEGER in the schema
+-- below.
 
 PRAGMA foreign_keys = ON;
 
@@ -60,6 +61,12 @@ CREATE TABLE user_pref (
 -- activity that a particular user has marked as a favorite.  We also
 -- store a priority, which determines the relative positioning in the
 -- user interface (it's essentially a sorting key).
+--
+-- NOTE:
+-- The "redmine_activity_id" may be NULL.  This would mean that only the
+-- Redmine issue was favorited without specifying a particular activity.
+-- The time logging interface would need to provide a way to select an
+-- activity in this case.  It is unknown if this would be useful or not.
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
@@ -67,7 +74,7 @@ CREATE TABLE favorite (
 		PRIMARY KEY AUTOINCREMENT,
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
-	redmine_activity_id INTEGER NOT NULL,
+	redmine_activity_id INTEGER,
 	priority INTEGER NOT NULL,
 
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
