@@ -11,8 +11,8 @@
 --
 -- See also https://sqlite.org/docs.html
 
--- FIXME: The "user_id" datatype is currently unknown, so we assume that
---        it is INTEGER in the schema below.
+
+PRAGMA foreign_keys = ON;
 
 BEGIN;
 
