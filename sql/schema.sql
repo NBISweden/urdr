@@ -46,7 +46,25 @@ CREATE TABLE user_pref (
 		ON DELETE CASCADE
 );
 
--- Insert default values:
+-- Favorites.
+-- https://github.com/NBISweden/urdr/issues/19
+--
+-- A "favorite" is a combination of a Redmine issue and a Redmine
+-- activity that a particular user has maked as a favorite.  We also
+-- store a priority, which determines the relative positioning in the
+-- user interface (it's essentially a sorting key).
+
+DROP TABLE IF EXISTS favorite;
+CREATE TABLE favorite (
+	redmine_user_id INTEGER NOT NULL,
+	redmine_issue_id INTEGER NOT NULL,
+	redmine_activity_id INTEGER NOT NULL,
+	priority INTEGER NOT NULL,
+
+	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
+);
+
+-- Insert default preference values:
 
 -- "Default days"
 -- https://github.com/NBISweden/urdr/issues/22
