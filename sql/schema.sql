@@ -13,7 +13,7 @@
 --      https://sqlite.org/docs.html
 --      https://sqlite.org/cli.html
 --
--- The `sqlite3` command line utility is part of the `sqlite3` package
+-- The "sqlite3" command line utility is part of the "sqlite3" package
 -- on Ubuntu.  The utility is part of the macOS base system and does not
 -- need to be installed separately.
 
