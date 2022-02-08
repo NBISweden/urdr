@@ -44,7 +44,6 @@ INSERT INTO preference (name, value) VALUES
 -- "weekly".
 
 INSERT INTO preference (name, value) VALUES
-
 	("input", "daily");	-- or "weekly"
 
 COMMIT;
