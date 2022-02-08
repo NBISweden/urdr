@@ -16,6 +16,13 @@ PRAGMA foreign_keys = ON;
 
 BEGIN;
 
+-- Preferences.
+-- A "preference" is a "name" and a "value".  The "name" is the name of
+-- the preference, for example "tab" for specifying the wanted movement
+-- when pressing the tab key.  The "value" is the default value of the
+-- preference, for example "horizontal" for the "tab" preference.  A
+-- preference without a default value has the value NULL.
+
 DROP TABLE IF EXISTS preference;
 CREATE TABLE preference (
 	preference_id INTEGER
