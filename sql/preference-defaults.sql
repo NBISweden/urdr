@@ -12,7 +12,7 @@ BEGIN;
 -- https://github.com/NBISweden/urdr/issues/22
 --
 -- A user may have a default report for a day.  The preference entry
--- for a default days has the abbreviated name of the day as "name",
+-- for a default day has the abbreviated name of the day as "name",
 -- and the report for that day as a string that encodes a JSON array
 -- with "{ issue: ..., activity: ..., hours: ... }" entries (where
 -- "issue" and "activity" are Redmine internal identifiers for issues
