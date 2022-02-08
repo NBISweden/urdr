@@ -1,15 +1,21 @@
--- Relational database schema for Urdr, storing the data that is not
--- kept by Redmine by default but that we need to be persistent between
--- sessions.
+-- A proposed relational database schema for Urdr, storing the data that
+-- is not kept by Redmine by default but that we need to be persistent
+-- between sessions.
 --
 -- We assume that this file is used to initialize a SQLite database.
 -- From the command line, this could be done using the following command
 -- (which creates the database file "database.db" if it does not already
 -- exist):
 --
---	sqlite database.db <sql/schema.sql
+--      sqlite3 database.db <sql/schema.sql
 --
--- See also https://sqlite.org/docs.html
+-- See also:
+--      https://sqlite.org/docs.html
+--      https://sqlite.org/cli.html
+--
+-- The `sqlite3` command line utility is part of the `sqlite3` package
+-- on Ubuntu.  The utility is part of the macOS base system and does not
+-- need to be installed separately.
 
 -- FIXME:
 -- The datatype for the fields whose names start with "redmine_" are
@@ -64,10 +70,12 @@ CREATE TABLE user_pref (
 -- user interface (it's essentially a sorting key).
 --
 -- NOTE:
--- The "redmine_activity_id" may be NULL.  This would mean that only the
--- Redmine issue was favorited without specifying a particular activity.
--- The time logging interface would need to provide a way to select an
--- activity in this case.  It is unknown if this would be useful or not.
+-- The "redmine_activity_id" may be NULL.  This would mean that only
+-- the Redmine issue was picked as a favorite without specifying a
+-- particular activity.  The time logging interface would need to
+-- provide a way to select an activity in this case.  It is unknown if
+-- this would be useful or not (we might want "NOT NULL", or a default
+-- value instead).
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
