@@ -11,7 +11,7 @@
 --
 -- See also https://sqlite.org/docs.html
 
--- FIXME: The datatypes for the fields whose names start with "redmine_"
+-- FIXME: The datatype for the fields whose names start with "redmine_"
 --      are currently unknown, so we assume that they are INTEGER in the
 --      schema below.
 
@@ -56,7 +56,7 @@ CREATE TABLE user_pref (
 -- https://github.com/NBISweden/urdr/issues/19
 --
 -- A "favorite" is a combination of a Redmine issue and a Redmine
--- activity that a particular user has maked as a favorite.  We also
+-- activity that a particular user has marked as a favorite.  We also
 -- store a priority, which determines the relative positioning in the
 -- user interface (it's essentially a sorting key).
 
