@@ -40,7 +40,8 @@ CREATE TABLE preference (
 	name TEXT NOT NULL,
 	value TEXT,	-- a default value, if applicable
 
-	UNIQUE (preference_id, name)
+	UNIQUE (name)
+		ON CONFLICT ROLLBACK
 );
 
 -- User preferences.
