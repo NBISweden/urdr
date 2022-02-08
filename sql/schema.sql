@@ -46,7 +46,8 @@ CREATE TABLE user_pref (
 	preference_id INTEGER NOT NULL,
 	value TEXT,
 
-	UNIQUE (redmine_user_id, preference_id),
+	UNIQUE (redmine_user_id, preference_id)
+		ON CONFLICT REPLACE,
 
 	FOREIGN KEY (preference_id)
 		REFERENCES preference (preference_id)
@@ -78,6 +79,7 @@ CREATE TABLE favorite (
 	priority INTEGER NOT NULL,
 
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
+		ON CONFLICT REPLACE
 );
 
 -- Insert default preference values:
