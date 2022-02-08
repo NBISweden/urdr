@@ -53,6 +53,7 @@ CREATE TABLE user_pref (
 );
 
 -- Favorites.
+-- https://github.com/NBISweden/urdr/issues/11
 -- https://github.com/NBISweden/urdr/issues/19
 --
 -- A "favorite" is a combination of a Redmine issue and a Redmine
@@ -62,6 +63,8 @@ CREATE TABLE user_pref (
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
+	favorite_id INTEGER
+		PRIMARY KEY AUTOINCREMENT,
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
 	redmine_activity_id INTEGER NOT NULL,
