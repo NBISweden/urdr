@@ -11,6 +11,9 @@
 --
 -- See also https://sqlite.org/docs.html
 
+-- FIXME: The datatypes for the fields whose names start with "redmine_"
+--      are currently unknown, so we assume that they are INTEGER in the
+--      schema below.
 
 PRAGMA foreign_keys = ON;
 
@@ -33,13 +36,16 @@ CREATE TABLE preference (
 	UNIQUE (preference_id, name)
 );
 
+-- User preferences.
+-- A table connecting users with sets of preferences.
+
 DROP TABLE IF EXISTS user_pref;
 CREATE TABLE user_pref (
-	user_id	INTEGER NOT NULL,
+	redmine_user_id	INTEGER NOT NULL,
 	preference_id INTEGER NOT NULL,
 	value TEXT,
 
-	UNIQUE (user_id, preference_id),
+	UNIQUE (redmine_user_id, preference_id),
 
 	FOREIGN KEY (preference_id)
 		REFERENCES preference (preference_id)
