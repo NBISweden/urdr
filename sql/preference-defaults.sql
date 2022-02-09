@@ -14,9 +14,9 @@ BEGIN;
 -- A user may have a default report for a day.  The preference entry
 -- for a default day has the abbreviated name of the day as "name",
 -- and the report for that day as a string that encodes a JSON array
--- with "{ issue: ..., activity: ..., hours: ... }" entries (where
--- "issue" and "activity" are Redmine internal identifiers for issues
--- and activities).
+-- with entries like {"issue":1234,"activity":56,"hours":7} (where the
+-- values used for the keys "issue" and "activity" are Redmine internal
+-- identifiers for issues and activities).
 
 INSERT INTO preference (name, value) VALUES
 	("Mon", NULL),

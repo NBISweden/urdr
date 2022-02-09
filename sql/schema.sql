@@ -38,7 +38,7 @@ CREATE TABLE preference (
 	preference_id INTEGER
 		PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
-	value TEXT,	-- a default value, if applicable
+	value TEXT,	-- A default value, if applicable.
 
 	UNIQUE (name)
 		ON CONFLICT ROLLBACK
@@ -47,11 +47,12 @@ CREATE TABLE preference (
 -- User preferences.
 -- A table connecting users with sets of preferences.
 
-DROP TABLE IF EXISTS user_pref;
-CREATE TABLE user_pref (
+DROP TABLE IF EXISTS user_preference;
+CREATE TABLE user_preference (
 	redmine_user_id	INTEGER NOT NULL,
 	preference_id INTEGER NOT NULL,
-	value TEXT,
+	value TEXT,	-- The user's preferred value
+			-- for this preference.
 
 	UNIQUE (redmine_user_id, preference_id)
 		ON CONFLICT REPLACE,
@@ -69,7 +70,7 @@ CREATE TABLE user_pref (
 -- activity that a particular user has marked as a favorite.  We also
 -- store a priority, which determines the relative positioning in the
 -- user interface (it's essentially a sorting key).
---
+
 -- NOTE:
 -- The "redmine_activity_id" may be NULL.  This would mean that only
 -- the Redmine issue was picked as a favorite without specifying a
