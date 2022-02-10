@@ -1,0 +1,20 @@
+{
+  "mount": {
+    "public": "/",
+    "src": "/_dist_"
+  },
+  "plugins": [
+    "@snowpack/plugin-react-refresh",
+    "@snowpack/plugin-babel",
+    "@snowpack/plugin-dotenv"
+  ],
+  "packageOptions": {
+    "polyfillNode": true
+  },
+  "devOptions": {
+    "port": 4242
+  },
+  "alias": {
+    "@app": "./src"
+  }
+}

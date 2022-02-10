@@ -1,0 +1,48 @@
+{
+  "name": "urdr",
+  "version": "0.1.0",
+  "description": "urdr time logging system",
+  "author": "NBIS",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@babel/core": "^7.13.16",
+    "@babel/preset-env": "^7.13.15",
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@snowpack/app-scripts-react": "^2.0.1",
+    "@testing-library/react": "^11.2.6",
+    "@types/react": "^17.0.4",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/react-select": "^4.0.15",
+    "@types/snowpack-env": "^2.3.3",
+    "@types/styled-components": "^5.1.9",
+    "base-64": "^1.0.0",
+    "esbuild": "^0.11.15",
+    "snowpack": "^2.14.0",
+    "typescript": "^4.2.4",
+    "css-loader": "^6.2.0"
+  },
+  "scripts": {
+    "start": "npx snowpack dev",
+    "build": "./build.sh",
+    "build:snowpack": "npx snowpack build"
+  },
+  "dependencies": {
+    "@date-io/core": "^1.3.13",
+    "@date-io/date-fns": "^1.3.13",
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
+    "@material-ui/pickers": "^3.3.10",
+    "@snowpack/plugin-react-refresh": "^2.5.0",
+    "date-fns": "2.21.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-icons": "^4.2.0",
+    "react-is": "^17.0.2",
+    "react-number-format": "^4.6.3",
+    "react-router-dom": "^5.2.0",
+    "styled-components": "^5.2.3"
+  }
+}
