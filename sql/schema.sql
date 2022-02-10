@@ -26,16 +26,16 @@ PRAGMA foreign_keys = ON;
 
 BEGIN;
 
--- Preferences.
--- A "preference" is a "name" and a "value".  The "name" is the name of
--- the preference, for example "tab" for specifying the wanted movement
+-- Settings.
+-- A "setting" is a "name" and a "value".  The "name" is the name of
+-- the setting, for example "tab" for specifying the wanted movement
 -- when pressing the tab key.  The "value" is the default value of the
--- preference, for example "horizontal" for the "tab" preference.  A
--- preference without a default value has the value NULL.
+-- setting, for example "horizontal" for the "tab" setting.  A setting
+-- without a default value has the value NULL.
 
-DROP TABLE IF EXISTS preference;
-CREATE TABLE preference (
-	preference_id INTEGER
+DROP TABLE IF EXISTS setting;
+CREATE TABLE setting (
+	setting_id INTEGER
 		PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
 	value TEXT,	-- A default value, if applicable.
@@ -44,21 +44,21 @@ CREATE TABLE preference (
 		ON CONFLICT ROLLBACK
 );
 
--- User preferences.
--- A table connecting users with sets of preferences.
+-- User settings.
+-- A table connecting users with sets of settings.
 
-DROP TABLE IF EXISTS user_preference;
-CREATE TABLE user_preference (
+DROP TABLE IF EXISTS user_setting;
+CREATE TABLE user_setting (
 	redmine_user_id	INTEGER NOT NULL,
-	preference_id INTEGER NOT NULL,
+	setting_id INTEGER NOT NULL,
 	value TEXT,	-- The user's preferred value
-			-- for this preference.
+			-- for this setting.
 
-	UNIQUE (redmine_user_id, preference_id)
+	UNIQUE (redmine_user_id, setting_id)
 		ON CONFLICT REPLACE,
 
-	FOREIGN KEY (preference_id)
-		REFERENCES preference (preference_id)
+	FOREIGN KEY (setting_id)
+		REFERENCES setting (setting_id)
 		ON DELETE CASCADE
 );
 
