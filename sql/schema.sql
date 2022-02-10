@@ -71,21 +71,14 @@ CREATE TABLE user_preference (
 -- store a priority, which determines the relative positioning in the
 -- user interface (it's essentially a sorting key).
 
--- NOTE:
--- The "redmine_activity_id" may be NULL.  This would mean that only
--- the Redmine issue was picked as a favorite without specifying a
--- particular activity.  The time logging interface would need to
--- provide a way to select an activity in this case.  It is unknown if
--- this would be useful or not (we might want "NOT NULL", or a default
--- value instead).
-
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
 	favorite_id INTEGER
 		PRIMARY KEY AUTOINCREMENT,
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
-	redmine_activity_id INTEGER,
+	redmine_activity_id INTEGER NOT NULL,
+	name TEXT,
 	priority INTEGER NOT NULL,
 
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
