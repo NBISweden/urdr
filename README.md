@@ -20,7 +20,7 @@ psql -U redmine
 redmine=> update users set admin='t' where login='MYUSER';
 ```
 
-Now you need to create the env file .urdr.env using .urdr.env.default as a template. Then, fetch the API key of your redmine user by navigating to your page, and update urdr.env by setting the variable `REDMINE_ADMIN_TOKEN`.
+Now please create the env file .urdr.env using .urdr.env.default as a template. If you are on Linux you need to set the variable `REDMINE_HOST="http://172.17.0.1"`. Then, fetch the API key of your redmine user by navigating to your page, and update urdr.env by setting the variable `REDMINE_ADMIN_TOKEN`.
 
 Finally, you can start urdr by using:
 
