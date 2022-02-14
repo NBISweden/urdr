@@ -1,3 +1,4 @@
 ops-redmine/
 backend/urdr
 backend/.env
+backend/tmp/
