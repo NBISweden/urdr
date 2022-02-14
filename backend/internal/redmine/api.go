@@ -1,11 +1,11 @@
-package logging
+package redmine
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
-	"errors"
 	cfg "urdr-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
@@ -52,12 +52,12 @@ type timeEntryRequest struct {
 }
 
 type TimeEntry struct {
-	Issue    int      `json:"issue_id"`
-	SpentOn  string  `json:"spent_on"`
-	Hours    int `json:"hours"`
-	Activity int  `json:"activity_id"`
-	Comments string  `json:"comments"`
-	User int `json:"user_id"`
+	Issue    int    `json:"issue_id"`
+	SpentOn  string `json:"spent_on"`
+	Hours    int    `json:"hours"`
+	Activity int    `json:"activity_id"`
+	Comments string `json:"comments"`
+	User     int    `json:"user_id"`
 }
 
 func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
@@ -157,7 +157,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 		log.Errorf("Failed to create time entry: %s", res.Status)
 		return errors.New(res.Status)
 	} else {
-	    log.Infof("Created time entry: %s", s)
+		log.Infof("Created time entry: %s", s)
 	}
 	return nil
 }
