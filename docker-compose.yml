@@ -2,9 +2,31 @@ version: '3'
 
 services:
   urdr:
-      image: urdr
-      build:
-        context: ./
-        dockerfile: Dockerfile
-      container_name: urdr
-      restart: unless-stopped
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: urdr
+    entrypoint: /usr/bin/urdr
+    expose:
+      - "8080"
+    ports:
+      - 8080:8080
+    restart: always
+    user: '65534:65534'
+    env_file:
+      - .urdr.env
+
+  node-urdr:
+    container_name: node-urdr
+    build:
+      context: ./
+      dockerfile: ./node/Dockerfile
+    volumes:
+        - ./frontend:/home/node/app/
+        - /home/node/app/node_modules
+    ports:
+      - 4242:4242
+    environment:
+        - NODE_OPTIONS="--max-old-space-size=2048"
+
+
