@@ -10,16 +10,7 @@ https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1
 
 ## Setup
 
-As a prerequisite, you need to clone the [ops-redmine repo](https://github.com/NBISweden/ops-redmine) and follow the instructions until you run ./setup.sh. These steps include importing a backup of redmine in your database.
-
-Start by creating a network and spinning up Redmine:
-
-```command
-docker network create urdr-net
-cp docker-compose-dev.yml ops-redmine/
-cd ops-redmine
-docker-compose -f docker-compose-dev.yml up
-```
+As a prerequisite, you need to clone the [ops-redmine repo](https://github.com/NBISweden/ops-redmine), and follow the instructions to setup and run redmine. These steps include importing a backup of redmine in your database.
 
 Log in to the postgres container and then make your user administrator:
 
@@ -29,13 +20,13 @@ psql -U redmine
 redmine=> update users set admin='t' where login='MYUSER';
 ```
 
-Now you need to fetch the API key of your user by navigating to your page, and add it to urdr.env by setting the variable `REDMINE_ADMIN_TOKEN`.
+Now please create the env file .urdr.env using .urdr.env.default as a template. If you are on Linux you need to set the variable `REDMINE_HOST="http://172.17.0.1"`. Then, fetch the API key of your redmine user by navigating to your page, and update urdr.env by setting the variable `REDMINE_ADMIN_TOKEN`.
 
-Finally, start the `urdr` and `node` services by using:
+Finally, you can start urdr by using:
 
 ```command
-cd ../
-docker-compose -f docker-compose.yml up urdr node-urdr
+
+docker-compose up
 ```
 
 ## Frontend
