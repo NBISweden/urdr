@@ -1,7 +1,7 @@
-FROM golang:1.16.2-alpine3.13 as builder
+FROM golang:1.17.7-alpine3.15 as builder
 
 ENV GOPATH=$PWD
-ENV CGO_ENABLED=0
+ENV CGO_ENABLED=0 GOOS=linux
 
 COPY . .
 

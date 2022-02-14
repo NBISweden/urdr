@@ -4,17 +4,17 @@ services:
   urdr:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./backend/:/app
     container_name: urdr
-    entrypoint: /usr/bin/urdr
     expose:
       - "8080"
     ports:
       - 8080:8080
     restart: always
-    user: '65534:65534'
     env_file:
-      - .urdr.env
+      - ./backend/.env
 
   node-urdr:
     container_name: node-urdr
