@@ -10,9 +10,9 @@ https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1
 
 ## Setup
 
-As a prerequisite, you need to clone the [ops-redmine repo](https://github.com/NBISweden/ops-redmine), and follow the instructions to setup and run redmine. These steps include importing a backup of redmine in your database.
+As a prerequisite, you need to clone the [ops-redmine repo](https://github.com/NBISweden/ops-redmine), and follow the instructions to setup and run redmine. These steps include importing a backup of redmine in your database. The backup file should be named `redmine_db.dump`.
 
-Log in to the postgres container and then make your user administrator:
+Log in to the postgres container and then make your user administrator. Run the following commands, where `MYUSER` should be replaced with your redmine username:
 
 ```command
 docker exec -it <postgres-container> bash
@@ -25,7 +25,7 @@ Now please create the env file .env using .env.default as a template. If you are
 Finally, you can start urdr by using:
 
 ```command
-
+docker-compose build
 docker-compose up
 ```
 
