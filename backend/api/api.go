@@ -1,39 +1,68 @@
 package api
 
 import (
+	"time"
 	cfg "urdr-api/internal/config"
 	redmine "urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/fiber/v2/utils"
 	log "github.com/sirupsen/logrus"
 )
+
+func isLoggedIn(c *fiber.Ctx, store *session.Store) bool {
+	sess, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %s", err)
+	}
+	if (sess.Get("is_logged_in")) != true {
+		return false
+	}
+	return true
+}
 
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	// Fiber instance
 	app := fiber.New()
-	// Or extend your config for customization
+
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
 	}))
 
+	store := session.New(session.Config{
+		Expiration:     time.Minute * 5,
+		CookieName:     "urdr_session",
+		CookieDomain:   "",
+		CookiePath:     "",
+		CookieSecure:   true,
+		CookieHTTPOnly: false,
+		CookieSameSite: "Lax",
+		KeyGenerator:   utils.UUID,
+	})
+
 	app.Get("/", func(c *fiber.Ctx) error {
+		if isLoggedIn(c, store) == false {
+			return c.SendStatus(401)
+		}
 		return c.SendString("Hello, World!")
 	})
 
-	app.Get("/issues", func(c *fiber.Ctx) error {
-		issuesJson, err := redmine.ListIssues(redmineConf)
+	app.Post("/api/login", func(c *fiber.Ctx) error {
+		sess, err := store.Get(c)
 		if err != nil {
-			c.Response().SetBodyString(err.Error())
+			log.Errorf("Failed to get session: %s", err)
 			return c.SendStatus(500)
 		}
-		return c.JSON(issuesJson)
-	})
-
-	app.Post("/api/login", func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		res := redmine.Login(authHeader, redmineConf)
 		if res == true {
+			sess.Set("is_logged_in", true)
+			err = sess.Save()
+			if err != nil {
+				log.Errorf("Failed to save session: %s", err)
+			}
 			log.Info("Logged in user")
 			return c.SendStatus(200)
 		} else {
@@ -42,7 +71,36 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		}
 	})
 
+	app.Get("/api/logout", func(c *fiber.Ctx) error {
+		sess, err := store.Get(c)
+		if err != nil {
+			log.Errorf("Failed to get session: %s", err)
+			return c.SendStatus(500)
+		}
+		err = sess.Destroy()
+		if err != nil {
+			log.Errorf("Failed to destroy session: %s", err)
+			return c.SendStatus(500)
+		}
+		return c.SendStatus(200)
+	})
+
+	app.Get("/api/issues", func(c *fiber.Ctx) error {
+		if isLoggedIn(c, store) == false {
+			return c.SendStatus(401)
+		}
+		issuesJson, err := redmine.ListIssues(redmineConf)
+		if err != nil {
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
+		return c.JSON(issuesJson)
+	})
+
 	app.Post("/api/report", func(c *fiber.Ctx) error {
+		if isLoggedIn(c, store) == false {
+			return c.SendStatus(401)
+		}
 		var r redmine.TimeEntry
 		err := c.BodyParser(&r)
 
