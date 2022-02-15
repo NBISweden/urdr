@@ -43,7 +43,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		if isLoggedIn(c, store) == false {
+		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
 		return c.SendString("Hello, World!")
@@ -56,8 +56,8 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		authHeader := c.Get("Authorization")
-		res := redmine.Login(authHeader, redmineConf)
-		if res == true {
+		is_logged_in := redmine.Login(authHeader, redmineConf)
+		if is_logged_in {
 			sess.Set("is_logged_in", true)
 			err = sess.Save()
 			if err != nil {
