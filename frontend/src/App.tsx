@@ -1,33 +1,23 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import { Login } from "./login";
 import { Reporter } from "./reporter";
 
 export const App = () => {
   return(
     <>
-      <h1> Welcome to urdr </h1>
       <Router>
-        <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
-              <li>
-                <Link to="/report">Report</Link>
-              </li>
-            </ul>
-          </nav>
           <Switch>
-            <Route path="/report">
-              <Reporter />
+            <Route exact path = "/">
+              <Redirect to="/login"/>
             </Route>
             <Route path="/login">
               <Login />
             </Route>
+            <Route path="/timelog">
+              <Reporter />
+            </Route>
           </Switch>
-        </div>
       </Router>
     </>
   );
