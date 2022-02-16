@@ -60,24 +60,33 @@ type TimeEntry struct {
 	User     int    `json:"user_id"`
 }
 
-func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
+func prepareRequest(
+	redmineConf cfg.RedmineConfig,
+	method string, endpoint string) (*http.Request, error) {
 
-	url := redmineConf.Host + ":" + redmineConf.Port + "/issues.json"
-	method := "GET"
+	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
 
-	var r IssuesRes
-
-	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, err
+	}
 
+	req.Header.Add("Content-Type", "application/json")
+
+	return req, nil
+}
+
+func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
+	req, err := prepareRequest(redmineConf, "GET", "/issues.json")
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
-
 	req.Header.Add("Authorization", authHeader)
-	req.Header.Add("Content-Type", "application/json")
 
+	var r
+
+	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
@@ -87,11 +96,8 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
-	if r.TotalCount != 0 {
-		return true
-	} else {
-		return false
-	}
+
+	return r.TotalCount != 0
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig) (IssuesRes, error) {
