@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { TextField, Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 
 export const Login = () => {
@@ -7,7 +6,8 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const history = useHistory();
 
-  const authenticateRedmine = () => {
+  const authenticateRedmine = (event) => {
+    event?.preventDefault();
     // We are not doing account linking
     let headers = new Headers();
     headers.set("Authorization", "Basic " + btoa(username + ":" + password));
@@ -30,43 +30,28 @@ export const Login = () => {
     });
   };
 
-  const loginButtonStyle = {
-    width: "50",
-    border: "3px solid darkblue",
-    margin: "0px 50px",
-    padding: "10px",
-  };
-
   return (
-    <>
-      <TextField
-        id="username"
-        autoFocus
-        margin="dense"
-        label="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      ></TextField>
-      <TextField
-        id="password"
-        margin="dense"
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      ></TextField>
-      <Button
-        style={loginButtonStyle}
-        label="Submit"
-        onClick={() => authenticateRedmine()}
-        key={"Login"}
-        name={"Login"}
-        visible="true"
-        type={"submit"}
-      >
-        {" "}
-        Login
-      </Button>
-    </>
+    <div>
+      <form onSubmit={authenticateRedmine}>
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          value={username}
+          placeholder="Enter your username"
+          autoFocus
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <label htmlFor="Password">Password</label>
+        <input
+          type="password"
+          id="password"
+          value={password}
+          placeholder="Enter you password"
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <input type="submit" value="Login" />
+      </form>
+    </div>
   );
 };
