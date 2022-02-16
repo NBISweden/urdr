@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
-import { Login } from "./pages/login";
+import { Login } from "./pages/Login";
 import { Reporter } from "./pages/reporter";
 
 export const App = () => {

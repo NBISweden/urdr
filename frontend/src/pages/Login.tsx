@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { TextField, Button } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 
-export function Login() {
-  const [username, set_username] = useState("");
-  const [password, set_password] = useState("");
+export const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const history = useHistory();
 
-  function authenticateRedmine() {
+  const authenticateRedmine = () => {
     // We are not doing account linking
     let headers = new Headers();
     headers.set("Authorization", "Basic " + btoa(username + ":" + password));
@@ -21,13 +21,14 @@ export function Login() {
       headers: headers,
     }).then((response) => {
       if (response.ok) {
-        console.log("Login success");
-        var w = history.push("/report");
+        history.push("/timelog");
       } else {
         console.log("Error: login failed");
+        setUsername("");
+        setPassword("");
       }
     });
-  }
+  };
 
   const loginButtonStyle = {
     width: "50",
@@ -43,7 +44,8 @@ export function Login() {
         autoFocus
         margin="dense"
         label="Username"
-        onChange={(e) => set_username(e.target.value)}
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
       ></TextField>
       <TextField
         id="password"
@@ -51,7 +53,7 @@ export function Login() {
         label="Password"
         type="password"
         value={password}
-        onChange={(e) => set_password(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
       ></TextField>
       <Button
         style={loginButtonStyle}
@@ -67,4 +69,4 @@ export function Login() {
       </Button>
     </>
   );
-}
+};
