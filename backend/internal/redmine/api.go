@@ -84,7 +84,7 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	}
 	req.Header.Add("Authorization", authHeader)
 
-	var r
+	var r IssuesRes
 
 	client := &http.Client{}
 	res, err := client.Do(req)
@@ -102,35 +102,30 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 
 func ListIssues(redmineConf cfg.RedmineConfig) (IssuesRes, error) {
 
-	url := redmineConf.Host + ":" + redmineConf.Port + "/issues.json"
-	method := "GET"
+	req err := prepareRequest(redmineConf, "GET", "/issues.json")
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
 
 	var r IssuesRes
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil)
-
-	if err != nil {
-		fmt.Println(err)
-		return r, err
-	}
-	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
-	req.Header.Add("Content-Type", "application/json")
-
 	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return r, err
 	}
 	defer res.Body.Close()
-	decoder := json.NewDecoder(res.Body)
 
+	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
 	if err != nil {
 		log.Error("Failed decoding response: %s", err)
 	}
-	return r, err
 
+	return r, err
 }
 
 func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
