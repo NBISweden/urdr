@@ -59,9 +59,10 @@ type TimeEntry struct {
 	User     int    `json:"user_id"`
 }
 
-func prepareRequest(
+func doRequest(
 	redmineConf cfg.RedmineConfig,
-	method string, endpoint string) (*http.Request, error) {
+	method string, endpoint string,
+	headers map[string]string) (*http.Response, error) {
 
 	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
 
@@ -70,28 +71,31 @@ func prepareRequest(
 		return nil, err
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-
-	return req, nil
-}
-
-func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
-	req, err := prepareRequest(redmineConf, "GET", "/issues.json")
-	if err != nil {
-		fmt.Println(err)
-		return false
+	for key, value := range headers {
+		req.Header.Set(key, value)
 	}
-	req.Header.Add("Authorization", authHeader)
-
-	var r IssuesRes
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
+	res, err :=
+		doRequest(redmineConf, "GET", "/issues.json",
+			map[string]string{"Authorization": authHeader})
 	if err != nil {
 		fmt.Println(err)
 		return false
 	}
 	defer res.Body.Close()
+
+	var r IssuesRes
 
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
@@ -100,17 +104,12 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
-	req, err := prepareRequest(redmineConf, "GET", "/issues.json")
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
+	res, err :=
+		doRequest(redmineConf, "GET", "/issues.json",
+			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey})
 
 	r := &IssuesRes{}
 
-	client := &http.Client{}
-	res, err := client.Do(req)
 	if err != nil {
 		fmt.Println(err)
 		return r, err
@@ -135,17 +134,10 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 		return err
 	}
 
-	req, err := prepareRequest(redmineConf, "POST", "/time_entries.json")
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
-	// Here we impersonate as a user to report his/her time
-	req.Header.Set("X-Redmine-Switch-User", "jon")
-
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err :=
+		doRequest(redmineConf, "POST", "/time_entries.json",
+			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey,
+				"X-Redmine-Switch-User": "jon"})
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
 		return err
