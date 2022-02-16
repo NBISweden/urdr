@@ -130,23 +130,23 @@ func ListIssues(redmineConf cfg.RedmineConfig) (IssuesRes, error) {
 
 func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 	var ir timeEntryRequest
+
 	ir.TimeEntry = timeEntry
 	s, err := json.Marshal(ir)
 	if err != nil {
 		return err
 	}
-	method := "POST"
 
-	client := &http.Client{}
-	req, err := http.NewRequest(method, redmineConf.Host+":"+redmineConf.Port+"/time_entries.json", strings.NewReader(string(s)))
+	req, err := prepareRequest(redmineConf, "POST", "/time_entries.json")
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
-	req.Header.Set("Content-Type", "application/json")
 	// Here we impersonate as a user to report his/her time
 	req.Header.Set("X-Redmine-Switch-User", "jon")
 
+	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
@@ -157,8 +157,8 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 	if res.StatusCode != 201 {
 		log.Errorf("Failed to create time entry: %s", res.Status)
 		return errors.New(res.Status)
-	} else {
-		log.Infof("Created time entry: %s", s)
 	}
+	log.Infof("Created time entry: %s", s)
+
 	return nil
 }
