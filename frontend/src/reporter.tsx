@@ -16,10 +16,11 @@ export interface TimeEntry {
 }
 
 export function Reporter() {
-  const [hours, set_hours] = useState(0 as number);
-  const [date, set_date] = useState("" as string);
+  //used default values to speed testing
+  const [hours, set_hours] = useState(5 as number);
+  const [date, set_date] = useState("2022-02-16" as string);
   const [issue, set_issue] = useState(0 as number);
-  const [activity, set_activity] = useState(0 as number);
+  const [activity, set_activity] = useState(18 as number);
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -30,9 +31,14 @@ export function Reporter() {
     return (
       <>
         <div>
-          {issues.map((data, key) => {
-            return <div key={key}>{data.subject}</div>;
-          })}
+          <span>Issue</span> :
+          {issues && issues.length > 0 && (
+            <select onChange={(e) => set_issue(e.target.value)}>
+              {issues.map((data, index) => {
+                return <option value={data.id}>{data.subject}</option>;
+              })}
+            </select>
+          )}
         </div>
       </>
     );
@@ -48,6 +54,7 @@ export function Reporter() {
       .then((data) => {
         console.log(data.issues);
         setIssues(data.issues);
+        if (data.issues.length > 0) set_issue(data.issues[0].id);
       });
   }, []);
 
@@ -62,6 +69,7 @@ export function Reporter() {
       spent_on: date,
       user_id: 232,
     };
+    console.log(timeLog);
 
     fetch("http://localhost:8080/api/report", {
       body: JSON.stringify(timeLog),
@@ -111,15 +119,7 @@ export function Reporter() {
         value={hours}
         onChange={(e) => set_hours(e.target.value)}
       ></TextField>
-      <TextField
-        id="project"
-        placeholder="3499"
-        margin="dense"
-        label="issue"
-        value={issue}
-        onChange={(e) => set_issue(e.target.value)}
-      ></TextField>
-      <IssuesList></IssuesList>
+      <IssuesList />
       <TextField
         id="activity"
         placeholder="18"

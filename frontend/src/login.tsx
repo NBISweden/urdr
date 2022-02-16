@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
 
 export function Login() {
   const [username, set_username] = useState("");
   const [password, set_password] = useState("");
+  const history = useHistory();
 
   function authenticateRedmine() {
     // We are not doing account linking
@@ -20,10 +22,9 @@ export function Login() {
     }).then((response) => {
       if (response.ok) {
         console.log("Login success");
-        //var w = window.open("http://localhost:8080/api/issues");
+        var w = history.push("/report");
       } else {
         console.log("Error: login failed");
-        var w = window.open("/login");
       }
     });
   }

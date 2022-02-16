@@ -14,9 +14,6 @@ const Main = (
             <li>
               <Link to="/login">Login</Link>
             </li>
-            <li>
-              <Link to="/report">Report</Link>
-            </li>
           </ul>
         </nav>
         <Switch>
