@@ -20,7 +20,7 @@ export function Login() {
     }).then((response) => {
       if (response.ok) {
         console.log("Login success");
-        var w = window.open("http://localhost:8080/api/issues");
+        //var w = window.open("http://localhost:8080/api/issues");
       } else {
         console.log("Error: login failed");
         var w = window.open("/login");
@@ -58,7 +58,7 @@ export function Login() {
         onClick={() => authenticateRedmine()}
         key={"Login"}
         name={"Login"}
-        visible={true}
+        visible="true"
         type={"submit"}
       >
         {" "}

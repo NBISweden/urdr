@@ -21,11 +21,38 @@ export function Reporter() {
   const [issue, set_issue] = useState(0 as number);
   const [activity, set_activity] = useState(0 as number);
 
+  let headers = new Headers();
+  headers.set("Accept", "application/json");
+  headers.set("Content-Type", "application/json");
+  const [issues, setIssues] = useState([]);
+
+  const IssuesList = () => {
+    return (
+      <>
+        <div>
+          {issues.map((data, key) => {
+            return <div key={key}>{data.subject}</div>;
+          })}
+        </div>
+      </>
+    );
+  };
+
+  React.useEffect(() => {
+    fetch("http://localhost:8080/api/issues", {
+      method: "GET",
+      credentials: "include",
+      headers: headers,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data.issues);
+        setIssues(data.issues);
+      });
+  }, []);
+
   function reportTime() {
     // We are not doing account linking
-    let headers = new Headers();
-    headers.set("Accept", "application/json");
-    headers.set("Content-Type", "application/json");
 
     let timeLog: TimeEntry = {
       issue_id: Number(issue),
@@ -92,6 +119,7 @@ export function Reporter() {
         value={issue}
         onChange={(e) => set_issue(e.target.value)}
       ></TextField>
+      <IssuesList></IssuesList>
       <TextField
         id="activity"
         placeholder="18"
@@ -106,7 +134,7 @@ export function Reporter() {
         onClick={() => reportTime()}
         key={"report"}
         name={"report"}
-        visible={true}
+        visible="true"
         type={"submit"}
       >
         {" "}
