@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 	cfg "urdr-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
