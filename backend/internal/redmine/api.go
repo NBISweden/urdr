@@ -100,16 +100,15 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	return r.TotalCount != 0
 }
 
-func ListIssues(redmineConf cfg.RedmineConfig) (IssuesRes, error) {
-
-	req err := prepareRequest(redmineConf, "GET", "/issues.json")
+func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
+	req, err := prepareRequest(redmineConf, "GET", "/issues.json")
 	if err != nil {
 		fmt.Println(err)
-		return false
+		return nil, err
 	}
 	req.Header.Add("X-Redmine-API-Key", redmineConf.ApiKey)
 
-	var r IssuesRes
+	r := &IssuesRes{}
 
 	client := &http.Client{}
 	res, err := client.Do(req)
