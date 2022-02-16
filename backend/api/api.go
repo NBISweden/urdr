@@ -38,7 +38,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		CookiePath:     "",
 		CookieSecure:   true,
 		CookieHTTPOnly: false,
-		CookieSameSite: "Lax",
+		CookieSameSite: "none",
 		KeyGenerator:   utils.UUID,
 	})
 

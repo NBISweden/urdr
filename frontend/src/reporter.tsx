@@ -39,6 +39,7 @@ export function Reporter() {
     fetch("http://localhost:8080/api/report", {
       body: JSON.stringify(timeLog),
       method: "POST",
+      credentials: "include",
       headers: headers,
     }).then((response) => {
       if (response.ok) {
