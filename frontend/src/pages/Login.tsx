@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { Header } from "../components/Header";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -32,6 +33,7 @@ export const Login = () => {
 
   return (
     <div>
+      <Header />
       <form onSubmit={authenticateRedmine}>
         <label htmlFor="username">Username</label>
         <input
