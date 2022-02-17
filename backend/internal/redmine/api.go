@@ -63,11 +63,19 @@ type TimeEntry struct {
 func doRequest(
 	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
+<<<<<<< HEAD
 	headers map[string]string, body string) (*http.Response, error) {
 
 	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
 
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
+=======
+	headers map[string]string, body strings.Reader) (*http.Response, error) {
+
+	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
+
+	req, err := http.NewRequest(method, url, &body)
+>>>>>>> 40d3b98 (Use body in post request)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +97,11 @@ func doRequest(
 func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
+<<<<<<< HEAD
 			map[string]string{"Authorization": authHeader}, "")
+=======
+			map[string]string{"Authorization": authHeader}, *strings.NewReader(""))
+>>>>>>> 40d3b98 (Use body in post request)
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -107,7 +119,11 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
+<<<<<<< HEAD
 			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, "")
+=======
+			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, *strings.NewReader(""))
+>>>>>>> 40d3b98 (Use body in post request)
 
 	r := &IssuesRes{}
 
