@@ -118,6 +118,7 @@ export function Reporter() {
         type={"submit"}
       >
         {" "}
+        Report
       </Button>
     </>
   );
