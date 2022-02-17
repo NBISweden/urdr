@@ -2,11 +2,11 @@
 
 ## Miro board
 
-https://miro.com/app/board/uXjVOVRByuw=/
+[Miro board](https://miro.com/app/board/uXjVOVRByuw=/)
 
 ## Team project in Figma
 
-https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1
+[Figma project](https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1)
 
 ## Setup
 
