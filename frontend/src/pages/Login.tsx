@@ -23,7 +23,7 @@ export const Login = () => {
       headers: headers,
     }).then((response) => {
       if (response.ok) {
-        history.push("/timelog");
+        history.push("/report");
       } else {
         console.log("Error: login failed");
         setUsername("");

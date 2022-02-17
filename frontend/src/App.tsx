@@ -19,7 +19,7 @@ export const App = () => {
           <Route path="/login">
             <Login />
           </Route>
-          <Route path="/timelog">
+          <Route path="/report">
             <Reporter />
           </Route>
         </Switch>
