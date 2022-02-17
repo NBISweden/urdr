@@ -36,3 +36,7 @@ docker-compose up
 ## Backend
 
 [urdr api](http://localhost:8080/issues)
+
+---
+
+[![GitHub Super-Linter](https://github.com/NBISweden/urdr/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
