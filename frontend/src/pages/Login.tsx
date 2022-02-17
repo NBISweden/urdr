@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Header } from "../components/Header";
+import "../app.css";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -32,9 +33,9 @@ export const Login = () => {
   };
 
   return (
-    <div>
+    <div className="login-wrapper">
       <Header />
-      <form onSubmit={authenticateRedmine}>
+      <form onSubmit={authenticateRedmine} className="login-form">
         <label htmlFor="username">Username</label>
         <input
           type="text"
@@ -52,7 +53,7 @@ export const Login = () => {
           placeholder="Enter you password"
           onChange={(event) => setPassword(event.target.value)}
         />
-        <input type="submit" value="Login" />
+        <input type="submit" value="Login" className="login-button" />
       </form>
     </div>
   );
