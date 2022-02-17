@@ -1,8 +1,4 @@
 import React, { useState } from "react";
-import {
-  KeyboardDatePicker,
-  MuiPickersUtilsProvider,
-} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import { TextField, Button } from "@material-ui/core";
 
@@ -94,22 +90,6 @@ export function Reporter() {
 
   return (
     <>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <KeyboardDatePicker
-          autoOk
-          disableFuture
-          className="simpleField"
-          label="Day to report"
-          format="yyyy-MM-dd"
-          value={date}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={(dte: Date) => {
-            set_date(dte.toISOString().split("T")[0]);
-          }}
-        />
-      </MuiPickersUtilsProvider>
       <TextField
         id="hours"
         autoFocus
@@ -138,7 +118,6 @@ export function Reporter() {
         type={"submit"}
       >
         {" "}
-        Report
       </Button>
     </>
   );
