@@ -63,11 +63,11 @@ type TimeEntry struct {
 func doRequest(
 	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
-	headers map[string]string, body strings.Reader) (*http.Response, error) {
+	headers map[string]string, body string) (*http.Response, error) {
 
 	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
 
-	req, err := http.NewRequest(method, url, &body)
+	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func doRequest(
 func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
-			map[string]string{"Authorization": authHeader}, *strings.NewReader(""))
+			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
 		fmt.Println(err)
 		return false
@@ -107,7 +107,7 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
-			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, *strings.NewReader(""))
+			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, "")
 
 	r := &IssuesRes{}
 
@@ -138,7 +138,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 	res, err :=
 		doRequest(redmineConf, "POST", "/time_entries.json",
 			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey,
-				"X-Redmine-Switch-User": "jon"}, *strings.NewReader(string(s)))
+				"X-Redmine-Switch-User": "jon"}, string(s))
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
 		return err
