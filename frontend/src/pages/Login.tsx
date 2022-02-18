@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
+
 import "../app.css";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const authenticateRedmine = (event) => {
     event?.preventDefault();
@@ -23,7 +24,7 @@ export const Login = () => {
       headers: headers,
     }).then((response) => {
       if (response.ok) {
-        history.push("/report");
+        navigate("/report");
       } else {
         console.log("Error: login failed");
         setUsername("");
