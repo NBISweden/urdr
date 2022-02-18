@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	cfg "urdr-api/internal/config"
@@ -91,7 +90,7 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 		doRequest(redmineConf, "GET", "/issues.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return false
 	}
 	defer res.Body.Close()
@@ -99,8 +98,13 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	var r IssuesRes
 
 	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(&r)
+	if err != nil {
+		log.Error(err)
+		return false
+	}
 
-	return (decoder.Decode(&r) != nil && r.TotalCount != 0)
+	return r.TotalCount != 0
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
@@ -111,7 +115,7 @@ func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	r := &IssuesRes{}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return r, err
 	}
 	defer res.Body.Close()
