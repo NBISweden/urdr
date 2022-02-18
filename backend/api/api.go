@@ -43,7 +43,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		if isLoggedIn(c, store) == false {
+		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
 		return c.SendString("Hello, World!")
@@ -57,7 +57,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		}
 		authHeader := c.Get("Authorization")
 		res := redmine.Login(authHeader, redmineConf)
-		if res == true {
+		if res {
 			sess.Set("is_logged_in", true)
 			err = sess.Save()
 			if err != nil {
@@ -86,7 +86,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/api/issues", func(c *fiber.Ctx) error {
-		if isLoggedIn(c, store) == false {
+		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
 		issuesJson, err := redmine.ListIssues(redmineConf)
@@ -98,7 +98,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
-		if isLoggedIn(c, store) == false {
+		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
 		var r redmine.TimeEntry
@@ -108,7 +108,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return err
 		}
 
-		log.Infof("Received time entry: %s", r)
+		log.Infof("Received time entry: %#v", r)
 
 		err = redmine.CreateTimeEntry(redmineConf, r)
 		if err == nil {

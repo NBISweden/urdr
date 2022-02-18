@@ -3,8 +3,8 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
+	"strings"
 	cfg "urdr-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
@@ -62,11 +62,11 @@ type TimeEntry struct {
 func doRequest(
 	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
-	headers map[string]string) (*http.Response, error) {
+	headers map[string]string, body string) (*http.Response, error) {
 
 	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
 
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -88,9 +88,9 @@ func doRequest(
 func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
-			map[string]string{"Authorization": authHeader})
+			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return false
 	}
 	defer res.Body.Close()
@@ -99,6 +99,10 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
+	if err != nil {
+		log.Error(err)
+		return false
+	}
 
 	return r.TotalCount != 0
 }
@@ -106,12 +110,12 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
-			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey})
+			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, "")
 
 	r := &IssuesRes{}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return r, err
 	}
 	defer res.Body.Close()
@@ -119,7 +123,7 @@ func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
 	if err != nil {
-		log.Error("Failed decoding response: %s", err)
+		log.Errorf("Failed decoding response: %s", err)
 	}
 
 	return r, err
@@ -137,7 +141,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 	res, err :=
 		doRequest(redmineConf, "POST", "/time_entries.json",
 			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey,
-				"X-Redmine-Switch-User": "jon"})
+				"X-Redmine-Switch-User": "jon"}, string(s))
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
 		return err
@@ -148,7 +152,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 		log.Errorf("Failed to create time entry: %s", res.Status)
 		return errors.New(res.Status)
 	}
-	log.Infof("Created time entry: %s", s)
+	log.Infof("Created time entry: %s", string(s))
 
 	return nil
 }
