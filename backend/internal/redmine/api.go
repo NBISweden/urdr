@@ -120,7 +120,7 @@ func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&r)
 	if err != nil {
-		log.Error("Failed decoding response: %s", err)
+		log.Errorf("Failed decoding response: %s", err)
 	}
 
 	return r, err
@@ -149,7 +149,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 		log.Errorf("Failed to create time entry: %s", res.Status)
 		return errors.New(res.Status)
 	}
-	log.Infof("Created time entry: %s", s)
+	log.Infof("Created time entry: %s", string(s))
 
 	return nil
 }
