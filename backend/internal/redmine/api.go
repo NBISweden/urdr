@@ -99,9 +99,8 @@ func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
 	var r IssuesRes
 
 	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&r)
 
-	return r.TotalCount != 0
+	return (decoder.Decode(&r) != nil && r.TotalCount != 0)
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {

@@ -108,7 +108,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return err
 		}
 
-		log.Infof("Received time entry: %s", r)
+		log.Infof("Received time entry: %#v", r)
 
 		err = redmine.CreateTimeEntry(redmineConf, r)
 		if err == nil {
