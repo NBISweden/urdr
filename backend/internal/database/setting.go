@@ -1,9 +1,9 @@
 package database
 
 import (
-	"fmt"
-	"errors"
 	"database/sql"
+	"errors"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 
 	log "github.com/sirupsen/logrus"
@@ -52,7 +52,9 @@ func getSetting(settingName string) (int, string, error) {
 	}
 
 	if !isValidSetting {
-		return 0, "", errors.New(fmt.Sprintf("Illegal setting name: %s\n", settingName))
+		return 0, "",
+			errors.New(fmt.Sprintf("Illegal setting name: %s\n",
+				settingName))
 	}
 
 	if !settingValue.Valid {
@@ -91,7 +93,7 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 	}
 	defer rows.Close()
 
-	settingFound := false
+	userSettingFound := false
 	var userSettingValue sql.NullString
 
 	for rows.Next() {
@@ -100,8 +102,8 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 			log.Error(err)
 			return "", errors.New("rows.Scan() failed")
 		}
-		
-		settingFound = true
+
+		userSettingFound = true
 	}
 	err = rows.Err()
 	if err != nil {
@@ -109,12 +111,10 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 		return "", errors.New("rows.Next() failed")
 	}
 
-	if !settingFound {
+	if !(userSettingFound && userSettingValue.Valid) {
+		// User setting was not found, or value is NULL.
+		// Return the default value instead.
 		return settingValue, nil
-	}
-
-	if !userSettingValue.Valid {
-		return "", nil
 	}
 
 	return userSettingValue.String, nil
@@ -141,14 +141,41 @@ func SetUserSetting(redmineUserId int, settingName string, userSettingValue stri
 	}
 	defer stmt.Close()
 
-	var res sql.Result
-	res, err = stmt.Exec(redmineUserId, settingId, userSettingValue)
+	_, err = stmt.Exec(redmineUserId, settingId, userSettingValue)
 	if err != nil {
 		log.Error(err)
 		return errors.New("db.Exec() failed")
 	}
 
-	n, _ := res.RowsAffected()
-	log.Printf("Rows affected = %d\n", n)
+	return nil
+}
+
+// DeleteUserSetting removes the user-specific value for a particular
+// setting.
+func DeleteUserSetting(redmineUserId int, settingName string) error {
+	settingId, _, err := getSetting(settingName)
+	if err != nil {
+		log.Error(err)
+		return errors.New("getSettingId() failed")
+	}
+
+	sqlStmt := `
+		DELETE FROM user_setting
+		WHERE	redmine_user_id = ?
+		AND	setting_id = ?`
+
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		log.Error(err)
+		return errors.New("db.Prepare() failed")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(redmineUserId, settingId)
+	if err != nil {
+		log.Error(err)
+		return errors.New("db.Exec() failed")
+	}
+
 	return nil
 }
