@@ -22,6 +22,7 @@
 -- currently unknown, so we assume that they are INTEGER in the schema
 -- below.
 
+PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
 
 BEGIN;
