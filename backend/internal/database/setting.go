@@ -53,8 +53,8 @@ func getSetting(settingName string) (int, string, error) {
 
 	if !isValidSetting {
 		return 0, "",
-			errors.New(fmt.Sprintf("Illegal setting name: %s\n",
-				settingName))
+			fmt.Errorf("Illegal setting name: %s\n",
+				settingName)
 	}
 
 	if !settingValue.Valid {
