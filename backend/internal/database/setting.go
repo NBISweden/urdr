@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"errors"
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
@@ -17,7 +18,7 @@ func GetSetting(user int, setting string) (string, error) {
         // We also retrieve the default value for the setting at the
         // same time.
 	sqlStmt := `
-		SELECT	us.value, s.value
+		SELECT	us.redmine_user_id, us.value, s.value
 		FROM	setting AS s
 		LEFT JOIN	user_setting AS us USING (setting_id)
 		WHERE	(us.redmine_user_id = ? OR
@@ -38,22 +39,29 @@ func GetSetting(user int, setting string) (string, error) {
 	}
 	defer rows.Close()
 
-	var value sql.NullString
+	isValidSetting := false
+	var dbValue sql.NullString
 
 	for rows.Next() {
                 // The default value will be used if the user-specific
                 // value is NULL.
-		var defaultValue sql.NullString
+		var dbDefaultValue sql.NullString
+		var dbUser sql.NullString
 
-		err = rows.Scan(&value, &defaultValue)
+		err = rows.Scan(&dbUser, &dbDefaultValue, &dbValue)
 		if err != nil {
 			log.Error(err)
 			return "", errors.New("rows.Scan() failed")
 		}
 		
-		if !value.Valid {
-			value = defaultValue
+                // If the user ID coming back from the database is
+                // NULL, then there is no user-specific value for this
+                // setting.
+		if !dbUser.Valid {
+			dbValue = dbDefaultValue
 		}
+
+		isValidSetting = true
 	}
 	err = rows.Err()
 	if err != nil {
@@ -61,8 +69,12 @@ func GetSetting(user int, setting string) (string, error) {
 		return "", errors.New("rows.Next() failed")
 	}
 
-	if value.Valid {
-		return value.String, nil
+	if !isValidSetting {
+		return "", errors.New(fmt.Sprintf("Invalid setting: %s", setting))
+	}
+
+	if dbValue.Valid {
+		return dbValue.String, nil
 	}
 	return "", nil
 }
