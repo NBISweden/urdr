@@ -7,11 +7,11 @@
 -- (which creates the database file "database.db" if it does not already
 -- exist):
 --
---      sqlite3 database.db <sql/schema.sql
+--	sqlite3 database.db <sql/schema.sql
 --
 -- See also:
---      https://sqlite.org/docs.html
---      https://sqlite.org/cli.html
+--	https://sqlite.org/docs.html
+--	https://sqlite.org/cli.html
 --
 -- The "sqlite3" command line utility is part of the "sqlite3" package
 -- on Ubuntu.  The utility is part of the macOS base system and does not
@@ -36,8 +36,7 @@ BEGIN;
 
 DROP TABLE IF EXISTS setting;
 CREATE TABLE setting (
-	setting_id INTEGER
-		PRIMARY KEY AUTOINCREMENT,
+	setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
 	value TEXT,	-- A default value, if applicable.
 
@@ -50,7 +49,7 @@ CREATE TABLE setting (
 
 DROP TABLE IF EXISTS user_setting;
 CREATE TABLE user_setting (
-	redmine_user_id	INTEGER NOT NULL,
+	redmine_user_id INTEGER NOT NULL,
 	setting_id INTEGER NOT NULL,
 	value TEXT,	-- The user's preferred value
 			-- for this setting.
@@ -74,8 +73,7 @@ CREATE TABLE user_setting (
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
-	favorite_id INTEGER
-		PRIMARY KEY AUTOINCREMENT,
+	favorite_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
 	redmine_activity_id INTEGER NOT NULL,
