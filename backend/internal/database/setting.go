@@ -48,7 +48,7 @@ func GetSetting(user int, setting string) (string, error) {
 		var dbDefaultValue sql.NullString
 		var dbUser sql.NullString
 
-		err = rows.Scan(&dbUser, &dbDefaultValue, &dbValue)
+		err = rows.Scan(&dbUser, &dbValue, &dbDefaultValue)
 		if err != nil {
 			log.Error(err)
 			return "", errors.New("rows.Scan() failed")
