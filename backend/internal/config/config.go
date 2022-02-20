@@ -12,8 +12,9 @@ var Config ConfigMap
 
 // ConfigMap stores all different configs
 type ConfigMap struct {
-	App     AppConfig
-	Redmine RedmineConfig
+	App      AppConfig
+	Redmine  RedmineConfig
+	Database DatabaseConfig
 }
 
 type AppConfig struct {
@@ -25,6 +26,10 @@ type RedmineConfig struct {
 	Host   string
 	Port   string
 	ApiKey string
+}
+
+type DatabaseConfig struct {
+	Path string
 }
 
 // getEnv returns given os.Getenv value, or a default value if os.Getenv is empty
@@ -51,6 +56,8 @@ func LoadConfig(c *ConfigMap) error {
 	c.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
 	c.Redmine.Port = getEnv("REDMINE_PORT", "3000")
 	c.Redmine.ApiKey = getEnv("REDMINE_ADMIN_TOKEN", "")
+
+	c.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
 
 	return nil
 }
