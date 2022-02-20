@@ -4,17 +4,24 @@ import (
 	"urdr-api/api"
 	"urdr-api/internal/config"
 	"urdr-api/internal/logging"
+	"urdr-api/internal/database"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// init is run before main, it loads the configuration variables
+// init is run before main.  It loads the configuration variables and
+// connects to the database.
 func init() {
 	logging.LoggingSetup("debug")
 
 	err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("config.LoadConfig() failed: %v", err)
+	}
+
+	err = db.Setup()
+	if err != nil {
+		log.Fatalf("db.Setup() failed: %v", err)
 	}
 }
 
@@ -26,5 +33,4 @@ func main() {
 
 	// Start server
 	log.Fatal(app.Listen(config.Config.App.Host + ":" + config.Config.App.Port))
-
 }
