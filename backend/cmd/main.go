@@ -12,8 +12,7 @@ import (
 func init() {
 	logging.LoggingSetup("debug")
 
-	c := &config.Config
-	err := config.LoadConfig(c)
+	err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("config.LoadConfig() failed: %v", err)
 	}
