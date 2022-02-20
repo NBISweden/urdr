@@ -2,3 +2,6 @@ ops-redmine/
 backend/urdr
 backend/.env
 backend/tmp/
+
+frontend/node_modules
+frontend/dist
