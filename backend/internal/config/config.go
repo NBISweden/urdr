@@ -59,5 +59,7 @@ func Setup() error {
 
 	Config.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
 
+	c.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
+
 	return nil
 }
