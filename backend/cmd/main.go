@@ -10,9 +10,13 @@ import (
 
 // init is run before main, it loads the configuration variables
 func init() {
-	c := &config.Config
-	config.LoadConfig(c)
 	logging.LoggingSetup("debug")
+
+	c := &config.Config
+	err := config.LoadConfig(c)
+	if err != nil {
+		log.Fatalf("config.LoadConfig() failed: %v", err)
+	}
 }
 
 func main() {
