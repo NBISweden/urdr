@@ -10,4 +10,4 @@ USER node
 RUN npm install && npm run build
 VOLUME /home/node/app/node_modules
 
-CMD npm --version && npx snowpack dev
+CMD [npm --version && npx snowpack dev]

@@ -23,7 +23,8 @@ services:
       dockerfile: ./node/Dockerfile
     volumes:
         - ./frontend:/home/node/app/ #allows hot reload
-        - /home/node/app/node_modules #prevents host to overwrite node_modules, breaking platform specific dependencies
+        #prevents host to overwrite node_modules, breaking platform specific dependencies
+        - /home/node/app/node_modules 
     ports:
       - 4242:4242
     environment:
