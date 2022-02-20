@@ -4,7 +4,7 @@ import (
 	"urdr-api/api"
 	"urdr-api/internal/config"
 	"urdr-api/internal/logging"
-	"urdr-api/internal/database"
+	db "urdr-api/internal/database"
 
 	log "github.com/sirupsen/logrus"
 )
