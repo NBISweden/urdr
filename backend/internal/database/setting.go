@@ -2,11 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
-
-	log "github.com/sirupsen/logrus"
 )
 
 // getSetting is an internal function that returns the setting_id and
@@ -20,15 +17,13 @@ func getSetting(settingName string) (int, string, error) {
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		log.Error(err)
-		return 0, "", errors.New("db.Prepare() failed")
+		return 0, "", fmt.Errorf("db.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(settingName)
 	if err != nil {
-		log.Error(err)
-		return 0, "", errors.New("stmt.Query() failed")
+		return 0, "", fmt.Errorf("stmt.Query() failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -39,22 +34,18 @@ func getSetting(settingName string) (int, string, error) {
 	for rows.Next() {
 		err = rows.Scan(&settingId, &settingValue)
 		if err != nil {
-			log.Error(err)
-			return 0, "", errors.New("rows.Scan() failed")
+			return 0, "", fmt.Errorf("rows.Scan() failed: %w", err)
 		}
 
 		isValidSetting = true
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Error(err)
-		return 0, "", errors.New("rows.Next() failed")
+		return 0, "", fmt.Errorf("rows.Next() failed: %w", err)
 	}
 
 	if !isValidSetting {
-		return 0, "",
-			fmt.Errorf("Illegal setting name: %s\n",
-				settingName)
+		return 0, "", fmt.Errorf("illegal setting name: %v", settingName)
 	}
 
 	if !settingValue.Valid {
@@ -69,8 +60,7 @@ func getSetting(settingName string) (int, string, error) {
 func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 	settingId, settingValue, err := getSetting(settingName)
 	if err != nil {
-		log.Error(err)
-		return "", errors.New("getSettingId() failed")
+		return "", fmt.Errorf("getSetting() failed: %w", err)
 	}
 
 	sqlStmt := `
@@ -81,15 +71,13 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		log.Error(err)
-		return "", errors.New("db.Prepare() failed")
+		return "", fmt.Errorf("db.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(redmineUserId, settingId)
 	if err != nil {
-		log.Error(err)
-		return "", errors.New("stmt.Query() failed")
+		return "", fmt.Errorf("stmt.Query() failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -99,16 +87,14 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 	for rows.Next() {
 		err = rows.Scan(&userSettingValue)
 		if err != nil {
-			log.Error(err)
-			return "", errors.New("rows.Scan() failed")
+			return "", fmt.Errorf("rows.Scan() failed: %w", err)
 		}
 
 		userSettingFound = true
 	}
 	err = rows.Err()
 	if err != nil {
-		log.Error(err)
-		return "", errors.New("rows.Next() failed")
+		return "", fmt.Errorf("rows.Next() failed: %w", err)
 	}
 
 	if !(userSettingFound && userSettingValue.Valid) {
@@ -126,8 +112,7 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 func SetUserSetting(redmineUserId int, settingName string, userSettingValue string) error {
 	settingId, _, err := getSetting(settingName)
 	if err != nil {
-		log.Error(err)
-		return errors.New("getSettingId() failed")
+		return fmt.Errorf("getSetting() failed: %w", err)
 	}
 
 	sqlStmt := `
@@ -136,15 +121,13 @@ func SetUserSetting(redmineUserId int, settingName string, userSettingValue stri
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		log.Error(err)
-		return errors.New("db.Prepare() failed")
+		return fmt.Errorf("db.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(redmineUserId, settingId, userSettingValue)
 	if err != nil {
-		log.Error(err)
-		return errors.New("db.Exec() failed")
+		return fmt.Errorf("db.Exec() failed: %w", err)
 	}
 
 	return nil
@@ -155,8 +138,7 @@ func SetUserSetting(redmineUserId int, settingName string, userSettingValue stri
 func DeleteUserSetting(redmineUserId int, settingName string) error {
 	settingId, _, err := getSetting(settingName)
 	if err != nil {
-		log.Error(err)
-		return errors.New("getSettingId() failed")
+		return fmt.Errorf("getSetting() failed: %w", err)
 	}
 
 	sqlStmt := `
@@ -166,15 +148,13 @@ func DeleteUserSetting(redmineUserId int, settingName string) error {
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		log.Error(err)
-		return errors.New("db.Prepare() failed")
+		return fmt.Errorf("db.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(redmineUserId, settingId)
 	if err != nil {
-		log.Error(err)
-		return errors.New("db.Exec() failed")
+		return fmt.Errorf("db.Exec() failed: %w", err)
 	}
 
 	return nil
