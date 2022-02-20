@@ -41,7 +41,7 @@ func getEnv(key string, def string) string {
 }
 
 // LoadConfig populates ConfigMap with data
-func LoadConfig(c *ConfigMap) error {
+func LoadConfig() error {
 	// Load settings from .env
 	err := godotenv.Load(getEnv("DOT_ENV_FILE", ".env"))
 	if err != nil {
@@ -50,14 +50,14 @@ func LoadConfig(c *ConfigMap) error {
 
 	// Populate config structs, place defaults if empty in .env
 
-	c.App.Host = getEnv("APP_HOST", "127.0.0.1")
-	c.App.Port = getEnv("APP_PORT", "8080")
+	Config.App.Host = getEnv("APP_HOST", "127.0.0.1")
+	Config.App.Port = getEnv("APP_PORT", "8080")
 
-	c.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
-	c.Redmine.Port = getEnv("REDMINE_PORT", "3000")
-	c.Redmine.ApiKey = getEnv("REDMINE_ADMIN_TOKEN", "")
+	Config.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
+	Config.Redmine.Port = getEnv("REDMINE_PORT", "3000")
+	Config.Redmine.ApiKey = getEnv("REDMINE_ADMIN_TOKEN", "")
 
-	c.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
+	Config.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
 
 	return nil
 }
