@@ -48,6 +48,7 @@ the variable `REDMINE_HOST` to the value `"http://172.17.0.1"`.
 
 2. Create a database for the Urdr backend containing the Urdr schema and
 default values:
+
   ```shell
   cd backend
   sqlite3 database.db <../sql/schema.sql
