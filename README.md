@@ -49,16 +49,16 @@ the variable `REDMINE_HOST` to the value `"http://172.17.0.1"`.
 2. Create a database for the Urdr backend containing the Urdr schema and
 default values:
 
-  ```shell
-  cd backend
-  sqlite3 database.db <../sql/schema.sql
-  sqlite3 database.db <../sql/setting-defaults.sql
-  ```
+   ```shell
+   cd backend
+   sqlite3 database.db <../sql/schema.sql
+   sqlite3 database.db <../sql/setting-defaults.sql
+   ```
 
-  The name and location of the database file is configurable by setting
-  `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
-  pathname that is relative to the `backend` directory and the default
-  value is `./database.db`.
+   The name and location of the database file is configurable by setting
+   `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
+   pathname that is relative to the `backend` directory and the default
+   value is `./database.db`.
 
 Finally, you can start Urdr by using:
 
