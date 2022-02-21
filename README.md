@@ -13,25 +13,24 @@
 ### Local Redmine setup
 
 As a prerequisite for running Urdr during development, you need to run
-a local installation of Redmine.  Our Redmine installation is currently
-maintained in the
+a local installation of Redmine.  The NBIS Redmine installation is
+currently maintained in the
 [ops-redmine repository](https://github.com/NBISweden/ops-redmine).
 
 Follow
 [the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
-to set up and run Redmine.  The repository may be cloned in a separate
-directory, away from where you cloned the `urdr` repository.
+to set up and run Redmine locally.  The repository may be cloned in a
+separate directory, away from where you cloned the `urdr` repository.
 
 The setup of Redmine includes importing a database dump of Redmine
-in your local Redmine database. The database dump file should be
+in your local Redmine database.  The database dump file should be
 named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
 
-When the Redmine containers are up and running (use, e.g., the
-`docker-compose-dev.yml` file with `docker-compose` as described in
-their `README.md`), log in to the `postgres` container and then make
-your user administrator. Run the following commands, where `MYUSER`
-should be replaced with your Redmine username:
+When the local Redmine containers are up and running, log in to the
+`postgres` container and turn your user into a Redmine administrator.
+Run the following commands, where `MYUSER` should be replaced with your
+Redmine username:
 
 ```command
 cd .../ops-redmine
@@ -50,7 +49,8 @@ the variable `REDMINE_HOST` to the value `"http://172.17.0.1"`.
 default values:
 
    ```shell
-   cd backend
+   cd .../urdr/backend
+   rm -f database.db
    sqlite3 database.db <../sql/schema.sql
    sqlite3 database.db <../sql/setting-defaults.sql
    ```
