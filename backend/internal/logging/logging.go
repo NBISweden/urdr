@@ -28,8 +28,8 @@ func determineLogLevel(level string) log.Level {
 	}
 }
 
-// LoggingSetup configures logging format and rules
-func LoggingSetup(logLevel string) {
+// Setup configures logging format and rules
+func Setup(logLevel string) {
 	// Log formatting
 	log.SetFormatter(&log.TextFormatter{
 		DisableColors: true,
