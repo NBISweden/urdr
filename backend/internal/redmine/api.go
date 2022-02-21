@@ -152,8 +152,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry, apiKey 
 
 	res, err :=
 		doRequest(redmineConf, "POST", "/time_entries.json",
-			map[string]string{"X-Redmine-API-Key": apiKey,
-				"X-Redmine-Switch-User": "jon"}, string(s))
+			map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
 		return err
