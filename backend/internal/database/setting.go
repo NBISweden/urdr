@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // getSetting is an internal function that returns the setting_id and
