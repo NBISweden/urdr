@@ -8,21 +8,34 @@
 
 [Figma project](https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1)
 
-## Setup
+## Development setup
 
-As a prerequisite, you need to clone the
-[ops-redmine repository](https://github.com/NBISweden/ops-redmine), and
-follow the instructions to setup and run Redmine. These steps include
-importing a backup of Redmine in your database. The backup file should
-be named `redmine_db.dump`.
+### Local Redmine setup
 
-Log in to the `postgres` container and then make your user
-administrator. Run the following commands, where `MYUSER` should be
-replaced with your Redmine username:
+As a prerequisite for running Urdr during development, you need to run
+a local installation of Redmine.  Our Redmine installation is currently
+maintained in the
+[ops-redmine repository](https://github.com/NBISweden/ops-redmine).
+
+Follow
+[the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
+to setup and run Redmine.  The repository may be cloned in a separate
+directory, away from where you cloned the `urdr` repository.
+
+The setup of Redmine include importing a database dump of Redmine
+in your local Redmine database. The database dump file should be
+named `redmine_db.dump` and it should be placed in that repository's
+`initdb.d` directory.
+
+When the Redmine containers are up and running (use e.g. the
+`docker-compose-dev.yml` file with `docker-compose` as described in
+their `README.md`), log in to the `postgres` container and then make
+your user administrator. Run the following commands, where `MYUSER`
+should be replaced with your Redmine username:
 
 ```command
-docker exec -it <postgres-container> bash
-psql -U redmine
+cd .../ops-redmine
+docker-compose -f docker-compose-dev.yml exec -- postgres psql -U redmine
 redmine=> update users set admin='t' where login='MYUSER';
 ```
 
