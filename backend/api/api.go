@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"time"
 	cfg "urdr-api/internal/config"
 	redmine "urdr-api/internal/redmine"
@@ -21,6 +22,20 @@ func isLoggedIn(c *fiber.Ctx, store *session.Store) bool {
 		return false
 	}
 	return true
+}
+
+func getSessionApiKey(c *fiber.Ctx, store *session.Store) (error, string) {
+	sess, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return err, ""
+	}
+	key := sess.Get("api_key")
+	if key == nil {
+		log.Errorf("No session api key found")
+		return errors.New("No session api key found"), ""
+	}
+	return nil, key.(string)
 }
 
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
@@ -56,9 +71,10 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		authHeader := c.Get("Authorization")
-		res := redmine.Login(authHeader, redmineConf)
+		res, apiKey := redmine.Login(authHeader, redmineConf)
 		if res {
 			sess.Set("is_logged_in", true)
+			sess.Set("api_key", apiKey)
 			err = sess.Save()
 			if err != nil {
 				log.Errorf("Failed to save session: %s", err)
@@ -89,7 +105,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
-		issuesJson, err := redmine.ListIssues(redmineConf)
+		err, apiKey := getSessionApiKey(c, store)
+		if err != nil {
+			log.Errorf("Failed to get session api key: %v", err)
+			return c.SendStatus(401)
+		}
+		issuesJson, err := redmine.ListIssues(redmineConf, apiKey)
 		if err != nil {
 			c.Response().SetBodyString(err.Error())
 			return c.SendStatus(500)
@@ -101,8 +122,13 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		if !isLoggedIn(c, store) {
 			return c.SendStatus(401)
 		}
+		err, apiKey := getSessionApiKey(c, store)
+		if err != nil {
+			log.Errorf("Failed to get session api key: %v", err)
+			return c.SendStatus(401)
+		}
 		var r redmine.TimeEntry
-		err := c.BodyParser(&r)
+		err = c.BodyParser(&r)
 
 		if err != nil {
 			return err
@@ -110,7 +136,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 
 		log.Infof("Received time entry: %#v", r)
 
-		err = redmine.CreateTimeEntry(redmineConf, r)
+		err = redmine.CreateTimeEntry(redmineConf, r, apiKey)
 		if err == nil {
 			log.Info("time entry created")
 			return c.SendStatus(200)
