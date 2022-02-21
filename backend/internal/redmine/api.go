@@ -59,6 +59,17 @@ type TimeEntry struct {
 	User     int    `json:"user_id"`
 }
 
+type account struct {
+	User User `json:"user"`
+}
+
+type User struct {
+	Login     string `json:"login"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	ApiKey    string `json:"api_key"`
+}
+
 func doRequest(
 	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
@@ -85,26 +96,27 @@ func doRequest(
 	return res, nil
 }
 
-func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
+func Login(authHeader string, redmineConf cfg.RedmineConfig) (bool, string) {
 	res, err :=
-		doRequest(redmineConf, "GET", "/issues.json",
+		doRequest(redmineConf, "GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
 		log.Error(err)
-		return false
+		return false, ""
 	}
 	defer res.Body.Close()
 
-	var r IssuesRes
+	var a account
 
 	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&r)
+
+	err = decoder.Decode(&a)
 	if err != nil {
 		log.Error(err)
-		return false
+		return false, ""
 	}
-
-	return r.TotalCount != 0
+	log.Debugf("User %s: credentials are valid", a.User.Login)
+	return res.StatusCode == 200, a.User.ApiKey
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
