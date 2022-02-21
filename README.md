@@ -19,15 +19,15 @@ maintained in the
 
 Follow
 [the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
-to setup and run Redmine.  The repository may be cloned in a separate
+to set up and run Redmine.  The repository may be cloned in a separate
 directory, away from where you cloned the `urdr` repository.
 
-The setup of Redmine include importing a database dump of Redmine
+The setup of Redmine includes importing a database dump of Redmine
 in your local Redmine database. The database dump file should be
-named `redmine_db.dump` and it should be placed in that repository's
+named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
 
-When the Redmine containers are up and running (use e.g. the
+When the Redmine containers are up and running (use, e.g., the
 `docker-compose-dev.yml` file with `docker-compose` as described in
 their `README.md`), log in to the `postgres` container and then make
 your user administrator. Run the following commands, where `MYUSER`
@@ -57,8 +57,8 @@ default values:
 
    The name and location of the database file is configurable by setting
    `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
-   pathname that is relative to the `backend` directory and the default
-   value is `./database.db`.
+   pathname relative to the `backend` directory, and the default value
+   is `./database.db`.
 
 Finally, you can start Urdr by using:
 
