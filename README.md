@@ -10,9 +10,15 @@
 
 ## Setup
 
-As a prerequisite, you need to clone the [ops-redmine repository](https://github.com/NBISweden/ops-redmine), and follow the instructions to setup and run Redmine. These steps include importing a backup of Redmine in your database. The backup file should be named `redmine_db.dump`.
+As a prerequisite, you need to clone the
+[ops-redmine repository](https://github.com/NBISweden/ops-redmine), and
+follow the instructions to setup and run Redmine. These steps include
+importing a backup of Redmine in your database. The backup file should
+be named `redmine_db.dump`.
 
-Log in to the `postgres` container and then make your user administrator. Run the following commands, where `MYUSER` should be replaced with your Redmine username:
+Log in to the `postgres` container and then make your user
+administrator. Run the following commands, where `MYUSER` should be
+replaced with your Redmine username:
 
 ```command
 docker exec -it <postgres-container> bash
@@ -20,7 +26,9 @@ psql -U redmine
 redmine=> update users set admin='t' where login='MYUSER';
 ```
 
-Now please create the env file `.env` using `.env.default` as a template. If you are on Linux you need to set the variable `REDMINE_HOST="http://172.17.0.1"`.
+Now please create the env file `.env` using `.env.default` as
+a template. If you are on Linux you need to set the variable
+`REDMINE_HOST="http://172.17.0.1"`.
 
 Finally, you can start Urdr by using:
 
