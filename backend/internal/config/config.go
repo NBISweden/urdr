@@ -40,8 +40,8 @@ func getEnv(key string, def string) string {
 	return def
 }
 
-// LoadConfig populates ConfigMap with data
-func LoadConfig() error {
+// Setup populates ConfigMap with data
+func Setup() error {
 	// Load settings from .env
 	err := godotenv.Load(getEnv("DOT_ENV_FILE", ".env"))
 	if err != nil {
