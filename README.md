@@ -39,9 +39,25 @@ docker-compose -f docker-compose-dev.yml exec -- postgres psql -U redmine
 redmine=> update users set admin='t' where login='MYUSER';
 ```
 
-Now please create the env file `.env` using `.env.default` as
-a template. If you are on Linux you need to set the variable
-`REDMINE_HOST="http://172.17.0.1"`.
+=======
+### Urdr setup
+
+1. In the `backend` directory, create the file `.env`, using
+`.env.default` as the template.  If you are on Linux, you need to set
+the variable `REDMINE_HOST` to the value `"http://172.17.0.1"`.
+
+2. Create a database for the Urdr backend containing the Urdr schema and
+default values:
+  ```shell
+  cd backend
+  sqlite3 database.db <../sql/schema.sql
+  sqlite3 database.db <../sql/setting-defaults.sql
+  ```
+
+  The name and location of the database file is configurable by setting
+  `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
+  pathname that is relative to the `backend` directory and the default
+  value is `./database.db`.
 
 Finally, you can start Urdr by using:
 
