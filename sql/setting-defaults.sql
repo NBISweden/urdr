@@ -2,7 +2,7 @@
 
 -- To load from the command line:
 --
---      sqlite3 database.db <setting-defaults.sql
+--	sqlite3 database.db <setting-defaults.sql
 
 PRAGMA foreign_keys = ON;
 
@@ -21,13 +21,13 @@ BEGIN;
 -- issues and activities).
 
 INSERT INTO setting (name, value) VALUES
-	("Mon", NULL),
-	("Tue", NULL),
-	("Wed", NULL),
-	("Thu", NULL),
-	("Fri", NULL),
-	("Sat", NULL),
-	("Sun", NULL);
+	('Mon', NULL),
+	('Tue', NULL),
+	('Wed', NULL),
+	('Thu', NULL),
+	('Fri', NULL),
+	('Sat', NULL),
+	('Sun', NULL);
 
 -- "Tabbing behaviour"
 -- https://github.com/NBISweden/urdr/issues/4
@@ -38,7 +38,7 @@ INSERT INTO setting (name, value) VALUES
 -- "horizontal".
 
 INSERT INTO setting (name, value) VALUES
-	("tab", "horizontal");	-- or "vertical"
+	('tab', 'horizontal');	-- or 'vertical'
 
 -- "Default input view (or behavior)"
 -- https://github.com/NBISweden/urdr/issues/23
@@ -47,6 +47,6 @@ INSERT INTO setting (name, value) VALUES
 -- "weekly".  The default value is "daily".
 
 INSERT INTO setting (name, value) VALUES
-	("input", "daily");	-- or "weekly"
+	('input', 'daily');	-- or 'weekly'
 
 COMMIT;
