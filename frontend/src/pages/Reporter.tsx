@@ -79,16 +79,5 @@ export function Reporter() {
     });
   }
 
-  const reportButtonStyle = {
-    width: "50",
-    border: "3px solid darkblue",
-    margin: "0px 50px",
-    padding: "10px",
-  };
-
-  return (
-    <>
-      <button onClick={reportTime()}>Report time</button>{" "}
-    </>
-  );
+  return <input type="button" onClick={reportTime} value="Report time" />;
 }
