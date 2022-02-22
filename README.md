@@ -31,7 +31,7 @@ docker-compose up
 
 ## Frontend dev server
 
-In order to install/update packages in the node server you should:
+In order to install/update packages in the node-urdr server you should:
 
 - Make the neccessary updates in the package.json
 - Execute the following commands:
