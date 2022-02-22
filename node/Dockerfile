@@ -1,5 +1,5 @@
 FROM node:lts
-RUN npm install --global npm@7
+RUN npm install --global npm@8
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 COPY /frontend/ /home/node/app/
@@ -10,4 +10,4 @@ USER node
 RUN npm install && npm run build
 VOLUME /home/node/app/node_modules
 
-CMD npm --version && npx snowpack dev
+CMD ["npx", "snowpack", "dev"]

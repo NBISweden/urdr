@@ -23,9 +23,8 @@ type AppConfig struct {
 }
 
 type RedmineConfig struct {
-	Host   string
-	Port   string
-	ApiKey string
+	Host string
+	Port string
 }
 
 type DatabaseConfig struct {
@@ -55,7 +54,6 @@ func Setup() error {
 
 	Config.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
 	Config.Redmine.Port = getEnv("REDMINE_PORT", "3000")
-	Config.Redmine.ApiKey = getEnv("REDMINE_ADMIN_TOKEN", "")
 
 	Config.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
 

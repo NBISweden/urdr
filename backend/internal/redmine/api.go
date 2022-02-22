@@ -59,6 +59,17 @@ type TimeEntry struct {
 	User     int    `json:"user_id"`
 }
 
+type account struct {
+	User User `json:"user"`
+}
+
+type User struct {
+	Login     string `json:"login"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
+	ApiKey    string `json:"api_key"`
+}
+
 func doRequest(
 	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
@@ -85,32 +96,31 @@ func doRequest(
 	return res, nil
 }
 
-func Login(authHeader string, redmineConf cfg.RedmineConfig) bool {
+func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 	res, err :=
-		doRequest(redmineConf, "GET", "/issues.json",
+		doRequest(redmineConf, "GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
-		log.Error(err)
-		return false
+		return "", err
 	}
 	defer res.Body.Close()
 
-	var r IssuesRes
+	var a account
 
 	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&r)
-	if err != nil {
-		log.Error(err)
-		return false
-	}
 
-	return r.TotalCount != 0
+	err = decoder.Decode(&a)
+	if err != nil {
+		return "", err
+	}
+	log.Debugf("User %s: credentials are valid", a.User.Login)
+	return a.User.ApiKey, nil
 }
 
-func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
+func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/issues.json",
-			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey}, "")
+			map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &IssuesRes{}
 
@@ -129,7 +139,7 @@ func ListIssues(redmineConf cfg.RedmineConfig) (*IssuesRes, error) {
 	return r, err
 }
 
-func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
+func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry, apiKey string) error {
 	var ir timeEntryRequest
 
 	ir.TimeEntry = timeEntry
@@ -140,8 +150,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry) error {
 
 	res, err :=
 		doRequest(redmineConf, "POST", "/time_entries.json",
-			map[string]string{"X-Redmine-API-Key": redmineConf.ApiKey,
-				"X-Redmine-Switch-User": "jon"}, string(s))
+			map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)
 		return err

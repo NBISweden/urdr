@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import DateFnsUtils from "@date-io/date-fns";
-import { TextField, Button } from "@material-ui/core";
 
 export interface TimeEntry {
   issue_id: number;
@@ -81,45 +79,5 @@ export function Reporter() {
     });
   }
 
-  const reportButtonStyle = {
-    width: "50",
-    border: "3px solid darkblue",
-    margin: "0px 50px",
-    padding: "10px",
-  };
-
-  return (
-    <>
-      <TextField
-        id="hours"
-        autoFocus
-        placeholder="8"
-        margin="dense"
-        label="hours"
-        value={hours}
-        onChange={(e) => set_hours(e.target.value)}
-      ></TextField>
-      <IssuesList />
-      <TextField
-        id="activity"
-        placeholder="18"
-        margin="dense"
-        label="activity"
-        value={activity}
-        onChange={(e) => set_activity(e.target.value)}
-      ></TextField>
-      <Button
-        style={reportButtonStyle}
-        label="Submit"
-        onClick={() => reportTime()}
-        key={"report"}
-        name={"report"}
-        visible="true"
-        type={"submit"}
-      >
-        {" "}
-        Report
-      </Button>
-    </>
-  );
+  return <input type="button" onClick={reportTime} value="Report time" />;
 }
