@@ -8,19 +8,45 @@
 
 [Figma project](https://www.figma.com/file/Bf2OgUIIqRBMUREMuVcxs9/draft?node-id=0%3A1)
 
-## Setup
+## Development setup
 
-As a prerequisite, you need to clone the [ops-redmine repository](https://github.com/NBISweden/ops-redmine), and follow the instructions to setup and run Redmine. These steps include importing a backup of Redmine in your database. The backup file should be named `redmine_db.dump`.
+### Local Redmine setup
 
-Log in to the `postgres` container and then make your user administrator. Run the following commands, where `MYUSER` should be replaced with your Redmine username:
+As a prerequisite for running Urdr during development, you need to run
+a local installation of Redmine.  The NBIS Redmine installation is
+currently maintained in the
+[ops-redmine repository](https://github.com/NBISweden/ops-redmine).
 
-```command
-docker exec -it <postgres-container> bash
-psql -U redmine
-redmine=> update users set admin='t' where login='MYUSER';
-```
+Follow
+[the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
+to set up and run Redmine locally.  The repository may be cloned in a
+separate directory, away from where you cloned the `urdr` repository.
 
-Now please create the env file `.env` using `.env.default` as a template. If you are on Linux you need to set the variable `REDMINE_HOST="http://172.17.0.1"`.
+The setup of Redmine includes importing a database dump of Redmine
+in your local Redmine database.  The database dump file should be
+named `redmine_db.dump`, and it should be placed in that repository's
+`initdb.d` directory.
+
+### Urdr setup
+
+1. In the `backend` directory of the `urdr` repository, create the
+file `.env`, using `.env.default` as the template.  If you are on
+Linux, you need to set the variable `REDMINE_HOST` to the value
+`"http://172.17.0.1"`.
+
+2. Create a database for the Urdr backend containing the Urdr schema and
+default values.  From the top directory in the `urdr` repository.
+
+   ```shell
+   rm -f backend/database.db
+   sqlite3 backend/database.db <sql/schema.sql
+   sqlite3 backend/database.db <sql/setting-defaults.sql
+   ```
+
+   The name and location of the database file is configurable by setting
+   `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
+   pathname relative to the `backend` directory, and the default value
+   is `./database.db`.
 
 Finally, you can start Urdr by using:
 
