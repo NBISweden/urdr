@@ -96,7 +96,7 @@ func doRequest(
 	return res, nil
 }
 
-func Login(authHeader string, redmineConf cfg.RedmineConfig) (bool, string) {
+func Login(redmineConf cfg.RedmineConfig, authHeader string) (bool, string) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
