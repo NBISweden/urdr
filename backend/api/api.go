@@ -93,6 +93,21 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.JSON(issuesJson)
 	})
 
+	app.Get("/api/recent_entries", func(c *fiber.Ctx) error {
+		apiKey, err := getSessionApiKey(c, store)
+		if err != nil {
+			log.Errorf("Failed to get session api key: %v", err)
+			return c.SendStatus(401)
+		}
+		timeEntries, err := redmine.GetRecentTimeEntries(redmineConf, apiKey)
+		if err != nil {
+			log.Errorf("Failed to get recent time entries: %v", err)
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
+		return c.JSON(timeEntries)
+	})
+
 	app.Post("/api/report", func(c *fiber.Ctx) error {
 		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
