@@ -1,5 +1,5 @@
 FROM node:lts
-RUN npm install --global npm@7
+RUN npm install --global npm@8
 
 RUN mkdir -p /home/node/app && chown -R node:node /home/node/app
 COPY /frontend/ /home/node/app/
