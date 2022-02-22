@@ -96,13 +96,12 @@ func doRequest(
 	return res, nil
 }
 
-func Login(redmineConf cfg.RedmineConfig, authHeader string) (bool, string) {
+func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
-		log.Error(err)
-		return false, ""
+		return "", err
 	}
 	defer res.Body.Close()
 
@@ -112,11 +111,10 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (bool, string) {
 
 	err = decoder.Decode(&a)
 	if err != nil {
-		log.Error(err)
-		return false, ""
+		return "", err
 	}
 	log.Debugf("User %s: credentials are valid", a.User.Login)
-	return res.StatusCode == 200, a.User.ApiKey
+	return a.User.ApiKey, nil
 }
 
 func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error) {

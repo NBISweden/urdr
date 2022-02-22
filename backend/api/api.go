@@ -51,19 +51,18 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		authHeader := c.Get("Authorization")
-		res, apiKey := redmine.Login(redmineConf, authHeader)
-		if res {
-			sess.Set("api_key", apiKey)
-			err = sess.Save()
-			if err != nil {
-				log.Errorf("Failed to save session: %s", err)
-			}
-			log.Info("Logged in user")
-			return c.SendStatus(200)
-		} else {
+		apiKey, err := redmine.Login(redmineConf, authHeader)
+		if err != nil {
 			log.Info("Log in failed")
 			return c.SendStatus(401)
 		}
+		sess.Set("api_key", apiKey)
+		err = sess.Save()
+		if err != nil {
+			log.Errorf("Failed to save session: %s", err)
+		}
+		log.Info("Logged in user")
+		return c.SendStatus(200)
 	})
 
 	app.Get("/api/logout", func(c *fiber.Ctx) error {
