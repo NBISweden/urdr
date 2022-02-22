@@ -44,13 +44,6 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		KeyGenerator:   utils.UUID,
 	})
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		if !isLoggedIn(c, store) {
-			return c.SendStatus(401)
-		}
-		return c.SendString("Hello, World!")
-	})
-
 	app.Post("/api/login", func(c *fiber.Ctx) error {
 		sess, err := store.Get(c)
 		if err != nil {
