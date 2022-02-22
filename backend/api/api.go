@@ -51,7 +51,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		authHeader := c.Get("Authorization")
-		res, apiKey := redmine.Login(authHeader, redmineConf)
+		res, apiKey := redmine.Login(redmineConf, authHeader)
 		if res {
 			sess.Set("is_logged_in", true)
 			sess.Set("api_key", apiKey)
