@@ -27,17 +27,6 @@ in your local Redmine database.  The database dump file should be
 named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
 
-When the local Redmine containers are up and running, log in to the
-`postgres` container and turn your user into a Redmine administrator.
-Run the following commands from within the `ops-redmine` repository.
-Replace `MYUSER` with your Redmine username:
-
-```command
-docker-compose -f docker-compose-dev.yml exec -- postgres psql -U redmine
-redmine=> update users set admin='t' where login='MYUSER';
-```
-
-=======
 ### Urdr setup
 
 1. In the `backend` directory of the `urdr` repository, create the
