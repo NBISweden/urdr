@@ -29,6 +29,19 @@ docker-compose build
 docker-compose up
 ```
 
+## Frontend dev server
+
+In order to install/update packages in the node server you should:
+
+- Make the neccessary updates in the package.json
+- Execute the following commands:
+
+```command
+docker-compose down node-urdr --volumes
+docker-compose build node-urdr
+docker-compose up node-urdr
+```
+
 ## Frontend
 
 [Node.js server](http://localhost:4242)
