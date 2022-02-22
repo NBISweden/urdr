@@ -13,29 +13,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func isLoggedIn(c *fiber.Ctx, store *session.Store) bool {
+func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
 	sess, err := store.Get(c)
 	if err != nil {
-		log.Errorf("Failed to get session: %s", err)
-	}
-	if (sess.Get("is_logged_in")) != true {
-		return false
-	}
-	return true
-}
-
-func getSessionApiKey(c *fiber.Ctx, store *session.Store) (error, string) {
-	sess, err := store.Get(c)
-	if err != nil {
-		log.Errorf("Failed to get session: %v", err)
-		return err, ""
+		return "", err
 	}
 	key := sess.Get("api_key")
 	if key == nil {
-		log.Errorf("No session api key found")
-		return errors.New("No session api key found"), ""
+		return "", errors.New("No session api key found")
 	}
-	return nil, key.(string)
+	return key.(string), nil
 }
 
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
@@ -102,10 +89,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/api/issues", func(c *fiber.Ctx) error {
-		if !isLoggedIn(c, store) {
-			return c.SendStatus(401)
-		}
-		err, apiKey := getSessionApiKey(c, store)
+		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
@@ -119,10 +103,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
-		if !isLoggedIn(c, store) {
-			return c.SendStatus(401)
-		}
-		err, apiKey := getSessionApiKey(c, store)
+		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
