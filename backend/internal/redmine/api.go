@@ -162,10 +162,10 @@ func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error
 
 func GetRecentTimeEntries(redmineConf cfg.RedmineConfig, apiKey string) (*timeEntryResponse, error) {
 	now := time.Now()
-	today := now.Format("01-02-2006")
-	oneMonthAgo := now.AddDate(0, -1, 0).Format("01-02-2006")
+	today := now.Format("2006-01-02")
+	oneMonthAgo := now.AddDate(0, -2, 0).Format("2006-01-02")
 	res, err :=
-		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s&limit=200", oneMonthAgo, today),
+		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s&limit=50", oneMonthAgo, today),
 			map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &timeEntryResponse{}
