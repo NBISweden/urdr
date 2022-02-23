@@ -5,6 +5,8 @@
   "author": "NBIS",
   "license": "GPL-3.0",
   "scripts": {
+    "start": "snowpack dev",
+    "build": "snowpack build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
