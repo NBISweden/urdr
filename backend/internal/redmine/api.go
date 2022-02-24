@@ -138,9 +138,10 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 	return a.User.ApiKey, nil
 }
 
-func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error) {
+func ListIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
+	issues := strings.Join(issueIds, ",")
 	res, err :=
-		doRequest(redmineConf, "GET", "/issues.json",
+		doRequest(redmineConf, "GET", fmt.Sprintf("/issues.json?issue_id=%s", issues),
 			map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &IssuesRes{}
@@ -160,13 +161,16 @@ func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error
 	return r, err
 }
 
-func GetRecentTimeEntries(redmineConf cfg.RedmineConfig, apiKey string) (*timeEntryResponse, error) {
-	now := time.Now()
-	today := now.Format("2006-01-02")
-	oneMonthAgo := now.AddDate(0, -2, 0).Format("2006-01-02")
+func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string, dayTo string) (*timeEntryResponse, error) {
+	_, err := time.Parse("2006-01-02", dayFrom)
+	_, err = time.Parse("2006-01-02", dayTo)
+
+	if err != nil {
+		return nil, err
+	}
+
 	res, err :=
-		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s&limit=50", oneMonthAgo, today),
-			map[string]string{"X-Redmine-API-Key": apiKey}, "")
+		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &timeEntryResponse{}
 
