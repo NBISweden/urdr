@@ -15,6 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const defaultDate = "1970-01-01"
+
 func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
 	sess, err := store.Get(c)
 	if err != nil {
@@ -87,7 +89,6 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
 		}
-		defaultDate := time.Now().Format("2006-01-02")
 		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
 		if err != nil {
 			log.Errorf("Failed to get recent time entries: %v", err)
@@ -103,8 +104,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
 		}
-		defaultDate := time.Now().Format("2006-01-02")
 		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
+		if err != nil {
+			log.Errorf("Failed to get recent entries: %v", err)
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
 		var issueIds []string
 		numberOfIssues := 5
 		for _, entry := range timeEntries.TimeEntries {
