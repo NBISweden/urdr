@@ -143,6 +143,24 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.JSON(settingJson)
 	})
 
+	app.Get("/api/user/setting/:name/value/:value", func(c *fiber.Ctx) error {
+		isUserLoggedIn, err := isUserLoggedIn(c, store)
+		if !isUserLoggedIn {
+			log.Error(err)
+			return c.SendStatus(401)
+		}
+		redmineUserId := 250 //should be replaced by the user id
+		name := c.Params("name")
+		value := c.Params("value")
+		dbErr := database.SetUserSetting(redmineUserId, name, value)
+		if err != nil {
+			c.Response().SetBodyString(dbErr.Error())
+			return c.SendStatus(500)
+		}
+		return c.SendStatus(200)
+
+	})
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
 		return c.SendStatus(404) // => 404 "Not Found"
