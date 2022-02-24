@@ -81,33 +81,49 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.SendStatus(200)
 	})
 
-	app.Get("/api/issues", func(c *fiber.Ctx) error {
+	app.Get("/api/time_entries", func(c *fiber.Ctx) error {
 		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
 		}
-		issuesJson, err := redmine.ListIssues(redmineConf, apiKey)
-		if err != nil {
-			c.Response().SetBodyString(err.Error())
-			return c.SendStatus(500)
-		}
-		return c.JSON(issuesJson)
-	})
-
-	app.Get("/api/recent_entries", func(c *fiber.Ctx) error {
-		apiKey, err := getSessionApiKey(c, store)
-		if err != nil {
-			log.Errorf("Failed to get session api key: %v", err)
-			return c.SendStatus(401)
-		}
-		timeEntries, err := redmine.GetRecentTimeEntries(redmineConf, apiKey)
+		defaultDate := time.Now().Format("2006-01-02")
+		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
 		if err != nil {
 			log.Errorf("Failed to get recent time entries: %v", err)
 			c.Response().SetBodyString(err.Error())
 			return c.SendStatus(500)
 		}
 		return c.JSON(timeEntries)
+	})
+
+	app.Get("/api/issues", func(c *fiber.Ctx) error {
+		apiKey, err := getSessionApiKey(c, store)
+		if err != nil {
+			log.Errorf("Failed to get session api key: %v", err)
+			return c.SendStatus(401)
+		}
+		defaultDate := time.Now().Format("2006-01-02")
+		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
+		var issueIds []string
+		numberOfIssues := 5
+		for _, entry := range timeEntries.TimeEntries {
+			issueId := strconv.Itoa(entry.Issue.Id)
+			if !utl.Contains(issueIds, issueId) {
+				issueIds = append(issueIds, issueId)
+				numberOfIssues--
+				if numberOfIssues <= 0 {
+					break
+				}
+			}
+		}
+		issues, err := redmine.ListIssues(redmineConf, apiKey, issueIds)
+		if err != nil {
+			log.Errorf("Failed to get recent issues: %v", err)
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
+		return c.JSON(issues)
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
