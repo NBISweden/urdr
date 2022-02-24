@@ -4,7 +4,8 @@ import (
 	"errors"
 	"time"
 	cfg "urdr-api/internal/config"
-	redmine "urdr-api/internal/redmine"
+	"urdr-api/internal/database"
+	"urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -12,6 +13,15 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	log "github.com/sirupsen/logrus"
 )
+
+func isUserLoggedIn(c *fiber.Ctx, store *session.Store) (bool, error) {
+	sess, err := store.Get(c)
+	if err != nil {
+		return false, err
+	}
+	key := sess.Get("api_key")
+	return key != nil, nil
+}
 
 func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
 	sess, err := store.Get(c)
@@ -116,6 +126,21 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Info("time entry creation failed")
 			return c.SendStatus(401)
 		}
+	})
+
+	app.Get("/api/user/setting/:name", func(c *fiber.Ctx) error {
+		isUserLoggedIn, err := isUserLoggedIn(c, store)
+		if !isUserLoggedIn {
+			log.Error(err)
+			return c.SendStatus(401)
+		}
+		redmineUserId := 250
+		settingJson, err := database.GetUserSetting(redmineUserId, c.Params("name"))
+		if err != nil {
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
+		return c.JSON(settingJson)
 	})
 
 	// 404 Handler
