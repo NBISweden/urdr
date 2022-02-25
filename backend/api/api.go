@@ -17,16 +17,28 @@ import (
 
 const defaultDate = "1970-01-01"
 
-func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
+func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
 	sess, err := store.Get(c)
+	if err != nil {
+		return nil, err
+	}
+	user := sess.Get("user").(*redmine.User)
+	if user == nil {
+		return nil, errors.New("No session user found")
+	}
+	return user, nil
+}
+
+func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
+	user, err := getUser(c, store)
 	if err != nil {
 		return "", err
 	}
-	key := sess.Get("api_key")
-	if key == nil {
+	key := user.ApiKey
+	if key == "" {
 		return "", errors.New("No session api key found")
 	}
-	return key.(string), nil
+	return key, nil
 }
 
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
@@ -55,12 +67,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		authHeader := c.Get("Authorization")
-		apiKey, err := redmine.Login(redmineConf, authHeader)
+		user, err := redmine.Login(redmineConf, authHeader)
 		if err != nil {
 			log.Info("Log in failed")
 			return c.SendStatus(401)
 		}
-		sess.Set("api_key", apiKey)
+		sess.Set("user", user)
 		err = sess.Save()
 		if err != nil {
 			log.Errorf("Failed to save session: %s", err)
@@ -149,12 +161,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/api/user/setting/:name", func(c *fiber.Ctx) error {
-		isUserLoggedIn, err := isUserLoggedIn(c, store)
-		if !isUserLoggedIn {
+		user, err := getUser(c, store)
+		if err != nil {
 			log.Error(err)
 			return c.SendStatus(401)
 		}
-		redmineUserId := 250
+		redmineUserId := user.Id
 		settingJson, err := database.GetUserSetting(redmineUserId, c.Params("name"))
 		if err != nil {
 			c.Response().SetBodyString(err.Error())
@@ -164,12 +176,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Get("/api/user/setting/:name/value/:value", func(c *fiber.Ctx) error {
-		isUserLoggedIn, err := isUserLoggedIn(c, store)
-		if !isUserLoggedIn {
+		user, err := getUser(c, store)
+		if err != nil {
 			log.Error(err)
 			return c.SendStatus(401)
 		}
-		redmineUserId := 250 //should be replaced by the user id
+		redmineUserId := user.Id //should be replaced by the user id
 		name := c.Params("name")
 		value := c.Params("value")
 		dbErr := database.SetUserSetting(redmineUserId, name, value)

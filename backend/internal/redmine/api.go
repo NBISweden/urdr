@@ -85,6 +85,7 @@ type account struct {
 }
 
 type User struct {
+	Id        int    `json:"id"`
 	Login     string `json:"login"`
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
@@ -135,7 +136,7 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 		return "", err
 	}
 	log.Debugf("User %s: credentials are valid", a.User.Login)
-	return a.User.ApiKey, nil
+	return a.User, nil
 }
 
 func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
