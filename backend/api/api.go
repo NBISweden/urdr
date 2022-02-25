@@ -111,15 +111,10 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		var issueIds []string
-		numberOfIssues := 5
 		for _, entry := range timeEntries.TimeEntries {
 			issueId := strconv.Itoa(entry.Issue.Id)
 			if !utl.Contains(issueIds, issueId) {
 				issueIds = append(issueIds, issueId)
-				numberOfIssues--
-				if numberOfIssues <= 0 {
-					break
-				}
 			}
 		}
 		issues, err := redmine.GetIssues(redmineConf, apiKey, issueIds)
