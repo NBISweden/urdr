@@ -23,11 +23,11 @@ func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	user := sess.Get("user").(*redmine.User)
+	user := sess.Get("user")
 	if user == nil {
 		return nil, errors.New("No session user found")
 	}
-	return user, nil
+	return user.(*redmine.User), nil
 }
 
 func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
@@ -165,7 +165,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		}
 	})
 
-	app.Get("/api/user/setting/:name", func(c *fiber.Ctx) error {
+	app.Get("/api/setting/:name", func(c *fiber.Ctx) error {
 		user, err := getUser(c, store)
 		if err != nil {
 			log.Error(err)
@@ -180,7 +180,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.JSON(settingJson)
 	})
 
-	app.Get("/api/user/setting/:name/value/:value", func(c *fiber.Ctx) error {
+	app.Get("/api/setting/:name/value/:value", func(c *fiber.Ctx) error {
 		user, err := getUser(c, store)
 		if err != nil {
 			log.Error(err)
