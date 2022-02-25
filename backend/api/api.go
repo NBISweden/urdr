@@ -122,7 +122,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 				}
 			}
 		}
-		issues, err := redmine.ListIssues(redmineConf, apiKey, issueIds)
+		issues, err := redmine.GetIssues(redmineConf, apiKey, issueIds)
 		if err != nil {
 			log.Errorf("Failed to get recent issues: %v", err)
 			c.Response().SetBodyString(err.Error())

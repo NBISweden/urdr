@@ -138,7 +138,7 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 	return a.User.ApiKey, nil
 }
 
-func ListIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
+func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
 	issues := strings.Join(issueIds, ",")
 	res, err :=
 		doRequest(redmineConf, "GET", fmt.Sprintf("/issues.json?issue_id=%s", issues),
