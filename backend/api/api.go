@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/gob"
 	"errors"
 	"strconv"
 	"time"
@@ -42,6 +43,9 @@ func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
 }
 
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
+
+	gob.Register(&redmine.User{})
+
 	// Fiber instance
 	app := fiber.New()
 
@@ -72,7 +76,8 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Info("Log in failed")
 			return c.SendStatus(401)
 		}
-		sess.Set("user", user)
+		log.Println(user)
+		sess.Set("user", &user)
 		err = sess.Save()
 		if err != nil {
 			log.Errorf("Failed to save session: %s", err)
