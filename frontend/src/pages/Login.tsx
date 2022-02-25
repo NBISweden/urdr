@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
-
-import "../app.css";
+import "../index.css";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -22,15 +21,17 @@ export const Login = () => {
       method: "POST",
       credentials: "include",
       headers: headers,
-    }).then((response) => {
-      if (response.ok) {
-        navigate("/report");
-      } else {
-        console.log("Error: login failed");
-        setUsername("");
-        setPassword("");
-      }
-    });
+    })
+      .then((response) => {
+        if (response.ok) {
+          navigate("/report");
+        } else {
+          console.log("Error: login failed");
+          setUsername("");
+          setPassword("");
+        }
+      })
+      .catch((error) => console.log("An error occured.", error));
   };
 
   return (

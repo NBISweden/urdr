@@ -6,12 +6,14 @@ import { Reporter } from "./pages/Reporter";
 export const App = () => {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route exact path="/" element={<Login />} />
-          <Route path="/report" element={<Reporter />} />
-        </Routes>
-      </BrowserRouter>
+      <React.StrictMode>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/report" element={<Reporter />} />
+          </Routes>
+        </BrowserRouter>
+      </React.StrictMode>
     </>
   );
 };
