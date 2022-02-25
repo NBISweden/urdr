@@ -110,12 +110,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 		type SpentTime struct {
-			TimeEnt *redmine.TimeEntryResponse `json:"time_spent"`
-			Issues  *redmine.IssuesRes         `json:"issues"`
+			TimeEnt []redmine.FetchedTimeEntry `json:"time_spent"`
+			Issues  []redmine.Issue            `json:"issues"`
 		}
 		var spent SpentTime
-		spent.TimeEnt = timeEntries
-		spent.Issues = issues
+		spent.TimeEnt = timeEntries.TimeEntries
+		spent.Issues = issues.Issues
 		return c.JSON(spent)
 	})
 
