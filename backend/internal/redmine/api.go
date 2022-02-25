@@ -64,7 +64,7 @@ type TimeEntry struct {
 	Comments string `json:"comments"`
 	User     int    `json:"user_id"`
 }
-type timeEntryResponse struct {
+type TimeEntryResponse struct {
 	TimeEntries []FetchedTimeEntry `json:"time_entries"`
 }
 
@@ -161,7 +161,7 @@ func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) 
 	return r, err
 }
 
-func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string, dayTo string) (*timeEntryResponse, error) {
+func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
 	_, err := time.Parse("2006-01-02", dayFrom)
 	if err != nil {
 		return nil, err
@@ -174,7 +174,7 @@ func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string
 	res, err :=
 		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
-	r := &timeEntryResponse{}
+	r := &TimeEntryResponse{}
 
 	if err != nil {
 		return r, err

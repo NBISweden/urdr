@@ -83,22 +83,8 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.SendStatus(200)
 	})
 
-	app.Get("/api/time_entries", func(c *fiber.Ctx) error {
-		apiKey, err := getSessionApiKey(c, store)
-		if err != nil {
-			log.Errorf("Failed to get session api key: %v", err)
-			return c.SendStatus(401)
-		}
-		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
-		if err != nil {
-			log.Errorf("Failed to get recent time entries: %v", err)
-			c.Response().SetBodyString(err.Error())
-			return c.SendStatus(500)
-		}
-		return c.JSON(timeEntries)
-	})
+	app.Get("/api/spent_time", func(c *fiber.Ctx) error {
 
-	app.Get("/api/issues", func(c *fiber.Ctx) error {
 		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
 			log.Errorf("Failed to get session api key: %v", err)
@@ -123,7 +109,14 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			c.Response().SetBodyString(err.Error())
 			return c.SendStatus(500)
 		}
-		return c.JSON(issues)
+		type SpentTime struct {
+			TimeEnt *redmine.TimeEntryResponse `json:"time_spent"`
+			Issues  *redmine.IssuesRes         `json:"issues"`
+		}
+		var spent SpentTime
+		spent.TimeEnt = timeEntries
+		spent.Issues = issues
+		return c.JSON(spent)
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
