@@ -49,13 +49,13 @@ func Setup() error {
 
 	// Populate config structs, place defaults if empty in .env
 
-	Config.App.Host = getEnv("APP_HOST", "127.0.0.1")
-	Config.App.Port = getEnv("APP_PORT", "8080")
+	Config.App.Host = getEnv("BACKEND_HOST", "127.0.0.1")
+	Config.App.Port = getEnv("BACKEND_PORT", "8080")
 
 	Config.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
 	Config.Redmine.Port = getEnv("REDMINE_PORT", "3000")
 
-	Config.Database.Path = getEnv("URDR_DB_PATH", "./database.db")
+	Config.Database.Path = getEnv("BACKEND_DB_PATH", "./database.db")
 
 	return nil
 }
