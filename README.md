@@ -29,9 +29,9 @@ named `redmine_db.dump`, and it should be placed in that repository's
 
 ### Urdr setup
 
-1. In the `backend` directory of the `urdr` repository, create the
-file `.env`, using `.env.default` as the template.  If you are on
-Linux, you need to set the variable `REDMINE_HOST` to the value
+1. In the top-most directory of the `urdr` repository, create the file
+`urdr.env`, using `urdr.env.default` as the template.  If you are
+on Linux, you need to set the variable `REDMINE_HOST` to the value
 `"http://172.17.0.1"`.
 
 2. Create a database for the Urdr backend containing the Urdr schema and
