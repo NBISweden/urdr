@@ -14,7 +14,7 @@ services:
       - 8080:8080
     restart: always
     env_file:
-      - ./backend/.env
+      - ./urdr.env
 
   node-urdr:
     container_name: node-urdr
