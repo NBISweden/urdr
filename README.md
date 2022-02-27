@@ -44,9 +44,9 @@ default values.  From the top directory in the `urdr` repository.
    ```
 
    The name and location of the database file is configurable by setting
-   `URDR_DB_PATH` in the `.env` file.  The value of that variable is a
-   pathname relative to the `backend` directory, and the default value
-   is `./database.db`.
+   `BACKEND_DB_PATH` in the `urdr.env` file.  The value of that variable
+   is a pathname relative to the `backend` directory, and the default
+   value is `./database.db`.
 
 Finally, you can start Urdr by using:
 
