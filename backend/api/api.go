@@ -63,13 +63,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Info("Log in failed")
 			return c.SendStatus(401)
 		}
-		log.Println(user)
 		sess.Set("user", &user)
 		err = sess.Save()
 		if err != nil {
 			log.Errorf("Failed to save session: %s", err)
 		}
-		log.Info("Logged in user")
+		log.Debugf("Logged in user %v", user)
 		return c.SendStatus(200)
 	})
 
