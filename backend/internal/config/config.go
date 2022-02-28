@@ -42,7 +42,7 @@ func getEnv(key string, def string) string {
 // Setup populates ConfigMap with data
 func Setup() error {
 	// Load settings from .env
-	err := godotenv.Load(getEnv("DOT_ENV_FILE", ".env"))
+	err := godotenv.Load(getEnv("DOT_ENV_FILE", "./urdr.env"))
 	if err != nil {
 		return fmt.Errorf("godotenv.Load() failed: %w", err)
 	}
