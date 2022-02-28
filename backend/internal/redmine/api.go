@@ -135,7 +135,6 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("User %s: credentials are valid", a.User.Login)
 	return &a.User, nil
 }
 
