@@ -3,8 +3,10 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 	cfg "urdr-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
@@ -13,6 +15,10 @@ import (
 type IdName struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type Id struct {
+	Id int `json:"id"`
 }
 
 type Issue struct {
@@ -58,7 +64,22 @@ type TimeEntry struct {
 	Comments string `json:"comments"`
 	User     int    `json:"user_id"`
 }
+type TimeEntryResponse struct {
+	TimeEntries []FetchedTimeEntry `json:"time_entries"`
+}
 
+type FetchedTimeEntry struct {
+	Id        int     `json:"id"`
+	Project   IdName  `json:"project"`
+	Issue     Id      `json:"issue"`
+	User      IdName  `json:"user"`
+	Activity  IdName  `json:"activity"`
+	Hours     float32 `json:"hours"`
+	Comments  string  `json:"comments"`
+	SpentOn   string  `json:"spent_on"`
+	CreatedOn string  `json:"created_on"`
+	UpdatedOn string  `json:"updated_on"`
+}
 type account struct {
 	User User `json:"user"`
 }
@@ -117,9 +138,10 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 	return a.User.ApiKey, nil
 }
 
-func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error) {
+func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
+	issues := strings.Join(issueIds, ",")
 	res, err :=
-		doRequest(redmineConf, "GET", "/issues.json",
+		doRequest(redmineConf, "GET", fmt.Sprintf("/issues.json?issue_id=%s", issues),
 			map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &IssuesRes{}
@@ -135,6 +157,32 @@ func ListIssues(redmineConf cfg.RedmineConfig, apiKey string) (*IssuesRes, error
 	if err != nil {
 		log.Errorf("Failed decoding response: %s", err)
 	}
+
+	return r, err
+}
+
+func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
+	_, err := time.Parse("2006-01-02", dayFrom)
+	if err != nil {
+		return nil, err
+	}
+	_, err = time.Parse("2006-01-02", dayTo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err :=
+		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
+
+	r := &TimeEntryResponse{}
+
+	if err != nil {
+		return r, err
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(&r)
 
 	return r, err
 }

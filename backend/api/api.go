@@ -2,9 +2,10 @@ package api
 
 import (
 	"errors"
+	"strconv"
 	"time"
 	cfg "urdr-api/internal/config"
-	redmine "urdr-api/internal/redmine"
+	"urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -12,6 +13,8 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 	log "github.com/sirupsen/logrus"
 )
+
+const defaultDate = "1970-01-01"
 
 func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
 	sess, err := store.Get(c)
@@ -79,18 +82,44 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		return c.SendStatus(200)
 	})
 
-	app.Get("/api/issues", func(c *fiber.Ctx) error {
+	app.Get("/api/spent_time", func(c *fiber.Ctx) error {
+
 		apiKey, err := getSessionApiKey(c, store)
 		if err != nil {
 			log.Errorf("Failed to get session api key: %v", err)
 			return c.SendStatus(401)
 		}
-		issuesJson, err := redmine.ListIssues(redmineConf, apiKey)
+		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
 		if err != nil {
+			log.Errorf("Failed to get recent entries: %v", err)
 			c.Response().SetBodyString(err.Error())
 			return c.SendStatus(500)
 		}
-		return c.JSON(issuesJson)
+
+		seen := make(map[int]int)
+		var issueIds []string
+
+		for _, entry := range timeEntries.TimeEntries {
+			seen[entry.Issue.Id]++
+			if seen[entry.Issue.Id] == 1 {
+				issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+			}
+		}
+
+		issues, err := redmine.GetIssues(redmineConf, apiKey, issueIds)
+		if err != nil {
+			log.Errorf("Failed to get recent issues: %v", err)
+			c.Response().SetBodyString(err.Error())
+			return c.SendStatus(500)
+		}
+		type SpentTime struct {
+			TimeEnt []redmine.FetchedTimeEntry `json:"time_spent"`
+			Issues  []redmine.Issue            `json:"issues"`
+		}
+		var spent SpentTime
+		spent.TimeEnt = timeEntries.TimeEntries
+		spent.Issues = issues.Issues
+		return c.JSON(spent)
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
