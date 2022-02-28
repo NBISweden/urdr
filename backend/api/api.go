@@ -29,18 +29,6 @@ func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
 	return user.(*redmine.User), nil
 }
 
-func getSessionApiKey(c *fiber.Ctx, store *session.Store) (string, error) {
-	user, err := getUser(c, store)
-	if err != nil {
-		return "", err
-	}
-	key := user.ApiKey
-	if key == "" {
-		return "", errors.New("No session api key found")
-	}
-	return key, nil
-}
-
 func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 
 	gob.Register(&redmine.User{})
