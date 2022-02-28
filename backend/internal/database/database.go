@@ -33,5 +33,10 @@ func Setup() error {
 		return fmt.Errorf("sql.Open() failed: %w", err)
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return fmt.Errorf("sql.Ping() failed: %w", err)
+	}
+
 	return nil
 }
