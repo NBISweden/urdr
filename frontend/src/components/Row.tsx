@@ -1,10 +1,13 @@
 import React from "react";
+import { recentIssue } from "../pages/Report";
 
-export const Row = ({ name, issueId }: { name: string; issueId: number }) => {
+export const Row = ({ recentIssue }: { recentIssue: recentIssue }) => {
   return (
     <>
       <div>
-        <p>{name}</p>
+        <p>
+          {recentIssue.name} - {recentIssue.activity.name}
+        </p>
       </div>
     </>
   );

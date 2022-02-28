@@ -102,7 +102,7 @@ export const Report = () => {
       {recentIssues.map((issue) => {
         return (
           <>
-            <Row name={issue.name} issueId={issue.id} />
+            <Row recentIssue={issue} />
           </>
         );
       })}
