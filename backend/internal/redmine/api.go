@@ -85,6 +85,7 @@ type account struct {
 }
 
 type User struct {
+	Id        int    `json:"id"`
 	Login     string `json:"login"`
 	FirstName string `json:"firstname"`
 	LastName  string `json:"lastname"`
@@ -117,12 +118,12 @@ func doRequest(
 	return res, nil
 }
 
-func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
+func Login(redmineConf cfg.RedmineConfig, authHeader string) (*User, error) {
 	res, err :=
 		doRequest(redmineConf, "GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -132,10 +133,9 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (string, error) {
 
 	err = decoder.Decode(&a)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	log.Debugf("User %s: credentials are valid", a.User.Login)
-	return a.User.ApiKey, nil
+	return &a.User, nil
 }
 
 func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
