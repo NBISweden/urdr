@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Row } from "../components/Row";
 
 export interface Activity {
   id: number;
@@ -19,6 +20,7 @@ export const Report = () => {
   headers.set("Content-Type", "application/json");
 
   const getRecentIssues = () => {
+    // Here we should do an API fetch. The recent issues endpoint doesn't exist yet.
     return [
       {
         id: 1,
@@ -95,5 +97,15 @@ export const Report = () => {
     });
   }
 
-  return <input type="button" onClick={reportTime} value="Report time" />;
+  return (
+    <>
+      {recentIssues.map((issue) => {
+        return (
+          <>
+            <Row name={issue.name} issueId={issue.id} />
+          </>
+        );
+      })}
+    </>
+  );
 };
