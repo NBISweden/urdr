@@ -88,12 +88,12 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 
 	app.Get("/api/spent_time", func(c *fiber.Ctx) error {
 
-		apiKey, err := getSessionApiKey(c, store)
+		user, err := getUser(c, store)
 		if err != nil {
-			log.Errorf("Failed to get session api key: %v", err)
+			log.Errorf("Failed to get session: %v", err)
 			return c.SendStatus(401)
 		}
-		timeEntries, err := redmine.GetTimeEntries(redmineConf, apiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
+		timeEntries, err := redmine.GetTimeEntries(redmineConf, user.ApiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
 		if err != nil {
 			log.Errorf("Failed to get recent entries: %v", err)
 			c.Response().SetBodyString(err.Error())
@@ -110,7 +110,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			}
 		}
 
-		issues, err := redmine.GetIssues(redmineConf, apiKey, issueIds)
+		issues, err := redmine.GetIssues(redmineConf, user.ApiKey, issueIds)
 		if err != nil {
 			log.Errorf("Failed to get recent issues: %v", err)
 			c.Response().SetBodyString(err.Error())
@@ -127,9 +127,9 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 	})
 
 	app.Post("/api/report", func(c *fiber.Ctx) error {
-		apiKey, err := getSessionApiKey(c, store)
+		user, err := getUser(c, store)
 		if err != nil {
-			log.Errorf("Failed to get session api key: %v", err)
+			log.Errorf("Failed to get session: %v", err)
 			return c.SendStatus(401)
 		}
 		var r redmine.TimeEntry
@@ -141,7 +141,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 
 		log.Infof("Received time entry: %#v", r)
 
-		err = redmine.CreateTimeEntry(redmineConf, r, apiKey)
+		err = redmine.CreateTimeEntry(redmineConf, r, user.ApiKey)
 		if err == nil {
 			log.Info("time entry created")
 			return c.SendStatus(200)
