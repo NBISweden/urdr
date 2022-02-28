@@ -1,55 +1,71 @@
 import React, { useState } from "react";
 
-export interface TimeEntry {
-  issue_id: number;
-  activity_id: number;
-  hours: number;
-  comments: string;
-  spent_on: Date;
-  user_id: number;
+export interface Activity {
+  id: number;
+  name: string;
 }
 
-export function Report() {
-  //used default values to speed testing
-  const [hours, set_hours] = useState(5 as number);
-  const [date, set_date] = useState("2022-02-16" as string);
-  const [issue, set_issue] = useState(0 as number);
-  const [activity, set_activity] = useState(18 as number);
+export interface recentIssue {
+  id: number;
+  name: string;
+  activity: Activity;
+}
+
+export const Report = () => {
+  const [recentIssues, setRecentIssues] = useState<recentIssue[]>([]);
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
-  const [issues, setIssues] = useState([]);
 
-  const IssuesList = () => {
-    return (
-      <>
-        <div>
-          <span>Issue</span> :
-          {issues && issues.length > 0 && (
-            <select onChange={(e) => set_issue(e.target.value)}>
-              {issues.map((data, index) => {
-                return <option value={data.id}>{data.subject}</option>;
-              })}
-            </select>
-          )}
-        </div>
-      </>
-    );
+  const getRecentIssues = () => {
+    return [
+      {
+        id: 1,
+        name: "First dummy issue",
+        activity: {
+          id: 1,
+          name: "testing",
+        },
+      },
+      {
+        id: 2,
+        name: "Second dummy issue",
+        activity: {
+          id: 1,
+          name: "testing",
+        },
+      },
+      {
+        id: 3,
+        name: "Third dummy issue",
+        activity: {
+          id: 1,
+          name: "testing",
+        },
+      },
+      {
+        id: 4,
+        name: "Fourth dummy issue",
+        activity: {
+          id: 1,
+          name: "testing",
+        },
+      },
+      {
+        id: 5,
+        name: "Fifth dummy issue",
+        activity: {
+          id: 2,
+          name: "development",
+        },
+      },
+    ];
   };
 
   React.useEffect(() => {
-    fetch("http://localhost:8080/api/spent_time", {
-      method: "GET",
-      credentials: "include",
-      headers: headers,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data.issues);
-        setIssues(data.issues);
-        if (data.issues.length > 0) set_issue(data.issues[0].id);
-      });
+    const newIssues: recentIssue[] = getRecentIssues();
+    setRecentIssues(newIssues);
   }, []);
 
   function reportTime() {
@@ -80,4 +96,4 @@ export function Report() {
   }
 
   return <input type="button" onClick={reportTime} value="Report time" />;
-}
+};
