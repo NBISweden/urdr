@@ -6,7 +6,6 @@ import (
 	"time"
 	cfg "urdr-api/internal/config"
 	"urdr-api/internal/redmine"
-	utl "urdr-api/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -97,16 +96,16 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			return c.SendStatus(500)
 		}
 
-                seen := make(map[int]int)
-                var issueIds []string
+		seen := make(map[int]int)
+		var issueIds []string
 
-                for _, entry := range timeEntries.TimeEntries {
-                        seen[entry.Issue.Id]++
-                        if seen[entry.Issue.Id] == 1 {
-                                issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
-                        }
-                }
-                
+		for _, entry := range timeEntries.TimeEntries {
+			seen[entry.Issue.Id]++
+			if seen[entry.Issue.Id] == 1 {
+				issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+			}
+		}
+
 		issues, err := redmine.GetIssues(redmineConf, apiKey, issueIds)
 		if err != nil {
 			log.Errorf("Failed to get recent issues: %v", err)
