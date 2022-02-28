@@ -9,7 +9,7 @@ export interface TimeEntry {
   user_id: number;
 }
 
-export function Reporter() {
+export function Report() {
   //used default values to speed testing
   const [hours, set_hours] = useState(5 as number);
   const [date, set_date] = useState("2022-02-16" as string);
@@ -39,7 +39,7 @@ export function Reporter() {
   };
 
   React.useEffect(() => {
-    fetch("http://localhost:8080/api/issues", {
+    fetch("http://localhost:8080/api/spent_time", {
       method: "GET",
       credentials: "include",
       headers: headers,
