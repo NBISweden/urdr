@@ -39,8 +39,8 @@ default values.  From the top directory in the `urdr` repository.
 
    ```shell
    rm -f backend/database.db
-   sqlite3 backend/database.db <sql/schema.sql
-   sqlite3 backend/database.db <sql/setting-defaults.sql
+   sqlite3 backend/database.db <backend/sql/schema.sql
+   sqlite3 backend/database.db <backend/sql/setting-defaults.sql
    ```
 
    The name and location of the database file is configurable by setting
