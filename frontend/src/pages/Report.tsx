@@ -12,8 +12,18 @@ export interface recentIssue {
   activity: Activity;
 }
 
+export interface TimeEntry {
+  issue_id: number;
+  activity_id: number;
+  hours: number;
+  comments: string;
+  spent_on: Date;
+  user_id: number;
+}
+
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<recentIssue[]>([]);
+  const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
