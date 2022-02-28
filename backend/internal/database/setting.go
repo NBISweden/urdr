@@ -5,13 +5,23 @@ import (
 	"fmt"
 )
 
-// getSetting() is an internal function that returns the setting_id and
-// the value stored for a setting, given the setting's name.  It returns
+// The Setting type is a simple struct encapsulating a setting,
+// containing a setting's name and its value.  The struct also contains
+// the internal database identifier for the setting, however, this is
+// not externally accessible.
+type Setting struct {
+	id    int
+	Name  string
+	Value string
+}
+
+// getSetting() is an internal function that returns the setting struct
+// (setting ID, name and value), given the setting's name.  It returns
 // an error for illegal settings.
-func getSetting(settingName string) (int, string, error) {
+func getSetting(settingName string) (*Setting, error) {
 	err := db.Ping()
 	if err != nil {
-		return 0, "", fmt.Errorf("sql.Ping() failed: %w", err)
+		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
 	sqlStmt := `
@@ -21,13 +31,13 @@ func getSetting(settingName string) (int, string, error) {
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		return 0, "", fmt.Errorf("sql.Prepare() failed: %w", err)
+		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(settingName)
 	if err != nil {
-		return 0, "", fmt.Errorf("sql.Query() failed: %w", err)
+		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -38,34 +48,41 @@ func getSetting(settingName string) (int, string, error) {
 	for rows.Next() {
 		err = rows.Scan(&settingId, &settingValue)
 		if err != nil {
-			return 0, "", fmt.Errorf("sql.Scan() failed: %w", err)
+			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		isValidSetting = true
 	}
 	err = rows.Err()
 	if err != nil {
-		return 0, "", fmt.Errorf("sql.Next() failed: %w", err)
+		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
 	if !isValidSetting {
-		return 0, "", fmt.Errorf("illegal setting name: %v", settingName)
+		return nil, fmt.Errorf("illegal setting name: %v", settingName)
 	}
 
-	if !settingValue.Valid {
-		return settingId, "", nil
+	var setting Setting
+	setting.id = settingId
+	setting.Name = settingName
+
+	if settingValue.Valid {
+		setting.Value = settingValue.String
+	} else {
+		setting.Value = ""
 	}
 
-	return settingId, settingValue.String, nil
+	return &setting, nil
 }
 
-// GetUserSetting() returns the user-specific value for a particular
-// setting.  If there is no user-specific value stored for the given
-// user, then the default value is returned, if there is one.
-func GetUserSetting(redmineUserId int, settingName string) (string, error) {
-	settingId, settingValue, err := getSetting(settingName)
+// GetUserSetting() returns a Setting struct containing the
+// user-specific value for a particular setting.  If there is no
+// user-specific value stored for the given user, then the default value
+// is returned, if there is one.
+func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
+	setting, err := getSetting(settingName)
 	if err != nil {
-		return "", fmt.Errorf("getSetting() failed: %w", err)
+		return nil, fmt.Errorf("getSetting() failed: %w", err)
 	}
 
 	sqlStmt := `
@@ -76,13 +93,13 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 
 	stmt, err := db.Prepare(sqlStmt)
 	if err != nil {
-		return "", fmt.Errorf("sql.Prepare() failed: %w", err)
+		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(redmineUserId, settingId)
+	rows, err := stmt.Query(redmineUserId, setting.id)
 	if err != nil {
-		return "", fmt.Errorf("sql.Query() failed: %w", err)
+		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
 	defer rows.Close()
 
@@ -92,30 +109,29 @@ func GetUserSetting(redmineUserId int, settingName string) (string, error) {
 	for rows.Next() {
 		err = rows.Scan(&userSettingValue)
 		if err != nil {
-			return "", fmt.Errorf("sql.Scan() failed: %w", err)
+			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		userSettingFound = true
 	}
 	err = rows.Err()
 	if err != nil {
-		return "", fmt.Errorf("sql.Next() failed: %w", err)
+		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
-	if !(userSettingFound && userSettingValue.Valid) {
-		// User setting was not found, or value is NULL.
-		// Return the default value instead.
-		return settingValue, nil
+	if userSettingFound && userSettingValue.Valid {
+		// User setting was found and the value is not NULL.
+		setting.Value = userSettingValue.String
 	}
 
-	return userSettingValue.String, nil
+	return setting, nil
 }
 
 // SetUserSetting() assigns the user-specific value for a particular
 // setting.  If there is already a user-specific value stored for the
 // given setting, the new value replaces the old value.
-func SetUserSetting(redmineUserId int, settingName string, userSettingValue string) error {
-	settingId, _, err := getSetting(settingName)
+func SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
+	setting, err := getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
@@ -130,7 +146,7 @@ func SetUserSetting(redmineUserId int, settingName string, userSettingValue stri
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, settingId, userSettingValue)
+	_, err = stmt.Exec(redmineUserId, setting.id, settingValue)
 	if err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
@@ -141,7 +157,7 @@ func SetUserSetting(redmineUserId int, settingName string, userSettingValue stri
 // DeleteUserSetting() removes the user-specific value for a particular
 // setting.
 func DeleteUserSetting(redmineUserId int, settingName string) error {
-	settingId, _, err := getSetting(settingName)
+	setting, err := getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
@@ -157,7 +173,7 @@ func DeleteUserSetting(redmineUserId int, settingName string) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, settingId)
+	_, err = stmt.Exec(redmineUserId, setting.id)
 	if err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
