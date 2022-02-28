@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 	cfg "urdr-api/internal/config"
-	"urdr-api/internal/database"
 	"urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
@@ -163,39 +162,6 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 			log.Info("time entry creation failed")
 			return c.SendStatus(401)
 		}
-	})
-
-	app.Get("/api/setting/:name", func(c *fiber.Ctx) error {
-		user, err := getUser(c, store)
-		if err != nil {
-			log.Error(err)
-			return c.SendStatus(401)
-		}
-		redmineUserId := user.Id
-		settingJson, err := database.GetUserSetting(redmineUserId, c.Params("name"))
-		if err != nil {
-			c.Response().SetBodyString(err.Error())
-			return c.SendStatus(500)
-		}
-		return c.JSON(settingJson)
-	})
-
-	app.Get("/api/setting/:name/value/:value", func(c *fiber.Ctx) error {
-		user, err := getUser(c, store)
-		if err != nil {
-			log.Error(err)
-			return c.SendStatus(401)
-		}
-		redmineUserId := user.Id //should be replaced by the user id
-		name := c.Params("name")
-		value := c.Params("value")
-		dbErr := database.SetUserSetting(redmineUserId, name, value)
-		if err != nil {
-			c.Response().SetBodyString(dbErr.Error())
-			return c.SendStatus(500)
-		}
-		return c.SendStatus(200)
-
 	})
 
 	// 404 Handler
