@@ -1,13 +1,26 @@
-import React from "react";
-import { recentIssue } from "../pages/Report";
+import React, { useState } from "react";
+import { recentIssue, TimeEntry } from "../pages/Report";
 
 export const Cell = ({
   recentIssue,
   date,
+  onCellUpdate,
 }: {
   recentIssue: recentIssue;
   date: Date;
+  onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
+  const passTimeEntry = (hours: number) => {
+    let newEntry: TimeEntry = {
+      issueId: recentIssue.id,
+      activityId: recentIssue.activity.id,
+      hours: hours,
+      comments: "",
+      spentOn: date,
+      userId: 232,
+    };
+    onCellUpdate(newEntry);
+  };
   return (
     <>
       <label
@@ -21,6 +34,7 @@ export const Cell = ({
         type="number"
         id={`${recentIssue.id}${recentIssue.activity.id}`}
         min={0}
+        onChange={(event: any) => passTimeEntry(+event.target.value)}
       />
     </>
   );

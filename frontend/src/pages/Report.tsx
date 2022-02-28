@@ -13,12 +13,12 @@ export interface recentIssue {
 }
 
 export interface TimeEntry {
-  issue_id: number;
-  activity_id: number;
+  issueId: number;
+  activityId: number;
   hours: number;
   comments: string;
-  spent_on: Date;
-  user_id: number;
+  spentOn: Date;
+  userId: number;
 }
 
 export const Report = () => {
@@ -80,6 +80,10 @@ export const Report = () => {
     setRecentIssues(newIssues);
   }, []);
 
+  const handleCellUpdate = (timeEntry: TimeEntry): void => {
+    setNewTimeEntries([...newTimeEntries, timeEntry]);
+  };
+
   function reportTime() {
     // We are not doing account linking
 
@@ -112,7 +116,7 @@ export const Report = () => {
       {recentIssues.map((issue) => {
         return (
           <>
-            <Row recentIssue={issue} />
+            <Row recentIssue={issue} onCellUpdate={handleCellUpdate} />
           </>
         );
       })}
