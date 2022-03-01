@@ -3,8 +3,8 @@ package main
 import (
 	"urdr-api/api"
 	"urdr-api/internal/config"
-	"urdr-api/internal/logging"
 	db "urdr-api/internal/database"
+	"urdr-api/internal/logging"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -29,7 +29,7 @@ func main() {
 	// app contains the web app and endpoints
 
 	log.Infof("Redmine host config: %s", config.Config.Redmine.Host)
-	app := api.Setup(config.Config.Redmine)
+	app := api.Setup()
 
 	// Start server
 	log.Fatal(app.Listen(config.Config.App.Host + ":" + config.Config.App.Port))
