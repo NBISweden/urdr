@@ -1,9 +1,17 @@
 name: golangci-lint
 on:
   push:
-    branches-ignore: [main, develop]
+    branches-ignore:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
 permissions:
   contents: read
 jobs:
@@ -24,6 +32,7 @@ jobs:
           # Optional: golangci-lint command line arguments.
           # args: --issues-exit-code=0
           # args: -E gosec,goconst,nestif,interfacer,bodyclose,rowserrcheck
+          args: --timeout=5m
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true
