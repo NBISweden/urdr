@@ -56,10 +56,64 @@ func GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 	return favorites, nil
 }
 
-func AddUserFavorite(redmineUserId int, favorite *Favorite) error {
-	return nil
-}
+// SetAllUserFavorites() replaces all stored favorites for the given
+// user by the ones provided in the list to this function.
+func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("sql.Begin() failed: %w", err)
+	}
 
-func DeleteUserFavorite(redmineUserId int, favorite *Favorite) error {
+	deleteStmt := `
+		DELETE FROM favorite
+		WHERE	redmine_user_id = ?`
+
+	stmt, err := tx.Prepare(deleteStmt)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(redmineUserId)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("sql.Exec() failed: %w", err)
+	}
+
+	insertStmt := `
+		INSERT INTO favorite (
+			redmine_user_id, 
+			redmine_issue_id,
+			redmine_activity_id,
+			name,
+			priority )
+		VALUES (?, ?, ?, ?, ?)`
+
+	stmt, err = tx.Prepare(insertStmt)
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
+	}
+	defer stmt.Close()
+
+	for priority, favorite := range favorites {
+		_, err = stmt.Exec(redmineUserId,
+			favorite.RedmineIssueId,
+			favorite.RedmineActivityId,
+			favorite.Name,
+			priority)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("sql.Exec() failed: %w", err)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		tx.Rollback()
+		return fmt.Errorf("sql.Tx.Commit() failed: %w", err)
+	}
+
 	return nil
 }
