@@ -93,11 +93,10 @@ type User struct {
 }
 
 func doRequest(
-	redmineConf cfg.RedmineConfig,
 	method string, endpoint string,
 	headers map[string]string, body string) (*http.Response, error) {
 
-	url := redmineConf.Host + ":" + redmineConf.Port + endpoint
+	url := cfg.Config.Redmine.Host + ":" + cfg.Config.Redmine.Port + endpoint
 
 	req, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
@@ -118,9 +117,9 @@ func doRequest(
 	return res, nil
 }
 
-func Login(redmineConf cfg.RedmineConfig, authHeader string) (*User, error) {
+func Login(authHeader string) (*User, error) {
 	res, err :=
-		doRequest(redmineConf, "GET", "/my/account.json",
+		doRequest("GET", "/my/account.json",
 			map[string]string{"Authorization": authHeader}, "")
 	if err != nil {
 		return nil, err
@@ -138,10 +137,10 @@ func Login(redmineConf cfg.RedmineConfig, authHeader string) (*User, error) {
 	return &a.User, nil
 }
 
-func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) (*IssuesRes, error) {
+func GetIssues(apiKey string, issueIds []string) (*IssuesRes, error) {
 	issues := strings.Join(issueIds, ",")
 	res, err :=
-		doRequest(redmineConf, "GET", fmt.Sprintf("/issues.json?issue_id=%s", issues),
+		doRequest("GET", fmt.Sprintf("/issues.json?issue_id=%s", issues),
 			map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &IssuesRes{}
@@ -161,7 +160,7 @@ func GetIssues(redmineConf cfg.RedmineConfig, apiKey string, issueIds []string) 
 	return r, err
 }
 
-func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
+func GetTimeEntries(apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
 	_, err := time.Parse("2006-01-02", dayFrom)
 	if err != nil {
 		return nil, err
@@ -172,7 +171,7 @@ func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string
 	}
 
 	res, err :=
-		doRequest(redmineConf, "GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
+		doRequest("GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &TimeEntryResponse{}
 
@@ -187,7 +186,7 @@ func GetTimeEntries(redmineConf cfg.RedmineConfig, apiKey string, dayFrom string
 	return r, err
 }
 
-func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry, apiKey string) error {
+func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {
 	var ir timeEntryRequest
 
 	ir.TimeEntry = timeEntry
@@ -197,7 +196,7 @@ func CreateTimeEntry(redmineConf cfg.RedmineConfig, timeEntry TimeEntry, apiKey 
 	}
 
 	res, err :=
-		doRequest(redmineConf, "POST", "/time_entries.json",
+		doRequest("POST", "/time_entries.json",
 			map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
 	if err != nil {
 		log.Errorf("Failed to create time entry: %s", err)

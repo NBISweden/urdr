@@ -13,29 +13,29 @@
 ### Local Redmine setup
 
 As a prerequisite for running Urdr during development, you need to run
-a local installation of Redmine.  The NBIS Redmine installation is
+a local installation of Redmine. The NBIS Redmine installation is
 currently maintained in the
 [ops-redmine repository](https://github.com/NBISweden/ops-redmine).
 
 Follow
 [the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
-to set up and run Redmine locally.  The repository may be cloned in a
+to set up and run Redmine locally. The repository may be cloned in a
 separate directory, away from where you cloned the `urdr` repository.
 
 The setup of Redmine includes importing a database dump of Redmine
-in your local Redmine database.  The database dump file should be
+in your local Redmine database. The database dump file should be
 named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
 
 ### Urdr setup
 
 1. In the top-most directory of the `urdr` repository, create the file
-`urdr.env`, using `urdr.env.default` as the template.  If you are
-on Linux, you need to set the variable `REDMINE_HOST` to the value
-`"http://172.17.0.1"`.
+   `urdr.env`, using `urdr.env.default` as the template. If you are
+   on Linux, you need to set the variable `REDMINE_HOST` to the value
+   `"http://172.17.0.1"`.
 
 2. Create a database for the Urdr backend containing the Urdr schema and
-default values.  From the top directory in the `urdr` repository.
+   default values. From the top directory in the `urdr` repository.
 
    ```shell
    rm -f backend/database.db
@@ -44,7 +44,7 @@ default values.  From the top directory in the `urdr` repository.
    ```
 
    The name and location of the database file is configurable by setting
-   `BACKEND_DB_PATH` in the `urdr.env` file.  The value of that variable
+   `BACKEND_DB_PATH` in the `urdr.env` file. The value of that variable
    is a pathname relative to the `backend` directory, and the default
    value is `./database.db`.
 
@@ -54,6 +54,17 @@ Finally, you can start Urdr by using:
 docker-compose build
 docker-compose up
 ```
+
+## API specification
+
+In order to rebuild the API spec you should run:
+
+```command
+# For installing swag, follow https://github.com/swaggo/swag
+swag init -g cmd/main.go
+```
+
+[Swagger](http://localhost:8080/swagger/index.html)
 
 ## Frontend dev server
 
