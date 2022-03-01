@@ -17,7 +17,7 @@ export const Cell = ({
       hours: hours,
       comments: "",
       spent_on: date.toISOString().split("T")[0],
-      user_id: 266,
+      user_id: 266, // TODO: replace with actual user id
     };
     onCellUpdate(newEntry);
   };

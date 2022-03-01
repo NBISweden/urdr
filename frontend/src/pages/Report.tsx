@@ -34,7 +34,7 @@ export const Report = () => {
   const today = new Date();
 
   const getRecentIssues = () => {
-    // Here we should do an API fetch. The recent issues endpoint doesn't exist yet.
+    // TODO: fetch list of recent issues from API
     return [
       {
         id: 5068,
