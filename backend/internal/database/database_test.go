@@ -10,9 +10,12 @@ import (
 
 func TestMain(m *testing.M) {
 	// Correct for the fact that we're in the "wrong" directory.
-	os.Chdir("../..")
+	err := os.Chdir("../..")
+	if err != nil {
+		log.Fatalf("os.Chdir() failed: %v", err)
+	}
 
-	err := config.Setup()
+	err = config.Setup()
 	if err != nil {
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
