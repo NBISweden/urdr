@@ -24,12 +24,12 @@ func getSetting(settingName string) (*Setting, error) {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
-	sqlStmt := `
+	selectStmt := `
 		SELECT	setting_id, value
 		FROM	setting
 		WHERE	name = ?`
 
-	stmt, err := db.Prepare(sqlStmt)
+	stmt, err := db.Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -85,13 +85,13 @@ func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
 		return nil, fmt.Errorf("getSetting() failed: %w", err)
 	}
 
-	sqlStmt := `
+	selectStmt := `
 		SELECT	value
 		FROM	user_setting
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Prepare(sqlStmt)
+	stmt, err := db.Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -136,11 +136,11 @@ func SetUserSetting(redmineUserId int, settingName string, settingValue string) 
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
 
-	sqlStmt := `
+	insertStmt := `
 		INSERT INTO user_setting (redmine_user_id, setting_id, value)
 		VALUES (?, ?, ?)`
 
-	stmt, err := db.Prepare(sqlStmt)
+	stmt, err := db.Prepare(insertStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -162,12 +162,12 @@ func DeleteUserSetting(redmineUserId int, settingName string) error {
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
 
-	sqlStmt := `
+	deleteStmt := `
 		DELETE FROM user_setting
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Prepare(sqlStmt)
+	stmt, err := db.Prepare(deleteStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}

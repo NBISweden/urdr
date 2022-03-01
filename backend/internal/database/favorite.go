@@ -14,7 +14,7 @@ type Favorite struct {
 // GetAllUserFavorites() returns a list of favorites for a particular
 // user.
 func GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
-	sqlStmt := `
+	selectStmt := `
 		SELECT	redmine_issue_id,
 			redmine_activity_id,
 			name
@@ -22,7 +22,7 @@ func GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 		WHERE	redmine_user_id = ?
 		ORDER BY	priority`
 
-	stmt, err := db.Prepare(sqlStmt)
+	stmt, err := db.Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
