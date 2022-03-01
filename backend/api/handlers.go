@@ -10,6 +10,15 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type LoginResponse struct {
+	Login  string `json:"login"`
+	UserId int    `json:"user_id"`
+}
+type IssueActivityResponse struct {
+	Issue    redmine.Issue  `json:"issue"`
+	Activity redmine.IdName `json:"activity"`
+}
+
 // loginHandler godoc
 // @Summary Log in a user
 // @Description Log in a user using the Redmine API
