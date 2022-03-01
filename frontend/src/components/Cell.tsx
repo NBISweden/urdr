@@ -22,7 +22,7 @@ export const Cell = ({
     onCellUpdate(newEntry);
   };
   return (
-    <>
+    <div className="col-1">
       <label
         htmlFor={`${recentIssue.id}${recentIssue.activity.id}`}
         hidden={true}
@@ -36,6 +36,6 @@ export const Cell = ({
         min={0}
         onChange={(event: any) => passTimeEntry(+event.target.value)}
       />
-    </>
+    </div>
   );
 };

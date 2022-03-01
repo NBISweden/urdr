@@ -12,8 +12,8 @@ export const Row = ({
   const today = new Date();
   return (
     <>
-      <div>
-        <p>
+      <div className="row">
+        <p className="col-6">
           {recentIssue.name} - {recentIssue.activity.name}
         </p>
         <Cell
