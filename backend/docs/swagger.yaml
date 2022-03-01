@@ -1,4 +1,95 @@
+basePath: /
+definitions:
+  redmine.TimeEntry:
+    properties:
+      activity_id:
+        type: integer
+      comments:
+        type: string
+      hours:
+        type: integer
+      issue_id:
+        type: integer
+      spent_on:
+        type: string
+      user_id:
+        type: integer
+    type: object
+host: localhost:8080
 info:
-  contact: {}
-paths: {}
+  contact:
+    name: National Bioinformatics Infrastructure Sweden
+    url: https://www.nbis.se
+  description: This is the Urdr API.
+  title: Urdr API
+  version: "1.0"
+paths:
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Log in a user using the Redmine API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Log in a user
+  /api/logout:
+    post:
+      consumes:
+      - application/json
+      description: Log out a user by destroying the session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Log out a user
+  /api/report:
+    post:
+      consumes:
+      - application/json
+      description: report time spent on issues
+      parameters:
+      - description: urdr_session=default
+        in: body
+        name: time_entry
+        required: true
+        schema:
+          $ref: '#/definitions/redmine.TimeEntry'
+      - description: default
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: report time spent on issues
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"
