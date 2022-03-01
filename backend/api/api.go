@@ -3,19 +3,22 @@ package api
 import (
 	"encoding/gob"
 	"errors"
-	"strconv"
 	"time"
-	cfg "urdr-api/internal/config"
 	"urdr-api/internal/redmine"
+
+	"github.com/swaggo/fiber-swagger"
+
+	_ "urdr-api/docs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/fiber/v2/utils"
-	log "github.com/sirupsen/logrus"
 )
 
 const defaultDate = "1970-01-01"
+
+var store *session.Store
 
 func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
 	sess, err := store.Get(c)
@@ -29,7 +32,17 @@ func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
 	return user.(*redmine.User), nil
 }
 
-func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
+// @title Urdr API
+// @version 1.0
+// @description This is the Urdr API.
+
+// @contact.name National Bioinformatics Infrastructure Sweden
+// @contact.url https://www.nbis.se
+
+// @host localhost:8080
+// @securityDefinitions.basic BasicAuth
+// @BasePath /
+func Setup() *fiber.App {
 
 	gob.Register(&redmine.User{})
 
@@ -40,7 +53,7 @@ func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
 		AllowCredentials: true,
 	}))
 
-	store := session.New(session.Config{
+	store = session.New(session.Config{
 		Expiration:     time.Minute * 5,
 		CookieName:     "urdr_session",
 		CookieDomain:   "",
