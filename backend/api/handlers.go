@@ -25,7 +25,7 @@ type IssueActivityResponse struct {
 // @Security BasicAuth
 // @Accept  json
 // @Produce  json
-// @Success 200 {string} error "OK"
+// @Success 200 {object} LoginResponse
 // @Failure 401 {string} error "Unauthorized"
 // @Router /api/login [post]
 func loginHandler(c *fiber.Ctx) error {
@@ -46,7 +46,7 @@ func loginHandler(c *fiber.Ctx) error {
 		log.Errorf("Failed to save session: %s", err)
 	}
 	log.Debugf("Logged in user %v", user)
-	return c.SendStatus(200)
+	return c.JSON(LoginResponse{Login: user.Login, UserId: user.Id})
 }
 
 // logoutHandler godoc
@@ -71,26 +71,41 @@ func logoutHandler(c *fiber.Ctx) error {
 	return c.SendStatus(200)
 }
 
-func spentTimeHandler(c *fiber.Ctx) error {
+// recentIssuesHandler godoc
+// @Summary get recent issues
+// @Description get recent issues
+// @Param Cookie header string true "default"
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} IssueActivityResponse
+// @Failure 401 {string} error "Unauthorized"
+// @Router /api/recent_issues [get]
+func recentIssuesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
 		return c.SendStatus(401)
 	}
-	timeEntries, err := redmine.GetTimeEntries(user.ApiKey, c.Query("start", defaultDate), c.Query("end", defaultDate))
+	timeEntries, err := redmine.GetTimeEntries(user.ApiKey)
 	if err != nil {
 		log.Errorf("Failed to get recent entries: %v", err)
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-
-	seen := make(map[int]int)
+	type IssueActivity struct {
+		Issue    int
+		Activity redmine.IdName
+	}
+	seen := make(map[IssueActivity]int)
 	var issueIds []string
+	var issueActivities []IssueActivity
 
 	for _, entry := range timeEntries.TimeEntries {
-		seen[entry.Issue.Id]++
-		if seen[entry.Issue.Id] == 1 {
+		issueAct := IssueActivity{Issue: entry.Issue.Id, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
+		seen[issueAct]++
+		if seen[issueAct] == 1 {
 			issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+			issueActivities = append(issueActivities, issueAct)
 		}
 	}
 
@@ -100,14 +115,19 @@ func spentTimeHandler(c *fiber.Ctx) error {
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-	type SpentTime struct {
-		TimeEnt []redmine.FetchedTimeEntry `json:"time_spent"`
-		Issues  []redmine.Issue            `json:"issues"`
+	issuesMap := make(map[int]redmine.Issue)
+	for _, issue := range issues.Issues {
+		issuesMap[issue.Id] = issue
 	}
-	var spent SpentTime
-	spent.TimeEnt = timeEntries.TimeEntries
-	spent.Issues = issues.Issues
-	return c.JSON(spent)
+
+	var recentIssues []IssueActivityResponse
+
+	for _, issueAct := range issueActivities {
+		recentIssues = append(recentIssues,
+			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
+				Activity: issueAct.Activity})
+	}
+	return c.JSON(recentIssues)
 }
 
 // timeReportHandler godoc
