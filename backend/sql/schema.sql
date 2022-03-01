@@ -73,7 +73,6 @@ CREATE TABLE user_setting (
 
 DROP TABLE IF EXISTS favorite;
 CREATE TABLE favorite (
-	favorite_id INTEGER PRIMARY KEY AUTOINCREMENT,
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
 	redmine_activity_id INTEGER NOT NULL,
