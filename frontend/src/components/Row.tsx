@@ -4,12 +4,13 @@ import { Cell } from "./Cell";
 
 export const Row = ({
   recentIssue,
+  days,
   onCellUpdate,
 }: {
   recentIssue: recentIssue;
+  days: Date[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
-  const today = new Date();
   return (
     <>
       <div className="row">
@@ -18,7 +19,7 @@ export const Row = ({
         </p>
         <Cell
           recentIssue={recentIssue}
-          date={today}
+          date={days[0]}
           onCellUpdate={onCellUpdate}
         />
       </div>

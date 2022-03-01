@@ -35,6 +35,7 @@ export const Cell = ({
         id={`${recentIssue.id}${recentIssue.activity.id}`}
         min={0}
         onChange={(event: any) => passTimeEntry(+event.target.value)}
+        className="cell"
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Row } from "../components/Row";
+import { HeaderRow } from "../components/HeaderRow";
 
 export interface Activity {
   id: number;
@@ -29,6 +30,8 @@ export const Report = () => {
   let headers = new Headers();
   headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
+
+  const today = new Date();
 
   const getRecentIssues = () => {
     // Here we should do an API fetch. The recent issues endpoint doesn't exist yet.
@@ -115,7 +118,6 @@ export const Report = () => {
   };
 
   const handleSave = () => {
-    console.log("handle save");
     newTimeEntries.forEach((entry) => {
       reportTime(entry);
     });
@@ -123,10 +125,18 @@ export const Report = () => {
 
   return (
     <>
+      <HeaderRow
+        days={[today.toISOString().split("T")[0]]}
+        title="Recent issues"
+      />
       {recentIssues.map((issue) => {
         return (
           <>
-            <Row recentIssue={issue} onCellUpdate={handleCellUpdate} />
+            <Row
+              recentIssue={issue}
+              onCellUpdate={handleCellUpdate}
+              days={[today]}
+            />
           </>
         );
       })}
