@@ -16,8 +16,6 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const defaultDate = "1970-01-01"
-
 var store *session.Store
 
 func getUser(c *fiber.Ctx) (*redmine.User, error) {
@@ -70,7 +68,7 @@ func Setup() *fiber.App {
 
 	app.Post("/api/logout", logoutHandler)
 
-	app.Get("/api/spent_time", spentTimeHandler)
+	app.Get("/api/recent_issues", recentIssuesHandler)
 
 	app.Post("/api/report", timeReportHandler)
 
