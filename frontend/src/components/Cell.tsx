@@ -16,8 +16,8 @@ export const Cell = ({
       activity_id: recentIssue.activity.id,
       hours: hours,
       comments: "",
-      spent_on: date,
-      user_id: 232,
+      spent_on: date.toISOString().split("T")[0],
+      user_id: 266,
     };
     onCellUpdate(newEntry);
   };
