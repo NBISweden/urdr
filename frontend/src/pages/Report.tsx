@@ -82,7 +82,19 @@ export const Report = () => {
   }, []);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
-    setNewTimeEntries([...newTimeEntries, timeEntry]);
+    const entries = newTimeEntries;
+    const existingEntry = entries.find(
+      (entry) =>
+        entry.issue_id === timeEntry.issue_id &&
+        entry.activity_id === timeEntry.activity_id &&
+        entry.spent_on === timeEntry.spent_on
+    );
+    if (existingEntry) {
+      entries.splice(entries.indexOf(existingEntry), 1, timeEntry);
+      setNewTimeEntries(entries);
+    } else {
+      setNewTimeEntries([...entries, timeEntry]);
+    }
   };
 
   const reportTime = (timeEntry: TimeEntry) => {
