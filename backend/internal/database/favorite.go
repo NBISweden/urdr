@@ -63,6 +63,9 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 	if err != nil {
 		return fmt.Errorf("sql.Begin() failed: %w", err)
 	}
+	// Defering tx.Rollback() is okay since a rollback after
+	// tx.Commit() is a no-op.
+	defer func() { _ = tx.Rollback() }()
 
 	deleteStmt := `
 		DELETE FROM favorite
@@ -70,14 +73,12 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 
 	stmt, err := tx.Prepare(deleteStmt)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(redmineUserId)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -92,7 +93,6 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 
 	stmt, err = tx.Prepare(insertStmt)
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
@@ -104,14 +104,13 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 			favorite.Name,
 			priority)
 		if err != nil {
-			tx.Rollback()
 			return fmt.Errorf("sql.Exec() failed: %w", err)
 		}
 	}
 
+	// The deferred tx.Rollback() will be a no-op after this.
 	err = tx.Commit()
 	if err != nil {
-		tx.Rollback()
 		return fmt.Errorf("sql.Tx.Commit() failed: %w", err)
 	}
 
