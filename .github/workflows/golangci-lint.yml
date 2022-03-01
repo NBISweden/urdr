@@ -1,9 +1,17 @@
 name: golangci-lint
 on:
   push:
-    branches-ignore: [main, develop]
+    branches-ignore:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
   pull_request:
-    branches: [main, develop]
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
 permissions:
   contents: read
 jobs:
