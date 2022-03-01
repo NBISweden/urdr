@@ -4,22 +4,18 @@ import "fmt"
 
 // The Favorite type is a simple struct that encapsulates a "favorite",
 // i.e. a Redmine issue ID and a Redmine activity ID together with a
-// custom name.  There is also an internal ID field corresponding to the
-// favorite_id field in the database.
+// custom name.
 type Favorite struct {
-	id                int
 	RedmineIssueId    int
 	RedmineActivityId int
 	Name              string
 }
 
-// GetAllUserFavorites() returns a list of Favorite elements, in
-// "priority order", i.e. ordered by the priority integer in the
-// database.
+// GetAllUserFavorites() returns a list of favorites for a particular
+// user.
 func GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 	sqlStmt := `
-		SELECT	favorite_id,
-			redmine_issue_id,
+		SELECT	redmine_issue_id,
 			redmine_activity_id,
 			name
 		FROM	favorite
@@ -42,8 +38,8 @@ func GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 
 	for rows.Next() {
 		var favorite Favorite
-		err = rows.Scan(&favorite.id,
-			&favorite.RedmineIssueId,
+
+		err = rows.Scan(&favorite.RedmineIssueId,
 			&favorite.RedmineActivityId,
 			&favorite.Name)
 		if err != nil {
