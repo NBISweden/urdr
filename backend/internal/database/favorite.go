@@ -67,6 +67,14 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 	// tx.Commit() is a no-op.
 	defer func() { _ = tx.Rollback() }()
 
+	// Ideally, we'd call DeleteAllUserFavorites(redmineUserId)
+	// here, but we can't do that as we're in a transaction block.
+	// The statement object (stmt) in the other function is not
+	// related to the transaction here (coming from sql.Prepare()
+	// rather than from sql.Tx.Prepare()), so it would execute
+	// outside of it and we would not be able to roll it back on
+	// errors.
+
 	deleteStmt := `
 		DELETE FROM favorite
 		WHERE	redmine_user_id = ?`
@@ -112,6 +120,27 @@ func SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
 	err = tx.Commit()
 	if err != nil {
 		return fmt.Errorf("sql.Tx.Commit() failed: %w", err)
+	}
+
+	return nil
+}
+
+// DeleteAllUserFavorites() removes all stored favorites for the given
+// user.
+func DeleteAllUserFavorites(redmineUserId int) error {
+	deleteStmt := `
+		DELETE FROM favorite
+		WHERE	redmine_user_id = ?`
+
+	stmt, err := db.Prepare(deleteStmt)
+	if err != nil {
+		return fmt.Errorf("sql.Prepare() failed: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(redmineUserId)
+	if err != nil {
+		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
 	return nil
