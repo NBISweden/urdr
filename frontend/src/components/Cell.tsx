@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { recentIssue, TimeEntry } from "../pages/Report";
 
 export const Cell = ({
@@ -12,12 +12,12 @@ export const Cell = ({
 }) => {
   const passTimeEntry = (hours: number) => {
     let newEntry: TimeEntry = {
-      issueId: recentIssue.id,
-      activityId: recentIssue.activity.id,
+      issue_id: recentIssue.id,
+      activity_id: recentIssue.activity.id,
       hours: hours,
       comments: "",
-      spentOn: date,
-      userId: 232,
+      spent_on: date,
+      user_id: 232,
     };
     onCellUpdate(newEntry);
   };

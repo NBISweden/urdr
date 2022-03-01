@@ -13,12 +13,12 @@ export interface recentIssue {
 }
 
 export interface TimeEntry {
-  issueId: number;
-  activityId: number;
+  issue_id: number;
+  activity_id: number;
   hours: number;
   comments: string;
-  spentOn: Date;
-  userId: number;
+  spent_on: Date;
+  user_id: number;
 }
 
 export const Report = () => {
