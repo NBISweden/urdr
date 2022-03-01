@@ -6,7 +6,7 @@ import (
 	"time"
 	"urdr-api/internal/redmine"
 
-	"github.com/swaggo/fiber-swagger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	_ "urdr-api/docs"
 
@@ -20,7 +20,7 @@ const defaultDate = "1970-01-01"
 
 var store *session.Store
 
-func getUser(c *fiber.Ctx, store *session.Store) (*redmine.User, error) {
+func getUser(c *fiber.Ctx) (*redmine.User, error) {
 	sess, err := store.Get(c)
 	if err != nil {
 		return nil, err

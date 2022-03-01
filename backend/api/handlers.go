@@ -63,7 +63,7 @@ func logoutHandler(c *fiber.Ctx) error {
 }
 
 func spentTimeHandler(c *fiber.Ctx) error {
-	user, err := getUser(c, store)
+	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
 		return c.SendStatus(401)
@@ -112,7 +112,7 @@ func spentTimeHandler(c *fiber.Ctx) error {
 // @Failure 401 {string} error "Unauthorized"
 // @Router /api/report [post]
 func timeReportHandler(c *fiber.Ctx) error {
-	user, err := getUser(c, store)
+	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
 		return c.SendStatus(401)
