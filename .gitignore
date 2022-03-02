@@ -3,4 +3,5 @@ backend/urdr
 backend/tmp/
 backend/database.db
 urdr.env
+tests.env
 frontend/node_modules
