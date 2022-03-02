@@ -1,5 +1,5 @@
 import React from "react";
-import { recentIssue, TimeEntry } from "../pages/Report";
+import { RecentIssue, TimeEntry } from "../pages/Report";
 import { Cell } from "./Cell";
 
 export const Row = ({
@@ -8,7 +8,7 @@ export const Row = ({
   userId,
   onCellUpdate,
 }: {
-  recentIssue: recentIssue;
+  recentIssue: RecentIssue;
   days: Date[];
   userId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
@@ -17,7 +17,7 @@ export const Row = ({
     <>
       <div className="row">
         <p className="col-6">
-          {recentIssue.name} - {recentIssue.activity.name}
+          {recentIssue.issue.subject} - {recentIssue.activity.name}
         </p>
         <Cell
           recentIssue={recentIssue}

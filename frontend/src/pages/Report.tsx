@@ -4,19 +4,43 @@ import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { User } from "../pages/Login";
 
-export interface Activity {
+// interfaces use snake case to follow Redmines variable names
+
+export interface IdName {
   id: number;
   name: string;
 }
 
-export interface recentIssue {
+export interface RecentIssue {
+  activity: IdName;
+  issue: Issue;
+}
+
+export interface Issue {
+  assigned_to: IdName;
+  assigned_to_id: number;
+  author: IdName;
+  category: IdName;
+  category_id: number;
+  closed_on: string;
+  created_on: string;
+  description: string;
+  done_ratio: number;
+  due_date: string;
+  estimated_hours: number;
   id: number;
-  name: string;
-  activity: Activity;
+  notes: string;
+  project: IdName;
+  project_id: number;
+  start_date: string;
+  status: IdName;
+  status_date: string;
+  status_id: 0;
+  subject: string;
+  updated_on: string;
 }
 
 export interface TimeEntry {
-  // snake case to follow Redmines variable names
   issue_id: number;
   activity_id: number;
   hours: number;
@@ -26,7 +50,7 @@ export interface TimeEntry {
 }
 
 export const Report = () => {
-  const [recentIssues, setRecentIssues] = useState<recentIssue[]>([]);
+  const [recentIssues, setRecentIssues] = useState<RecentIssue[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   let location = useLocation();
   const user: User = location.state as User;
@@ -37,55 +61,30 @@ export const Report = () => {
 
   const today = new Date();
 
-  const getRecentIssues = () => {
-    // TODO: fetch list of recent issues from API
-    return [
+  const getRecentIssues = async () => {
+    let issues: RecentIssue[] = await fetch(
+      "http://localhost:8080/api/recent_issues",
       {
-        id: 5068,
-        name: "First dummy issue",
-        activity: {
-          id: 10,
-          name: "testing",
-        },
-      },
-      {
-        id: 5140,
-        name: "Second dummy issue",
-        activity: {
-          id: 19,
-          name: "testing",
-        },
-      },
-      {
-        id: 5214,
-        name: "Third dummy issue",
-        activity: {
-          id: 8,
-          name: "testing",
-        },
-      },
-      {
-        id: 5849,
-        name: "Fourth dummy issue",
-        activity: {
-          id: 10,
-          name: "testing",
-        },
-      },
-      {
-        id: 5763,
-        name: "Fifth dummy issue",
-        activity: {
-          id: 9,
-          name: "development",
-        },
-      },
-    ];
+        method: "GET",
+        credentials: "include",
+        headers: headers,
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Could not find recent issues.");
+        }
+      })
+      .catch((error) => console.log(error));
+
+    console.log(issues);
+    setRecentIssues(issues);
   };
 
   React.useEffect(() => {
-    const newIssues: recentIssue[] = getRecentIssues();
-    setRecentIssues(newIssues);
+    getRecentIssues();
   }, []);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
@@ -114,11 +113,13 @@ export const Report = () => {
       .then((response) => {
         if (response.ok) {
           console.log("Time reported");
+          setNewTimeEntries([]);
+          alert("Changes saved!");
         } else {
           throw new Error("Time report failed.");
         }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => alert(error));
   };
 
   const handleSave = () => {

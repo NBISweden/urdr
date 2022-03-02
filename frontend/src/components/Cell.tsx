@@ -1,5 +1,5 @@
 import React from "react";
-import { recentIssue, TimeEntry } from "../pages/Report";
+import { RecentIssue, TimeEntry } from "../pages/Report";
 
 export const Cell = ({
   recentIssue,
@@ -7,14 +7,14 @@ export const Cell = ({
   userId,
   onCellUpdate,
 }: {
-  recentIssue: recentIssue;
+  recentIssue: RecentIssue;
   date: Date;
   userId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   const passTimeEntry = (hours: number) => {
     let newEntry: TimeEntry = {
-      issue_id: recentIssue.id,
+      issue_id: recentIssue.issue.id,
       activity_id: recentIssue.activity.id,
       hours: hours,
       comments: "",
@@ -26,15 +26,16 @@ export const Cell = ({
   return (
     <div className="col-1">
       <label
-        htmlFor={`${recentIssue.id}${recentIssue.activity.id}`}
+        htmlFor={`${recentIssue.issue.id}${recentIssue.activity.id}`}
         hidden={true}
       >
-        Time spent on {`${recentIssue.name} ${recentIssue.activity.name}`}
+        Time spent on{" "}
+        {`${recentIssue.issue.subject} ${recentIssue.activity.name}`}
         on {`${date}`}
       </label>
       <input
         type="number"
-        id={`${recentIssue.id}${recentIssue.activity.id}`}
+        id={`${recentIssue.issue.id}${recentIssue.activity.id}`}
         min={0}
         onChange={(event: any) => passTimeEntry(+event.target.value)}
         className="cell"
