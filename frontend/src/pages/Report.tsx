@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
+import { User } from "../pages/Login";
 
 export interface Activity {
   id: number;
@@ -26,6 +28,8 @@ export interface TimeEntry {
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<recentIssue[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
+  let location = useLocation();
+  const user: User = location.state as User;
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -136,6 +140,7 @@ export const Report = () => {
               recentIssue={issue}
               onCellUpdate={handleCellUpdate}
               days={[today]}
+              userId={user.user_id}
             />
           </>
         );

@@ -5,10 +5,12 @@ import { Cell } from "./Cell";
 export const Row = ({
   recentIssue,
   days,
+  userId,
   onCellUpdate,
 }: {
   recentIssue: recentIssue;
   days: Date[];
+  userId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   return (
@@ -21,6 +23,7 @@ export const Row = ({
           recentIssue={recentIssue}
           date={days[0]}
           onCellUpdate={onCellUpdate}
+          userId={userId}
         />
       </div>
     </>

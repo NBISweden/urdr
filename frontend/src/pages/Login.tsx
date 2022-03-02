@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "../components/Header";
 import "../index.css";
 
+export interface User {
+  login: string;
+  user_id: number;
+}
+
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const authenticateRedmine = (event) => {
+  const authenticateRedmine = async (event) => {
     event?.preventDefault();
     // We are not doing account linking
     let headers = new Headers();
@@ -16,7 +21,7 @@ export const Login = () => {
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
 
-    fetch("http://localhost:8080/api/login", {
+    const user: User = await fetch("http://localhost:8080/api/login", {
       body: "",
       method: "POST",
       credentials: "include",
@@ -24,7 +29,7 @@ export const Login = () => {
     })
       .then((response) => {
         if (response.ok) {
-          navigate("/report");
+          return response.json();
         } else {
           console.log("Error: login failed");
           setUsername("");
@@ -32,6 +37,12 @@ export const Login = () => {
         }
       })
       .catch((error) => console.log("An error occured.", error));
+
+    if (!user) {
+      console.log("Something went wrong!");
+      return;
+    }
+    navigate("/report", { state: user });
   };
 
   return (
