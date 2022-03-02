@@ -61,7 +61,7 @@ In order to rebuild the API spec you should run:
 
 ```command
 # For installing swag, follow https://github.com/swaggo/swag
-swag init -g cmd/main.go
+swag init -g api/api.go
 ```
 
 [Swagger](http://localhost:8080/swagger/index.html)
