@@ -1,5 +1,71 @@
 basePath: /
 definitions:
+  api.IssueActivityResponse:
+    properties:
+      activity:
+        $ref: '#/definitions/redmine.IdName'
+      issue:
+        $ref: '#/definitions/redmine.Issue'
+    type: object
+  api.LoginResponse:
+    properties:
+      login:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  redmine.IdName:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  redmine.Issue:
+    properties:
+      assigned_to:
+        $ref: '#/definitions/redmine.IdName'
+      assigned_to_id:
+        type: integer
+      author:
+        $ref: '#/definitions/redmine.IdName'
+      category:
+        $ref: '#/definitions/redmine.IdName'
+      category_id:
+        type: integer
+      closed_on:
+        type: string
+      created_on:
+        type: string
+      description:
+        type: string
+      done_ratio:
+        type: number
+      due_date:
+        type: string
+      estimated_hours:
+        type: number
+      id:
+        type: integer
+      notes:
+        type: string
+      project:
+        $ref: '#/definitions/redmine.IdName'
+      project_id:
+        type: integer
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/redmine.IdName'
+      status_date:
+        type: string
+      status_id:
+        type: integer
+      subject:
+        type: string
+      updated_on:
+        type: string
+    type: object
   redmine.TimeEntry:
     properties:
       activity_id:
@@ -35,7 +101,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/api.LoginResponse'
         "401":
           description: Unauthorized
           schema:
@@ -60,6 +126,31 @@ paths:
           schema:
             type: string
       summary: Log out a user
+  /api/recent_issues:
+    get:
+      consumes:
+      - application/json
+      description: get recent issues
+      parameters:
+      - description: default
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.IssueActivityResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      summary: get recent issues
   /api/report:
     post:
       consumes:

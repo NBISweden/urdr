@@ -31,7 +31,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/api.LoginResponse"
                         }
                     },
                     "401": {
@@ -62,6 +62,44 @@
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/recent_issues": {
+            "get": {
+                "description": "get recent issues",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get recent issues",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "default",
+                        "name": "Cookie",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.IssueActivityResponse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "type": "string"
                         }
@@ -115,6 +153,107 @@
         }
     },
     "definitions": {
+        "api.IssueActivityResponse": {
+            "type": "object",
+            "properties": {
+                "activity": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "issue": {
+                    "$ref": "#/definitions/redmine.Issue"
+                }
+            }
+        },
+        "api.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "login": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "redmine.IdName": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "redmine.Issue": {
+            "type": "object",
+            "properties": {
+                "assigned_to": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "assigned_to_id": {
+                    "type": "integer"
+                },
+                "author": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "category": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "closed_on": {
+                    "type": "string"
+                },
+                "created_on": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "done_ratio": {
+                    "type": "number"
+                },
+                "due_date": {
+                    "type": "string"
+                },
+                "estimated_hours": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "project": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "project_id": {
+                    "type": "integer"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "status_date": {
+                    "type": "string"
+                },
+                "status_id": {
+                    "type": "integer"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "updated_on": {
+                    "type": "string"
+                }
+            }
+        },
         "redmine.TimeEntry": {
             "type": "object",
             "properties": {
