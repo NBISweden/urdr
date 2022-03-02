@@ -68,9 +68,22 @@ swag init -g cmd/main.go
 
 ## Frontend dev server
 
-In order to install/update packages in the node-urdr server you should:
+In order to run the node-urdr server in a Docker container, you don't need to install frontend packages locally. However, for your IDE (e.g. VSCode) to deal properly with React and other packages, a local install might be needed. To do that:
 
-- Make the neccessary updates in the package.json
+- Move to the `/frontend` directory
+- Run `npm ci`.
+
+### Installing and updating packages
+
+In order to minimize dependency errors after installing or updating packages, your local machine should have the same versions of Node and npm installed as used in the Docker container:
+
+- Node version 17.6.0
+- npm version 8.5.1
+
+To install/update packages in the node-urdr server you should:
+
+- Make the neccessary updates in `package.json`
+- Run `npm install` locally to generate a new `package-lock.json`
 - Execute the following commands:
 
 ```command
@@ -78,6 +91,8 @@ docker-compose down node-urdr --volumes
 docker-compose build node-urdr
 docker-compose up node-urdr
 ```
+
+Finally, you should commit and push your changes in both `package.json` and `package-lock.json` to GitHub. During build, the Docker container does not generate a new `package-lock.json` file for installing packages but rather uses the one found in the repo.
 
 ## Frontend
 
