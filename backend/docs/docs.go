@@ -203,7 +203,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/api.IssueActivityResponse"
+                                "$ref": "#/definitions/api.SpentOnIssueActivityResponse"
                             }
                         }
                     },
@@ -243,6 +243,20 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "api.SpentOnIssueActivityResponse": {
+            "type": "object",
+            "properties": {
+                "activity": {
+                    "$ref": "#/definitions/redmine.IdName"
+                },
+                "hours": {
+                    "type": "number"
+                },
+                "issue": {
+                    "$ref": "#/definitions/redmine.Issue"
                 }
             }
         },

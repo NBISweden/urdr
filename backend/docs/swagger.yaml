@@ -14,6 +14,15 @@ definitions:
       user_id:
         type: integer
     type: object
+  api.SpentOnIssueActivityResponse:
+    properties:
+      activity:
+        $ref: '#/definitions/redmine.IdName'
+      hours:
+        type: number
+      issue:
+        $ref: '#/definitions/redmine.Issue'
+    type: object
   redmine.IdName:
     properties:
       id:
@@ -212,7 +221,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/api.IssueActivityResponse'
+              $ref: '#/definitions/api.SpentOnIssueActivityResponse'
             type: array
         "401":
           description: Unauthorized
