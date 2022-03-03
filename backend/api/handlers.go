@@ -139,6 +139,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Produce  json
 // @Success 200 {string} error "OK"
 // @Failure 401 {string} error "Unauthorized"
+// @Failure 500 {string} error "Internal Server Error"
 // @Router /api/report [post]
 func timeReportHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
