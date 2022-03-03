@@ -4,8 +4,8 @@
 
 body {
   margin: 0;
-  font-family: "Lato", sans-serif;
-  color: hsl(0, 0%, 15%);
+  font-family: Lato, sans-serif;
+  color: hsl(0deg 0% 15%);
 }
 
 h2 {
@@ -73,12 +73,12 @@ input[type="number"] {
 
 .cell {
   width: 100%;
-  border: 1px solid hsl(0, 0%, 83%);
+  border: 1px solid hsl(0deg 0% 83%);
   padding: 0.5rem;
 }
 
 .recent-container {
-  background-color: hsl(0, 0%, 97%);
+  background-color: hsl(0deg 0% 97%);
   padding: 1.5rem;
 }
 
@@ -95,13 +95,13 @@ input[type="number"] {
 }
 
 .save-button {
-  background-color: hsl(76, 55%, 53%);
-  color: hsl(0, 0%, 15%);
+  background-color: hsl(76deg 55% 53%);
+  color: hsl(0deg 0% 15%);
   border: 0px solid black;
   border-radius: 4px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 3px 6px hsl(0, 0, 15%);
-  box-shadow: 0 2px 4px hsl(0, 0, 12%);
+  box-shadow: 0 3px 6px hsl(0deg 0 15%);
+  box-shadow: 0 2px 4px hsl(0deg 0 12%);
   transition-duration: 0.2s;
   margin: 2rem;
   position: absolute;
@@ -109,12 +109,12 @@ input[type="number"] {
 }
 
 .save-button:hover {
-  background-color: hsl(76, 55%, 42%);
-  box-shadow: 0 1px 3px hsl(0, 0, 12%);
-  box-shadow: 0 1px 2px hsl(0, 0, 24%);
+  background-color: hsl(76deg 55% 42%);
+  box-shadow: 0 1px 3px hsl(0deg 0 12%);
+  box-shadow: 0 1px 2px hsl(0deg 0 24%);
 }
 
 .save-button:disabled {
-  background-color: hsl(76, 55%, 77%);
-  color: hsl(84, 55%, 33%);
+  background-color: hsl(76deg 55% 77%);
+  color: hsl(84deg 55% 33%);
 }
