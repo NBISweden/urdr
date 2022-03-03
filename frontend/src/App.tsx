@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Login } from "./pages/Login";
-import { Reporter } from "./pages/Reporter";
+import { Report } from "./pages/Report";
 
 export const App = () => {
   return (
@@ -10,7 +10,7 @@ export const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/report" element={<Reporter />} />
+            <Route path="/report" element={<Report />} />
           </Routes>
         </BrowserRouter>
       </React.StrictMode>
