@@ -10,6 +10,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const defaultDate = "1970-01-01"
+
 type LoginResponse struct {
 	Login  string `json:"login"`
 	UserId int    `json:"user_id"`
@@ -17,6 +19,27 @@ type LoginResponse struct {
 type IssueActivityResponse struct {
 	Issue    redmine.Issue  `json:"issue"`
 	Activity redmine.IdName `json:"activity"`
+}
+type IssueActivity struct {
+	Issue    int
+	Activity redmine.IdName
+}
+
+func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueActivity) []IssueActivityResponse {
+	issuesMap := make(map[int]redmine.Issue)
+	for _, issue := range issues.Issues {
+		issuesMap[issue.Id] = issue
+	}
+
+	var recentIssues []IssueActivityResponse
+
+	for _, issueAct := range issueActivities {
+		recentIssues = append(recentIssues,
+			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
+				Activity: issueAct.Activity})
+	}
+	return recentIssues
+
 }
 
 // loginHandler godoc
@@ -92,10 +115,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-	type IssueActivity struct {
-		Issue    int
-		Activity redmine.IdName
-	}
+
 	seen := make(map[IssueActivity]int)
 	var issueIds []string
 	var issueActivities []IssueActivity
