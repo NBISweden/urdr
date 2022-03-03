@@ -130,23 +130,31 @@ export const Report = () => {
 
   return (
     <>
-      <HeaderRow
-        days={[today.toISOString().split("T")[0]]}
-        title="Recent issues"
-      />
-      {recentIssues.map((issue) => {
-        return (
-          <>
-            <Row
-              recentIssue={issue}
-              onCellUpdate={handleCellUpdate}
-              days={[today]}
-              userId={user.user_id}
-            />
-          </>
-        );
-      })}
-      <button onClick={handleSave}>Save changes</button>
+      <section className="recent-container">
+        <HeaderRow
+          days={[today.toISOString().split("T")[0]]}
+          title="Recent issues"
+        />
+        {recentIssues.map((issue) => {
+          return (
+            <>
+              <Row
+                recentIssue={issue}
+                onCellUpdate={handleCellUpdate}
+                days={[today]}
+                userId={user.user_id}
+              />
+            </>
+          );
+        })}
+      </section>
+      <button
+        className="save-button"
+        onClick={handleSave}
+        disabled={newTimeEntries.length === 0}
+      >
+        Save changes
+      </button>
     </>
   );
 };

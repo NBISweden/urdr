@@ -15,8 +15,8 @@ export const Row = ({
 }) => {
   return (
     <>
-      <div className="row">
-        <p className="col-6">
+      <div className="row issue-row">
+        <p className="col-6 issue-label">
           {recentIssue.issue.subject} - {recentIssue.activity.name}
         </p>
         <Cell
