@@ -135,19 +135,50 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-	issuesMap := make(map[int]redmine.Issue)
-	for _, issue := range issues.Issues {
-		issuesMap[issue.Id] = issue
+
+	return c.JSON(getIssueActivityPairs(issues, issueActivities))
+}
+
+// issuesWithinDateRangeHandler godoc
+// @Summary get time entries within a given time period
+// @Description get time entries within start and end dates
+// @Param Cookie header string true "default"
+// @Param start_date query string true "start date"
+// @Param end_date query string true "end date"
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} IssueActivityResponse
+// @Failure 401 {string} error "Unauthorized"
+// @Router /api/spent_time [get]
+func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
+	user, err := getUser(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(401)
+	}
+	startDate := c.Query("start_date", defaultDate)
+	endDate := c.Query("end_date", defaultDate)
+
+	timeEntries, err := redmine.GetTimeEntriesWithinDateRange(user.ApiKey, startDate, endDate)
+	if err != nil {
+		log.Errorf("Failed to get recent entries: %v", err)
+		return c.SendStatus(500)
+	}
+	var issueIds []string
+	var issueActivities []IssueActivity
+
+	for _, entry := range timeEntries.TimeEntries {
+		issueAct := IssueActivity{Issue: entry.Issue.Id, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
+		issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+		issueActivities = append(issueActivities, issueAct)
 	}
 
-	var recentIssues []IssueActivityResponse
-
-	for _, issueAct := range issueActivities {
-		recentIssues = append(recentIssues,
-			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity})
+	issues, err := redmine.GetIssues(user.ApiKey, issueIds)
+	if err != nil {
+		log.Errorf("Failed to get issues: %v", err)
+		return c.SendStatus(500)
 	}
-	return c.JSON(recentIssues)
+	return c.JSON(getIssueActivityPairs(issues, issueActivities))
 }
 
 // timeReportHandler godoc
