@@ -55,6 +55,18 @@ docker-compose build
 docker-compose up
 ```
 
+## Tests
+
+There are tests for each part of the backend API, which can be tested by the following commands:
+
+```command
+go test -v urdr-api/internal/database
+```
+```command
+REDMINE_HOST=http://localhost USERNAME=user PASSWORD=password USER_ID=123 \
+go test -v urdr-api/internal/redmine
+```
+
 ## API specification
 
 In order to rebuild the API spec you should run:
