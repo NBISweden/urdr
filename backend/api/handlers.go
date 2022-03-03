@@ -102,6 +102,7 @@ func logoutHandler(c *fiber.Ctx) error {
 // @Produce  json
 // @Success 200 {array} IssueActivityResponse
 // @Failure 401 {string} error "Unauthorized"
+// @Failure 500 {string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
 func recentIssuesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
@@ -149,6 +150,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Produce  json
 // @Success 200 {array} IssueActivityResponse
 // @Failure 401 {string} error "Unauthorized"
+// @Failure 500 {string} error "Internal Server Error"
 // @Router /api/spent_time [get]
 func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
