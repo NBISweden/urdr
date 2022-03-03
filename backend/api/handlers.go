@@ -161,6 +161,6 @@ func timeReportHandler(c *fiber.Ctx) error {
 		return c.SendStatus(200)
 	} else {
 		log.Info("time entry creation failed")
-		return c.SendStatus(401)
+		return c.SendStatus(500)
 	}
 }
