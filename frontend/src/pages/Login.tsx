@@ -16,8 +16,6 @@ export const Login = () => {
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
-    let auth = Buffer.from(username + ":" + password).toString("base64");
-    console.log(auth);
     // We are not doing account linking
     let headers = new Headers();
     headers.set(
