@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Buffer } from "buffer";
 import { Header } from "../components/Header";
 import "../index.css";
 
@@ -15,9 +16,14 @@ export const Login = () => {
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
+    let auth = Buffer.from(username + ":" + password).toString("base64");
+    console.log(auth);
     // We are not doing account linking
     let headers = new Headers();
-    headers.set("Authorization", "Basic " + btoa(username + ":" + password));
+    headers.set(
+      "Authorization",
+      "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
+    );
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
 
