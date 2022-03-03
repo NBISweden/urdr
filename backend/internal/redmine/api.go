@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 	cfg "urdr-api/internal/config"
 
 	log "github.com/sirupsen/logrus"
@@ -162,6 +163,32 @@ func GetIssues(apiKey string, issueIds []string) (*IssuesRes, error) {
 func GetTimeEntries(apiKey string) (*TimeEntryResponse, error) {
 	res, err :=
 		doRequest("GET", "/time_entries.json?user_id=me", map[string]string{"X-Redmine-API-Key": apiKey}, "")
+
+	r := &TimeEntryResponse{}
+
+	if err != nil {
+		return r, err
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(&r)
+
+	return r, err
+}
+
+func GetTimeEntriesWithinDateRange(apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
+	_, err := time.Parse("2006-01-02", dayFrom)
+	if err != nil {
+		return nil, err
+	}
+	_, err = time.Parse("2006-01-02", dayTo)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err :=
+		doRequest("GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &TimeEntryResponse{}
 
