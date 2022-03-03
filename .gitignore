@@ -2,6 +2,5 @@ ops-redmine/
 backend/urdr
 backend/tmp/
 backend/database.db
-urdr.env
-tests.env
+*.env
 frontend/node_modules
