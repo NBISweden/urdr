@@ -25,6 +25,18 @@ type IssueActivity struct {
 	Activity redmine.IdName
 }
 
+type SpentOnIssueActivityResponse struct {
+	Issue    redmine.Issue  `json:"issue"`
+	Activity redmine.IdName `json:"activity"`
+	Hours    float32        `json:"hours"`
+}
+
+type SpentOnIssueActivity struct {
+	Issue    int
+	Activity redmine.IdName
+	Hours    float32
+}
+
 func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueActivity) []IssueActivityResponse {
 	issuesMap := make(map[int]redmine.Issue)
 	for _, issue := range issues.Issues {
@@ -37,6 +49,23 @@ func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueAct
 		recentIssues = append(recentIssues,
 			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
 				Activity: issueAct.Activity})
+	}
+	return recentIssues
+
+}
+
+func getSpentOnIssueActivities(issues *redmine.IssuesRes, issueActivities []SpentOnIssueActivity) []SpentOnIssueActivityResponse {
+	issuesMap := make(map[int]redmine.Issue)
+	for _, issue := range issues.Issues {
+		issuesMap[issue.Id] = issue
+	}
+
+	var recentIssues []SpentOnIssueActivityResponse
+
+	for _, issueAct := range issueActivities {
+		recentIssues = append(recentIssues,
+			SpentOnIssueActivityResponse{Issue: issuesMap[issueAct.Issue],
+				Activity: issueAct.Activity, Hours: issueAct.Hours})
 	}
 	return recentIssues
 
@@ -148,7 +177,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Param end_date query string true "end date"
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} IssueActivityResponse
+// @Success 200 {array} SpentOnIssueActivityResponse
 // @Failure 401 {string} error "Unauthorized"
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/spent_time [get]
@@ -167,10 +196,10 @@ func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 		return c.SendStatus(500)
 	}
 	var issueIds []string
-	var issueActivities []IssueActivity
+	var issueActivities []SpentOnIssueActivity
 
 	for _, entry := range timeEntries.TimeEntries {
-		issueAct := IssueActivity{Issue: entry.Issue.Id, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
+		issueAct := SpentOnIssueActivity{Issue: entry.Issue.Id, Hours: entry.Hours, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
 		issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
 		issueActivities = append(issueActivities, issueAct)
 	}
@@ -180,7 +209,7 @@ func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 		log.Errorf("Failed to get issues: %v", err)
 		return c.SendStatus(500)
 	}
-	return c.JSON(getIssueActivityPairs(issues, issueActivities))
+	return c.JSON(getSpentOnIssueActivities(issues, issueActivities))
 }
 
 // timeReportHandler godoc
