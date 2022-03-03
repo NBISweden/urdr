@@ -70,6 +70,8 @@ func Setup() *fiber.App {
 
 	app.Get("/api/recent_issues", recentIssuesHandler)
 
+	app.Get("/api/spent_time", spentTimeWithinDateRangeHandler)
+
 	app.Post("/api/report", timeReportHandler)
 
 	// 404 Handler
