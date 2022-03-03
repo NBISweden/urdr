@@ -140,7 +140,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	return c.JSON(getIssueActivityPairs(issues, issueActivities))
 }
 
-// issuesWithinDateRangeHandler godoc
+// spentTimeWithinDateRangeHandler godoc
 // @Summary get time entries within a given time period
 // @Description get time entries within start and end dates
 // @Param Cookie header string true "default"
