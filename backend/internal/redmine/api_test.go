@@ -176,3 +176,36 @@ func TestCreateTimeEntry(t *testing.T) {
 		})
 	}
 }
+
+func TestGetTimeEntriesWithinDateRange(t *testing.T) {
+	type args struct {
+		apiKey  string
+		dayFrom string
+		dayTo   string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    bool
+		wantErr bool
+	}{
+		{name: "test_valid",
+			args:    args{apiKey: apiKey, dayFrom: "2019-01-01", dayTo: "2022-01-01"},
+			want:    true,
+			wantErr: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			resp, err := GetTimeEntriesWithinDateRange(tt.args.apiKey, tt.args.dayFrom, tt.args.dayTo)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetTimeEntriesWithinDateRange() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			log.Infof("%+v", resp)
+			got := len(resp.TimeEntries) == 100
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetTimeEntriesWithinDateRange() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

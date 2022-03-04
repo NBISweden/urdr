@@ -10,6 +10,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const defaultDate = "1970-01-01"
+
 type LoginResponse struct {
 	Login  string `json:"login"`
 	UserId int    `json:"user_id"`
@@ -17,6 +19,58 @@ type LoginResponse struct {
 type IssueActivityResponse struct {
 	Issue    redmine.Issue  `json:"issue"`
 	Activity redmine.IdName `json:"activity"`
+}
+type IssueActivity struct {
+	Issue    int
+	Activity redmine.IdName
+}
+
+type SpentOnIssueActivityResponse struct {
+	Issue    redmine.Issue  `json:"issue"`
+	Activity redmine.IdName `json:"activity"`
+	Hours    float32        `json:"hours"`
+	SpentOn  string         `json:"spent_on"`
+}
+
+type SpentOnIssueActivity struct {
+	Issue    int
+	Activity redmine.IdName
+	Hours    float32
+	SpentOn  string
+}
+
+func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueActivity) []IssueActivityResponse {
+	issuesMap := make(map[int]redmine.Issue)
+	for _, issue := range issues.Issues {
+		issuesMap[issue.Id] = issue
+	}
+
+	var recentIssues []IssueActivityResponse
+
+	for _, issueAct := range issueActivities {
+		recentIssues = append(recentIssues,
+			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
+				Activity: issueAct.Activity})
+	}
+	return recentIssues
+
+}
+
+func getSpentOnIssueActivities(issues *redmine.IssuesRes, issueActivities []SpentOnIssueActivity) []SpentOnIssueActivityResponse {
+	issuesMap := make(map[int]redmine.Issue)
+	for _, issue := range issues.Issues {
+		issuesMap[issue.Id] = issue
+	}
+
+	var timeSpent []SpentOnIssueActivityResponse
+
+	for _, issueAct := range issueActivities {
+		timeSpent = append(timeSpent,
+			SpentOnIssueActivityResponse{Issue: issuesMap[issueAct.Issue],
+				Activity: issueAct.Activity, Hours: issueAct.Hours, SpentOn: issueAct.SpentOn})
+	}
+	return timeSpent
+
 }
 
 // loginHandler godoc
@@ -79,6 +133,7 @@ func logoutHandler(c *fiber.Ctx) error {
 // @Produce  json
 // @Success 200 {array} IssueActivityResponse
 // @Failure 401 {string} error "Unauthorized"
+// @Failure 500 {string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
 func recentIssuesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
@@ -92,10 +147,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-	type IssueActivity struct {
-		Issue    int
-		Activity redmine.IdName
-	}
+
 	seen := make(map[IssueActivity]int)
 	var issueIds []string
 	var issueActivities []IssueActivity
@@ -115,19 +167,56 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		c.Response().SetBodyString(err.Error())
 		return c.SendStatus(500)
 	}
-	issuesMap := make(map[int]redmine.Issue)
-	for _, issue := range issues.Issues {
-		issuesMap[issue.Id] = issue
+
+	return c.JSON(getIssueActivityPairs(issues, issueActivities))
+}
+
+// spentTimeWithinDateRangeHandler godoc
+// @Summary get time entries within a given time period
+// @Description get time entries within start and end dates
+// @Param Cookie header string true "default"
+// @Param start_date query string true "start date"
+// @Param end_date query string true "end date"
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} SpentOnIssueActivityResponse
+// @Failure 401 {string} error "Unauthorized"
+// @Failure 500 {string} error "Internal Server Error"
+// @Router /api/spent_time [get]
+func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
+	user, err := getUser(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(401)
+	}
+	startDate := c.Query("start_date", defaultDate)
+	endDate := c.Query("end_date", defaultDate)
+
+	timeEntries, err := redmine.GetTimeEntriesWithinDateRange(user.ApiKey, startDate, endDate)
+	if err != nil {
+		log.Errorf("Failed to get recent entries: %v", err)
+		return c.SendStatus(500)
+	}
+	var issueIds []string
+	seen := make(map[int]int)
+	var issueActivities []SpentOnIssueActivity
+
+	for _, entry := range timeEntries.TimeEntries {
+		issueAct := SpentOnIssueActivity{Issue: entry.Issue.Id, Hours: entry.Hours,
+			Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}, SpentOn: entry.SpentOn}
+		seen[entry.Issue.Id]++
+		if seen[entry.Issue.Id] == 1 {
+			issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+		}
+		issueActivities = append(issueActivities, issueAct)
 	}
 
-	var recentIssues []IssueActivityResponse
-
-	for _, issueAct := range issueActivities {
-		recentIssues = append(recentIssues,
-			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity})
+	issues, err := redmine.GetIssues(user.ApiKey, issueIds)
+	if err != nil {
+		log.Errorf("Failed to get issues: %v", err)
+		return c.SendStatus(500)
 	}
-	return c.JSON(recentIssues)
+	return c.JSON(getSpentOnIssueActivities(issues, issueActivities))
 }
 
 // timeReportHandler godoc

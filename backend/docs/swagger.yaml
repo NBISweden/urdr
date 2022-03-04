@@ -14,6 +14,17 @@ definitions:
       user_id:
         type: integer
     type: object
+  api.SpentOnIssueActivityResponse:
+    properties:
+      activity:
+        $ref: '#/definitions/redmine.IdName'
+      hours:
+        type: number
+      issue:
+        $ref: '#/definitions/redmine.Issue'
+      spent_on:
+        type: string
+    type: object
   redmine.IdName:
     properties:
       id:
@@ -150,6 +161,10 @@ paths:
           description: Unauthorized
           schema:
             type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
       summary: get recent issues
   /api/report:
     post:
@@ -180,6 +195,45 @@ paths:
           schema:
             type: string
       summary: report time spent on issues
+  /api/spent_time:
+    get:
+      consumes:
+      - application/json
+      description: get time entries within start and end dates
+      parameters:
+      - description: default
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: start date
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: end date
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.SpentOnIssueActivityResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: get time entries within a given time period
 securityDefinitions:
   BasicAuth:
     type: basic
