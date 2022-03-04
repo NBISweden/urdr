@@ -1,9 +1,6 @@
 name: CodeQL
-"on":
+on:
   pull_request:
-    branches:
-      - main
-      - develop
 jobs:
   analyze:
     name: Analyze

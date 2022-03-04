@@ -1,9 +1,6 @@
 name: Super Linter
-"on":
+on:
   pull_request:
-    branches:
-      - main
-      - develop
 jobs:
   build:
     name: Lint Code Base
