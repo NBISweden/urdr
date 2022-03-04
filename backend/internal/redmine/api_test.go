@@ -190,7 +190,7 @@ func TestGetTimeEntriesWithinDateRange(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "test_valid",
-			args:    args{apiKey: apiKey, dayFrom: "2020-01-01", dayTo: "2021-01-01"},
+			args:    args{apiKey: apiKey, dayFrom: "2019-01-01", dayTo: "2022-01-01"},
 			want:    true,
 			wantErr: false},
 	}
@@ -201,7 +201,8 @@ func TestGetTimeEntriesWithinDateRange(t *testing.T) {
 				t.Errorf("GetTimeEntriesWithinDateRange() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			got := len(resp.TimeEntries) > 5
+			log.Infof("%+v", resp)
+			got := len(resp.TimeEntries) == 100
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetTimeEntriesWithinDateRange() = %v, want %v", got, tt.want)
 			}
