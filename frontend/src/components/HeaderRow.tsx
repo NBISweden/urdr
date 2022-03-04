@@ -9,7 +9,7 @@ export const HeaderRow = ({
 }) => {
   return (
     <div className="row">
-      <p className="col-6">{title}</p>
+      <h2 className="col-6">{title}</h2>
       {days.map((day) => {
         return (
           <p key={day} className="col-1">
