@@ -22,6 +22,8 @@ definitions:
         type: number
       issue:
         $ref: '#/definitions/redmine.Issue'
+      spent_on:
+        type: string
     type: object
   redmine.IdName:
     properties:

@@ -257,6 +257,9 @@ const docTemplate = `{
                 },
                 "issue": {
                     "$ref": "#/definitions/redmine.Issue"
+                },
+                "spent_on": {
+                    "type": "string"
                 }
             }
         },
