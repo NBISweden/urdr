@@ -29,12 +29,14 @@ type SpentOnIssueActivityResponse struct {
 	Issue    redmine.Issue  `json:"issue"`
 	Activity redmine.IdName `json:"activity"`
 	Hours    float32        `json:"hours"`
+	SpentOn  string         `json:"spent_on"`
 }
 
 type SpentOnIssueActivity struct {
 	Issue    int
 	Activity redmine.IdName
 	Hours    float32
+	SpentOn  string
 }
 
 func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueActivity) []IssueActivityResponse {
@@ -60,14 +62,14 @@ func getSpentOnIssueActivities(issues *redmine.IssuesRes, issueActivities []Spen
 		issuesMap[issue.Id] = issue
 	}
 
-	var recentIssues []SpentOnIssueActivityResponse
+	var timeSpent []SpentOnIssueActivityResponse
 
 	for _, issueAct := range issueActivities {
-		recentIssues = append(recentIssues,
+		timeSpent = append(timeSpent,
 			SpentOnIssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity, Hours: issueAct.Hours})
+				Activity: issueAct.Activity, Hours: issueAct.Hours, SpentOn: issueAct.SpentOn})
 	}
-	return recentIssues
+	return timeSpent
 
 }
 
@@ -196,11 +198,16 @@ func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 		return c.SendStatus(500)
 	}
 	var issueIds []string
+	seen := make(map[int]int)
 	var issueActivities []SpentOnIssueActivity
 
 	for _, entry := range timeEntries.TimeEntries {
-		issueAct := SpentOnIssueActivity{Issue: entry.Issue.Id, Hours: entry.Hours, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
-		issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+		issueAct := SpentOnIssueActivity{Issue: entry.Issue.Id, Hours: entry.Hours,
+			Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}, SpentOn: entry.SpentOn}
+		seen[entry.Issue.Id]++
+		if seen[entry.Issue.Id] == 1 {
+			issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
+		}
 		issueActivities = append(issueActivities, issueAct)
 	}
 

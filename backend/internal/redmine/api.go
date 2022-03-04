@@ -188,7 +188,7 @@ func GetTimeEntriesWithinDateRange(apiKey string, dayFrom string, dayTo string) 
 	}
 
 	res, err :=
-		doRequest("GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
+		doRequest("GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s&limit=100", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
 
 	r := &TimeEntryResponse{}
 
