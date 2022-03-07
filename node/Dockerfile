@@ -4,7 +4,7 @@ USER node
 RUN mkdir /home/node/app
 
 WORKDIR /home/node
-COPY /frontend/package.json /frontend/package-lock.json ./
+COPY --chown=node:node /frontend/package.json /frontend/package-lock.json ./
 RUN npm ci
 
 ENV PATH=/home/node/node_modules/.bin:$PATH
