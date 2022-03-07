@@ -6,9 +6,11 @@ WORKDIR /app
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apt-get -y update; \
-    apt-get -y upgrade; \
-    apt-get -y install git='1:2.*'; \
+RUN apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install --no-install-recommends -y git='1:2.*'; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*; \
     curl --fail --location \
         'https://raw.githubusercontent.com/cosmtrek/air/master/install.sh' | \
     sh -e -s && cp -v ./bin/air /bin/air
