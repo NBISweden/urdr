@@ -4,7 +4,7 @@ services:
   urdr:
     build:
       context: ./backend
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./backend/:/app
       - ./urdr.env:/app/urdr.env
