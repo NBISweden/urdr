@@ -161,10 +161,7 @@ export const Report = () => {
   return (
     <>
       <section className="recent-container">
-        <HeaderRow
-          days={[today.toISOString().split("T")[0]]}
-          title="Recent issues"
-        />
+        <HeaderRow days={thisWeek} title="Recent issues" />
         {recentIssues.map((issue) => {
           return (
             <>

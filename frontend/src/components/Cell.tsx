@@ -26,7 +26,9 @@ export const Cell = ({
   return (
     <div className="col-1">
       <label
-        htmlFor={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+        htmlFor={`${recentIssue.issue.id}${
+          recentIssue.activity.id
+        }${date.toISOString()}`}
         hidden={true}
       >
         Time spent on{" "}
@@ -35,7 +37,9 @@ export const Cell = ({
       </label>
       <input
         type="number"
-        id={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+        id={`${recentIssue.issue.id}${
+          recentIssue.activity.id
+        }${date.toISOString()}`}
         min={0}
         onChange={(event: any) => passTimeEntry(+event.target.value)}
         className="cell"

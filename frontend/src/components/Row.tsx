@@ -19,12 +19,19 @@ export const Row = ({
         <p className="col-6 issue-label">
           {recentIssue.issue.subject} - {recentIssue.activity.name}
         </p>
-        <Cell
-          recentIssue={recentIssue}
-          date={days[0]}
-          onCellUpdate={onCellUpdate}
-          userId={userId}
-        />
+        {days.map((day) => {
+          return (
+            <Cell
+              key={`${recentIssue.issue.id}${
+                recentIssue.activity.id
+              }${day.toISOString()}`}
+              recentIssue={recentIssue}
+              date={day}
+              onCellUpdate={onCellUpdate}
+              userId={userId}
+            />
+          );
+        })}
       </div>
     </>
   );
