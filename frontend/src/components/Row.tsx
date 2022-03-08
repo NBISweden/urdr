@@ -18,9 +18,11 @@ export const Row = ({
   return (
     <>
       <div className="row issue-row">
-        <p className="col-6 issue-label">
-          {recentIssue.issue.subject} - {recentIssue.activity.name}
-        </p>
+        <div className="col-6 ">
+          <p className="issue-label">
+            {recentIssue.issue.subject} - {recentIssue.activity.name}
+          </p>
+        </div>
         {days.map((day) => {
           const currentEntry = rowEntries?.find(
             (entry) => entry.spent_on === day.toISOString().split("T")[0]
