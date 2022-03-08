@@ -6,11 +6,13 @@ export const Row = ({
   recentIssue,
   days,
   userId,
+  rowEntries,
   onCellUpdate,
 }: {
   recentIssue: RecentIssue;
   days: Date[];
   userId: number;
+  rowEntries: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   return (
@@ -20,6 +22,9 @@ export const Row = ({
           {recentIssue.issue.subject} - {recentIssue.activity.name}
         </p>
         {days.map((day) => {
+          const currentEntry = rowEntries?.find(
+            (entry) => entry.spent_on === day.toISOString().split("T")[0]
+          );
           return (
             <Cell
               key={`${recentIssue.issue.id}${
@@ -29,6 +34,7 @@ export const Row = ({
               date={day}
               onCellUpdate={onCellUpdate}
               userId={userId}
+              entry={currentEntry}
             />
           );
         })}

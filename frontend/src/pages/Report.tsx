@@ -118,7 +118,9 @@ export const Report = () => {
   }, []);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
-    const entries = newTimeEntries;
+    const entries = newTimeEntries.map((entry) => {
+      return entry;
+    });
     const existingEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
@@ -163,13 +165,20 @@ export const Report = () => {
       <section className="recent-container">
         <HeaderRow days={thisWeek} title="Recent issues" />
         {recentIssues.map((issue) => {
+          const rowEntries = newTimeEntries?.filter(
+            (entry) =>
+              entry.issue_id === issue.issue.id &&
+              entry.activity_id === issue.activity.id
+          );
           return (
             <>
               <Row
+                key={`${issue.issue.id}${issue.activity.id}`}
                 recentIssue={issue}
                 onCellUpdate={handleCellUpdate}
                 days={thisWeek}
                 userId={user.user_id}
+                rowEntries={rowEntries}
               />
             </>
           );
