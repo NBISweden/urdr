@@ -10,8 +10,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const defaultDate = "1970-01-01"
-
 type LoginResponse struct {
 	Login  string `json:"login"`
 	UserId int    `json:"user_id"`
@@ -53,23 +51,6 @@ func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueAct
 				Activity: issueAct.Activity})
 	}
 	return recentIssues
-
-}
-
-func getSpentOnIssueActivities(issues *redmine.IssuesRes, issueActivities []SpentOnIssueActivity) []SpentOnIssueActivityResponse {
-	issuesMap := make(map[int]redmine.Issue)
-	for _, issue := range issues.Issues {
-		issuesMap[issue.Id] = issue
-	}
-
-	var timeSpent []SpentOnIssueActivityResponse
-
-	for _, issueAct := range issueActivities {
-		timeSpent = append(timeSpent,
-			SpentOnIssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity, Hours: issueAct.Hours, SpentOn: issueAct.SpentOn})
-	}
-	return timeSpent
 
 }
 
@@ -126,7 +107,7 @@ func logoutHandler(c *fiber.Ctx) error {
 }
 
 // recentIssuesHandler godoc
-// @Summary get recent issues
+// @Summary get issues that the user has spent time on
 // @Description get recent issues
 // @Param Cookie header string true "default"
 // @Accept  json
