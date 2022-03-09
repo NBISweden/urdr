@@ -168,7 +168,7 @@ export const Report = () => {
         <HeaderRow days={thisWeek} title="Recent issues" />
         {recentIssues &&
           recentIssues.map((issue) => {
-            const rowEntries = newTimeEntries?.filter(
+            const rowUpdates = newTimeEntries?.filter(
               (entry) =>
                 entry.issue_id === issue.issue.id &&
                 entry.activity_id === issue.activity.id
@@ -181,7 +181,7 @@ export const Report = () => {
                   onCellUpdate={handleCellUpdate}
                   days={thisWeek}
                   userId={user.user_id}
-                  rowEntries={rowEntries}
+                  rowUpdates={rowUpdates}
                 />
               </>
             );
