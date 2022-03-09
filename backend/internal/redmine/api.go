@@ -160,21 +160,32 @@ func GetIssues(apiKey string, issueIds []string) (*IssuesRes, error) {
 	return r, err
 }
 
-// getTimeEntries() performs a GET request to the "/time_entries.json"
+// GetTimeEntries() performs a GET request to the "/time_entries.json"
 // endpoint of Redmine.  It takes an API key and some optional filtering
 // parameters.  The filtering parameters that are not used should be
 // specified as nil.  The filtering parameters are date start/end and
-// project ID.
-func getTimeEntries(apiKey string,
+// issue ID + activity ID.
+func GetTimeEntries(apiKey string,
 	dateFrom *string, dateTo *string,
-	projectId *int) (*TimeEntryResponse, error) {
+	issueId *int, activityId *int) (*TimeEntryResponse, error) {
 
 	request := "/time_entries.json?user_id=me"
 
-	if projectId != nil {
-		request += fmt.Sprintf("&project_id=%d", *projectId)
+	if issueId != nil {
+		request += fmt.Sprintf("&issue_id=%d", *issueId)
+	}
+	if activityId != nil {
+		request += fmt.Sprintf("&activity_id=%d", *activityId)
 	}
 	if dateFrom != nil && dateTo != nil {
+		_, err := time.Parse("2006-01-02", *dateFrom)
+		if err != nil {
+			return nil, fmt.Errorf("time.Parse() failed: %w", err)
+		}
+		_, err = time.Parse("2006-01-02", *dateTo)
+		if err != nil {
+			return nil, fmt.Errorf("time.Parse() failed: %w", err)
+		}
 		request += "&from=" + *dateFrom
 		request += "&to=" + *dateTo
 	}
@@ -190,28 +201,6 @@ func getTimeEntries(apiKey string,
 	err = decoder.Decode(&response)
 
 	return response, err
-}
-
-// GetTimeEntries() gets all time entries for a user.
-func GetTimeEntries(apiKey string) (*TimeEntryResponse, error) {
-	return getTimeEntries(apiKey, nil, nil, nil)
-}
-
-// GetTimeEntriesFiltered() get all time entries for a user, for a
-// specific date range and project + activity.
-func GetTimeEntriesFiltered(apiKey string,
-dateFrom string, dateTo string,
-projectId int, activityId int) (*TimeEntryResponse, error) {
-	_, err := time.Parse("2006-01-02", dateFrom)
-	if err != nil {
-		return nil, fmt.Errorf("time.Parse() failed: %w", err)
-	}
-	_, err = time.Parse("2006-01-02", dateTo)
-	if err != nil {
-		return nil, fmt.Errorf("time.Parse() failed: %w", err)
-	}
-
-	return getTimeEntries(apiKey, &dateFrom, &dateTo, &projectId)
 }
 
 func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {

@@ -133,7 +133,7 @@ func TestGetTimeEntries(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := GetTimeEntries(tt.args.apiKey)
+			resp, err := GetTimeEntries(tt.args.apiKey,nil,nil,nil,nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetTimeEntries() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -196,7 +196,7 @@ func TestGetTimeEntriesWithinDateRange(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, err := GetTimeEntriesWithinDateRange(tt.args.apiKey, tt.args.dayFrom, tt.args.dayTo)
+			resp, err := GetTimeEntries(tt.args.apiKey, &tt.args.dayFrom, &tt.args.dayTo,nil,nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetTimeEntriesWithinDateRange() error = %v, wantErr %v", err, tt.wantErr)
 				return
