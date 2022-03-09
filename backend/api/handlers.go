@@ -162,7 +162,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Param activity_id query int false "Redmine activity ID"
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} FetchedTimeEntry
+// @Success 200 {array} redmine.FetchedTimeEntry
 // @Failure 401 {string} error "Unauthorized"
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/time_entries [get]
