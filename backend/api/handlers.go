@@ -122,7 +122,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		log.Errorf("Failed to get session: %v", err)
 		return c.SendStatus(401)
 	}
-	timeEntries, err := redmine.GetTimeEntries(user.ApiKey,nil,nil,nil,nil)
+	timeEntries, err := redmine.GetTimeEntries(user.ApiKey, nil, nil, nil, nil)
 	if err != nil {
 		log.Errorf("Failed to get recent entries: %v", err)
 		c.Response().SetBodyString(err.Error())
@@ -183,7 +183,7 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 	}
 	var endDate *string
 	if endDateStr != "" {
-		endDate =  &endDateStr
+		endDate = &endDateStr
 	}
 	var issueId *int
 	if issueIdStr != "" {

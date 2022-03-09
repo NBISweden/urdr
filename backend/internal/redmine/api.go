@@ -57,12 +57,12 @@ type timeEntryRequest struct {
 }
 
 type TimeEntry struct {
-	Issue    int    `json:"issue_id"`
-	SpentOn  string `json:"spent_on"`
-	Hours    float32    `json:"hours"`
-	Activity int    `json:"activity_id"`
-	Comments string `json:"comments"`
-	User     int    `json:"user_id"`
+	Issue    int     `json:"issue_id"`
+	SpentOn  string  `json:"spent_on"`
+	Hours    float32 `json:"hours"`
+	Activity int     `json:"activity_id"`
+	Comments string  `json:"comments"`
+	User     int     `json:"user_id"`
 }
 type TimeEntryResponse struct {
 	TimeEntries []FetchedTimeEntry `json:"time_entries"`
@@ -196,7 +196,7 @@ func GetTimeEntries(apiKey string,
 	}
 	defer res.Body.Close()
 
-	response := &TimeEntryResponse{};
+	response := &TimeEntryResponse{}
 	decoder := json.NewDecoder(res.Body)
 	err = decoder.Decode(&response)
 
