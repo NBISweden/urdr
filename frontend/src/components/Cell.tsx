@@ -43,7 +43,7 @@ export const Cell = ({
           });
         }}
         className="cell"
-        value={hours}
+        value={hours === 0 ? "" : hours}
       />
     </div>
   );
