@@ -177,6 +177,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Param Cookie header string true "default"
 // @Param start_date query string true "start date"
 // @Param end_date query string true "end date"
+// @Param project_id query int true "Redmine project ID"
+// @Param activity_id query int true "Redmine activity ID"
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} SpentOnIssueActivityResponse
@@ -191,8 +193,10 @@ func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 	}
 	startDate := c.Query("start_date", defaultDate)
 	endDate := c.Query("end_date", defaultDate)
+	projectId := c.Query("project_id")
+	activityId := c.Query("activity_id")
 
-	timeEntries, err := redmine.GetTimeEntriesWithinDateRange(user.ApiKey, startDate, endDate)
+	timeEntries, err := redmine.GetTimeEntriesFiltered(user.ApiKey, startDate, endDate, projectId, activityId)
 	if err != nil {
 		log.Errorf("Failed to get recent entries: %v", err)
 		return c.SendStatus(500)
