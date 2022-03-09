@@ -5,13 +5,13 @@ export const Cell = ({
   recentIssue,
   date,
   userId,
-  entry,
+  hours,
   onCellUpdate,
 }: {
   recentIssue: RecentIssue;
   date: Date;
   userId: number;
-  entry: TimeEntry;
+  hours: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   return (
@@ -43,7 +43,7 @@ export const Cell = ({
           });
         }}
         className="cell"
-        value={entry?.hours}
+        value={hours}
       />
     </div>
   );
