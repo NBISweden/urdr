@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RecentIssue, TimeEntry } from "../pages/Report";
+import { RecentIssue, TimeEntry, FetchedTimeEntry } from "../pages/Report";
 import { Cell } from "./Cell";
 
 export const Row = ({
@@ -15,7 +15,7 @@ export const Row = ({
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
-  const [rowEntries, setRowEntries] = useState<TimeEntry[]>([]);
+  const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   let headers = new Headers();
   headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
@@ -25,7 +25,7 @@ export const Row = ({
     startDate: string,
     endDate: string
   ) => {
-    let entries: TimeEntry[] = await fetch(
+    let entries: FetchedTimeEntry[] = await fetch(
       "http://localhost:8080/api/spent_time",
       {
         method: "GET",
@@ -47,7 +47,7 @@ export const Row = ({
 
   const findCurrentHours = (day: Date) => {
     let hours = 0;
-    let entry = rowUpdates?.find(
+    let entry: TimeEntry | FetchedTimeEntry = rowUpdates?.find(
       (entry) => entry.spent_on === day.toISOString().split("T")[0]
     );
     if (!entry) {
@@ -60,6 +60,17 @@ export const Row = ({
     }
     return hours;
   };
+
+  const findEntryId = (day: Date) => {
+    let id = 0;
+    let entry = rowEntries?.find(
+      (entry) => entry.spent_on === day.toISOString().split("T")[0]
+    );
+    if (entry) {
+      id = entry.id;
+    }
+    return id;
+  };
   return (
     <>
       <div className="row issue-row">
@@ -70,6 +81,7 @@ export const Row = ({
         </div>
         {days.map((day) => {
           const hours = findCurrentHours(day);
+          const id = findEntryId(day);
           return (
             <Cell
               key={`${recentIssue.issue.id}${
@@ -80,6 +92,7 @@ export const Row = ({
               onCellUpdate={onCellUpdate}
               userId={userId}
               hours={hours}
+              entryId={id}
             />
           );
         })}
