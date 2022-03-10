@@ -15,6 +15,7 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
+  console.log(SNOWPACK_PUBLIC_API_URL);
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
@@ -27,15 +28,12 @@ export const Login = () => {
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
 
-    const user: User = await fetch(
-      `http://${SNOWPACK_PUBLIC_API_URL}/api/login`,
-      {
-        body: "",
-        method: "POST",
-        credentials: "include",
-        headers: headers,
-      }
-    )
+    const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
+      body: "",
+      method: "POST",
+      credentials: "include",
+      headers: headers,
+    })
       .then((response) => {
         if (response.ok) {
           return response.json();

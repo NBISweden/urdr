@@ -95,7 +95,7 @@ export const Report = () => {
 
   const getRecentIssues = async () => {
     let issues: RecentIssue[] = await fetch(
-      `http://${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
+      `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
       {
         method: "GET",
         credentials: "include",
@@ -138,7 +138,7 @@ export const Report = () => {
   };
 
   const reportTime = (timeEntry: TimeEntry) => {
-    fetch(`http://${SNOWPACK_PUBLIC_API_URL}/api/report`, {
+    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/report`, {
       body: JSON.stringify(timeEntry),
       method: "POST",
       credentials: "include",
