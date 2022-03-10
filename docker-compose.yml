@@ -21,6 +21,11 @@ services:
 
   node-urdr:
     container_name: node-urdr
+    env_file:
+      - ./urdr.env
+    environment:
+      - NODE_OPTIONS="--max-old-space-size=2048"
+   
     build:
       context: ./
       dockerfile: ./node/Dockerfile
@@ -30,8 +35,7 @@ services:
       - exclude:/home/node/app/node_modules
     ports:
       - 4242:4242
-    environment:
-      - NODE_OPTIONS="--max-old-space-size=2048"
+    
 
 volumes:
   exclude: null

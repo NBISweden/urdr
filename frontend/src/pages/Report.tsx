@@ -1,3 +1,4 @@
+import.meta.hot;
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
@@ -54,6 +55,7 @@ export const Report = () => {
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   let location = useLocation();
   const user: User = location.state as User;
+  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -93,7 +95,7 @@ export const Report = () => {
 
   const getRecentIssues = async () => {
     let issues: RecentIssue[] = await fetch(
-      "http://localhost:8080/api/recent_issues",
+      `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
       {
         method: "GET",
         credentials: "include",
@@ -136,7 +138,7 @@ export const Report = () => {
   };
 
   const reportTime = (timeEntry: TimeEntry) => {
-    fetch("http://localhost:8080/api/report", {
+    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/report`, {
       body: JSON.stringify(timeEntry),
       method: "POST",
       credentials: "include",
@@ -164,25 +166,26 @@ export const Report = () => {
     <>
       <section className="recent-container">
         <HeaderRow days={thisWeek} title="Recent issues" />
-        {recentIssues.map((issue) => {
-          const rowEntries = newTimeEntries?.filter(
-            (entry) =>
-              entry.issue_id === issue.issue.id &&
-              entry.activity_id === issue.activity.id
-          );
-          return (
-            <>
-              <Row
-                key={`${issue.issue.id}${issue.activity.id}`}
-                recentIssue={issue}
-                onCellUpdate={handleCellUpdate}
-                days={thisWeek}
-                userId={user.user_id}
-                rowEntries={rowEntries}
-              />
-            </>
-          );
-        })}
+        {recentIssues &&
+          recentIssues.map((issue) => {
+            const rowEntries = newTimeEntries?.filter(
+              (entry) =>
+                entry.issue_id === issue.issue.id &&
+                entry.activity_id === issue.activity.id
+            );
+            return (
+              <>
+                <Row
+                  key={`${issue.issue.id}${issue.activity.id}`}
+                  recentIssue={issue}
+                  onCellUpdate={handleCellUpdate}
+                  days={thisWeek}
+                  userId={user.user_id}
+                  rowEntries={rowEntries}
+                />
+              </>
+            );
+          })}
       </section>
       <button
         className="save-button"

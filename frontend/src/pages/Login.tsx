@@ -1,3 +1,4 @@
+import.meta.hot;
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
@@ -13,6 +14,8 @@ export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
+  console.log(SNOWPACK_PUBLIC_API_URL);
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
@@ -25,7 +28,7 @@ export const Login = () => {
     headers.set("Accept", "application/json");
     headers.set("Content-Type", "application/json");
 
-    const user: User = await fetch("http://localhost:8080/api/login", {
+    const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
       body: "",
       method: "POST",
       credentials: "include",
