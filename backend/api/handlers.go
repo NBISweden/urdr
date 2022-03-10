@@ -202,7 +202,7 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(500)
 	}
 
-	return c.JSON(timeEntries)
+	return c.JSON(timeEntries.TimeEntries)
 }
 
 // postTimeEntriesHandler godoc
