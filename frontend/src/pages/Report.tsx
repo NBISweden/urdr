@@ -7,6 +7,10 @@ import { User } from "../pages/Login";
 
 // interfaces use snake case to follow Redmines variable names
 
+export interface Id {
+  id: number;
+}
+
 export interface IdName {
   id: number;
   name: string;
@@ -42,12 +46,26 @@ export interface Issue {
 }
 
 export interface TimeEntry {
+  id: number;
   issue_id: number;
   activity_id: number;
   hours: number;
   comments: string;
   spent_on: string;
   user_id: number;
+}
+
+export interface FetchedTimeEntry {
+  id: number;
+  project: IdName;
+  issue: Id;
+  user: IdName;
+  activity: IdName;
+  hours: number;
+  comments: string;
+  spent_on: string;
+  created_on: string;
+  updated_on: string;
 }
 
 export const Report = () => {
