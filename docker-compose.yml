@@ -24,7 +24,7 @@ services:
     build:
       context: ./
       dockerfile: ./node/Dockerfile
-    command: bash -c "rm -rf /home/node/app/node_modules/* && npm run start"
+    command: bash -c "rm -rf /home/node/app/node_modules/* && export SNOWPACK_PUBLIC_API_URL=${BACKEND_HOST}:${BACKEND_PORT} && npm run start"
     volumes:
       - ./frontend:/home/node/app/
       - exclude:/home/node/app/node_modules
@@ -32,6 +32,8 @@ services:
       - 4242:4242
     environment:
       - NODE_OPTIONS="--max-old-space-size=2048"
+    env_file:
+      - ./urdr.env
 
 volumes:
   exclude: null
