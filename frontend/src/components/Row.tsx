@@ -8,12 +8,16 @@ export const Row = ({
   userId,
   rowUpdates,
   onCellUpdate,
+  onReset,
+  saved,
 }: {
   recentIssue: RecentIssue;
   days: Date[];
   userId: number;
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
+  onReset: () => void;
+  saved: boolean;
 }) => {
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
@@ -49,11 +53,12 @@ export const Row = ({
       })
       .catch((error) => console.log(error));
     setRowEntries(entries.time_entries);
+    setTimeout(() => onReset(), 100);
   };
 
   React.useEffect(() => {
     getTimeEntries(params);
-  }, []);
+  }, [saved]);
 
   const findCurrentHours = (day: Date) => {
     let hours = 0;
