@@ -57,6 +57,7 @@ type timeEntryRequest struct {
 }
 
 type TimeEntry struct {
+	Id       int     `json:"id"`
 	Issue    int     `json:"issue_id"`
 	SpentOn  string  `json:"spent_on"`
 	Hours    float32 `json:"hours"`
