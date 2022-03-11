@@ -70,6 +70,7 @@ export interface FetchedTimeEntry {
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<RecentIssue[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
+  const [toggleSave, setToggleSave] = useState(false);
   let location = useLocation();
   const user: User = location.state as User;
 
@@ -154,7 +155,7 @@ export const Report = () => {
   };
 
   const reportTime = (timeEntry: TimeEntry) => {
-    fetch("http://localhost:8080/api/report", {
+    fetch("http://localhost:8080/api/time_entries", {
       body: JSON.stringify(timeEntry),
       method: "POST",
       credentials: "include",
@@ -163,7 +164,6 @@ export const Report = () => {
       .then((response) => {
         if (response.ok) {
           console.log("Time reported");
-          setNewTimeEntries([]);
           alert("Changes saved!");
         } else {
           throw new Error("Time report failed.");
@@ -176,6 +176,11 @@ export const Report = () => {
     newTimeEntries.forEach((entry) => {
       reportTime(entry);
     });
+    setToggleSave(!toggleSave);
+  };
+
+  const handleReset = () => {
+    setNewTimeEntries([]);
   };
 
   return (
@@ -194,6 +199,8 @@ export const Report = () => {
                 key={`${issue.issue.id}${issue.activity.id}`}
                 recentIssue={issue}
                 onCellUpdate={handleCellUpdate}
+                onReset={handleReset}
+                saved={toggleSave}
                 days={thisWeek}
                 userId={user.user_id}
                 rowUpdates={rowUpdates}
