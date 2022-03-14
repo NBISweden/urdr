@@ -181,8 +181,9 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 	// Add the API key to the headers.
 	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
 
-	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?user_id=me",
-		config.Config.Redmine.Host, config.Config.Redmine.Port)
+	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?%s",
+		config.Config.Redmine.Host, config.Config.Redmine.Port,
+		c.Request().URI().QueryString())
 
 	// Proxy the request to Redmine
 	return proxy.Do(c, redmineURL)
