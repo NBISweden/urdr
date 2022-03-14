@@ -28,10 +28,11 @@ export const Row = ({
   headers.set("Content-Type", "application/json");
 
   let params = new URLSearchParams({
+    user_id: `me`,
     issue_id: `${recentIssue.issue.id}`,
     activity_id: `${recentIssue.activity.id}`,
-    start_date: `${days[0].toISOString().split("T")[0]}`,
-    end_date: `${days[4].toISOString().split("T")[0]}`,
+    from: `${days[0].toISOString().split("T")[0]}`,
+    to: `${days[4].toISOString().split("T")[0]}`,
   });
 
   const getTimeEntries = async (params: URLSearchParams) => {
