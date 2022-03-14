@@ -28,7 +28,6 @@ export const Row = ({
   headers.set("Content-Type", "application/json");
 
   let params = new URLSearchParams({
-    user_id: `me`,
     issue_id: `${recentIssue.issue.id}`,
     activity_id: `${recentIssue.activity.id}`,
     from: `${days[0].toISOString().split("T")[0]}`,
