@@ -157,11 +157,12 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 }
 
 // getTimeEntriesHandler godoc
-// @Summary get time entries for an issue+activity within a given time period
-// @Description get time entries within start and end dates
+// @Summary Proxy for the "/time_entries.json" Redmine endpoint
+// @Description get time entries
 // @Param Cookie header string true "default"
-// @Param start_date query string false "start date"
-// @Param end_date query string false "end date"
+// @Param from query string false "start date"
+// @Param to query string false "end date"
+// @Param spent_on string false "date"
 // @Param issue_id query int false "Redmine issue ID"
 // @Param activity_id query int false "Redmine activity ID"
 // @Accept  json
@@ -178,10 +179,10 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 	}
 
 	// Add the API key to the headers.
-	c.Set("X-Redmine-API-Key", user.ApiKey)
+	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
 
-	redmineURL := fmt.Sprintf("http://%s:%s/time_entries.json?user_id=%d",
-		config.Config.Redmine.Host, config.Config.Redmine.Port, user.Id)
+	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?user_id=me",
+		config.Config.Redmine.Host, config.Config.Redmine.Port)
 
 	// Proxy the request to Redmine
 	return proxy.Do(c, redmineURL)
