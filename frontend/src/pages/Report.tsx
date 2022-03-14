@@ -157,7 +157,7 @@ export const Report = () => {
   };
 
   const reportTime = (timeEntry: TimeEntry) => {
-    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/report`, {
+    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify(timeEntry),
       method: "POST",
       credentials: "include",
