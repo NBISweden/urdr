@@ -1,13 +1,17 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
-	"urdr-api/internal/redmine"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/proxy"
+	log "github.com/sirupsen/logrus"
 
 	_ "urdr-api/docs"
 
-	"github.com/gofiber/fiber/v2"
-	log "github.com/sirupsen/logrus"
+	"urdr-api/internal/config"
+	"urdr-api/internal/redmine"
 )
 
 type LoginResponse struct {
@@ -170,39 +174,17 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(401)
-	}
-	startDateStr := c.Query("start_date")
-	endDateStr := c.Query("end_date")
-	issueIdStr := c.Query("issue_id")
-	activityIdStr := c.Query("activity_id")
-
-	var startDate *string
-	if startDateStr != "" {
-		startDate = &startDateStr
-	}
-	var endDate *string
-	if endDateStr != "" {
-		endDate = &endDateStr
-	}
-	var issueId *int
-	if issueIdStr != "" {
-		val, _ := strconv.Atoi(issueIdStr)
-		issueId = &val
-	}
-	var activityId *int
-	if activityIdStr != "" {
-		val, _ := strconv.Atoi(activityIdStr)
-		activityId = &val
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	timeEntries, err := redmine.GetTimeEntries(user.ApiKey, startDate, endDate, issueId, activityId)
-	if err != nil {
-		log.Errorf("Failed to get recent entries: %v", err)
-		return c.SendStatus(500)
-	}
+	// Add the API key to the headers.
+	c.Set("X-Redmine-API-Key", user.ApiKey)
 
-	return c.JSON(timeEntries.TimeEntries)
+	redmineURL := fmt.Sprintf("http://%s:%s/time_entries.json?user_id=%d",
+		config.Config.Redmine.Host, config.Config.Redmine.Port, user.Id)
+
+	// Proxy the request to Redmine
+	return proxy.Do(c, redmineURL)
 }
 
 // postTimeEntriesHandler godoc
