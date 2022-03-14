@@ -1,3 +1,4 @@
+import.meta.hot;
 import React, { useState } from "react";
 import { RecentIssue, TimeEntry, FetchedTimeEntry } from "../pages/Report";
 import { Cell } from "./Cell";
@@ -22,6 +23,7 @@ export const Row = ({
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
   const [rowEntryIds, setRowEntryIds] = useState<number[]>([]);
+  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -36,7 +38,7 @@ export const Row = ({
 
   const getTimeEntries = async (params: URLSearchParams) => {
     let entries: { time_entries: FetchedTimeEntry[] } = await fetch(
-      `http://localhost:8080/api/time_entries?${params}`,
+      `${SNOWPACK_PUBLIC_API_URL}/api/time_entries?${params}`,
       {
         method: "GET",
         credentials: "include",

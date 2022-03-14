@@ -205,6 +205,8 @@ export const Report = () => {
                   days={thisWeek}
                   userId={user.user_id}
                   rowUpdates={rowUpdates}
+                  onReset={handleReset}
+                  saved={toggleSave}
                 />
               </>
             );
