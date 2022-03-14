@@ -189,7 +189,6 @@ export const Report = () => {
     <>
       <section className="recent-container">
         <HeaderRow days={thisWeek} title="Recent issues" />
-<<<<<<< HEAD
         {recentIssues &&
           recentIssues.map((issue) => {
             const rowUpdates = newTimeEntries?.filter(
@@ -210,29 +209,6 @@ export const Report = () => {
               </>
             );
           })}
-=======
-        {recentIssues.map((issue) => {
-          const rowUpdates = newTimeEntries?.filter(
-            (entry) =>
-              entry.issue_id === issue.issue.id &&
-              entry.activity_id === issue.activity.id
-          );
-          return (
-            <>
-              <Row
-                key={`${issue.issue.id}${issue.activity.id}`}
-                recentIssue={issue}
-                onCellUpdate={handleCellUpdate}
-                onReset={handleReset}
-                saved={toggleSave}
-                days={thisWeek}
-                userId={user.user_id}
-                rowUpdates={rowUpdates}
-              />
-            </>
-          );
-        })}
->>>>>>> f7c6ef2 (remove number flickering on save)
       </section>
       <button
         className="save-button"
