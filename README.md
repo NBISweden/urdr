@@ -75,16 +75,22 @@ In order to run the node-urdr server in a Docker container, you don't need to in
 
 ### Installing and updating packages
 
-In order to minimize dependency errors after installing or updating packages, your local machine should have the same versions of Node and npm installed as used in the Docker container:
+In order to minimize dependency differences between local environments we create our `package-lock.json` file in a separate Docker container.
 
-- Node version 17.6.0
-- npm version 8.5.1
+If you want to add a new dependency to the project:
 
-To install/update packages in the node-urdr server you should:
+- add it in the `package.json` file using semantic versioning. We usually specify versions using the Caret (^) to automatically include minor releases, for example
 
-- Make the neccessary updates in `package.json`
-- Run `npm install` locally to generate a new `package-lock.json`
-- Execute the following commands:
+```json
+"typescript": "^4.5.5"
+```
+
+- move to the `frontend` folder and run `./update-package-lock`. A new `package-lock.json` file will be created.
+- add, commit and push `package.json` and `package-lock.json` to GitHub.
+
+Have in mind that these steps will also update existing dependencies according to the rules specified in `package.json`.
+
+Afterwards, you will have to rebuild the Docker container that runs the Node.js server. Do like this:
 
 ```command
 docker-compose down node-urdr --volumes
@@ -92,7 +98,7 @@ docker-compose build node-urdr
 docker-compose up node-urdr
 ```
 
-Finally, you should commit and push your changes in both `package.json` and `package-lock.json` to GitHub. During build, the Docker container does not generate a new `package-lock.json` file for installing packages but rather uses the one found in the repo.
+If you only want to update dependencies, follow the same steps but skip adding a new dependency.
 
 ## Frontend
 
