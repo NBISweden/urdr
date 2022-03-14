@@ -2,7 +2,6 @@ package redmine
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -204,7 +203,7 @@ func GetTimeEntries(apiKey string,
 	return response, err
 }
 
-func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {
+func ProcessTimeEntry(timeEntry TimeEntry, apiKey string) error {
 	var ir timeEntryRequest
 
 	ir.TimeEntry = timeEntry
@@ -213,20 +212,41 @@ func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {
 		return err
 	}
 
-	res, err :=
-		doRequest("POST", "/time_entries.json",
-			map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
-	if err != nil {
-		log.Errorf("Failed to create time entry: %s", err)
-		return err
-	}
-	defer res.Body.Close()
+	method := "IGNORE"
+	request := "/time_entries"
 
-	if res.StatusCode != 201 {
-		log.Errorf("Failed to create time entry: %s", res.Status)
-		return errors.New(res.Status)
+	if timeEntry.Id == 0 {
+		if timeEntry.Hours > 0 {
+			// Create time entry (POST)
+			method = "POST"
+			request += ".json"
+		} // else ignore
+	} else {
+		request += fmt.Sprintf("/%d.json", timeEntry.Id)
+		if timeEntry.Hours == 0 {
+			// Delete time entry (DELETE)
+			method = "DELETE"
+		} else {
+			// Update time entry (PUT)
+			method = "PUT"
+		}
 	}
-	log.Infof("Created time entry: %s", string(s))
+
+	if method != "IGNORE" {
+		res, err :=
+			doRequest(method, request,
+				map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
+		if err != nil {
+			return fmt.Errorf("Failed to process (%v) time entry: %v", method, err)
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode != 201 {
+			return fmt.Errorf("Failed to process (%v) time entry: %v", method, res.Status)
+		}
+	}
+
+	log.Infof("Processed (%v) time entry: %v", method, string(s))
 
 	return nil
 }
