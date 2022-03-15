@@ -223,9 +223,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// Add the API key to the headers.
-	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
-
 	// If the method remains empty, we won't send anything to
 	// Redmine.
 	method := ""
@@ -257,6 +254,9 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 
 	// Set correct method before proxying.
 	c.Request().Header.SetMethod(method)
+
+	// Add the API key to the headers.
+	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
 
 	log.Debugln(redmineURL, string(c.Request().Body()))
 
