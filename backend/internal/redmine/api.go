@@ -51,10 +51,6 @@ type IssuesRes struct {
 	Limit      uint    `json:"limit"`
 }
 
-type timeEntryRequest struct {
-	TimeEntry TimeEntry `json:"time_entry"`
-}
-
 type TimeEntry struct {
 	Id       int     `json:"id"`
 	Issue    int     `json:"issue_id"`
