@@ -19,28 +19,6 @@ type LoginResponse struct {
 	Login  string `json:"login"`
 	UserId int    `json:"user_id"`
 }
-type IssueActivityResponse struct {
-	Issue    redmine.Issue  `json:"issue"`
-	Activity redmine.IdName `json:"activity"`
-}
-type IssueActivity struct {
-	Issue    int
-	Activity redmine.IdName
-}
-
-type SpentOnIssueActivityResponse struct {
-	Issue    redmine.Issue  `json:"issue"`
-	Activity redmine.IdName `json:"activity"`
-	Hours    float32        `json:"hours"`
-	SpentOn  string         `json:"spent_on"`
-}
-
-type SpentOnIssueActivity struct {
-	Issue    int
-	Activity redmine.IdName
-	Hours    float32
-	SpentOn  string
-}
 
 // loginHandler godoc
 // @Summary Log in a user
