@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
@@ -40,23 +40,6 @@ type SpentOnIssueActivity struct {
 	Activity redmine.IdName
 	Hours    float32
 	SpentOn  string
-}
-
-func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueActivity) []IssueActivityResponse {
-	issuesMap := make(map[int]redmine.Issue)
-	for _, issue := range issues.Issues {
-		issuesMap[issue.Id] = issue
-	}
-
-	var recentIssues []IssueActivityResponse
-
-	for _, issueAct := range issueActivities {
-		recentIssues = append(recentIssues,
-			IssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity})
-	}
-	return recentIssues
-
 }
 
 // loginHandler godoc
@@ -122,39 +105,111 @@ func logoutHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
 func recentIssuesHandler(c *fiber.Ctx) error {
-	user, err := getUser(c)
-	if err != nil {
-		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(401)
-	}
-	timeEntries, err := redmine.GetTimeEntries(user.ApiKey, nil, nil, nil, nil)
-	if err != nil {
-		log.Errorf("Failed to get recent entries: %v", err)
-		c.Response().SetBodyString(err.Error())
-		return c.SendStatus(500)
+	// Use the proxy to do an unrestricted call to the
+	// "/time_entries.json" Redmine endpoint, then call the
+	// "/issues.json" Redmine endpoint with the unique issue
+	// IDs from the response and pass that response back to our
+	// frontend.
+
+	// Note that the way we do this is by calling our own
+	// getTimeEntriesHandler() function and then parsing the
+	// result from there.  This means that our frontend could pass
+	// additional parameters to the Redmine "/time_entries.json"
+	// endpoint if needed, e.g., to extend the limit on number of
+	// returned entries, or to specify date filtering etc.
+
+	if err := getTimeEntriesHandler(c); err != nil {
+		return err
 	}
 
-	seen := make(map[IssueActivity]int)
+	// Get unique pairings of issue IDs and activity IDs from the
+	// response.
+
+	timeEntriesResponse := struct {
+		TimeEntries []struct {
+			Issue struct {
+				Id int `json:"id"`
+			} `json:"issue"`
+			Activity struct {
+				Id   int    `json:"id"`
+				Name string `json:"name"`
+			} `json:"activity"`
+		} `json:"time_entries"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &timeEntriesResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	type IssueActivity struct {
+		Issue struct {
+			Id   int    `json:"id"`
+			Name string `json:"subject"`
+		} `json:"issue"`
+		Activity struct {
+			Id   int    `json:"id"`
+			Name string `json:"name"`
+		} `json:"activity"`
+	}
+	seenIssueIds := make(map[int]bool)
 	var issueIds []string
-	var issueActivities []IssueActivity
+	seenIssueActivities := make(map[IssueActivity]bool)
 
-	for _, entry := range timeEntries.TimeEntries {
-		issueAct := IssueActivity{Issue: entry.Issue.Id, Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}}
-		seen[issueAct]++
-		if seen[issueAct] == 1 {
-			issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
-			issueActivities = append(issueActivities, issueAct)
+	for _, entry := range timeEntriesResponse.TimeEntries {
+		key := IssueActivity{}
+		key.Issue.Id = entry.Issue.Id
+		key.Activity.Id = entry.Activity.Id
+		key.Activity.Name = entry.Activity.Name
+
+		if !seenIssueActivities[key] {
+			seenIssueActivities[key] = true
+		}
+		if !seenIssueIds[key.Issue.Id] {
+			seenIssueIds[key.Issue.Id] = true
+			issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
 		}
 	}
 
-	issues, err := redmine.GetIssues(user.ApiKey, issueIds)
-	if err != nil {
-		log.Errorf("Failed to get recent issues: %v", err)
-		c.Response().SetBodyString(err.Error())
-		return c.SendStatus(500)
+	// Do a request to the Redmine "/issues.json" endpoint to get
+	// the issue names.
+
+	redmineURL := fmt.Sprintf("%s:%s/issues.json?issue_id=%s",
+		config.Config.Redmine.Host, config.Config.Redmine.Port,
+		strings.Join(issueIds, ","))
+
+	if err := proxy.Do(c, redmineURL); err != nil {
+		return err
 	}
 
-	return c.JSON(getIssueActivityPairs(issues, issueActivities))
+	issuesResponse := struct {
+		Issues []struct {
+			Id   int    `json:"id"`
+			Name string `json:"subject"`
+		} `json:"issues"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	log.Debugln(issuesResponse)
+
+	var issueActivities []IssueActivity
+	for issueActivity := range seenIssueActivities {
+		for _, entry := range issuesResponse.Issues {
+			if entry.Id == issueActivity.Issue.Id {
+				issueActivity.Issue.Name = entry.Name
+				issueActivities = append(issueActivities, issueActivity)
+				break
+			}
+		}
+	}
+
+	log.Debugln(issueActivities)
+
+	return c.JSON(issueActivities)
 }
 
 // getTimeEntriesHandler godoc
