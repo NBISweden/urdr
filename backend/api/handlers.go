@@ -122,8 +122,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 
 	type IssueActivity struct {
 		Issue struct {
-			Id   int    `json:"id"`
-			Name string `json:"subject"`
+			Id      int    `json:"id"`
+			Subject string `json:"subject"`
 		} `json:"issue"`
 		Activity struct {
 			Id   int    `json:"id"`
@@ -150,7 +150,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	}
 
 	// Do a request to the Redmine "/issues.json" endpoint to get
-	// the issue names.
+	// the issue subjects.
 
 	redmineURL := fmt.Sprintf("%s:%s/issues.json?issue_id=%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
@@ -160,10 +160,13 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Parse the response and fill out the subjects in the structs
+	// used as keys in the seenIssueActivities map.
+
 	issuesResponse := struct {
 		Issues []struct {
-			Id   int    `json:"id"`
-			Name string `json:"subject"`
+			Id      int    `json:"id"`
+			Subject string `json:"subject"`
 		} `json:"issues"`
 	}{}
 
@@ -178,7 +181,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	for issueActivity := range seenIssueActivities {
 		for _, entry := range issuesResponse.Issues {
 			if entry.Id == issueActivity.Issue.Id {
-				issueActivity.Issue.Name = entry.Name
+				issueActivity.Issue.Subject = entry.Subject
 				issueActivities = append(issueActivities, issueActivity)
 				break
 			}
