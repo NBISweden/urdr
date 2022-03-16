@@ -12,13 +12,7 @@ import (
 	_ "urdr-api/docs"
 
 	"urdr-api/internal/config"
-	"urdr-api/internal/redmine"
 )
-
-type LoginResponse struct {
-	Login  string `json:"login"`
-	UserId int    `json:"user_id"`
-}
 
 // loginHandler godoc
 // @Summary Log in a user
@@ -30,24 +24,48 @@ type LoginResponse struct {
 // @Failure 401 {string} error "Unauthorized"
 // @Router /api/login [post]
 func loginHandler(c *fiber.Ctx) error {
-	sess, err := store.Get(c)
+	session, err := store.Get(c)
 	if err != nil {
-		log.Errorf("Failed to get session: %s", err)
-		return c.SendStatus(500)
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-	authHeader := c.Get("Authorization")
-	user, err := redmine.Login(authHeader)
-	if err != nil {
-		log.Info("Log in failed")
-		return c.SendStatus(401)
+
+	// Redmine wants a GET request here, not a POST.
+	c.Request().Header.SetMethod(fiber.MethodGet)
+
+	redmineURL := fmt.Sprintf("%s:%s/my/account.json",
+		config.Config.Redmine.Host, config.Config.Redmine.Port)
+
+	if err := proxy.Do(c, redmineURL); err != nil {
+		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return nil
 	}
-	sess.Set("user", &user)
-	err = sess.Save()
-	if err != nil {
-		log.Errorf("Failed to save session: %s", err)
+
+	loginResponse := struct {
+		User struct {
+			Id     int    `json:"id"`
+			Login  string `json:"login"`
+			ApiKey string `json:"api_key"`
+		} `json:"user"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &loginResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
-	log.Debugf("Logged in user %v", user)
-	return c.JSON(LoginResponse{Login: user.Login, UserId: user.Id})
+
+	session.Set("id", loginResponse.User.Id)
+	session.Set("login", loginResponse.User.Login)
+	session.Set("api_key", loginResponse.User.ApiKey)
+
+	if err := session.Save(); err != nil {
+		log.Errorf("Failed to save session: %v", err)
+	}
+
+	log.Debugf("Logged in user %v", loginResponse)
+
+	return nil
 }
 
 // logoutHandler godoc
@@ -59,17 +77,25 @@ func loginHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/logout [post]
 func logoutHandler(c *fiber.Ctx) error {
-	sess, err := store.Get(c)
+	c.Response().Reset()
+
+	session, err := store.Get(c)
 	if err != nil {
-		log.Errorf("Failed to get session: %s", err)
-		return c.SendStatus(500)
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-	err = sess.Destroy()
+
+	if ApiKey := session.Get("api_key"); ApiKey == nil {
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	err = session.Destroy()
 	if err != nil {
-		log.Errorf("Failed to destroy session: %s", err)
-		return c.SendStatus(500)
+		log.Errorf("Failed to destroy session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-	return c.SendStatus(200)
+
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
 // recentIssuesHandler godoc
@@ -102,6 +128,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// This also sets the "X-Redmine-API-Key" header.
 	if err := getTimeEntriesHandler(c); err != nil {
 		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return nil
 	}
 
 	// Get unique pairings of issue IDs and activity IDs from the
@@ -173,6 +201,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 
 	if err := proxy.Do(c, redmineURL); err != nil {
 		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return nil
 	}
 
 	// Parse the response and fill out the subjects in the structs
@@ -190,8 +220,6 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	log.Debugln(issuesResponse)
-
 	var issueActivities []IssueActivity
 
 	// Iterate over the *keys* of the seenIssueActivities map
@@ -208,8 +236,6 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			}
 		}
 	}
-
-	log.Debugln(issueActivities)
 
 	return c.JSON(issueActivities)
 }
@@ -230,14 +256,20 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/time_entries [get]
 func getTimeEntriesHandler(c *fiber.Ctx) error {
-	user, err := getUser(c)
+	session, err := store.Get(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	ApiKey := session.Get("api_key")
+
+	if ApiKey == nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
 	// Add the API key to the headers.
-	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
+	c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 
 	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?user_id=me&%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
@@ -259,9 +291,14 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/time_entries [post]
 func postTimeEntriesHandler(c *fiber.Ctx) error {
-	user, err := getUser(c)
+	session, err := store.Get(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	ApiKey := session.Get("api_key")
+	if ApiKey == nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
@@ -276,7 +313,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	}{}
 
 	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
-		c.Response().Reset()
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
@@ -305,7 +341,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 
 	if method == "" {
 		// Just give back an OK (204, "No Content")
-		c.Response().Reset()
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 
@@ -313,9 +348,7 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	c.Request().Header.SetMethod(method)
 
 	// Add the API key to the headers.
-	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
-
-	log.Debugln(redmineURL, string(c.Request().Body()))
+	c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 
 	return proxy.Do(c, redmineURL)
 }

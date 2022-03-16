@@ -1,10 +1,7 @@
 package api
 
 import (
-	"encoding/gob"
-	"errors"
 	"time"
-	"urdr-api/internal/redmine"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
@@ -18,18 +15,6 @@ import (
 
 var store *session.Store
 
-func getUser(c *fiber.Ctx) (*redmine.User, error) {
-	sess, err := store.Get(c)
-	if err != nil {
-		return nil, err
-	}
-	user := sess.Get("user")
-	if user == nil {
-		return nil, errors.New("No session user found")
-	}
-	return user.(*redmine.User), nil
-}
-
 // @title Urdr API
 // @version 1.0
 // @description This is the Urdr API.
@@ -41,8 +26,6 @@ func getUser(c *fiber.Ctx) (*redmine.User, error) {
 // @securityDefinitions.basic BasicAuth
 // @BasePath /
 func Setup() *fiber.App {
-
-	gob.Register(&redmine.User{})
 
 	// Fiber instance
 	app := fiber.New()
