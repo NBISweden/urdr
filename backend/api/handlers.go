@@ -83,19 +83,23 @@ func logoutHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
 func recentIssuesHandler(c *fiber.Ctx) error {
-	// Use the proxy to do an unrestricted call to the
-	// "/time_entries.json" Redmine endpoint, then call the
-	// "/issues.json" Redmine endpoint with the unique issue
-	// IDs from the response and pass that response back to our
-	// frontend.
+	/* We want to return a list of pairs of issues and activities,
+	   where where each issue and activity is an ID and a
+	   name.  Unfortunately, the subject of the issue (its name,
+	   essentially) is not included in the output from the Redmine
+	   "/time_entries.json" endpoint, so we need to do a separate
+	   call to the Redmine "/issues.json" endpoint to get these
+	   strings. */
 
-	// Note that the way we do this is by calling our own
-	// getTimeEntriesHandler() function and then parsing the
-	// result from there.  This means that our frontend could pass
-	// additional parameters to the Redmine "/time_entries.json"
-	// endpoint if needed, e.g., to extend the limit on number of
-	// returned entries, or to specify date filtering etc.
+	/* Note that the way we do this is by calling our own
+	   getTimeEntriesHandler() function and then parsing the result
+	   from there.  This means that our frontend is allowed to pass
+	   additional parameters to the Redmine "/time_entries.json"
+	   endpoint if needed, e.g., to extend the limit on number of
+	   returned entries, or to specify date filtering, etc. */
 
+	// Start by getting the most recent time entries.
+	// This also sets the "X-Redmine-API-Key" header.
 	if err := getTimeEntriesHandler(c); err != nil {
 		return err
 	}
@@ -120,6 +124,9 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
+	// We'll use the following IssueActivity type to create a list
+	// of pairs of issues and activities that we later marshal into
+	// a JSON response from this function.
 	type IssueActivity struct {
 		Issue struct {
 			Id      int    `json:"id"`
@@ -130,8 +137,10 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			Name string `json:"name"`
 		} `json:"activity"`
 	}
+
 	seenIssueIds := make(map[int]bool)
 	var issueIds []string
+
 	seenIssueActivities := make(map[IssueActivity]bool)
 
 	for _, entry := range timeEntriesResponse.TimeEntries {
@@ -145,12 +154,16 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		}
 		if !seenIssueIds[key.Issue.Id] {
 			seenIssueIds[key.Issue.Id] = true
+
+			// We append the issue IDs as strings to be able
+			// to conveniently create a comma-delimited list
+			// using strings.Join() later.
 			issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
 		}
 	}
 
 	// Do a request to the Redmine "/issues.json" endpoint to get
-	// the issue subjects.
+	// the issue subjects for the issue IDs in the issueIds list.
 
 	redmineURL := fmt.Sprintf("%s:%s/issues.json?issue_id=%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
@@ -178,6 +191,12 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	log.Debugln(issuesResponse)
 
 	var issueActivities []IssueActivity
+
+	// Iterate over the *keys* of the seenIssueActivities map
+	// and add the subject to each issue from the issuesResponse
+	// structure.  Add the issueActivity with its now completed
+	// issue to the issueActivities list for marshalling into JSON.
+
 	for issueActivity := range seenIssueActivities {
 		for _, entry := range issuesResponse.Issues {
 			if entry.Id == issueActivity.Issue.Id {
