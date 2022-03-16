@@ -151,14 +151,16 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 
 		if !seenIssueActivities[key] {
 			seenIssueActivities[key] = true
-		}
-		if !seenIssueIds[key.Issue.Id] {
-			seenIssueIds[key.Issue.Id] = true
 
-			// We append the issue IDs as strings to be able
-			// to conveniently create a comma-delimited list
-			// using strings.Join() later.
-			issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
+			if !seenIssueIds[key.Issue.Id] {
+				seenIssueIds[key.Issue.Id] = true
+
+				// We append the issue IDs as strings
+				// to be able to conveniently create
+				// a comma-delimited list using
+				// strings.Join() later.
+				issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
+			}
 		}
 	}
 
