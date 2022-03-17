@@ -12,7 +12,7 @@ import (
 // init is run before main.  It loads the configuration variables and
 // connects to the database.
 func init() {
-	logging.Setup("debug")
+	logging.Setup(log.DebugLevel)
 
 	err := config.Setup()
 	if err != nil {
