@@ -3,8 +3,7 @@ package main
 import (
 	"urdr-api/api"
 	"urdr-api/internal/config"
-	db "urdr-api/internal/database"
-	"urdr-api/internal/logging"
+	"urdr-api/internal/database"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -12,13 +11,17 @@ import (
 // init is run before main.  It loads the configuration variables and
 // connects to the database.
 func init() {
-	logging.Setup(log.DebugLevel)
+	log.SetFormatter(&log.TextFormatter{
+		DisableColors: true,
+		FullTimestamp: true,
+	})
+	log.SetLevel(log.DebugLevel)
 
 	if err := config.Setup(); err != nil {
 		log.Fatalf("config.LoadConfig() failed: %v", err)
 	}
 
-	if err := db.Setup(); err != nil {
+	if err := database.Setup(); err != nil {
 		log.Fatalf("db.Setup() failed: %v", err)
 	}
 }
