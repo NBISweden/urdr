@@ -10,7 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/gofiber/fiber/v2/utils"
 )
 
 var store *session.Store
@@ -35,14 +34,9 @@ func Setup() *fiber.App {
 	}))
 
 	store = session.New(session.Config{
-		Expiration:     time.Minute * 5,
-		CookieName:     "urdr_session",
-		CookieDomain:   "",
-		CookiePath:     "",
-		CookieSecure:   true,
-		CookieHTTPOnly: false,
-		CookieSameSite: "none",
-		KeyGenerator:   utils.UUID,
+		Expiration:   time.Minute * 5,
+		KeyLookup:    "cookie:urdr_session",
+		CookieSecure: true,
 	})
 
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
