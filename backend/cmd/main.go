@@ -14,23 +14,18 @@ import (
 func init() {
 	logging.Setup(log.DebugLevel)
 
-	err := config.Setup()
-	if err != nil {
+	if err := config.Setup(); err != nil {
 		log.Fatalf("config.LoadConfig() failed: %v", err)
 	}
 
-	err = db.Setup()
-	if err != nil {
+	if err := db.Setup(); err != nil {
 		log.Fatalf("db.Setup() failed: %v", err)
 	}
 }
 
 func main() {
-	// app contains the web app and endpoints
-
-	log.Infof("Redmine host config: %s", config.Config.Redmine.Host)
-	app := api.Setup()
+	log.Infof("Redmine host config: %v", config.Config.Redmine.Host)
 
 	// Start server
-	log.Fatal(app.Listen(config.Config.App.Host + ":" + config.Config.App.Port))
+	log.Fatal(api.Setup().Listen(config.Config.App.Host + ":" + config.Config.App.Port))
 }
