@@ -5,13 +5,15 @@ export const Cell = ({
   recentIssue,
   date,
   userId,
-  entry,
+  hours,
+  entryId,
   onCellUpdate,
 }: {
   recentIssue: RecentIssue;
   date: Date;
   userId: number;
-  entry: TimeEntry;
+  hours: number;
+  entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   return (
@@ -34,6 +36,7 @@ export const Cell = ({
         min={0}
         onChange={(event: any) => {
           onCellUpdate({
+            id: entryId,
             issue_id: recentIssue.issue.id,
             activity_id: recentIssue.activity.id,
             hours: +event.target.value,
@@ -43,7 +46,7 @@ export const Cell = ({
           });
         }}
         className="cell"
-        value={entry?.hours}
+        value={hours === 0 ? "" : hours}
       />
     </div>
   );

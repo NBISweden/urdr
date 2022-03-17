@@ -57,12 +57,12 @@ type timeEntryRequest struct {
 }
 
 type TimeEntry struct {
-	Issue    int    `json:"issue_id"`
-	SpentOn  string `json:"spent_on"`
-	Hours    int    `json:"hours"`
-	Activity int    `json:"activity_id"`
-	Comments string `json:"comments"`
-	User     int    `json:"user_id"`
+	Issue    int     `json:"issue_id"`
+	SpentOn  string  `json:"spent_on"`
+	Hours    float32 `json:"hours"`
+	Activity int     `json:"activity_id"`
+	Comments string  `json:"comments"`
+	User     int     `json:"user_id"`
 }
 type TimeEntryResponse struct {
 	TimeEntries []FetchedTimeEntry `json:"time_entries"`
@@ -160,47 +160,47 @@ func GetIssues(apiKey string, issueIds []string) (*IssuesRes, error) {
 	return r, err
 }
 
-func GetTimeEntries(apiKey string) (*TimeEntryResponse, error) {
-	res, err :=
-		doRequest("GET", "/time_entries.json?user_id=me", map[string]string{"X-Redmine-API-Key": apiKey}, "")
+// GetTimeEntries() performs a GET request to the "/time_entries.json"
+// endpoint of Redmine.  It takes an API key and some optional filtering
+// parameters.  The filtering parameters that are not used should be
+// specified as nil.  The filtering parameters are date start/end and
+// issue ID + activity ID.
+func GetTimeEntries(apiKey string,
+	dateFrom *string, dateTo *string,
+	issueId *int, activityId *int) (*TimeEntryResponse, error) {
 
-	r := &TimeEntryResponse{}
+	request := "/time_entries.json?user_id=me"
 
+	if issueId != nil {
+		request += fmt.Sprintf("&issue_id=%d", *issueId)
+	}
+	if activityId != nil {
+		request += fmt.Sprintf("&activity_id=%d", *activityId)
+	}
+	if dateFrom != nil && dateTo != nil {
+		_, err := time.Parse("2006-01-02", *dateFrom)
+		if err != nil {
+			return nil, fmt.Errorf("time.Parse() failed: %w", err)
+		}
+		_, err = time.Parse("2006-01-02", *dateTo)
+		if err != nil {
+			return nil, fmt.Errorf("time.Parse() failed: %w", err)
+		}
+		request += "&from=" + *dateFrom
+		request += "&to=" + *dateTo
+	}
+
+	res, err := doRequest("GET", request, map[string]string{"X-Redmine-API-Key": apiKey}, "")
 	if err != nil {
-		return r, err
+		return nil, fmt.Errorf("doRequest() failed: %w", err)
 	}
 	defer res.Body.Close()
 
+	response := &TimeEntryResponse{}
 	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&r)
+	err = decoder.Decode(&response)
 
-	return r, err
-}
-
-func GetTimeEntriesWithinDateRange(apiKey string, dayFrom string, dayTo string) (*TimeEntryResponse, error) {
-	_, err := time.Parse("2006-01-02", dayFrom)
-	if err != nil {
-		return nil, err
-	}
-	_, err = time.Parse("2006-01-02", dayTo)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err :=
-		doRequest("GET", fmt.Sprintf("/time_entries.json?user_id=me&from=%s&to=%s&limit=100", dayFrom, dayTo), map[string]string{"X-Redmine-API-Key": apiKey}, "")
-
-	r := &TimeEntryResponse{}
-
-	if err != nil {
-		return r, err
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-	err = decoder.Decode(&r)
-
-	return r, err
+	return response, err
 }
 
 func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {

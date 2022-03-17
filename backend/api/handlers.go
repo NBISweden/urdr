@@ -1,16 +1,18 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
-	"urdr-api/internal/redmine"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/proxy"
+	log "github.com/sirupsen/logrus"
 
 	_ "urdr-api/docs"
 
-	"github.com/gofiber/fiber/v2"
-	log "github.com/sirupsen/logrus"
+	"urdr-api/internal/config"
+	"urdr-api/internal/redmine"
 )
-
-const defaultDate = "1970-01-01"
 
 type LoginResponse struct {
 	Login  string `json:"login"`
@@ -53,23 +55,6 @@ func getIssueActivityPairs(issues *redmine.IssuesRes, issueActivities []IssueAct
 				Activity: issueAct.Activity})
 	}
 	return recentIssues
-
-}
-
-func getSpentOnIssueActivities(issues *redmine.IssuesRes, issueActivities []SpentOnIssueActivity) []SpentOnIssueActivityResponse {
-	issuesMap := make(map[int]redmine.Issue)
-	for _, issue := range issues.Issues {
-		issuesMap[issue.Id] = issue
-	}
-
-	var timeSpent []SpentOnIssueActivityResponse
-
-	for _, issueAct := range issueActivities {
-		timeSpent = append(timeSpent,
-			SpentOnIssueActivityResponse{Issue: issuesMap[issueAct.Issue],
-				Activity: issueAct.Activity, Hours: issueAct.Hours, SpentOn: issueAct.SpentOn})
-	}
-	return timeSpent
 
 }
 
@@ -126,7 +111,7 @@ func logoutHandler(c *fiber.Ctx) error {
 }
 
 // recentIssuesHandler godoc
-// @Summary get recent issues
+// @Summary get issues that the user has spent time on
 // @Description get recent issues
 // @Param Cookie header string true "default"
 // @Accept  json
@@ -141,7 +126,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		log.Errorf("Failed to get session: %v", err)
 		return c.SendStatus(401)
 	}
-	timeEntries, err := redmine.GetTimeEntries(user.ApiKey)
+	timeEntries, err := redmine.GetTimeEntries(user.ApiKey, nil, nil, nil, nil)
 	if err != nil {
 		log.Errorf("Failed to get recent entries: %v", err)
 		c.Response().SetBodyString(err.Error())
@@ -171,57 +156,42 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	return c.JSON(getIssueActivityPairs(issues, issueActivities))
 }
 
-// spentTimeWithinDateRangeHandler godoc
-// @Summary get time entries within a given time period
-// @Description get time entries within start and end dates
+// getTimeEntriesHandler godoc
+// @Summary Proxy for the "/time_entries.json" Redmine endpoint
+// @Description get time entries
 // @Param Cookie header string true "default"
-// @Param start_date query string true "start date"
-// @Param end_date query string true "end date"
+// @Param from query string false "start date"
+// @Param to query string false "end date"
+// @Param spent_on string false "date"
+// @Param issue_id query int false "Redmine issue ID"
+// @Param activity_id query int false "Redmine activity ID"
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} SpentOnIssueActivityResponse
+// @Success 200 {array} redmine.FetchedTimeEntry
 // @Failure 401 {string} error "Unauthorized"
 // @Failure 500 {string} error "Internal Server Error"
-// @Router /api/spent_time [get]
-func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
+// @Router /api/time_entries [get]
+func getTimeEntriesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(401)
-	}
-	startDate := c.Query("start_date", defaultDate)
-	endDate := c.Query("end_date", defaultDate)
-
-	timeEntries, err := redmine.GetTimeEntriesWithinDateRange(user.ApiKey, startDate, endDate)
-	if err != nil {
-		log.Errorf("Failed to get recent entries: %v", err)
-		return c.SendStatus(500)
-	}
-	var issueIds []string
-	seen := make(map[int]int)
-	var issueActivities []SpentOnIssueActivity
-
-	for _, entry := range timeEntries.TimeEntries {
-		issueAct := SpentOnIssueActivity{Issue: entry.Issue.Id, Hours: entry.Hours,
-			Activity: redmine.IdName{Id: entry.Activity.Id, Name: entry.Activity.Name}, SpentOn: entry.SpentOn}
-		seen[entry.Issue.Id]++
-		if seen[entry.Issue.Id] == 1 {
-			issueIds = append(issueIds, strconv.Itoa(entry.Issue.Id))
-		}
-		issueActivities = append(issueActivities, issueAct)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	issues, err := redmine.GetIssues(user.ApiKey, issueIds)
-	if err != nil {
-		log.Errorf("Failed to get issues: %v", err)
-		return c.SendStatus(500)
-	}
-	return c.JSON(getSpentOnIssueActivities(issues, issueActivities))
+	// Add the API key to the headers.
+	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
+
+	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?user_id=me&%s",
+		config.Config.Redmine.Host, config.Config.Redmine.Port,
+		c.Request().URI().QueryString())
+
+	// Proxy the request to Redmine
+	return proxy.Do(c, redmineURL)
 }
 
-// timeReportHandler godoc
-// @Summary report time spent on issues
-// @Description report time spent on issues
+// postTimeEntriesHandler godoc
+// @Summary report time spent on an issue
+// @Description report time spent on an issue
 // @Param time_entry body redmine.TimeEntry true "urdr_session=default"
 // @Param Cookie header string true "default"
 // @Accept  json
@@ -229,8 +199,8 @@ func spentTimeWithinDateRangeHandler(c *fiber.Ctx) error {
 // @Success 200 {string} error "OK"
 // @Failure 401 {string} error "Unauthorized"
 // @Failure 500 {string} error "Internal Server Error"
-// @Router /api/report [post]
-func timeReportHandler(c *fiber.Ctx) error {
+// @Router /api/time_entries [post]
+func postTimeEntriesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)

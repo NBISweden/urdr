@@ -70,9 +70,9 @@ func Setup() *fiber.App {
 
 	app.Get("/api/recent_issues", recentIssuesHandler)
 
-	app.Get("/api/spent_time", spentTimeWithinDateRangeHandler)
+	app.Get("/api/time_entries", getTimeEntriesHandler)
 
-	app.Post("/api/report", timeReportHandler)
+	app.Post("/api/time_entries", postTimeEntriesHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
