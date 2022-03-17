@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -204,23 +205,60 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	user, err := getUser(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(401)
-	}
-	var r redmine.TimeEntry
-	err = c.BodyParser(&r)
-
-	if err != nil {
-		return err
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	log.Infof("Received time entry: %#v", r)
+	// Try pulling out the "id" and "hours" from the request, then
+	// decide how to proxy the request to Redmine.
 
-	err = redmine.CreateTimeEntry(r, user.ApiKey)
-	if err == nil {
-		log.Info("time entry created")
-		return c.SendStatus(200)
+	query := struct {
+		TimeEntry struct {
+			Id    int     `json:"id"`
+			Hours float32 `json:"hours"`
+		} `json:"time_entry"`
+	}{}
+
+	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// If the method remains empty, we won't send anything to
+	// Redmine.
+	method := ""
+	redmineURL := fmt.Sprintf("%s:%s/time_entries",
+		config.Config.Redmine.Host, config.Config.Redmine.Port)
+
+	if query.TimeEntry.Id == 0 {
+		if query.TimeEntry.Hours > 0 {
+			// Create time entry.
+			method = fiber.MethodPost
+			redmineURL += ".json"
+		} // else ignore
 	} else {
-		log.Info("time entry creation failed")
-		return c.SendStatus(500)
+		redmineURL += fmt.Sprintf("/%d.json", query.TimeEntry.Id)
+		if query.TimeEntry.Hours > 0 {
+			// Update time entry.
+			method = fiber.MethodPut
+		} else {
+			// Delete time entry.
+			method = fiber.MethodDelete
+		}
 	}
+
+	if method == "" {
+		// Just give back an OK (204, "No Content")
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+
+	// Set correct method before proxying.
+	c.Request().Header.SetMethod(method)
+
+	// Add the API key to the headers.
+	c.Request().Header.Set("X-Redmine-API-Key", user.ApiKey)
+
+	log.Debugln(redmineURL, string(c.Request().Body()))
+
+	return proxy.Do(c, redmineURL)
 }

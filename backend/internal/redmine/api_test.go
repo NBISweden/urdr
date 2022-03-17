@@ -146,37 +146,6 @@ func TestGetTimeEntries(t *testing.T) {
 	}
 }
 
-func TestCreateTimeEntry(t *testing.T) {
-	type args struct {
-		timeEntry TimeEntry
-		apiKey    string
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{name: "test_valid",
-			args: args{apiKey: apiKey, timeEntry: TimeEntry{
-				Issue:    3499,
-				SpentOn:  "2019-01-01",
-				Hours:    2,
-				Activity: 18,
-				Comments: "test",
-				User:     userId,
-			}},
-			wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := CreateTimeEntry(tt.args.timeEntry, tt.args.apiKey); (err != nil) != tt.wantErr {
-				t.Errorf("CreateTimeEntry() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestGetTimeEntriesWithinDateRange(t *testing.T) {
 	type args struct {
 		apiKey  string

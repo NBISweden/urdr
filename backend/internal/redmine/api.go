@@ -2,7 +2,6 @@ package redmine
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -52,11 +51,8 @@ type IssuesRes struct {
 	Limit      uint    `json:"limit"`
 }
 
-type timeEntryRequest struct {
-	TimeEntry TimeEntry `json:"time_entry"`
-}
-
 type TimeEntry struct {
+	Id       int     `json:"id"`
 	Issue    int     `json:"issue_id"`
 	SpentOn  string  `json:"spent_on"`
 	Hours    float32 `json:"hours"`
@@ -201,31 +197,4 @@ func GetTimeEntries(apiKey string,
 	err = decoder.Decode(&response)
 
 	return response, err
-}
-
-func CreateTimeEntry(timeEntry TimeEntry, apiKey string) error {
-	var ir timeEntryRequest
-
-	ir.TimeEntry = timeEntry
-	s, err := json.Marshal(ir)
-	if err != nil {
-		return err
-	}
-
-	res, err :=
-		doRequest("POST", "/time_entries.json",
-			map[string]string{"X-Redmine-API-Key": apiKey}, string(s))
-	if err != nil {
-		log.Errorf("Failed to create time entry: %s", err)
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != 201 {
-		log.Errorf("Failed to create time entry: %s", res.Status)
-		return errors.New(res.Status)
-	}
-	log.Infof("Created time entry: %s", string(s))
-
-	return nil
 }
