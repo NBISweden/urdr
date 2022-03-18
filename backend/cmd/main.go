@@ -27,7 +27,7 @@ func init() {
 }
 
 func main() {
-	log.Infof("Redmine host config: %v", config.Config.Redmine.Host)
+	log.Infof("Redmine host config: %v", config.Config.Redmine.URL)
 
 	// Start server
 	log.Fatal(api.Setup().Listen(config.Config.App.Host + ":" + config.Config.App.Port))

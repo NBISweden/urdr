@@ -20,8 +20,7 @@ type AppConfig struct {
 }
 
 type RedmineConfig struct {
-	Host string
-	Port string
+	URL string
 }
 
 type DatabaseConfig struct {
@@ -45,8 +44,7 @@ func Setup() error {
 	Config.App.Host = getEnv("BACKEND_HOST", "127.0.0.1")
 	Config.App.Port = getEnv("BACKEND_PORT", "8080")
 
-	Config.Redmine.Host = getEnv("REDMINE_HOST", "redmine")
-	Config.Redmine.Port = getEnv("REDMINE_PORT", "3000")
+	Config.Redmine.URL = getEnv("REDMINE_URL", "http://redmine:3000")
 
 	Config.Database.Path = getEnv("BACKEND_DB_PATH", "./database.db")
 
