@@ -44,8 +44,8 @@ func loginHandler(c *fiber.Ctx) error {
 
 	loginResponse := struct {
 		User struct {
-			Id     int    `json:"id"`
-			Login  string `json:"login"`
+			// Id     int    `json:"id"`
+			// Login  string `json:"login"`
 			ApiKey string `json:"api_key"`
 		} `json:"user"`
 	}{}
@@ -55,8 +55,8 @@ func loginHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	session.Set("id", loginResponse.User.Id)
-	session.Set("login", loginResponse.User.Login)
+	// session.Set("id", loginResponse.User.Id)
+	// session.Set("login", loginResponse.User.Login)
 	session.Set("api_key", loginResponse.User.ApiKey)
 
 	if err := session.Save(); err != nil {
@@ -64,6 +64,8 @@ func loginHandler(c *fiber.Ctx) error {
 	}
 
 	log.Debugf("Logged in user %v", loginResponse)
+
+	// FIXME: Remove API key from response.
 
 	return nil
 }
@@ -87,8 +89,7 @@ func logoutHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	err = session.Destroy()
-	if err != nil {
+	if err := session.Destroy(); err != nil {
 		log.Errorf("Failed to destroy session: %v", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
@@ -260,14 +261,12 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	ApiKey := session.Get("api_key")
-
-	if ApiKey == nil {
+	if ApiKey := session.Get("api_key"); ApiKey == nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
+	} else {
+		// Add the API key to the headers.
+		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 	}
-
-	// Add the API key to the headers.
-	c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 
 	redmineURL := fmt.Sprintf("http://%s:%s/time_entries.json?user_id=me&%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
@@ -295,9 +294,11 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	ApiKey := session.Get("api_key")
-	if ApiKey == nil {
+	if ApiKey := session.Get("api_key"); ApiKey == nil {
 		return c.SendStatus(fiber.StatusUnauthorized)
+	} else {
+		// Add the API key to the headers.
+		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 	}
 
 	// Try pulling out the "id" and "hours" from the request, then
@@ -344,9 +345,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 
 	// Set correct method before proxying.
 	c.Request().Header.SetMethod(method)
-
-	// Add the API key to the headers.
-	c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 
 	return proxy.Do(c, redmineURL)
 }
