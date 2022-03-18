@@ -66,8 +66,8 @@ func loginHandler(c *fiber.Ctx) error {
 
 	loginResponse := struct {
 		User struct {
-			// Id     int    `json:"id"`
-			// Login  string `json:"login"`
+			Id     int    `json:"id"`
+			Login  string `json:"login"`
 			ApiKey string `json:"api_key"`
 		} `json:"user"`
 	}{}
@@ -87,9 +87,13 @@ func loginHandler(c *fiber.Ctx) error {
 
 	log.Debugf("Logged in user %v", loginResponse)
 
-	// FIXME: Remove API key from response.
-
-	return nil
+	return c.JSON(struct {
+		UserId int    `json:"user_id"`
+		Login  string `json:"login"`
+	}{
+		UserId: loginResponse.User.Id,
+		Login:  loginResponse.User.Login,
+	})
 }
 
 // logoutHandler godoc
