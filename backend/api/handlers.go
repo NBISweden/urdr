@@ -33,7 +33,7 @@ func loginHandler(c *fiber.Ctx) error {
 	// Redmine wants a GET request here, not a POST.
 	c.Request().Header.SetMethod(fiber.MethodGet)
 
-	redmineURL := fmt.Sprintf("%s:%s/my/account.json",
+	redmineURL := fmt.Sprintf("http://%s:%s/my/account.json",
 		config.Config.Redmine.Host, config.Config.Redmine.Port)
 
 	if err := proxy.Do(c, redmineURL); err != nil {
@@ -195,7 +195,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// Do a request to the Redmine "/issues.json" endpoint to get
 	// the issue subjects for the issue IDs in the issueIds list.
 
-	redmineURL := fmt.Sprintf("%s:%s/issues.json?issue_id=%s",
+	redmineURL := fmt.Sprintf("http://%s:%s/issues.json?issue_id=%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
 		strings.Join(issueIds, ","))
 
@@ -271,7 +271,7 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 	// Add the API key to the headers.
 	c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
 
-	redmineURL := fmt.Sprintf("%s:%s/time_entries.json?user_id=me&%s",
+	redmineURL := fmt.Sprintf("http://%s:%s/time_entries.json?user_id=me&%s",
 		config.Config.Redmine.Host, config.Config.Redmine.Port,
 		c.Request().URI().QueryString())
 
@@ -319,7 +319,7 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	// If the method remains empty, we won't send anything to
 	// Redmine.
 	method := ""
-	redmineURL := fmt.Sprintf("%s:%s/time_entries",
+	redmineURL := fmt.Sprintf("http://%s:%s/time_entries",
 		config.Config.Redmine.Host, config.Config.Redmine.Port)
 
 	if query.TimeEntry.Id == 0 {
