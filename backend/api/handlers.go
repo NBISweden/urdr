@@ -14,6 +14,28 @@ import (
 	"urdr-api/internal/config"
 )
 
+// prepareRedmineRequest() gets the Redmine API key out of the current
+// session and adds it to the request headers.  It returns a false
+// boolean value if there is an issue together with the the result of
+// SendStatus().  This function was created by refactoring in VS Code
+// (with minor fixes).
+func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
+	session, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return false, c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if ApiKey := session.Get("api_key"); ApiKey == nil {
+		return false, c.SendStatus(fiber.StatusUnauthorized)
+	} else {
+		// Set the API key header.
+		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
+	}
+
+	return true, nil
+}
+
 // loginHandler godoc
 // @Summary Log in a user
 // @Description Log in a user using the Redmine API
@@ -255,17 +277,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/time_entries [get]
 func getTimeEntriesHandler(c *fiber.Ctx) error {
-	session, err := store.Get(c)
-	if err != nil {
-		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	if ApiKey := session.Get("api_key"); ApiKey == nil {
-		return c.SendStatus(fiber.StatusUnauthorized)
-	} else {
-		// Add the API key to the headers.
-		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
+	if ok, err := prepareRedmineRequest(c); !ok {
+		return err
 	}
 
 	redmineURL := fmt.Sprintf("http://%s:%s/time_entries.json?user_id=me&%s",
@@ -288,17 +301,8 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/time_entries [post]
 func postTimeEntriesHandler(c *fiber.Ctx) error {
-	session, err := store.Get(c)
-	if err != nil {
-		log.Errorf("Failed to get session: %v", err)
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	if ApiKey := session.Get("api_key"); ApiKey == nil {
-		return c.SendStatus(fiber.StatusUnauthorized)
-	} else {
-		// Add the API key to the headers.
-		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
+	if ok, err := prepareRedmineRequest(c); !ok {
+		return err
 	}
 
 	// Try pulling out the "id" and "hours" from the request, then
