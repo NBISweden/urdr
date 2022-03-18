@@ -1,10 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 // Config is a global configuration value store
@@ -31,23 +28,19 @@ type DatabaseConfig struct {
 	Path string
 }
 
-// getEnv returns given os.Getenv value, or a default value if os.Getenv is empty
-func getEnv(key string, def string) string {
-	if value := os.Getenv(key); value != "" {
+// getEnv() returns given environment variable's value, or a default
+// value if the environment variable does not exist.
+func getEnv(key string, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
-	return def
+	return defaultValue
 }
 
 // Setup populates ConfigMap with data
 func Setup() error {
-	// Load settings from .env
-	err := godotenv.Load(getEnv("DOT_ENV_FILE", "./urdr.env"))
-	if err != nil {
-		return fmt.Errorf("godotenv.Load() failed: %w", err)
-	}
-
-	// Populate config structs, place defaults if empty in .env
+	// Populate config structs, and use defaults if the needed
+	// variable is not in the environment.
 
 	Config.App.Host = getEnv("BACKEND_HOST", "127.0.0.1")
 	Config.App.Port = getEnv("BACKEND_PORT", "8080")
