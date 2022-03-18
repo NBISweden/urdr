@@ -77,8 +77,6 @@ func loginHandler(c *fiber.Ctx) error {
 // @Failure 500 {string} error "Internal Server Error"
 // @Router /api/logout [post]
 func logoutHandler(c *fiber.Ctx) error {
-	c.Response().Reset()
-
 	session, err := store.Get(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)

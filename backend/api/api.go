@@ -31,6 +31,7 @@ func Setup() *fiber.App {
 
 	app.Use(cors.New(cors.Config{
 		AllowCredentials: true,
+		AllowOrigins:     "*",
 	}))
 
 	store = session.New(session.Config{
