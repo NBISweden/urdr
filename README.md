@@ -55,7 +55,7 @@ docker-compose build
 docker-compose up
 ```
 
-And then visit the site through nginx at [localhost:5678](http://localhost:5678).
+And then visit the site through nginx at [localhost:4567](http://localhost:4567).
 
 ## Tests
 
