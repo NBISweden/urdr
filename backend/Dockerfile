@@ -12,7 +12,7 @@ RUN apt-get update; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \
     curl --fail --location \
-        'https://raw.githubusercontent.com/cosmtrek/air/master/install.sh' | \
-    sh -e -s && cp -v ./bin/air /bin/air
+    'https://raw.githubusercontent.com/cosmtrek/air/v1.29.0/install.sh' | \
+    sh -e -s v1.29.0 && cp -v ./bin/air /bin/air
 
 CMD ["air"]
