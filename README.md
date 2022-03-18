@@ -55,6 +55,8 @@ docker-compose build
 docker-compose up
 ```
 
+And then visit the site through nginx at [localhost:5678](http://localhost:5678).
+
 ## Tests
 
 There are tests for each part of the backend API, which can be tested by the following commands:
