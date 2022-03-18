@@ -187,7 +187,10 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 		c.Request().URI().QueryString())
 
 	// Proxy the request to Redmine
-	return proxy.Do(c, redmineURL)
+	result := proxy.Do(c, redmineURL)
+	res := c.Response()
+	res.Header.Set("Access-Control-Allow-Origin", "*")
+	return result
 }
 
 // postTimeEntriesHandler godoc
