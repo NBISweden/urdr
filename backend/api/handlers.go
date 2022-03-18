@@ -26,11 +26,11 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 		return false, c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	if ApiKey := session.Get("api_key"); ApiKey == nil {
+	if apiKey := session.Get("api_key"); apiKey == nil {
 		return false, c.SendStatus(fiber.StatusUnauthorized)
 	} else {
 		// Set the API key header.
-		c.Request().Header.Set("X-Redmine-API-Key", ApiKey.(string))
+		c.Request().Header.Set("X-Redmine-API-Key", apiKey.(string))
 	}
 
 	return true, nil
