@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@types/react": "^17.0.39",
+    "@types/react": "^17.0.41",
     "snowpack": "^3.8.8",
     "typescript": "^4.6.2"
   },
