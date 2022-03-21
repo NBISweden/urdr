@@ -37,6 +37,11 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	return true, nil
 }
 
+type user struct {
+	UserId int    `json:"user_id"`
+	Login  string `json:"login"`
+}
+
 // loginHandler godoc
 // @Summary Log in a user
 // @Description Log in a user using the Redmine API
@@ -88,10 +93,7 @@ func loginHandler(c *fiber.Ctx) error {
 
 	log.Debugf("Logged in user %v", loginResponse)
 
-	return c.JSON(struct {
-		UserId int    `json:"user_id"`
-		Login  string `json:"login"`
-	}{
+	return c.JSON(user{
 		UserId: loginResponse.User.Id,
 		Login:  loginResponse.User.Login,
 	})
