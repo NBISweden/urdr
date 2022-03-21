@@ -124,6 +124,21 @@ func logoutHandler(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+type issue struct {
+	ID      int    `json:"id"`
+	Subject string `json:"subject"`
+}
+
+type activity struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type issueActivity struct {
+	Issue    issue    `json:"issue"`
+	Activity activity `json:"activity"`
+}
+
 // recentIssuesHandler godoc
 // @Summary get issues that the user has spent time on
 // @Description get recent issues
@@ -160,15 +175,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// response.
 
 	timeEntriesResponse := struct {
-		TimeEntries []struct {
-			Issue struct {
-				Id int `json:"id"`
-			} `json:"issue"`
-			Activity struct {
-				Id   int    `json:"id"`
-				Name string `json:"name"`
-			} `json:"activity"`
-		} `json:"time_entries"`
+		TimeEntries []issueActivity `json:"time_entries"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &timeEntriesResponse); err != nil {
@@ -176,42 +183,28 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// We'll use the following IssueActivity type to create a list
-	// of pairs of issues and activities that we later marshal into
-	// a JSON response from this function.
-	type IssueActivity struct {
-		Issue struct {
-			Id      int    `json:"id"`
-			Subject string `json:"subject"`
-		} `json:"issue"`
-		Activity struct {
-			Id   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"activity"`
-	}
-
 	seenIssueIds := make(map[int]bool)
 	var issueIds []string
 
-	seenIssueActivities := make(map[IssueActivity]bool)
+	seenIssueActivities := make(map[issueActivity]bool)
+	var issueActivities []issueActivity
 
-	for _, entry := range timeEntriesResponse.TimeEntries {
-		key := IssueActivity{}
-		key.Issue.Id = entry.Issue.Id
-		key.Activity.Id = entry.Activity.Id
-		key.Activity.Name = entry.Activity.Name
+	for i := range timeEntriesResponse.TimeEntries {
+		issueActivity := timeEntriesResponse.TimeEntries[i]
 
-		if !seenIssueActivities[key] {
-			seenIssueActivities[key] = true
+		if !seenIssueActivities[issueActivity] {
+			seenIssueActivities[issueActivity] = true
+			issueActivities = append(issueActivities, issueActivity)
 
-			if !seenIssueIds[key.Issue.Id] {
-				seenIssueIds[key.Issue.Id] = true
+			if !seenIssueIds[issueActivity.Issue.ID] {
+				seenIssueIds[issueActivity.Issue.ID] = true
 
 				// We append the issue IDs as strings
 				// to be able to conveniently create
 				// a comma-delimited list using
 				// strings.Join() later.
-				issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
+				issueIds = append(issueIds,
+					fmt.Sprintf("%d", issueActivity.Issue.ID))
 			}
 		}
 	}
@@ -233,10 +226,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// used as keys in the seenIssueActivities map.
 
 	issuesResponse := struct {
-		Issues []struct {
-			Id      int    `json:"id"`
-			Subject string `json:"subject"`
-		} `json:"issues"`
+		Issues []issue `json:"issues"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
@@ -244,18 +234,15 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	var issueActivities []IssueActivity
+	// Iterate over our issueActivities list
+	// and fill in the missing subject to each issue from the issuesResponse
+	// structure.
 
-	// Iterate over the *keys* of the seenIssueActivities map
-	// and add the subject to each issue from the issuesResponse
-	// structure.  Add the issueActivity with its now completed
-	// issue to the issueActivities list for marshalling into JSON.
-
-	for issueActivity := range seenIssueActivities {
-		for _, entry := range issuesResponse.Issues {
-			if entry.Id == issueActivity.Issue.Id {
-				issueActivity.Issue.Subject = entry.Subject
-				issueActivities = append(issueActivities, issueActivity)
+	for i := range issueActivities {
+		for j := range issuesResponse.Issues {
+			if timeEntriesResponse.TimeEntries[j] == issueActivities[i] {
+				issueActivities[i].Issue.Subject =
+					timeEntriesResponse.TimeEntries[j].Issue.Subject
 				break
 			}
 		}
