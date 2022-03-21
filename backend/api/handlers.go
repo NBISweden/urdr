@@ -274,7 +274,11 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 
 	// Sort the issueActivities list on the issue IDs.
 	sort.Slice(issueActivities, func(i, j int) bool {
-		return issueActivities[i].Issue.ID > issueActivities[j].Issue.ID
+		a := issueActivities[i]
+		b := issueActivities[j]
+
+		return (a.Issue.ID == b.Issue.ID && a.Activity.ID < b.Activity.ID) ||
+			a.Issue.ID > b.Issue.ID
 	})
 
 	return c.JSON(issueActivities)
