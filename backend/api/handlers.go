@@ -236,15 +236,14 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// Iterate over our issueActivities list
-	// and fill in the missing subject to each issue from the issuesResponse
-	// structure.
+	// Iterate over our issueActivities list and fill in the missing
+	// subject to each issue from the issuesResponse structure.
 
 	for i := range issueActivities {
 		for j := range issuesResponse.Issues {
-			if timeEntriesResponse.TimeEntries[j] == issueActivities[i] {
+			if issuesResponse.Issues[j].ID == issueActivities[i].Issue.ID {
 				issueActivities[i].Issue.Subject =
-					timeEntriesResponse.TimeEntries[j].Issue.Subject
+					issuesResponse.Issues[j].Subject
 				break
 			}
 		}
