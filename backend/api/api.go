@@ -1,10 +1,7 @@
 package api
 
 import (
-	"encoding/gob"
-	"errors"
 	"time"
-	"urdr-api/internal/redmine"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
@@ -13,22 +10,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/gofiber/fiber/v2/utils"
 )
 
 var store *session.Store
-
-func getUser(c *fiber.Ctx) (*redmine.User, error) {
-	sess, err := store.Get(c)
-	if err != nil {
-		return nil, err
-	}
-	user := sess.Get("user")
-	if user == nil {
-		return nil, errors.New("No session user found")
-	}
-	return user.(*redmine.User), nil
-}
 
 // @title Urdr API
 // @version 1.0
@@ -42,8 +26,6 @@ func getUser(c *fiber.Ctx) (*redmine.User, error) {
 // @BasePath /
 func Setup() *fiber.App {
 
-	gob.Register(&redmine.User{})
-
 	// Fiber instance
 	app := fiber.New()
 
@@ -52,14 +34,9 @@ func Setup() *fiber.App {
 	}))
 
 	store = session.New(session.Config{
-		Expiration:     time.Minute * 5,
-		CookieName:     "urdr_session",
-		CookieDomain:   "",
-		CookiePath:     "",
-		CookieSecure:   true,
-		CookieHTTPOnly: false,
-		CookieSameSite: "none",
-		KeyGenerator:   utils.UUID,
+		Expiration:   time.Minute * 5,
+		KeyLookup:    "cookie:urdr_session",
+		CookieSecure: true,
 	})
 
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
