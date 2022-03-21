@@ -55,8 +55,6 @@ docker-compose build
 docker-compose up
 ```
 
-And then visit the site through nginx at [localhost:4567](http://localhost:4567).
-
 ## Tests
 
 There are tests for each part of the backend API, which can be tested by the following commands:
@@ -64,6 +62,7 @@ There are tests for each part of the backend API, which can be tested by the fol
 ```command
 go test -v urdr-api/internal/database
 ```
+
 ```command
 REDMINE_HOST=http://localhost USERNAME=user PASSWORD=password USER_ID=123 \
 go test -v urdr-api/internal/redmine
@@ -95,7 +94,7 @@ docker-compose up node-urdr
 
 ## Frontend
 
-[Node.js server](http://localhost:4242)
+[Nginx server](http://localhost:4567)
 
 ## Backend
 
