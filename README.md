@@ -75,7 +75,7 @@ In order to run the node-urdr server in a Docker container, you don't need to in
 
 ### Installing and updating packages
 
-In order to minimize dependency differences between local environments we create our `package-lock.json` file in a separate Docker container.
+In order to avoid dependency differences between local environments we create our `package-lock.json` file in a separate Docker container.
 
 If you want to add a new dependency to the project:
 
