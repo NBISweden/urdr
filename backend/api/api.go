@@ -51,9 +51,11 @@ func Setup() *fiber.App {
 
 	app.Post("/api/time_entries", postTimeEntriesHandler)
 
+	app.Get("/api/issues", getIssuesHandler)
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
-		return c.SendStatus(404) // => 404 "Not Found"
+		return c.SendStatus(fiber.StatusNotFound) // => 404 "Not Found"
 	})
 
 	// Return the configured app
