@@ -37,6 +37,22 @@ info:
   title: Urdr API
   version: "1.0"
 paths:
+  /api/issues:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Proxy for the "/issues.json" Redmine endpoint
   /api/login:
     post:
       consumes:

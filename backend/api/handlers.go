@@ -343,6 +343,13 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	return proxy.Do(c, redmineURL)
 }
 
+// getIssuesHandler godoc
+// @Summary	Proxy for the "/issues.json" Redmine endpoint
+// @Accept	json
+// @Produce	json
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	500	{string}	error "Internal Server Error"
+// @Router /api/issues [get]
 func getIssuesHandler(c *fiber.Ctx) error {
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
