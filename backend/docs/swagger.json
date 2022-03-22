@@ -31,11 +31,23 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.LoginResponse"
+                            "$ref": "#/definitions/api.user"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "string"
                         }
@@ -54,8 +66,14 @@
                 ],
                 "summary": "Log out a user",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "type": "string"
                         }
@@ -71,30 +89,21 @@
         },
         "/api/recent_issues": {
             "get": {
-                "description": "get recent issues",
+                "description": "Get recent issues that the user has spent time on",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get recent issues",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "default",
-                        "name": "Cookie",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
+                "summary": "Get recent issues",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/api.IssueActivityResponse"
+                                "$ref": "#/definitions/api.issueActivity"
                             }
                         }
                     },
@@ -113,91 +122,43 @@
                 }
             }
         },
-        "/api/report": {
+        "/api/time_entries": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Proxy for the \"/time_entries.json\" Redmine endpoint",
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "report time spent on issues",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "report time spent on issues",
-                "parameters": [
-                    {
-                        "description": "urdr_session=default",
-                        "name": "time_entry",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/redmine.TimeEntry"
-                        }
-                    },
-                    {
-                        "type": "string",
-                        "description": "default",
-                        "name": "Cookie",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
+                "summary": "Create, update, or delete a time entry",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/spent_time": {
-            "get": {
-                "description": "get time entries within start and end dates",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "get time entries within a given time period",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "default",
-                        "name": "Cookie",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "start date",
-                        "name": "start_date",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "end date",
-                        "name": "end_date",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/api.SpentOnIssueActivityResponse"
-                            }
                         }
                     },
                     "401": {
@@ -217,46 +178,7 @@
         }
     },
     "definitions": {
-        "api.IssueActivityResponse": {
-            "type": "object",
-            "properties": {
-                "activity": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "issue": {
-                    "$ref": "#/definitions/redmine.Issue"
-                }
-            }
-        },
-        "api.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "login": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api.SpentOnIssueActivityResponse": {
-            "type": "object",
-            "properties": {
-                "activity": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "hours": {
-                    "type": "number"
-                },
-                "issue": {
-                    "$ref": "#/definitions/redmine.Issue"
-                },
-                "spent_on": {
-                    "type": "string"
-                }
-            }
-        },
-        "redmine.IdName": {
+        "api.activity": {
             "type": "object",
             "properties": {
                 "id": {
@@ -267,90 +189,32 @@
                 }
             }
         },
-        "redmine.Issue": {
+        "api.issue": {
             "type": "object",
             "properties": {
-                "assigned_to": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "assigned_to_id": {
-                    "type": "integer"
-                },
-                "author": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "category": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "category_id": {
-                    "type": "integer"
-                },
-                "closed_on": {
-                    "type": "string"
-                },
-                "created_on": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "done_ratio": {
-                    "type": "number"
-                },
-                "due_date": {
-                    "type": "string"
-                },
-                "estimated_hours": {
-                    "type": "number"
-                },
                 "id": {
-                    "type": "integer"
-                },
-                "notes": {
-                    "type": "string"
-                },
-                "project": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "project_id": {
-                    "type": "integer"
-                },
-                "start_date": {
-                    "type": "string"
-                },
-                "status": {
-                    "$ref": "#/definitions/redmine.IdName"
-                },
-                "status_date": {
-                    "type": "string"
-                },
-                "status_id": {
                     "type": "integer"
                 },
                 "subject": {
                     "type": "string"
-                },
-                "updated_on": {
-                    "type": "string"
                 }
             }
         },
-        "redmine.TimeEntry": {
+        "api.issueActivity": {
             "type": "object",
             "properties": {
-                "activity_id": {
-                    "type": "integer"
+                "activity": {
+                    "$ref": "#/definitions/api.activity"
                 },
-                "comments": {
-                    "type": "string"
-                },
-                "hours": {
-                    "type": "integer"
-                },
-                "issue_id": {
-                    "type": "integer"
-                },
-                "spent_on": {
+                "issue": {
+                    "$ref": "#/definitions/api.issue"
+                }
+            }
+        },
+        "api.user": {
+            "type": "object",
+            "properties": {
+                "login": {
                     "type": "string"
                 },
                 "user_id": {
