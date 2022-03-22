@@ -158,7 +158,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	if queryString != "" {
 		queryString += "&"
 	}
-	queryString += "sort=spent_on:desc"
+	queryString += "limit=100&sort=spent_on:desc"
 	c.Request().URI().SetQueryString(queryString)
 
 	// The following sets the "X-Redmine-API-Key" header.
