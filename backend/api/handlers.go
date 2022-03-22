@@ -374,3 +374,14 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 
 	return proxy.Do(c, redmineURL)
 }
+
+func getIssuesHandler(c *fiber.Ctx) error {
+	if ok, err := prepareRedmineRequest(c); !ok {
+		return err
+	}
+
+	redmineURL := fmt.Sprintf("%s/issues.json?%s",
+		config.Config.Redmine.URL, c.Request().URI().QueryString())
+
+	return proxy.Do(c, redmineURL)
+}
