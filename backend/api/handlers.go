@@ -277,8 +277,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		a := issueActivities[i]
 		b := issueActivities[j]
 
-		return (a.Issue.ID == b.Issue.ID && a.Activity.ID < b.Activity.ID) ||
-			a.Issue.ID > b.Issue.ID
+		return (a.Issue.Id == b.Issue.Id && a.Activity.Id < b.Activity.Id) ||
+			a.Issue.Id > b.Issue.Id
 	})
 
 	return c.JSON(issueActivities)
