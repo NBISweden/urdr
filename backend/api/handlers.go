@@ -143,23 +143,11 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	   call to the Redmine "/issues.json" endpoint to get these
 	   strings. */
 
-	/* Note that the way we do this is by calling our own
-	   getTimeEntriesHandler() function and then parsing the result
-	   from there.  This means that our frontend is allowed to pass
-	   additional parameters to the Redmine "/time_entries.json"
-	   endpoint if needed, e.g., to extend the limit on number of
-	   returned entries, or to specify date filtering, etc. */
-
 	// Start by getting the most recent time entries.  We add a
 	// sorting parameter to the request to make sure that we get the
 	// mest recent entries with regards to the "spent_on" value.
 
-	queryString := string(c.Request().URI().QueryString())
-	if queryString != "" {
-		queryString += "&"
-	}
-	queryString += "limit=100&sort=spent_on:desc"
-	c.Request().URI().SetQueryString(queryString)
+	c.Request().URI().SetQueryString("limit=100&sort=spent_on:desc")
 
 	// The following sets the "X-Redmine-API-Key" header.
 	if err := getTimeEntriesHandler(c); err != nil {
@@ -231,10 +219,11 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// Do a request to the Redmine "/issues.json" endpoint to get
 	// the issue subjects for the issue IDs in the issueIds list.
 
-	redmineURL := fmt.Sprintf("%s/issues.json?issue_id=%s",
-		config.Config.Redmine.URL, strings.Join(issueIds, ","))
+	c.Request().URI().SetQueryString(
+		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
 
-	if err := proxy.Do(c, redmineURL); err != nil {
+	c.Response().Reset()
+	if err := getIssuesHandler(c); err != nil {
 		return err
 	} else if c.Response().StatusCode() != fiber.StatusOK {
 		return nil
