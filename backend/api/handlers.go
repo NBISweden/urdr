@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -149,8 +150,18 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	   endpoint if needed, e.g., to extend the limit on number of
 	   returned entries, or to specify date filtering, etc. */
 
-	// Start by getting the most recent time entries.
-	// This also sets the "X-Redmine-API-Key" header.
+	// Start by getting the most recent time entries.  We add a
+	// sorting parameter to the request to make sure that we get the
+	// mest recent entries with regards to the "spent_on" value.
+
+	queryString := string(c.Request().URI().QueryString())
+	if queryString != "" {
+		queryString += "&"
+	}
+	queryString += "limit=100&sort=spent_on:desc"
+	c.Request().URI().SetQueryString(queryString)
+
+	// The following sets the "X-Redmine-API-Key" header.
 	if err := getTimeEntriesHandler(c); err != nil {
 		return err
 	} else if c.Response().StatusCode() != fiber.StatusOK {
@@ -260,6 +271,15 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			}
 		}
 	}
+
+	// Sort the issueActivities list on the issue IDs.
+	sort.Slice(issueActivities, func(i, j int) bool {
+		a := issueActivities[i]
+		b := issueActivities[j]
+
+		return (a.Issue.Id == b.Issue.Id && a.Activity.Id < b.Activity.Id) ||
+			a.Issue.Id > b.Issue.Id
+	})
 
 	return c.JSON(issueActivities)
 }
