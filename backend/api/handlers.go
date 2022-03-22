@@ -127,12 +127,12 @@ func logoutHandler(c *fiber.Ctx) error {
 }
 
 type issue struct {
-	ID      int    `json:"id"`
+	Id      int    `json:"id"`
 	Subject string `json:"subject"`
 }
 
 type activity struct {
-	ID   int    `json:"id"`
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -198,15 +198,15 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			seenIssueActivities[issueActivity] = true
 			issueActivities = append(issueActivities, issueActivity)
 
-			if !seenIssueIds[issueActivity.Issue.ID] {
-				seenIssueIds[issueActivity.Issue.ID] = true
+			if !seenIssueIds[issueActivity.Issue.Id] {
+				seenIssueIds[issueActivity.Issue.Id] = true
 
 				// We append the issue IDs as strings
 				// to be able to conveniently create
 				// a comma-delimited list using
 				// strings.Join() later.
 				issueIds = append(issueIds,
-					fmt.Sprintf("%d", issueActivity.Issue.ID))
+					fmt.Sprintf("%d", issueActivity.Issue.Id))
 			}
 		}
 	}
@@ -241,7 +241,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 
 	for i := range issueActivities {
 		for j := range issuesResponse.Issues {
-			if issuesResponse.Issues[j].ID == issueActivities[i].Issue.ID {
+			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
 				issueActivities[i].Issue.Subject =
 					issuesResponse.Issues[j].Subject
 				break
