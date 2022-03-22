@@ -37,14 +37,21 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	return true, nil
 }
 
+type user struct {
+	UserId int    `json:"user_id"`
+	Login  string `json:"login"`
+}
+
 // loginHandler godoc
-// @Summary Log in a user
-// @Description Log in a user using the Redmine API
-// @Security BasicAuth
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} LoginResponse
-// @Failure 401 {string} error "Unauthorized"
+// @Summary	Log in a user
+// @Description	Log in a user using the Redmine API
+// @Security	BasicAuth
+// @Accept	json
+// @Produce	json
+// @Success	200	{object}	user
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	422	{string}	error "Unprocessable Entity"
+// @Failure	500	{string}	error "Internal Server Error"
 // @Router /api/login [post]
 func loginHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)
@@ -88,22 +95,20 @@ func loginHandler(c *fiber.Ctx) error {
 
 	log.Debugf("Logged in user %v", loginResponse)
 
-	return c.JSON(struct {
-		UserId int    `json:"user_id"`
-		Login  string `json:"login"`
-	}{
+	return c.JSON(user{
 		UserId: loginResponse.User.Id,
 		Login:  loginResponse.User.Login,
 	})
 }
 
 // logoutHandler godoc
-// @Summary Log out a user
-// @Description Log out a user by destroying the session
-// @Accept  json
-// @Produce  json
-// @Success 200 {string} error "OK"
-// @Failure 500 {string} error "Internal Server Error"
+// @Summary	Log out a user
+// @Description	Log out a user by destroying the session
+// @Accept	json
+// @Produce	json
+// @Success	204	{string}	error "No Content"
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	500	{string}	error "Internal Server Error"
 // @Router /api/logout [post]
 func logoutHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)
@@ -124,15 +129,29 @@ func logoutHandler(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+type issue struct {
+	Id      int    `json:"id"`
+	Subject string `json:"subject"`
+}
+
+type activity struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type issueActivity struct {
+	Issue    issue    `json:"issue"`
+	Activity activity `json:"activity"`
+}
+
 // recentIssuesHandler godoc
-// @Summary get issues that the user has spent time on
-// @Description get recent issues
-// @Param Cookie header string true "default"
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} IssueActivityResponse
-// @Failure 401 {string} error "Unauthorized"
-// @Failure 500 {string} error "Internal Server Error"
+// @Summary	Get recent issues
+// @Description	Get recent issues that the user has spent time on
+// @Accept	json
+// @Produce	json
+// @Success	200	{array}	issueActivity
+// @Failure	401	{string} error "Unauthorized"
+// @Failure	500	{string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
 func recentIssuesHandler(c *fiber.Ctx) error {
 	/* We want to return a list of pairs of issues and activities,
@@ -160,15 +179,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// response.
 
 	timeEntriesResponse := struct {
-		TimeEntries []struct {
-			Issue struct {
-				Id int `json:"id"`
-			} `json:"issue"`
-			Activity struct {
-				Id   int    `json:"id"`
-				Name string `json:"name"`
-			} `json:"activity"`
-		} `json:"time_entries"`
+		TimeEntries []issueActivity `json:"time_entries"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &timeEntriesResponse); err != nil {
@@ -176,42 +187,28 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// We'll use the following IssueActivity type to create a list
-	// of pairs of issues and activities that we later marshal into
-	// a JSON response from this function.
-	type IssueActivity struct {
-		Issue struct {
-			Id      int    `json:"id"`
-			Subject string `json:"subject"`
-		} `json:"issue"`
-		Activity struct {
-			Id   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"activity"`
-	}
-
 	seenIssueIds := make(map[int]bool)
 	var issueIds []string
 
-	seenIssueActivities := make(map[IssueActivity]bool)
+	seenIssueActivities := make(map[issueActivity]bool)
+	var issueActivities []issueActivity
 
-	for _, entry := range timeEntriesResponse.TimeEntries {
-		key := IssueActivity{}
-		key.Issue.Id = entry.Issue.Id
-		key.Activity.Id = entry.Activity.Id
-		key.Activity.Name = entry.Activity.Name
+	for i := range timeEntriesResponse.TimeEntries {
+		issueActivity := timeEntriesResponse.TimeEntries[i]
 
-		if !seenIssueActivities[key] {
-			seenIssueActivities[key] = true
+		if !seenIssueActivities[issueActivity] {
+			seenIssueActivities[issueActivity] = true
+			issueActivities = append(issueActivities, issueActivity)
 
-			if !seenIssueIds[key.Issue.Id] {
-				seenIssueIds[key.Issue.Id] = true
+			if !seenIssueIds[issueActivity.Issue.Id] {
+				seenIssueIds[issueActivity.Issue.Id] = true
 
 				// We append the issue IDs as strings
 				// to be able to conveniently create
 				// a comma-delimited list using
 				// strings.Join() later.
-				issueIds = append(issueIds, fmt.Sprintf("%d", key.Issue.Id))
+				issueIds = append(issueIds,
+					fmt.Sprintf("%d", issueActivity.Issue.Id))
 			}
 		}
 	}
@@ -233,10 +230,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// used as keys in the seenIssueActivities map.
 
 	issuesResponse := struct {
-		Issues []struct {
-			Id      int    `json:"id"`
-			Subject string `json:"subject"`
-		} `json:"issues"`
+		Issues []issue `json:"issues"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
@@ -244,18 +238,14 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	var issueActivities []IssueActivity
+	// Iterate over our issueActivities list and fill in the missing
+	// subject to each issue from the issuesResponse structure.
 
-	// Iterate over the *keys* of the seenIssueActivities map
-	// and add the subject to each issue from the issuesResponse
-	// structure.  Add the issueActivity with its now completed
-	// issue to the issueActivities list for marshalling into JSON.
-
-	for issueActivity := range seenIssueActivities {
-		for _, entry := range issuesResponse.Issues {
-			if entry.Id == issueActivity.Issue.Id {
-				issueActivity.Issue.Subject = entry.Subject
-				issueActivities = append(issueActivities, issueActivity)
+	for i := range issueActivities {
+		for j := range issuesResponse.Issues {
+			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
+				issueActivities[i].Issue.Subject =
+					issuesResponse.Issues[j].Subject
 				break
 			}
 		}
@@ -274,19 +264,11 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 }
 
 // getTimeEntriesHandler godoc
-// @Summary Proxy for the "/time_entries.json" Redmine endpoint
-// @Description get time entries
-// @Param Cookie header string true "default"
-// @Param from query string false "start date"
-// @Param to query string false "end date"
-// @Param spent_on string false "date"
-// @Param issue_id query int false "Redmine issue ID"
-// @Param activity_id query int false "Redmine activity ID"
-// @Accept  json
-// @Produce  json
-// @Success 200 {array} redmine.FetchedTimeEntry
-// @Failure 401 {string} error "Unauthorized"
-// @Failure 500 {string} error "Internal Server Error"
+// @Summary	Proxy for the "/time_entries.json" Redmine endpoint
+// @Accept	json
+// @Produce	json
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	500	{string}	error "Internal Server Error"
 // @Router /api/time_entries [get]
 func getTimeEntriesHandler(c *fiber.Ctx) error {
 	if ok, err := prepareRedmineRequest(c); !ok {
@@ -301,15 +283,12 @@ func getTimeEntriesHandler(c *fiber.Ctx) error {
 }
 
 // postTimeEntriesHandler godoc
-// @Summary report time spent on an issue
-// @Description report time spent on an issue
-// @Param time_entry body redmine.TimeEntry true "urdr_session=default"
-// @Param Cookie header string true "default"
-// @Accept  json
-// @Produce  json
-// @Success 200 {string} error "OK"
-// @Failure 401 {string} error "Unauthorized"
-// @Failure 500 {string} error "Internal Server Error"
+// @Summary	Create, update, or delete a time entry
+// @Accept	json
+// @Produce	json
+// @Success	200	{string}	error "OK"
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	500	{string}	error "Internal Server Error"
 // @Router /api/time_entries [post]
 func postTimeEntriesHandler(c *fiber.Ctx) error {
 	if ok, err := prepareRedmineRequest(c); !ok {
@@ -364,6 +343,13 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	return proxy.Do(c, redmineURL)
 }
 
+// getIssuesHandler godoc
+// @Summary	Proxy for the "/issues.json" Redmine endpoint
+// @Accept	json
+// @Produce	json
+// @Failure	401	{string}	error "Unauthorized"
+// @Failure	500	{string}	error "Internal Server Error"
+// @Router /api/issues [get]
 func getIssuesHandler(c *fiber.Ctx) error {
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err

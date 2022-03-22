@@ -1,93 +1,29 @@
 basePath: /
 definitions:
-  api.IssueActivityResponse:
-    properties:
-      activity:
-        $ref: '#/definitions/redmine.IdName'
-      issue:
-        $ref: '#/definitions/redmine.Issue'
-    type: object
-  api.LoginResponse:
-    properties:
-      login:
-        type: string
-      user_id:
-        type: integer
-    type: object
-  api.SpentOnIssueActivityResponse:
-    properties:
-      activity:
-        $ref: '#/definitions/redmine.IdName'
-      hours:
-        type: number
-      issue:
-        $ref: '#/definitions/redmine.Issue'
-      spent_on:
-        type: string
-    type: object
-  redmine.IdName:
+  api.activity:
     properties:
       id:
         type: integer
       name:
         type: string
     type: object
-  redmine.Issue:
+  api.issue:
     properties:
-      assigned_to:
-        $ref: '#/definitions/redmine.IdName'
-      assigned_to_id:
-        type: integer
-      author:
-        $ref: '#/definitions/redmine.IdName'
-      category:
-        $ref: '#/definitions/redmine.IdName'
-      category_id:
-        type: integer
-      closed_on:
-        type: string
-      created_on:
-        type: string
-      description:
-        type: string
-      done_ratio:
-        type: number
-      due_date:
-        type: string
-      estimated_hours:
-        type: number
       id:
-        type: integer
-      notes:
-        type: string
-      project:
-        $ref: '#/definitions/redmine.IdName'
-      project_id:
-        type: integer
-      start_date:
-        type: string
-      status:
-        $ref: '#/definitions/redmine.IdName'
-      status_date:
-        type: string
-      status_id:
         type: integer
       subject:
         type: string
-      updated_on:
-        type: string
     type: object
-  redmine.TimeEntry:
+  api.issueActivity:
     properties:
-      activity_id:
-        type: integer
-      comments:
-        type: string
-      hours:
-        type: integer
-      issue_id:
-        type: integer
-      spent_on:
+      activity:
+        $ref: '#/definitions/api.activity'
+      issue:
+        $ref: '#/definitions/api.issue'
+    type: object
+  api.user:
+    properties:
+      login:
         type: string
       user_id:
         type: integer
@@ -101,6 +37,22 @@ info:
   title: Urdr API
   version: "1.0"
 paths:
+  /api/issues:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Proxy for the "/issues.json" Redmine endpoint
   /api/login:
     post:
       consumes:
@@ -112,9 +64,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.LoginResponse'
+            $ref: '#/definitions/api.user'
         "401":
           description: Unauthorized
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
           schema:
             type: string
       security:
@@ -128,8 +88,12 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
           schema:
             type: string
         "500":
@@ -141,13 +105,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get recent issues
-      parameters:
-      - description: default
-        in: header
-        name: Cookie
-        required: true
-        type: string
+      description: Get recent issues that the user has spent time on
       produces:
       - application/json
       responses:
@@ -155,7 +113,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/api.IssueActivityResponse'
+              $ref: '#/definitions/api.issueActivity'
             type: array
         "401":
           description: Unauthorized
@@ -165,66 +123,14 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: get recent issues
-  /api/report:
-    post:
-      consumes:
-      - application/json
-      description: report time spent on issues
-      parameters:
-      - description: urdr_session=default
-        in: body
-        name: time_entry
-        required: true
-        schema:
-          $ref: '#/definitions/redmine.TimeEntry'
-      - description: default
-        in: header
-        name: Cookie
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-      summary: report time spent on issues
-  /api/spent_time:
+      summary: Get recent issues
+  /api/time_entries:
     get:
       consumes:
       - application/json
-      description: get time entries within start and end dates
-      parameters:
-      - description: default
-        in: header
-        name: Cookie
-        required: true
-        type: string
-      - description: start date
-        in: query
-        name: start_date
-        required: true
-        type: string
-      - description: end date
-        in: query
-        name: end_date
-        required: true
-        type: string
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/api.SpentOnIssueActivityResponse'
-            type: array
         "401":
           description: Unauthorized
           schema:
@@ -233,7 +139,26 @@ paths:
           description: Internal Server Error
           schema:
             type: string
-      summary: get time entries within a given time period
+      summary: Proxy for the "/time_entries.json" Redmine endpoint
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Create, update, or delete a time entry
 securityDefinitions:
   BasicAuth:
     type: basic
