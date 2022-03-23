@@ -19,7 +19,7 @@ type Setting struct {
 // (setting ID, name and value), given the setting's name.  It returns
 // an error for illegal settings.
 func (db *database) getSetting(settingName string) (*Setting, error) {
-	err := db.Handle().Ping()
+	err := db.handle().Ping()
 	if err != nil {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
@@ -29,7 +29,7 @@ func (db *database) getSetting(settingName string) (*Setting, error) {
 		FROM	setting
 		WHERE	name = ?`
 
-	stmt, err := db.Handle().Prepare(selectStmt)
+	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -91,7 +91,7 @@ func (db *database) GetUserSetting(redmineUserId int, settingName string) (*Sett
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Handle().Prepare(selectStmt)
+	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -140,7 +140,7 @@ func (db *database) SetUserSetting(redmineUserId int, settingName string, settin
 		INSERT INTO user_setting (redmine_user_id, setting_id, value)
 		VALUES (?, ?, ?)`
 
-	stmt, err := db.Handle().Prepare(insertStmt)
+	stmt, err := db.handle().Prepare(insertStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -167,7 +167,7 @@ func (db *database) DeleteUserSetting(redmineUserId int, settingName string) err
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Handle().Prepare(deleteStmt)
+	stmt, err := db.handle().Prepare(deleteStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}

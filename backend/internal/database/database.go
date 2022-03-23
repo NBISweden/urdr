@@ -16,10 +16,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// A database is represented by a private structure containing a handle
-// to the underlying database connection object.
+// A database contains a private method, handle(), that returns a handle
+// to the underlying database connection handle.
 type database struct {
-	Handle func() *sql.DB
+	handle func() *sql.DB
 }
 
 // New() connects to the database, returns a database object.
@@ -35,5 +35,5 @@ func New() (*database, error) {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
-	return &database{Handle: func() *sql.DB { return handle }}, nil
+	return &database{handle: func() *sql.DB { return handle }}, nil
 }
