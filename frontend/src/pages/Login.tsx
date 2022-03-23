@@ -7,7 +7,6 @@ import "../index.css";
 
 export interface User {
   login: string;
-  user_id: number;
 }
 
 export const Login = () => {

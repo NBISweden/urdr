@@ -52,7 +52,6 @@ export interface TimeEntry {
   hours: number;
   comments: string;
   spent_on: string;
-  user_id: number;
 }
 
 export interface FetchedTimeEntry {
