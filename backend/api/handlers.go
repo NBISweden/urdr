@@ -73,7 +73,7 @@ func loginHandler(c *fiber.Ctx) error {
 
 	loginResponse := struct {
 		User struct {
-			UserId int    `json:"id"`
+			Id     int    `json:"id"`
 			Login  string `json:"login"`
 			ApiKey string `json:"api_key"`
 		} `json:"user"`
@@ -84,7 +84,7 @@ func loginHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	session.Set("user_id", loginResponse.User.UserId)
+	session.Set("user_id", loginResponse.User.Id)
 	session.Set("api_key", loginResponse.User.ApiKey)
 
 	if err := session.Save(); err != nil {
