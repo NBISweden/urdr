@@ -202,7 +202,6 @@ export const Report = () => {
                   recentIssue={issue}
                   onCellUpdate={handleCellUpdate}
                   days={thisWeek}
-                  userId={user.user_id}
                   rowUpdates={rowUpdates}
                   onReset={handleReset}
                   saved={toggleSave}
