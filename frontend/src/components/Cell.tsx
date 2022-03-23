@@ -4,14 +4,12 @@ import { RecentIssue, TimeEntry } from "../pages/Report";
 export const Cell = ({
   recentIssue,
   date,
-  userId,
   hours,
   entryId,
   onCellUpdate,
 }: {
   recentIssue: RecentIssue;
   date: Date;
-  userId: number;
   hours: number;
   entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
@@ -42,7 +40,6 @@ export const Cell = ({
             hours: +event.target.value,
             comments: "",
             spent_on: date.toISOString().split("T")[0],
-            user_id: userId,
           });
         }}
         className="cell"

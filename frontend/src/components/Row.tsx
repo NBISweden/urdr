@@ -6,7 +6,6 @@ import { Cell } from "./Cell";
 export const Row = ({
   recentIssue,
   days,
-  userId,
   rowUpdates,
   onCellUpdate,
   onReset,
@@ -14,7 +13,6 @@ export const Row = ({
 }: {
   recentIssue: RecentIssue;
   days: Date[];
-  userId: number;
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onReset: () => void;
@@ -113,7 +111,6 @@ export const Row = ({
               recentIssue={recentIssue}
               date={day}
               onCellUpdate={onCellUpdate}
-              userId={userId}
               hours={rowHours[i]}
               entryId={rowEntryIds[i]}
             />

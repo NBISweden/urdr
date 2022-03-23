@@ -52,7 +52,6 @@ export interface TimeEntry {
   hours: number;
   comments: string;
   spent_on: string;
-  user_id: number;
 }
 
 export interface FetchedTimeEntry {
@@ -203,7 +202,6 @@ export const Report = () => {
                   recentIssue={issue}
                   onCellUpdate={handleCellUpdate}
                   days={thisWeek}
-                  userId={user.user_id}
                   rowUpdates={rowUpdates}
                   onReset={handleReset}
                   saved={toggleSave}
