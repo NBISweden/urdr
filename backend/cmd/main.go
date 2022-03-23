@@ -3,7 +3,6 @@ package main
 import (
 	"urdr-api/api"
 	"urdr-api/internal/config"
-	"urdr-api/internal/database"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,10 +18,6 @@ func init() {
 
 	if err := config.Setup(); err != nil {
 		log.Fatalf("config.LoadConfig() failed: %v", err)
-	}
-
-	if err := database.Setup(); err != nil {
-		log.Fatalf("db.Setup() failed: %v", err)
 	}
 }
 

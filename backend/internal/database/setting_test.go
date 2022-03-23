@@ -1,16 +1,22 @@
-package database
+package database_test
 
 import (
 	"fmt"
 	"regexp"
 	"testing"
+	"urdr-api/internal/database"
 )
 
 func TestGetIllegalSetting(t *testing.T) {
 	settingName := "tuba"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	_, err := GetUserSetting(1, settingName)
+	db, err := database.New()
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	_, err = db.GetUserSetting(1, settingName)
 	if err == nil {
 		t.Fatal("GetUserSetting() returned no error")
 	}
@@ -24,7 +30,12 @@ func TestSetIllegalSetting(t *testing.T) {
 	settingValue := "bantu"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	err := SetUserSetting(1, settingName, settingValue)
+	db, err := database.New()
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	err = db.SetUserSetting(1, settingName, settingValue)
 	if err == nil {
 		t.Fatal("SetUserSetting() returned no error")
 	}
@@ -37,7 +48,12 @@ func TestDeleteIllegalSetting(t *testing.T) {
 	settingName := "tuba"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	err := DeleteUserSetting(1, settingName)
+	db, err := database.New()
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	err = db.DeleteUserSetting(1, settingName)
 	if err == nil {
 		t.Fatal("DeleteUserSetting() returned no error")
 	}
@@ -50,7 +66,12 @@ func TestGetDefaultSetting(t *testing.T) {
 	settingName := "tab"
 	want := "horizontal"
 
-	setting, err := GetUserSetting(1, settingName)
+	db, err := database.New()
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	setting, err := db.GetUserSetting(1, settingName)
 	if err != nil {
 		t.Fatalf("GetUserSetting() failed: %v", err)
 	}
@@ -66,12 +87,17 @@ func TestSetting(t *testing.T) {
 	want1 := settingValue
 	want2 := "horizontal"
 
-	err := SetUserSetting(1, settingName, settingValue)
+	db, err := database.New()
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	err = db.SetUserSetting(1, settingName, settingValue)
 	if err != nil {
 		t.Fatalf("SetUserSetting() failed: %v", err)
 	}
 
-	setting, err := GetUserSetting(1, settingName)
+	setting, err := db.GetUserSetting(1, settingName)
 	if err != nil {
 		t.Fatalf("GetUserSetting() failed: %v", err)
 	}
@@ -80,12 +106,12 @@ func TestSetting(t *testing.T) {
 			setting.Value, want1)
 	}
 
-	err = DeleteUserSetting(1, settingName)
+	err = db.DeleteUserSetting(1, settingName)
 	if err != nil {
 		t.Fatalf("DeleteUserSetting() failed: %v", err)
 	}
 
-	setting, err = GetUserSetting(1, settingName)
+	setting, err = db.GetUserSetting(1, settingName)
 	if err != nil {
 		t.Fatalf("GetUserSetting() failed: %v", err)
 	}
