@@ -13,6 +13,7 @@ import (
 	_ "urdr-api/docs"
 
 	"urdr-api/internal/config"
+	"urdr-api/internal/database"
 )
 
 // prepareRedmineRequest() gets the Redmine API key out of the current
@@ -375,4 +376,32 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 
 	// Proxy the request to Redmine
 	return proxy.Do(c, redmineURL)
+}
+
+func getFavoritesHandler(c *fiber.Ctx) error {
+	session, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	userId := session.Get("user_id")
+	if userId == nil {
+		log.Error("Failed to get vaid user ID from session")
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	db, err := database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Errorf("Failed to connect to database: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	favorites, err := db.GetAllUserFavorites(userId.(int))
+	if err != nil {
+		log.Errorf("Failed to get favorites for user ID %d: %v", userId.(int), err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.JSON(favorites)
 }
