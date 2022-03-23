@@ -4,8 +4,6 @@
 package database
 
 import (
-	"urdr-api/internal/config"
-
 	"database/sql"
 	"fmt"
 
@@ -23,10 +21,10 @@ type database struct {
 }
 
 // New() connects to the database, returns a database object.
-func New() (*database, error) {
+func New(databasePath string) (*database, error) {
 	handle, err := sql.Open("sqlite3",
 		fmt.Sprintf("%s?_auto_vacuum=FULL&_foreign_keys=true",
-			config.Config.Database.Path))
+			databasePath))
 	if err != nil {
 		return nil, fmt.Errorf("sql.Open() failed: %w", err)
 	}

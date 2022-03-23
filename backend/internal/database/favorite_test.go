@@ -2,6 +2,7 @@ package database_test
 
 import (
 	"testing"
+	"urdr-api/internal/config"
 	"urdr-api/internal/database"
 )
 
@@ -16,7 +17,7 @@ func TestFavorites(t *testing.T) {
 			RedmineActivityId: 1,
 			Name:              "Test 2"}}
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}

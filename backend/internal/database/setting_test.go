@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"testing"
+	"urdr-api/internal/config"
 	"urdr-api/internal/database"
 )
 
@@ -11,7 +12,7 @@ func TestGetIllegalSetting(t *testing.T) {
 	settingName := "tuba"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
@@ -30,7 +31,7 @@ func TestSetIllegalSetting(t *testing.T) {
 	settingValue := "bantu"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
@@ -48,7 +49,7 @@ func TestDeleteIllegalSetting(t *testing.T) {
 	settingName := "tuba"
 	want := regexp.MustCompilePOSIX("illegal setting name: " + settingName + "$")
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
@@ -66,7 +67,7 @@ func TestGetDefaultSetting(t *testing.T) {
 	settingName := "tab"
 	want := "horizontal"
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
@@ -87,7 +88,7 @@ func TestSetting(t *testing.T) {
 	want1 := settingValue
 	want2 := "horizontal"
 
-	db, err := database.New()
+	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
