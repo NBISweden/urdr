@@ -39,17 +39,15 @@ func (db *database) GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 	for rows.Next() {
 		var favorite Favorite
 
-		err = rows.Scan(&favorite.RedmineIssueId,
+		if err := rows.Scan(&favorite.RedmineIssueId,
 			&favorite.RedmineActivityId,
-			&favorite.Name)
-		if err != nil {
+			&favorite.Name); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		favorites = append(favorites, favorite)
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
@@ -85,8 +83,7 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -106,19 +103,17 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	defer stmt.Close()
 
 	for priority, favorite := range favorites {
-		_, err = stmt.Exec(redmineUserId,
+		if _, err := stmt.Exec(redmineUserId,
 			favorite.RedmineIssueId,
 			favorite.RedmineActivityId,
 			favorite.Name,
-			priority)
-		if err != nil {
+			priority); err != nil {
 			return fmt.Errorf("sql.Exec() failed: %w", err)
 		}
 	}
 
 	// The deferred tx.Rollback() will be a no-op after this.
-	err = tx.Commit()
-	if err != nil {
+	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("sql.Tx.Commit() failed: %w", err)
 	}
 
@@ -138,8 +133,7 @@ func (db *database) DeleteAllUserFavorites(redmineUserId int) error {
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 

@@ -19,8 +19,7 @@ type Setting struct {
 // (setting ID, name and value), given the setting's name.  It returns
 // an error for illegal settings.
 func (db *database) getSetting(settingName string) (*Setting, error) {
-	err := db.handle().Ping()
-	if err != nil {
+	if err := db.handle().Ping(); err != nil {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
@@ -46,15 +45,13 @@ func (db *database) getSetting(settingName string) (*Setting, error) {
 	var settingValue sql.NullString
 
 	for rows.Next() {
-		err = rows.Scan(&settingId, &settingValue)
-		if err != nil {
+		if err := rows.Scan(&settingId, &settingValue); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		isValidSetting = true
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
@@ -107,15 +104,13 @@ func (db *database) GetUserSetting(redmineUserId int, settingName string) (*Sett
 	var userSettingValue sql.NullString
 
 	for rows.Next() {
-		err = rows.Scan(&userSettingValue)
-		if err != nil {
+		if err := rows.Scan(&userSettingValue); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		userSettingFound = true
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
@@ -146,8 +141,7 @@ func (db *database) SetUserSetting(redmineUserId int, settingName string, settin
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, setting.id, settingValue)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId, setting.id, settingValue); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -173,8 +167,7 @@ func (db *database) DeleteUserSetting(redmineUserId int, settingName string) err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, setting.id)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId, setting.id); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
