@@ -7,11 +7,13 @@ import {
   User,
   RecentIssue,
   TimeEntry,
+  Favorite,
   SNOWPACK_PUBLIC_API_URL,
 } from "../model";
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<RecentIssue[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
   let location = useLocation();
@@ -74,8 +76,57 @@ export const Report = () => {
     setRecentIssues(issues);
   };
 
+  const getFavorites = async () => {
+    // let favorites: Favorite[] = await fetch(
+    //   `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
+    //   {
+    //     method: "GET",
+    //     credentials: "include",
+    //     headers: headers,
+    //   }
+    // )
+    //   .then((res) => {
+    //     if (res.ok) {
+    //       return res.json();
+    //     } else {
+    //       throw new Error("Could not find favorites.");
+    //     }
+    //   })
+    //   .catch((error) => console.log(error));
+
+    // console.log(favorites);
+    // setFavorites(favorites);
+    console.log(dummyFavorites);
+    setFavorites(dummyFavorites);
+  };
+
+  const dummyFavorites = [
+    {
+      redmine_user_id: 266,
+      redmine_issue_id: 5849,
+      redmine_activity_id: 10,
+      name: "My favorite scrum course",
+      priority: 1,
+    },
+    {
+      redmine_user_id: 266,
+      redmine_issue_id: 5763,
+      redmine_activity_id: 9,
+      name: "My favorite team work",
+      priority: 2,
+    },
+    {
+      redmine_user_id: 266,
+      redmine_issue_id: 5214,
+      redmine_activity_id: 8,
+      name: "My favorite website",
+      priority: 3,
+    },
+  ];
+
   React.useEffect(() => {
     getRecentIssues();
+    getFavorites();
   }, []);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
