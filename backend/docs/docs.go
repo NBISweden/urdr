@@ -248,9 +248,6 @@ const docTemplate = `{
             "properties": {
                 "login": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         }
