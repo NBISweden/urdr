@@ -34,7 +34,7 @@ func Setup() *fiber.App {
 	}))
 
 	store = session.New(session.Config{
-		Expiration:   time.Minute * 5,
+		Expiration:   time.Minute * 15,
 		KeyLookup:    "cookie:urdr_session",
 		CookieSecure: true,
 	})
@@ -52,6 +52,8 @@ func Setup() *fiber.App {
 	app.Post("/api/time_entries", postTimeEntriesHandler)
 
 	app.Get("/api/issues", getIssuesHandler)
+
+	app.Get("/api/activities", getActivitiesHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
