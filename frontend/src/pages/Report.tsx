@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
+import { QuickAdd } from "../components/QuickAdd";
+
 import { User } from "../pages/Login";
 
 // interfaces use snake case to follow Redmines variable names
@@ -210,13 +212,18 @@ export const Report = () => {
             );
           })}
       </section>
-      <button
-        className="save-button"
-        onClick={handleSave}
-        disabled={newTimeEntries.length === 0}
-      >
-        Save changes
-      </button>
+      <section className="save-button-container">
+        <button
+          className="basic-button save-button"
+          onClick={handleSave}
+          disabled={newTimeEntries.length === 0}
+        >
+          Save changes
+        </button>
+      </section>
+      <section className="recent-container">
+        <QuickAdd></QuickAdd>
+      </section>
     </>
   );
 };

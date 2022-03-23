@@ -91,7 +91,7 @@ input[type="number"] {
   margin: 0 2.25rem 0 3.75rem;
 }
 
-.save-button {
+.basic-button {
   background-color: hsl(76deg 55% 53%);
   color: hsl(0deg 0% 15%);
   border: none;
@@ -100,9 +100,11 @@ input[type="number"] {
   box-shadow: 0 3px 6px hsl(0deg 0 15%);
   box-shadow: 0 2px 4px hsl(0deg 0 12%);
   transition-duration: 0.2s;
+  margin-left: 1rem;
+}
+
+.save-button {
   margin: 2rem;
-  position: absolute;
-  right: 0;
 }
 
 .save-button:hover {
@@ -114,4 +116,9 @@ input[type="number"] {
 .save-button:disabled {
   background-color: hsl(76deg 55% 77%);
   color: hsl(84deg 55% 33%);
+}
+
+.save-button-container {
+  display: flex;
+  justify-content: end;
 }
