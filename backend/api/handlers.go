@@ -38,8 +38,7 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 }
 
 type user struct {
-	UserId int    `json:"user_id"`
-	Login  string `json:"login"`
+	Login string `json:"login"`
 }
 
 // loginHandler godoc
@@ -74,7 +73,6 @@ func loginHandler(c *fiber.Ctx) error {
 
 	loginResponse := struct {
 		User struct {
-			Id     int    `json:"id"`
 			Login  string `json:"login"`
 			ApiKey string `json:"api_key"`
 		} `json:"user"`
@@ -85,7 +83,6 @@ func loginHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// session.Set("id", loginResponse.User.Id)
 	// session.Set("login", loginResponse.User.Login)
 	session.Set("api_key", loginResponse.User.ApiKey)
 
@@ -96,8 +93,7 @@ func loginHandler(c *fiber.Ctx) error {
 	log.Debugf("Logged in user %v", loginResponse)
 
 	return c.JSON(user{
-		UserId: loginResponse.User.Id,
-		Login:  loginResponse.User.Login,
+		Login: loginResponse.User.Login,
 	})
 }
 
