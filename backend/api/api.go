@@ -55,6 +55,8 @@ func Setup() *fiber.App {
 
 	app.Get("/api/activities", getActivitiesHandler)
 
+	app.Get("/api/favorites", getFavoritesHandler)
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotFound) // => 404 "Not Found"
