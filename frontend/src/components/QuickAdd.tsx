@@ -9,7 +9,7 @@ export const QuickAdd = () => {
   headers.set("Content-Type", "application/json");
 
   const getActivities = async () => {
-    let activities: IdName[] = await fetch(
+    let result: { time_entry_activities: IdName[] } = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/activities`,
       {
         method: "GET",
@@ -26,8 +26,8 @@ export const QuickAdd = () => {
       })
       .catch((error) => console.log(error));
 
-    console.log(activities);
-    setActivities(activities);
+    setActivities(result.time_entry_activities);
+    console.log(result);
   };
 
   React.useEffect(() => {
@@ -54,8 +54,10 @@ export const QuickAdd = () => {
         Activity
       </label>
       <select className="col-3" name="activity" id="select-activity">
-        <option value="id-A">Activity A</option>
-        <option value="id-B">Activity B</option>
+        {activities &&
+          activities.map((activity) => {
+            return <option>{activity.name}</option>;
+          })}
       </select>
       <button className=" basic-button plus-button">
         <img src={plus} />

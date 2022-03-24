@@ -3,9 +3,12 @@ import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
-import { RecentIssue, TimeEntry, SNOWPACK_PUBLIC_API_URL } from "../model";
-
-import { User } from "../pages/Login";
+import {
+  User,
+  RecentIssue,
+  TimeEntry,
+  SNOWPACK_PUBLIC_API_URL,
+} from "../model";
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<RecentIssue[]>([]);
