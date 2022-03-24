@@ -467,3 +467,51 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 
 	return c.JSON(issueActivities)
 }
+
+func postFavoritesHandler(c *fiber.Ctx) error {
+	// Parse the favoites from the query.
+	query := []issueActivity{}
+
+	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	session, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	userId := session.Get("user_id")
+	if userId == nil {
+		log.Error("Failed to get vaid user ID from session")
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	db, err := database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Errorf("Failed to connect to database: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	// Create a list of database.Favorite entries from the
+	// parsed query.
+
+	var favorites []database.Favorite
+
+	for _, issueActivity := range query {
+		favorite := database.Favorite{
+			RedmineIssueId:    issueActivity.Issue.Id,
+			RedmineActivityId: issueActivity.Activity.Id,
+			Name:              issueActivity.CustomName,
+		}
+
+		favorites = append(favorites, favorite)
+	}
+
+	if err := db.SetAllUserFavorites(userId.(int), favorites); err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
