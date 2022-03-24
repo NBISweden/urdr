@@ -415,5 +415,27 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(favorites)
+	var issueActivities []issueActivity
+
+	for i := range favorites {
+		issueActivity := issueActivity{
+			Issue: issue{
+				Id:      favorites[i].RedmineIssueId,
+				Subject: "",
+			},
+			Activity: activity{
+				Id:   favorites[i].RedmineActivityId,
+				Name: "",
+			},
+			CustomName: favorites[i].Name,
+		}
+
+		issueActivities = append(issueActivities, issueActivity)
+	}
+
+	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
+		return err
+	}
+
+	return c.JSON(issueActivities)
 }
