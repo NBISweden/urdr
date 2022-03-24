@@ -433,8 +433,39 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 		issueActivities = append(issueActivities, issueActivity)
 	}
 
+	// Fetch the subjects for each issue.
 	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
 		return err
+	}
+
+	// Now fetch the activities from Redmine and fill out the
+	// activity names.
+	c.Response().Reset()
+	if err := getActivitiesHandler(c); err != nil {
+		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return nil
+	}
+
+	activitiesResponse := struct {
+		Activities []struct {
+			Id   int    `json:"id"`
+			Name string `json:"name"`
+		} `json:"time_entry_activities"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	for i := range issueActivities {
+		for _, activity := range activitiesResponse.Activities {
+			if activity.Id == issueActivities[i].Activity.Id {
+				issueActivities[i].Activity.Name = activity.Name
+				break
+			}
+		}
 	}
 
 	return c.JSON(issueActivities)
