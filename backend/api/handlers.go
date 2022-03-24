@@ -254,6 +254,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		}
 	}
 
+	// Populate the issue subjects.
 	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
 		return err
 	}
@@ -387,6 +388,15 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	return proxy.Do(c, redmineURL)
 }
 
+// getFavoritesHandler() godoc
+// @Summary	Get favorites
+// @Description	Get the favorites for the current user
+// @Accept	json
+// @Produce	json
+// @Success	200	{array}	issueActivity
+// @Failure	401	{string} error "Unauthorized"
+// @Failure	500	{string} error "Internal Server Error"
+// @Router /api/favorites [get]
 func getFavoritesHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)
 	if err != nil {
@@ -468,14 +478,17 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 	return c.JSON(issueActivities)
 }
 
+// postFavoritesHandler() godoc
+// @Summary	Store favorites
+// @Description	Stores the favorites for the current user
+// @Accept	json
+// @Produce	json
+// @Success	204	{string} error "No Content"
+// @Failure	401	{string} error "Unauthorized"
+// @Failure	422	{string} error "Unprocessable Entity"
+// @Failure	500	{string} error "Internal Server Error"
+// @Router /api/favorites [post]
 func postFavoritesHandler(c *fiber.Ctx) error {
-	// Parse the favoites from the query.
-	query := []issueActivity{}
-
-	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
 	session, err := store.Get(c)
 	if err != nil {
 		log.Errorf("Failed to get session: %v", err)
@@ -492,6 +505,13 @@ func postFavoritesHandler(c *fiber.Ctx) error {
 	if err != nil {
 		log.Errorf("Failed to connect to database: %v", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	// Parse the favoites from the query.
+	query := []issueActivity{}
+
+	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
 	// Create a list of database.Favorite entries from the
