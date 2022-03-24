@@ -13,6 +13,7 @@ export const Row = ({
   rowUpdates,
   onCellUpdate,
   onReset,
+  onToggleFav,
   saved,
 }: {
   topic: IssueActivityPair;
@@ -20,6 +21,7 @@ export const Row = ({
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onReset: () => void;
+  onToggleFav: (topic: IssueActivityPair) => void;
   saved: boolean;
 }) => {
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
@@ -100,12 +102,15 @@ export const Row = ({
   return (
     <>
       <div className="row issue-row">
-        <div className="col-6 ">
+        <div className="col-5 ">
           <p className="issue-label">
             {topic.custom_name
               ? `${topic.custom_name}`
               : `${topic.issue.subject} - ${topic.activity.name}`}
           </p>
+        </div>
+        <div className="col-1">
+          <button onClick={() => onToggleFav(topic)}>Toggle fav</button>
         </div>
         {days.map((day, i) => {
           return (

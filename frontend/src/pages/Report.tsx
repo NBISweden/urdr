@@ -56,23 +56,23 @@ export const Report = () => {
   const thisWeek = getFullWeek(today);
 
   const getRowTopics = async () => {
-    //const favorites = dummyFavorites;
-    const favorites: IssueActivityPair[] = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Could not find favorites.");
-        }
-      })
-      .catch((error) => console.log(error));
+    const favorites = dummyFavorites;
+    // const favorites: IssueActivityPair[] = await fetch(
+    //   `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
+    //   {
+    //     method: "GET",
+    //     credentials: "include",
+    //     headers: headers,
+    //   }
+    // )
+    //   .then((res) => {
+    //     if (res.ok) {
+    //       return res.json();
+    //     } else {
+    //       throw new Error("Could not find favorites.");
+    //     }
+    //   })
+    //   .catch((error) => console.log(error));
 
     const issues: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
@@ -168,6 +168,58 @@ export const Report = () => {
     }
   };
 
+  const saveFavorites = async (newFavs: IssueActivityPair[]) => {
+    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/favorites`, {
+      method: "POST",
+      credentials: "include",
+      headers: headers,
+      body: JSON.stringify(newFavs),
+    })
+      .then((res) => {
+        if (res.ok) {
+          return true;
+        } else {
+          throw new Error("Could not save favorites.");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        return false;
+      });
+    return saved;
+  };
+
+  const handleToggleFav = async (topic: IssueActivityPair) => {
+    const existingFav = favorites.find(
+      (fav) =>
+        fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
+    );
+    if (!existingFav) {
+      topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
+      const saved = await saveFavorites([...favorites, topic]);
+      if (!saved) {
+        console.log("Something went wrong with adding a favorite!");
+        return;
+      }
+      getRowTopics();
+    } else {
+      const favs = favorites.map((recent) => recent);
+      const removed = favs.find(
+        (recent) =>
+          recent.activity.id === topic.activity.id &&
+          recent.issue.id === topic.issue.id
+      );
+      const index = favs.indexOf(removed);
+      favs.splice(index, 1);
+      const saved = await saveFavorites(favs);
+      if (!saved) {
+        console.log("Something went wrong with removing a favorite!");
+        return;
+      }
+      getRowTopics();
+    }
+  };
+
   const reportTime = (timeEntry: TimeEntry) => {
     fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
@@ -215,6 +267,7 @@ export const Report = () => {
                     key={`${fav.issue.id}${fav.activity.id}`}
                     topic={fav}
                     onCellUpdate={handleCellUpdate}
+                    onToggleFav={handleToggleFav}
                     days={thisWeek}
                     userId={user.user_id}
                     rowUpdates={rowUpdates}
@@ -246,6 +299,7 @@ export const Report = () => {
                   key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
                   topic={recentIssue}
                   onCellUpdate={handleCellUpdate}
+                  onToggleFav={handleToggleFav}
                   days={thisWeek}
                   rowUpdates={rowUpdates}
                   onReset={handleReset}
