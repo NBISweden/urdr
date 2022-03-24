@@ -18,9 +18,8 @@ type Setting struct {
 // getSetting() is an internal function that returns the setting struct
 // (setting ID, name and value), given the setting's name.  It returns
 // an error for illegal settings.
-func getSetting(settingName string) (*Setting, error) {
-	err := db.Ping()
-	if err != nil {
+func (db *database) getSetting(settingName string) (*Setting, error) {
+	if err := db.handle().Ping(); err != nil {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
@@ -29,7 +28,7 @@ func getSetting(settingName string) (*Setting, error) {
 		FROM	setting
 		WHERE	name = ?`
 
-	stmt, err := db.Prepare(selectStmt)
+	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -46,15 +45,13 @@ func getSetting(settingName string) (*Setting, error) {
 	var settingValue sql.NullString
 
 	for rows.Next() {
-		err = rows.Scan(&settingId, &settingValue)
-		if err != nil {
+		if err := rows.Scan(&settingId, &settingValue); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		isValidSetting = true
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
@@ -79,8 +76,8 @@ func getSetting(settingName string) (*Setting, error) {
 // user-specific value for a particular setting.  If there is no
 // user-specific value stored for the given user, then the default value
 // is returned, if there is one.
-func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
-	setting, err := getSetting(settingName)
+func (db *database) GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
+	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return nil, fmt.Errorf("getSetting() failed: %w", err)
 	}
@@ -91,7 +88,7 @@ func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Prepare(selectStmt)
+	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
@@ -107,15 +104,13 @@ func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
 	var userSettingValue sql.NullString
 
 	for rows.Next() {
-		err = rows.Scan(&userSettingValue)
-		if err != nil {
+		if err := rows.Scan(&userSettingValue); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
 		userSettingFound = true
 	}
-	err = rows.Err()
-	if err != nil {
+	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
@@ -130,8 +125,8 @@ func GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
 // SetUserSetting() assigns the user-specific value for a particular
 // setting.  If there is already a user-specific value stored for the
 // given setting, the new value replaces the old value.
-func SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
-	setting, err := getSetting(settingName)
+func (db *database) SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
+	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
@@ -140,14 +135,13 @@ func SetUserSetting(redmineUserId int, settingName string, settingValue string) 
 		INSERT INTO user_setting (redmine_user_id, setting_id, value)
 		VALUES (?, ?, ?)`
 
-	stmt, err := db.Prepare(insertStmt)
+	stmt, err := db.handle().Prepare(insertStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, setting.id, settingValue)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId, setting.id, settingValue); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -156,8 +150,8 @@ func SetUserSetting(redmineUserId int, settingName string, settingValue string) 
 
 // DeleteUserSetting() removes the user-specific value for a particular
 // setting.
-func DeleteUserSetting(redmineUserId int, settingName string) error {
-	setting, err := getSetting(settingName)
+func (db *database) DeleteUserSetting(redmineUserId int, settingName string) error {
+	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)
 	}
@@ -167,14 +161,13 @@ func DeleteUserSetting(redmineUserId int, settingName string) error {
 		WHERE	redmine_user_id = ?
 		AND	setting_id = ?`
 
-	stmt, err := db.Prepare(deleteStmt)
+	stmt, err := db.handle().Prepare(deleteStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(redmineUserId, setting.id)
-	if err != nil {
+	if _, err := stmt.Exec(redmineUserId, setting.id); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 

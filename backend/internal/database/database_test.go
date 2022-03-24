@@ -1,4 +1,4 @@
-package database
+package database_test
 
 import (
 	"log"
@@ -18,11 +18,6 @@ func TestMain(m *testing.M) {
 	err = config.Setup()
 	if err != nil {
 		log.Fatalf("config.Setup() failed: %v", err)
-	}
-
-	err = Setup()
-	if err != nil {
-		log.Fatalf("database.Setup() failed: %v", err)
 	}
 
 	os.Exit(m.Run())

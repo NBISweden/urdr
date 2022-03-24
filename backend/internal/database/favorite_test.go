@@ -1,11 +1,13 @@
-package database
+package database_test
 
 import (
 	"testing"
+	"urdr-api/internal/config"
+	"urdr-api/internal/database"
 )
 
 func TestFavorites(t *testing.T) {
-	storeFaves := []Favorite{
+	storeFaves := []database.Favorite{
 		{
 			RedmineIssueId:    1,
 			RedmineActivityId: 1,
@@ -15,17 +17,22 @@ func TestFavorites(t *testing.T) {
 			RedmineActivityId: 1,
 			Name:              "Test 2"}}
 
-	err := DeleteAllUserFavorites(1)
+	db, err := database.New(config.Config.Database.Path)
+	if err != nil {
+		t.Fatalf("database.New() returned unexpected error %q", err)
+	}
+
+	err = db.DeleteAllUserFavorites(1)
 	if err != nil {
 		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
 	}
 
-	err = SetAllUserFavorites(1, storeFaves)
+	err = db.SetAllUserFavorites(1, storeFaves)
 	if err != nil {
 		t.Fatalf("SetAllUserFavorites() failed: %v", err)
 	}
 
-	fetchFaves, err := GetAllUserFavorites(1)
+	fetchFaves, err := db.GetAllUserFavorites(1)
 	if err != nil {
 		t.Fatalf("GetAllUserFavorites() failed: %v", err)
 	}
@@ -40,12 +47,12 @@ func TestFavorites(t *testing.T) {
 		}
 	}
 
-	err = DeleteAllUserFavorites(1)
+	err = db.DeleteAllUserFavorites(1)
 	if err != nil {
 		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
 	}
 
-	fetchFaves, err = GetAllUserFavorites(1)
+	fetchFaves, err = db.GetAllUserFavorites(1)
 	if err != nil {
 		t.Fatalf("GetAllUserFavorites() failed: %v", err)
 	}
