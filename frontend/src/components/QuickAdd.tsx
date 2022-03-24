@@ -1,4 +1,5 @@
 import React from "react";
+import plus from "../icons/plus.svg";
 
 export const QuickAdd = () => {
   return (
@@ -24,7 +25,9 @@ export const QuickAdd = () => {
         <option value="id-A">Activity A</option>
         <option value="id-B">Activity B</option>
       </select>
-      <button className="basic-button col-1">+</button>
+      <button className=" basic-button plus-button">
+        <img src={plus} />
+      </button>
     </div>
   );
 };

@@ -126,3 +126,14 @@ input[type="number"] {
 .accessibility-label {
   display: none;
 }
+
+.plus-button {
+  flex: 0 0 auto;
+  width: 5%;
+  height: 5%;
+}
+
+.plus-button img {
+  width: 90%;
+  height: 90%;
+}
