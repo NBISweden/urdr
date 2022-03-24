@@ -102,7 +102,9 @@ export const Row = ({
       <div className="row issue-row">
         <div className="col-6 ">
           <p className="issue-label">
-            {topic.issue.subject} - {topic.activity.name}
+            {topic.custom_name
+              ? `${topic.custom_name}`
+              : `${topic.issue.subject} - ${topic.activity.name}`}
           </p>
         </div>
         {days.map((day, i) => {

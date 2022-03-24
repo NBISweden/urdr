@@ -13,7 +13,7 @@ import {
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
-  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
   let location = useLocation();
@@ -56,7 +56,7 @@ export const Report = () => {
   const thisWeek = getFullWeek(today);
 
   const getRecentIssues = async () => {
-    let issues: IssueActivityPair[] = await fetch(
+    const issues: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
       {
         method: "GET",
@@ -73,7 +73,18 @@ export const Report = () => {
       })
       .catch((error) => console.log(error));
 
-    setRecentIssues(issues);
+    let nonFavIssues = [];
+    issues.forEach((issue, index) => {
+      let match = favorites.find(
+        (fav) =>
+          fav.issue.id === issue.issue.id &&
+          fav.activity.id === issue.activity.id
+      );
+      if (!match) {
+        nonFavIssues.push(issue);
+      }
+    });
+    setRecentIssues(nonFavIssues);
   };
 
   const getFavorites = async () => {
@@ -96,38 +107,54 @@ export const Report = () => {
 
     // console.log(favorites);
     // setFavorites(favorites);
-    console.log(dummyFavorites);
     setFavorites(dummyFavorites);
   };
 
   const dummyFavorites = [
     {
-      redmine_user_id: 266,
-      redmine_issue_id: 5849,
-      redmine_activity_id: 10,
-      name: "My favorite scrum course",
-      priority: 1,
+      issue: {
+        id: 5555,
+        subject: "Fantasy training",
+      },
+      activity: {
+        id: 10,
+        name: "Professional Development",
+      },
+      custom_name: "My favorite fantasy",
     },
     {
-      redmine_user_id: 266,
-      redmine_issue_id: 5763,
-      redmine_activity_id: 9,
-      name: "My favorite team work",
-      priority: 2,
+      issue: {
+        id: 5763,
+        subject: "Aspebodaklungan",
+      },
+      activity: {
+        id: 9,
+        name: "Development",
+      },
+      custom_name: "My favorite team work",
     },
     {
-      redmine_user_id: 266,
-      redmine_issue_id: 5214,
-      redmine_activity_id: 8,
-      name: "My favorite website",
-      priority: 3,
+      issue: {
+        id: 5214,
+        subject: "Development and maintenence of web",
+      },
+      activity: {
+        id: 8,
+        name: "Design",
+      },
+      custom_name: "My favorite website",
     },
   ];
 
   React.useEffect(() => {
-    getRecentIssues();
     getFavorites();
   }, []);
+
+  React.useEffect(() => {
+    if (favorites.length > 0) {
+      getRecentIssues();
+    }
+  }, [favorites]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = newTimeEntries.map((entry) => {
@@ -179,7 +206,32 @@ export const Report = () => {
   return (
     <>
       <section className="recent-container">
-        <HeaderRow days={thisWeek} title="Recent issues" />
+        <HeaderRow days={thisWeek} title="Favorites" />
+        {favorites &&
+          favorites.map((fav) => {
+            const rowUpdates = newTimeEntries?.filter(
+              (entry) =>
+                entry.issue_id === fav.issue.id &&
+                entry.activity_id === fav.activity.id
+            );
+            return (
+              <>
+                <Row
+                  key={`${fav.issue.id}${fav.activity.id}`}
+                  topic={fav}
+                  onCellUpdate={handleCellUpdate}
+                  days={thisWeek}
+                  userId={user.user_id}
+                  rowUpdates={rowUpdates}
+                  onReset={handleReset}
+                  saved={toggleSave}
+                />
+              </>
+            );
+          })}
+      </section>
+      <section className="recent-container">
+        <HeaderRow days={[]} title="Recent issues" />
         {recentIssues &&
           recentIssues.map((recentIssue) => {
             const rowUpdates = newTimeEntries?.filter(
