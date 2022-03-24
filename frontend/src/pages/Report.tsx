@@ -55,7 +55,25 @@ export const Report = () => {
   };
   const thisWeek = getFullWeek(today);
 
-  const getRecentIssues = async () => {
+  const getRowTopics = async () => {
+    //const favorites = dummyFavorites;
+    const favorites: IssueActivityPair[] = await fetch(
+      `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: headers,
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Could not find favorites.");
+        }
+      })
+      .catch((error) => console.log(error));
+
     const issues: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
       {
@@ -73,41 +91,23 @@ export const Report = () => {
       })
       .catch((error) => console.log(error));
 
-    let nonFavIssues = [];
-    issues.forEach((issue, index) => {
-      let match = favorites.find(
-        (fav) =>
-          fav.issue.id === issue.issue.id &&
-          fav.activity.id === issue.activity.id
-      );
-      if (!match) {
-        nonFavIssues.push(issue);
-      }
-    });
-    setRecentIssues(nonFavIssues);
-  };
-
-  const getFavorites = async () => {
-    // let favorites: Favorite[] = await fetch(
-    //   `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
-    //   {
-    //     method: "GET",
-    //     credentials: "include",
-    //     headers: headers,
-    //   }
-    // )
-    //   .then((res) => {
-    //     if (res.ok) {
-    //       return res.json();
-    //     } else {
-    //       throw new Error("Could not find favorites.");
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
-
-    // console.log(favorites);
-    // setFavorites(favorites);
-    setFavorites(dummyFavorites);
+    if (!!favorites) {
+      let nonFavIssues = [];
+      issues.forEach((issue, index) => {
+        let match = favorites.find(
+          (fav) =>
+            fav.issue.id === issue.issue.id &&
+            fav.activity.id === issue.activity.id
+        );
+        if (!match) {
+          nonFavIssues.push(issue);
+        }
+      });
+      setRecentIssues(nonFavIssues);
+      setFavorites(favorites);
+    } else {
+      setRecentIssues(issues);
+    }
   };
 
   const dummyFavorites = [
@@ -147,14 +147,8 @@ export const Report = () => {
   ];
 
   React.useEffect(() => {
-    getFavorites();
+    getRowTopics();
   }, []);
-
-  React.useEffect(() => {
-    if (favorites.length > 0) {
-      getRecentIssues();
-    }
-  }, [favorites]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = newTimeEntries.map((entry) => {
@@ -205,33 +199,40 @@ export const Report = () => {
 
   return (
     <>
+      {favorites.length > 0 ? (
+        <section className="recent-container">
+          <HeaderRow days={thisWeek} title="Favorites" />
+          {favorites &&
+            favorites.map((fav) => {
+              const rowUpdates = newTimeEntries?.filter(
+                (entry) =>
+                  entry.issue_id === fav.issue.id &&
+                  entry.activity_id === fav.activity.id
+              );
+              return (
+                <>
+                  <Row
+                    key={`${fav.issue.id}${fav.activity.id}`}
+                    topic={fav}
+                    onCellUpdate={handleCellUpdate}
+                    days={thisWeek}
+                    userId={user.user_id}
+                    rowUpdates={rowUpdates}
+                    onReset={handleReset}
+                    saved={toggleSave}
+                  />
+                </>
+              );
+            })}
+        </section>
+      ) : (
+        <div></div>
+      )}
       <section className="recent-container">
-        <HeaderRow days={thisWeek} title="Favorites" />
-        {favorites &&
-          favorites.map((fav) => {
-            const rowUpdates = newTimeEntries?.filter(
-              (entry) =>
-                entry.issue_id === fav.issue.id &&
-                entry.activity_id === fav.activity.id
-            );
-            return (
-              <>
-                <Row
-                  key={`${fav.issue.id}${fav.activity.id}`}
-                  topic={fav}
-                  onCellUpdate={handleCellUpdate}
-                  days={thisWeek}
-                  userId={user.user_id}
-                  rowUpdates={rowUpdates}
-                  onReset={handleReset}
-                  saved={toggleSave}
-                />
-              </>
-            );
-          })}
-      </section>
-      <section className="recent-container">
-        <HeaderRow days={[]} title="Recent issues" />
+        <HeaderRow
+          days={favorites.length > 0 ? [] : thisWeek}
+          title="Recent issues"
+        />
         {recentIssues &&
           recentIssues.map((recentIssue) => {
             const rowUpdates = newTimeEntries?.filter(
