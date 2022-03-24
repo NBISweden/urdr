@@ -34,7 +34,7 @@ func (db *database) GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 	}
 	defer rows.Close()
 
-	favorites := make([]Favorite, 0)
+	var favorites []Favorite
 
 	for rows.Next() {
 		var favorite Favorite

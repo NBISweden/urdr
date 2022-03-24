@@ -197,8 +197,9 @@ type activity struct {
 }
 
 type issueActivity struct {
-	Issue    issue    `json:"issue"`
-	Activity activity `json:"activity"`
+	Issue      issue    `json:"issue"`
+	Activity   activity `json:"activity"`
+	CustomName string   `json:"custom_name"`
 }
 
 // recentIssuesHandler godoc
