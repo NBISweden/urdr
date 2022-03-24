@@ -100,11 +100,13 @@ func Test_Handlers(t *testing.T) {
 
 	entryActsResponse, _ := json.Marshal(entryActs)
 
+	var err error
+
 	// Create a fake Redmine server to which redmine requests will be forwarded
 	fakeRedmine := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch endpoint := r.URL.Path; endpoint {
 		case "/my/account.json":
-			w.Write(userResponse)
+			_, err = w.Write(userResponse)
 		case "/time_entries.json":
 			if r.Method == "POST" {
 				bodyBytes, err := ioutil.ReadAll(r.Body)
@@ -116,21 +118,23 @@ func Test_Handlers(t *testing.T) {
 				if err != nil {
 					w.WriteHeader(fiber.StatusUnprocessableEntity)
 				}
-				w.WriteHeader(fiber.StatusOK)
-				w.Write(bodyBytes)
+				_, err = w.Write(bodyBytes)
+				if err != nil {
+					log.Fatalf("%v", err)
+				}
 			} else if r.Method == "GET" {
 				w.WriteHeader(fiber.StatusOK)
-				w.Write(fetchedEntries)
+				_, err = w.Write(fetchedEntries)
 			} else {
-				w.Write(nil)
+				_, err = w.Write(nil)
 			}
 		case "/issues.json":
-			w.Write(issuesResponse)
+			_, err = w.Write(issuesResponse)
 		case "/enumerations/time_entry_activities.json":
-			w.Write(entryActsResponse)
+			_, err = w.Write(entryActsResponse)
 		default:
 			log.Debugf("%s.\n", endpoint)
-			w.Write(nil)
+			_, err = w.Write(nil)
 		}
 	}))
 	defer fakeRedmine.Close()
@@ -138,12 +142,15 @@ func Test_Handlers(t *testing.T) {
 	// Fake redmine server which sends bad responses
 	badRedmine := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(fiber.StatusUnprocessableEntity)
-		w.Write(nil)
+		_, err = w.Write(nil)
 	}))
 	defer badRedmine.Close()
 
-	var tests endpointTestTable
-	tests = endpointTestTable{
+	if err != nil {
+		t.Fatalf("Error: %v", err)
+	}
+
+	tests := endpointTestTable{
 		{
 			name:        "Login",
 			method:      "POST",
