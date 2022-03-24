@@ -1,5 +1,12 @@
+import.meta.hot;
+
+export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
+
 // interfaces use snake case to follow Redmines variable names
 
+export interface User {
+  login: string;
+}
 export interface Id {
   id: number;
 }

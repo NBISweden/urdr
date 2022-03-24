@@ -1,10 +1,9 @@
-import.meta.hot;
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
-import { RecentIssue, TimeEntry } from "../model";
+import { RecentIssue, TimeEntry, SNOWPACK_PUBLIC_API_URL } from "../model";
 
 import { User } from "../pages/Login";
 
@@ -14,7 +13,6 @@ export const Report = () => {
   const [toggleSave, setToggleSave] = useState(false);
   let location = useLocation();
   const user: User = location.state as User;
-  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
