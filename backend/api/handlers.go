@@ -38,6 +38,65 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	return true, nil
 }
 
+// fetchIssueSubjects() takes a list of issueActivity structs and
+// proceeds to fill out the "subject" for each issue by querying
+// Redmine.
+func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, error) {
+	if ok, err := prepareRedmineRequest(c); !ok {
+		return false, err
+	}
+
+	seenIssueIds := make(map[int]bool)
+	var issueIds []string
+
+	for i := range issueActivities {
+		issueId := issueActivities[i].Issue.Id
+		if !seenIssueIds[issueId] {
+			seenIssueIds[issueId] = true
+			issueIds = append(issueIds, fmt.Sprintf("%d", issueId))
+		}
+	}
+
+	// Do a request to the Redmine "/issues.json" endpoint to get
+	// the issue subjects for the issue IDs in the issueIds list.
+
+	c.Request().URI().SetQueryString(
+		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
+
+	c.Response().Reset()
+	if err := getIssuesHandler(c); err != nil {
+		return false, err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return false, nil
+	}
+
+	// Parse the response and fill out the subjects.
+
+	issuesResponse := struct {
+		Issues []issue `json:"issues"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
+		c.Response().Reset()
+		return false, c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// Iterate over our issueActivities list and fill in the missing
+	// subject to each issue from the issuesResponse structure.
+
+	for i := range issueActivities {
+		for j := range issuesResponse.Issues {
+			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
+				issueActivities[i].Issue.Subject =
+					issuesResponse.Issues[j].Subject
+				break
+			}
+		}
+	}
+
+	return true, nil
+}
+
 type user struct {
 	Login string `json:"login"`
 }
@@ -185,9 +244,6 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	seenIssueIds := make(map[int]bool)
-	var issueIds []string
-
 	seenIssueActivities := make(map[issueActivity]bool)
 	var issueActivities []issueActivity
 
@@ -197,56 +253,11 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		if !seenIssueActivities[issueActivity] {
 			seenIssueActivities[issueActivity] = true
 			issueActivities = append(issueActivities, issueActivity)
-
-			if !seenIssueIds[issueActivity.Issue.Id] {
-				seenIssueIds[issueActivity.Issue.Id] = true
-
-				// We append the issue IDs as strings
-				// to be able to conveniently create
-				// a comma-delimited list using
-				// strings.Join() later.
-				issueIds = append(issueIds,
-					fmt.Sprintf("%d", issueActivity.Issue.Id))
-			}
 		}
 	}
 
-	// Do a request to the Redmine "/issues.json" endpoint to get
-	// the issue subjects for the issue IDs in the issueIds list.
-
-	c.Request().URI().SetQueryString(
-		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
-
-	c.Response().Reset()
-	if err := getIssuesHandler(c); err != nil {
+	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
 		return err
-	} else if c.Response().StatusCode() != fiber.StatusOK {
-		return nil
-	}
-
-	// Parse the response and fill out the subjects in the structs
-	// used as keys in the seenIssueActivities map.
-
-	issuesResponse := struct {
-		Issues []issue `json:"issues"`
-	}{}
-
-	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
-		c.Response().Reset()
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
-	// Iterate over our issueActivities list and fill in the missing
-	// subject to each issue from the issuesResponse structure.
-
-	for i := range issueActivities {
-		for j := range issuesResponse.Issues {
-			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
-				issueActivities[i].Issue.Subject =
-					issuesResponse.Issues[j].Subject
-				break
-			}
-		}
 	}
 
 	// Sort the issueActivities list on the issue IDs.
