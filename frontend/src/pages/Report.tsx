@@ -12,7 +12,7 @@ import {
 } from "../model";
 
 export const Report = () => {
-  const [recentIssues, setRecentIssues] = useState<RecentIssue[]>([]);
+  const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
@@ -56,7 +56,7 @@ export const Report = () => {
   const thisWeek = getFullWeek(today);
 
   const getRecentIssues = async () => {
-    let issues: RecentIssue[] = await fetch(
+    let issues: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
       {
         method: "GET",
@@ -181,17 +181,17 @@ export const Report = () => {
       <section className="recent-container">
         <HeaderRow days={thisWeek} title="Recent issues" />
         {recentIssues &&
-          recentIssues.map((issue) => {
+          recentIssues.map((recentIssue) => {
             const rowUpdates = newTimeEntries?.filter(
               (entry) =>
-                entry.issue_id === issue.issue.id &&
-                entry.activity_id === issue.activity.id
+                entry.issue_id === recentIssue.issue.id &&
+                entry.activity_id === recentIssue.activity.id
             );
             return (
               <>
                 <Row
-                  key={`${issue.issue.id}${issue.activity.id}`}
-                  recentIssue={issue}
+                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                  topic={recentIssue}
                   onCellUpdate={handleCellUpdate}
                   days={thisWeek}
                   rowUpdates={rowUpdates}
