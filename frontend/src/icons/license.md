@@ -1,4 +1,4 @@
-The MIT License (MIT)
+# The MIT License (MIT)
 
 Copyright (c) 2019-2021 The Bootstrap Authors
 
