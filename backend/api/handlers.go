@@ -49,8 +49,8 @@ func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, er
 	seenIssueIds := make(map[int]bool)
 	var issueIds []string
 
-	for i := range issueActivities {
-		issueId := issueActivities[i].Issue.Id
+	for _, issueActivity := range issueActivities {
+		issueId := issueActivity.Issue.Id
 		if !seenIssueIds[issueId] {
 			seenIssueIds[issueId] = true
 			issueIds = append(issueIds, fmt.Sprintf("%d", issueId))
@@ -85,10 +85,9 @@ func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, er
 	// subject to each issue from the issuesResponse structure.
 
 	for i := range issueActivities {
-		for j := range issuesResponse.Issues {
-			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
-				issueActivities[i].Issue.Subject =
-					issuesResponse.Issues[j].Subject
+		for _, issue := range issuesResponse.Issues {
+			if issue.Id == issueActivities[i].Issue.Id {
+				issueActivities[i].Issue.Subject = issue.Subject
 				break
 			}
 		}
@@ -248,9 +247,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	seenIssueActivities := make(map[issueActivity]bool)
 	var issueActivities []issueActivity
 
-	for i := range timeEntriesResponse.TimeEntries {
-		issueActivity := timeEntriesResponse.TimeEntries[i]
-
+	for _, issueActivity := range timeEntriesResponse.TimeEntries {
 		if !seenIssueActivities[issueActivity] {
 			seenIssueActivities[issueActivity] = true
 			issueActivities = append(issueActivities, issueActivity)
@@ -417,17 +414,17 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 
 	var issueActivities []issueActivity
 
-	for i := range favorites {
+	for _, favorite := range favorites {
 		issueActivity := issueActivity{
 			Issue: issue{
-				Id:      favorites[i].RedmineIssueId,
+				Id:      favorite.RedmineIssueId,
 				Subject: "",
 			},
 			Activity: activity{
-				Id:   favorites[i].RedmineActivityId,
+				Id:   favorite.RedmineActivityId,
 				Name: "",
 			},
-			CustomName: favorites[i].Name,
+			CustomName: favorite.Name,
 		}
 
 		issueActivities = append(issueActivities, issueActivity)
