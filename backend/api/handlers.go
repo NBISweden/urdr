@@ -495,12 +495,15 @@ func postFavoritesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	// The favorites are stored with the user's ID.
 	userId := session.Get("user_id")
 	if userId == nil {
 		log.Error("Failed to get vaid user ID from session")
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
+	// Fetch a database connection.
+	// FIXME: Do we want to do this only once for a session somehow?
 	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
 		log.Errorf("Failed to connect to database: %v", err)
