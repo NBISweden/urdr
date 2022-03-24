@@ -1,6 +1,6 @@
 import.meta.hot;
 import React, { useState } from "react";
-import { RecentIssue, TimeEntry, FetchedTimeEntry } from "../pages/Report";
+import { RecentIssue, TimeEntry, FetchedTimeEntry } from "../model";
 import { Cell } from "./Cell";
 
 export const Row = ({

@@ -1,5 +1,5 @@
 import React from "react";
-import { RecentIssue, TimeEntry } from "../pages/Report";
+import { RecentIssue, TimeEntry } from "../model";
 
 export const Cell = ({
   recentIssue,
