@@ -122,3 +122,7 @@ input[type="number"] {
   display: flex;
   justify-content: end;
 }
+
+.accessibility-label {
+  display: none;
+}
