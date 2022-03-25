@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { IdName, SNOWPACK_PUBLIC_API_URL } from "../model";
+import { IdName, Issue, SNOWPACK_PUBLIC_API_URL } from "../model";
 import plus from "../icons/plus.svg";
 import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = () => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
+
   let headers = new Headers();
   headers.set("Accept", "application/json");
   headers.set("Content-Type", "application/json");
@@ -38,26 +40,57 @@ export const QuickAdd = () => {
     getActivities();
   }, []);
 
+  const searchIssue = async (event) => {
+    const issue = event.target.value;
+    let result: { issues: Issue[] } = await fetch(
+      `${SNOWPACK_PUBLIC_API_URL}/api/issues?issue_id=${issue}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: headers,
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Could not find issue.");
+        }
+      })
+      .catch((error) => console.log(error));
+    if (result && result.issues.length > 0) {
+      setIssues(result.issues);
+      console.log(result.issues);
+    }
+  };
+
   return (
     <div className="row">
       <h2>Quick add:</h2>
-      <label htmlFor="input-issue" className="accessibility-label">
-        Issue
-      </label>
+
       <input
+        aria-label="Issue"
         id="input-issue"
         className="col-2 quick-add-input"
         type="number"
         min={0}
-        onChange={(event: any) => {
-          console.log(event);
-        }}
+        onKeyUp={searchIssue}
         placeholder="Type issue number..."
+        list="issue-list"
       />
-      <label htmlFor="select-activity" className="accessibility-label">
-        Activity
-      </label>
-      <select className="col-3" name="activity" id="select-activity">
+      <datalist id="issue-list">
+        {issues &&
+          issues.map((issue) => {
+            return <option>{issue.description}</option>;
+          })}
+      </datalist>
+
+      <select
+        aria-label="Activity"
+        className="col-3"
+        name="activity"
+        id="select-activity"
+      >
         {activities &&
           activities.map((activity) => {
             return (
