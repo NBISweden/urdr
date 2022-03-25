@@ -107,13 +107,13 @@ input[type="number"] {
   padding: 1rem 1.5rem;
 }
 
-.save-button:hover {
+.basic-button:hover {
   background-color: hsl(76deg 55% 42%);
   box-shadow: 0 1px 3px hsl(0deg 0 12%);
   box-shadow: 0 1px 2px hsl(0deg 0 24%);
 }
 
-.save-button:disabled {
+.basic-button:disabled {
   background-color: hsl(76deg 55% 77%);
   color: hsl(84deg 55% 33%);
 }
@@ -128,7 +128,6 @@ input[type="number"] {
 }
 
 .plus-button {
-  flex: 0 0 auto;
   width: 5%;
 }
 
