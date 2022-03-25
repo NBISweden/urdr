@@ -1,26 +1,32 @@
 import React, { useState } from "react";
 import {
-  RecentIssue,
+  IssueActivityPair,
   TimeEntry,
   FetchedTimeEntry,
   SNOWPACK_PUBLIC_API_URL,
 } from "../model";
 import { Cell } from "./Cell";
+import fillStar from "../icons/star-fill.svg";
+import star from "../icons/star.svg";
 
 export const Row = ({
-  recentIssue,
+  topic,
   days,
   rowUpdates,
   onCellUpdate,
   onReset,
+  onToggleFav,
   saved,
+  isFav,
 }: {
-  recentIssue: RecentIssue;
+  topic: IssueActivityPair;
   days: Date[];
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onReset: () => void;
+  onToggleFav: (topic: IssueActivityPair) => void;
   saved: boolean;
+  isFav: boolean;
 }) => {
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
@@ -31,8 +37,8 @@ export const Row = ({
   headers.set("Content-Type", "application/json");
 
   let params = new URLSearchParams({
-    issue_id: `${recentIssue.issue.id}`,
-    activity_id: `${recentIssue.activity.id}`,
+    issue_id: `${topic.issue.id}`,
+    activity_id: `${topic.activity.id}`,
     from: `${days[0].toISOString().split("T")[0]}`,
     to: `${days[4].toISOString().split("T")[0]}`,
   });
@@ -100,18 +106,26 @@ export const Row = ({
   return (
     <>
       <div className="row issue-row">
-        <div className="col-6 ">
+        <div className="col-5 ">
           <p className="issue-label">
-            {recentIssue.issue.subject} - {recentIssue.activity.name}
+            {topic.custom_name
+              ? `${topic.custom_name}`
+              : `${topic.issue.subject} - ${topic.activity.name}`}
           </p>
+        </div>
+        <div className="col-1 star-container">
+          <img
+            src={isFav ? fillStar : star}
+            onClick={() => onToggleFav(topic)}
+            className="star"
+            role="button"
+          />
         </div>
         {days.map((day, i) => {
           return (
             <Cell
-              key={`${recentIssue.issue.id}${
-                recentIssue.activity.id
-              }${day.toISOString()}`}
-              recentIssue={recentIssue}
+              key={`${topic.issue.id}${topic.activity.id}${day.toISOString()}`}
+              topic={topic}
               date={day}
               onCellUpdate={onCellUpdate}
               hours={rowHours[i]}

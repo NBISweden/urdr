@@ -1,14 +1,14 @@
 import React from "react";
-import { RecentIssue, TimeEntry } from "../model";
+import { IssueActivityPair, TimeEntry } from "../model";
 
 export const Cell = ({
-  recentIssue,
+  topic,
   date,
   hours,
   entryId,
   onCellUpdate,
 }: {
-  recentIssue: RecentIssue;
+  topic: IssueActivityPair;
   date: Date;
   hours: number;
   entryId: number;
@@ -17,26 +17,21 @@ export const Cell = ({
   return (
     <div className="col-1">
       <label
-        htmlFor={`${recentIssue.issue.id}${
-          recentIssue.activity.id
-        }${date.toISOString()}`}
+        htmlFor={`${topic.issue.id}${topic.activity.id}${date.toISOString()}`}
         hidden={true}
       >
-        Time spent on{" "}
-        {`${recentIssue.issue.subject} ${recentIssue.activity.name}`}
+        Time spent on {`${topic.issue.subject} ${topic.activity.name}`}
         on {`${date}`}
       </label>
       <input
         type="number"
-        id={`${recentIssue.issue.id}${
-          recentIssue.activity.id
-        }${date.toISOString()}`}
+        id={`${topic.issue.id}${topic.activity.id}${date.toISOString()}`}
         min={0}
         onChange={(event: any) => {
           onCellUpdate({
             id: entryId,
-            issue_id: recentIssue.issue.id,
-            activity_id: recentIssue.activity.id,
+            issue_id: topic.issue.id,
+            activity_id: topic.activity.id,
             hours: +event.target.value,
             comments: "",
             spent_on: date.toISOString().split("T")[0],

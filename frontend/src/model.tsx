@@ -16,33 +16,15 @@ export interface IdName {
   name: string;
 }
 
-export interface RecentIssue {
+export interface IssueActivityPair {
   activity: IdName;
   issue: Issue;
+  custom_name: string;
 }
 
 export interface Issue {
-  assigned_to: IdName;
-  assigned_to_id: number;
-  author: IdName;
-  category: IdName;
-  category_id: number;
-  closed_on: string;
-  created_on: string;
-  description: string;
-  done_ratio: number;
-  due_date: string;
-  estimated_hours: number;
   id: number;
-  notes: string;
-  project: IdName;
-  project_id: number;
-  start_date: string;
-  status: IdName;
-  status_date: string;
-  status_id: 0;
   subject: string;
-  updated_on: string;
 }
 
 export interface TimeEntry {

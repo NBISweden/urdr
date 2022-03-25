@@ -41,7 +41,7 @@ export const QuickAdd = () => {
       </label>
       <input
         id="input-issue"
-        className="col-2 issue-label"
+        className="col-2 quick-add-input"
         type="number"
         min={0}
         onChange={(event: any) => {
