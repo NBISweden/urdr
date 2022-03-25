@@ -1,4 +1,4 @@
-package api
+package api_test
 
 import (
 	"encoding/json"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"urdr-api/api"
 	_ "urdr-api/docs"
 	"urdr-api/internal/config"
 	"urdr-api/internal/redmine"
@@ -37,7 +38,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
 
-	app = Setup()
+	app = api.Setup()
 
 	os.Exit(m.Run())
 }
