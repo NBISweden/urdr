@@ -406,7 +406,7 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 
 	userId := session.Get("user_id")
 	if userId == nil {
-		log.Error("Failed to get vaid user ID from session")
+		log.Error("Failed to get valid user ID from session")
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
@@ -498,7 +498,7 @@ func postFavoritesHandler(c *fiber.Ctx) error {
 	// The favorites are stored with the user's ID.
 	userId := session.Get("user_id")
 	if userId == nil {
-		log.Error("Failed to get vaid user ID from session")
+		log.Error("Failed to get valid user ID from session")
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
