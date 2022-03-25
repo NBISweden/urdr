@@ -65,19 +65,19 @@ func New(databasePath string) (*database, error) {
 		for i := range files {
 			query, err := ioutil.ReadFile(files[i])
 			if err != nil {
-				tx.Rollback()
+				_ = tx.Rollback()
 				return nil,
 					fmt.Errorf("ioutil.ReadFile() failed: %w", err)
 			}
 			if _, err := tx.Exec(string(query)); err != nil {
-				tx.Rollback()
+				_ = tx.Rollback()
 				return nil,
 					fmt.Errorf("sql.Tx.Exec() failed: %w", err)
 			}
 		}
 
 		if err := tx.Commit(); err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return nil, fmt.Errorf("sql.Tx.Commit() failed: %w", err)
 		}
 	}
