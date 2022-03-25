@@ -55,23 +55,22 @@ export const Report = () => {
   const thisWeek = getFullWeek(today);
 
   const getRowTopics = async () => {
-    const favorites = dummyFavorites;
-    // const favorites: IssueActivityPair[] = await fetch(
-    //   `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
-    //   {
-    //     method: "GET",
-    //     credentials: "include",
-    //     headers: headers,
-    //   }
-    // )
-    //   .then((res) => {
-    //     if (res.ok) {
-    //       return res.json();
-    //     } else {
-    //       throw new Error("Could not find favorites.");
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
+    const favorites: IssueActivityPair[] = await fetch(
+      `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: headers,
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Could not find favorites.");
+        }
+      })
+      .catch((error) => console.log(error));
 
     const issues: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
@@ -108,42 +107,6 @@ export const Report = () => {
       setRecentIssues(issues);
     }
   };
-
-  const dummyFavorites = [
-    {
-      issue: {
-        id: 5555,
-        subject: "Fantasy training",
-      },
-      activity: {
-        id: 10,
-        name: "Professional Development",
-      },
-      custom_name: "My favorite fantasy",
-    },
-    {
-      issue: {
-        id: 5763,
-        subject: "Aspebodaklungan",
-      },
-      activity: {
-        id: 9,
-        name: "Development",
-      },
-      custom_name: "My favorite team work",
-    },
-    {
-      issue: {
-        id: 5214,
-        subject: "Development and maintenence of web",
-      },
-      activity: {
-        id: 8,
-        name: "Design",
-      },
-      custom_name: "My favorite website",
-    },
-  ];
 
   React.useEffect(() => {
     getRowTopics();
