@@ -25,8 +25,7 @@ export const QuickAdd = () => {
         }
       })
       .catch((error) => console.log(error));
-
-    setActivities(result.time_entry_activities);
+    if (result) setActivities(result.time_entry_activities);
     console.log(result);
   };
 
@@ -56,7 +55,11 @@ export const QuickAdd = () => {
       <select className="col-3" name="activity" id="select-activity">
         {activities &&
           activities.map((activity) => {
-            return <option>{activity.name}</option>;
+            return (
+              <option id={activity.id} key={activity.id}>
+                {activity.name}
+              </option>
+            );
           })}
       </select>
       <button className=" basic-button plus-button">
