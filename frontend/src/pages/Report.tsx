@@ -5,9 +5,8 @@ import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import {
   User,
-  RecentIssue,
+  IssueActivityPair,
   TimeEntry,
-  Favorite,
   SNOWPACK_PUBLIC_API_URL,
 } from "../model";
 

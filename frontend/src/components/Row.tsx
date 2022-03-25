@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  RecentIssue,
+  IssueActivityPair,
   TimeEntry,
   FetchedTimeEntry,
   SNOWPACK_PUBLIC_API_URL,
