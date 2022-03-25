@@ -17,15 +17,13 @@
 -- on Ubuntu.  The utility is part of the macOS base system and does not
 -- need to be installed separately.
 
+PRAGMA auto_vacuum = FULL;
+PRAGMA foreign_keys = ON;
+
 -- FIXME:
 -- The datatype for the fields whose names start with "redmine_" are
 -- currently unknown, so we assume that they are INTEGER in the schema
 -- below.
-
-PRAGMA auto_vacuum = FULL;
-PRAGMA foreign_keys = ON;
-
-BEGIN;
 
 -- Settings.
 -- A "setting" is a "name" and a "value".  The "name" is the name of
@@ -82,5 +80,3 @@ CREATE TABLE favorite (
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
 );
-
-COMMIT;

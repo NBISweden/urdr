@@ -4,9 +4,8 @@
 --
 --	sqlite3 database.db <setting-defaults.sql
 
+PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
-
-BEGIN;
 
 -- "Default days"
 -- https://github.com/NBISweden/urdr/issues/22
@@ -48,5 +47,3 @@ INSERT INTO setting (name, value) VALUES
 
 INSERT INTO setting (name, value) VALUES
 	('input', 'daily');	-- or 'weekly'
-
-COMMIT;
