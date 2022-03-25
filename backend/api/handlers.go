@@ -13,6 +13,7 @@ import (
 	_ "urdr-api/docs"
 
 	"urdr-api/internal/config"
+	"urdr-api/internal/database"
 )
 
 // prepareRedmineRequest() gets the Redmine API key out of the current
@@ -32,6 +33,64 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	} else {
 		// Set the API key header.
 		c.Request().Header.Set("X-Redmine-API-Key", apiKey.(string))
+	}
+
+	return true, nil
+}
+
+// fetchIssueSubjects() takes a list of issueActivity structs and
+// proceeds to fill out the "subject" for each issue by querying
+// Redmine.
+func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, error) {
+	if ok, err := prepareRedmineRequest(c); !ok {
+		return false, err
+	}
+
+	seenIssueIds := make(map[int]bool)
+	var issueIds []string
+
+	for _, issueActivity := range issueActivities {
+		issueId := issueActivity.Issue.Id
+		if !seenIssueIds[issueId] {
+			seenIssueIds[issueId] = true
+			issueIds = append(issueIds, fmt.Sprintf("%d", issueId))
+		}
+	}
+
+	// Do a request to the Redmine "/issues.json" endpoint to get
+	// the issue subjects for the issue IDs in the issueIds list.
+
+	c.Request().URI().SetQueryString(
+		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
+
+	c.Response().Reset()
+	if err := getIssuesHandler(c); err != nil {
+		return false, err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return false, nil
+	}
+
+	// Parse the response and fill out the subjects.
+
+	issuesResponse := struct {
+		Issues []issue `json:"issues"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
+		c.Response().Reset()
+		return false, c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// Iterate over our issueActivities list and fill in the missing
+	// subject to each issue from the issuesResponse structure.
+
+	for i := range issueActivities {
+		for _, issue := range issuesResponse.Issues {
+			if issue.Id == issueActivities[i].Issue.Id {
+				issueActivities[i].Issue.Subject = issue.Subject
+				break
+			}
+		}
 	}
 
 	return true, nil
@@ -137,8 +196,9 @@ type activity struct {
 }
 
 type issueActivity struct {
-	Issue    issue    `json:"issue"`
-	Activity activity `json:"activity"`
+	Issue      issue    `json:"issue"`
+	Activity   activity `json:"activity"`
+	CustomName string   `json:"custom_name"`
 }
 
 // recentIssuesHandler godoc
@@ -184,68 +244,19 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	seenIssueIds := make(map[int]bool)
-	var issueIds []string
-
 	seenIssueActivities := make(map[issueActivity]bool)
 	var issueActivities []issueActivity
 
-	for i := range timeEntriesResponse.TimeEntries {
-		issueActivity := timeEntriesResponse.TimeEntries[i]
-
+	for _, issueActivity := range timeEntriesResponse.TimeEntries {
 		if !seenIssueActivities[issueActivity] {
 			seenIssueActivities[issueActivity] = true
 			issueActivities = append(issueActivities, issueActivity)
-
-			if !seenIssueIds[issueActivity.Issue.Id] {
-				seenIssueIds[issueActivity.Issue.Id] = true
-
-				// We append the issue IDs as strings
-				// to be able to conveniently create
-				// a comma-delimited list using
-				// strings.Join() later.
-				issueIds = append(issueIds,
-					fmt.Sprintf("%d", issueActivity.Issue.Id))
-			}
 		}
 	}
 
-	// Do a request to the Redmine "/issues.json" endpoint to get
-	// the issue subjects for the issue IDs in the issueIds list.
-
-	c.Request().URI().SetQueryString(
-		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
-
-	c.Response().Reset()
-	if err := getIssuesHandler(c); err != nil {
+	// Populate the issue subjects.
+	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
 		return err
-	} else if c.Response().StatusCode() != fiber.StatusOK {
-		return nil
-	}
-
-	// Parse the response and fill out the subjects in the structs
-	// used as keys in the seenIssueActivities map.
-
-	issuesResponse := struct {
-		Issues []issue `json:"issues"`
-	}{}
-
-	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
-		c.Response().Reset()
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
-	// Iterate over our issueActivities list and fill in the missing
-	// subject to each issue from the issuesResponse structure.
-
-	for i := range issueActivities {
-		for j := range issuesResponse.Issues {
-			if issuesResponse.Issues[j].Id == issueActivities[i].Issue.Id {
-				issueActivities[i].Issue.Subject =
-					issuesResponse.Issues[j].Subject
-				break
-			}
-		}
 	}
 
 	// Sort the issueActivities list on the issue IDs.
@@ -375,4 +386,157 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 
 	// Proxy the request to Redmine
 	return proxy.Do(c, redmineURL)
+}
+
+// getFavoritesHandler() godoc
+// @Summary	Get favorites
+// @Description	Get the favorites for the current user
+// @Accept	json
+// @Produce	json
+// @Success	200	{array}	issueActivity
+// @Failure	401	{string} error "Unauthorized"
+// @Failure	500	{string} error "Internal Server Error"
+// @Router /api/favorites [get]
+func getFavoritesHandler(c *fiber.Ctx) error {
+	session, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	userId := session.Get("user_id")
+	if userId == nil {
+		log.Error("Failed to get valid user ID from session")
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	db, err := database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Errorf("Failed to connect to database: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	favorites, err := db.GetAllUserFavorites(userId.(int))
+	if err != nil {
+		log.Errorf("Failed to get favorites for user ID %d: %v", userId.(int), err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	var issueActivities []issueActivity
+
+	for _, favorite := range favorites {
+		issueActivity := issueActivity{
+			Issue: issue{
+				Id:      favorite.RedmineIssueId,
+				Subject: "",
+			},
+			Activity: activity{
+				Id:   favorite.RedmineActivityId,
+				Name: "",
+			},
+			CustomName: favorite.Name,
+		}
+
+		issueActivities = append(issueActivities, issueActivity)
+	}
+
+	// Fetch the subjects for each issue.
+	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
+		return err
+	}
+
+	// Now fetch the activities from Redmine and fill out the
+	// activity names.
+	c.Response().Reset()
+	if err := getActivitiesHandler(c); err != nil {
+		// There was some error in the handler.
+		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		// There was some error sent to us from Redmine.
+		return nil
+	}
+
+	activitiesResponse := struct {
+		Activities []struct {
+			Id   int    `json:"id"`
+			Name string `json:"name"`
+		} `json:"time_entry_activities"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	for i := range issueActivities {
+		for _, activity := range activitiesResponse.Activities {
+			if activity.Id == issueActivities[i].Activity.Id {
+				issueActivities[i].Activity.Name = activity.Name
+				break
+			}
+		}
+	}
+
+	return c.JSON(issueActivities)
+}
+
+// postFavoritesHandler() godoc
+// @Summary	Store favorites
+// @Description	Stores the favorites for the current user
+// @Accept	json
+// @Produce	json
+// @Success	204	{string} error "No Content"
+// @Failure	401	{string} error "Unauthorized"
+// @Failure	422	{string} error "Unprocessable Entity"
+// @Failure	500	{string} error "Internal Server Error"
+// @Router /api/favorites [post]
+func postFavoritesHandler(c *fiber.Ctx) error {
+	session, err := store.Get(c)
+	if err != nil {
+		log.Errorf("Failed to get session: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	// The favorites are stored with the user's ID.
+	userId := session.Get("user_id")
+	if userId == nil {
+		log.Error("Failed to get valid user ID from session")
+		return c.SendStatus(fiber.StatusUnauthorized)
+	}
+
+	// Fetch a database connection.
+	// FIXME: Do we want to do this only once for a session somehow?
+	db, err := database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Errorf("Failed to connect to database: %v", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	// Parse the favoites from the query.
+	query := []issueActivity{}
+
+	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// Create a list of database.Favorite entries from the
+	// parsed query.
+
+	var favorites []database.Favorite
+
+	for _, issueActivity := range query {
+		favorite := database.Favorite{
+			RedmineIssueId:    issueActivity.Issue.Id,
+			RedmineActivityId: issueActivity.Activity.Id,
+			Name:              issueActivity.CustomName,
+		}
+
+		favorites = append(favorites, favorite)
+	}
+
+	if err := db.SetAllUserFavorites(userId.(int), favorites); err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
 }
