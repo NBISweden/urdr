@@ -165,11 +165,11 @@ export const Report = () => {
       }
       getRowTopics();
     } else {
-      const favs = favorites.map((recent) => recent);
+      const favs = favorites.map((fav) => fav);
       const removed = favs.find(
-        (recent) =>
-          recent.activity.id === topic.activity.id &&
-          recent.issue.id === topic.issue.id
+        (fav) =>
+          fav.activity.id === topic.activity.id &&
+          fav.issue.id === topic.issue.id
       );
       const index = favs.indexOf(removed);
       favs.splice(index, 1);
@@ -231,7 +231,6 @@ export const Report = () => {
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
                     days={thisWeek}
-                    userId={user.user_id}
                     rowUpdates={rowUpdates}
                     onReset={handleReset}
                     saved={toggleSave}
