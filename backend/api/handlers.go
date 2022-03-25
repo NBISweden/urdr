@@ -422,6 +422,11 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
+	// If there are no favorites, return empty array and bail out here.
+	if len(favorites) == 0 {
+		return c.JSON([]struct{}{})
+	}
+
 	var issueActivities []issueActivity
 
 	for _, favorite := range favorites {
