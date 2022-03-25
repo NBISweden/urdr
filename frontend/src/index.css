@@ -88,7 +88,7 @@ input[type="number"] {
 .issue-label {
   background-color: white;
   padding: 0.5rem 0.75rem;
-  margin: 0 2.25rem 0 3.75rem;
+  margin: 0 0 0 3.75rem;
 }
 
 .basic-button {
@@ -133,4 +133,13 @@ input[type="number"] {
 
 .plus-button img {
   width: 50%;
+}
+
+.star-container {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  width: 1.7rem;
 }

@@ -6,6 +6,8 @@ import {
   SNOWPACK_PUBLIC_API_URL,
 } from "../model";
 import { Cell } from "./Cell";
+import fillStar from "../icons/star-fill.svg";
+import star from "../icons/star.svg";
 
 export const Row = ({
   topic,
@@ -15,6 +17,7 @@ export const Row = ({
   onReset,
   onToggleFav,
   saved,
+  isFav,
 }: {
   topic: IssueActivityPair;
   days: Date[];
@@ -23,6 +26,7 @@ export const Row = ({
   onReset: () => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   saved: boolean;
+  isFav: boolean;
 }) => {
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
@@ -109,8 +113,13 @@ export const Row = ({
               : `${topic.issue.subject} - ${topic.activity.name}`}
           </p>
         </div>
-        <div className="col-1">
-          <button onClick={() => onToggleFav(topic)}>Toggle fav</button>
+        <div className="col-1 star-container">
+          <img
+            src={isFav ? fillStar : star}
+            onClick={() => onToggleFav(topic)}
+            className="star"
+            role="button"
+          />
         </div>
         {days.map((day, i) => {
           return (

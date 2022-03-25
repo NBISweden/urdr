@@ -273,6 +273,7 @@ export const Report = () => {
                     rowUpdates={rowUpdates}
                     onReset={handleReset}
                     saved={toggleSave}
+                    isFav={true}
                   />
                 </>
               );
@@ -304,6 +305,7 @@ export const Report = () => {
                   rowUpdates={rowUpdates}
                   onReset={handleReset}
                   saved={toggleSave}
+                  isFav={false}
                 />
               </>
             );
