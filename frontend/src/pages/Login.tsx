@@ -1,20 +1,14 @@
-import.meta.hot;
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { Header } from "../components/Header";
 import "../index.css";
-
-export interface User {
-  login: string;
-}
+import { User, SNOWPACK_PUBLIC_API_URL } from "../model";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
-  console.log(SNOWPACK_PUBLIC_API_URL);
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();

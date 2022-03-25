@@ -91,27 +91,46 @@ input[type="number"] {
   margin: 0 2.25rem 0 3.75rem;
 }
 
-.save-button {
+.basic-button {
   background-color: hsl(76deg 55% 53%);
   color: hsl(0deg 0% 15%);
   border: none;
   border-radius: 4px;
-  padding: 1rem 1.5rem;
   box-shadow: 0 3px 6px hsl(0deg 0 15%);
   box-shadow: 0 2px 4px hsl(0deg 0 12%);
   transition-duration: 0.2s;
-  margin: 2rem;
-  position: absolute;
-  right: 0;
+  margin-left: 1rem;
 }
 
-.save-button:hover {
+.save-button {
+  margin: 2rem;
+  padding: 1rem 1.5rem;
+}
+
+.basic-button:hover {
   background-color: hsl(76deg 55% 42%);
   box-shadow: 0 1px 3px hsl(0deg 0 12%);
   box-shadow: 0 1px 2px hsl(0deg 0 24%);
 }
 
-.save-button:disabled {
+.basic-button:disabled {
   background-color: hsl(76deg 55% 77%);
   color: hsl(84deg 55% 33%);
+}
+
+.save-button-container {
+  display: flex;
+  justify-content: end;
+}
+
+.accessibility-label {
+  display: none;
+}
+
+.plus-button {
+  width: 5%;
+}
+
+.plus-button img {
+  width: 50%;
 }

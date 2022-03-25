@@ -1,6 +1,10 @@
-import.meta.hot;
 import React, { useState } from "react";
-import { RecentIssue, TimeEntry, FetchedTimeEntry } from "../pages/Report";
+import {
+  RecentIssue,
+  TimeEntry,
+  FetchedTimeEntry,
+  SNOWPACK_PUBLIC_API_URL,
+} from "../model";
 import { Cell } from "./Cell";
 
 export const Row = ({
@@ -21,7 +25,6 @@ export const Row = ({
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
   const [rowEntryIds, setRowEntryIds] = useState<number[]>([]);
-  const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
