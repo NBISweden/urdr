@@ -449,8 +449,10 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 	// activity names.
 	c.Response().Reset()
 	if err := getActivitiesHandler(c); err != nil {
+		// There was some error in the handler.
 		return err
 	} else if c.Response().StatusCode() != fiber.StatusOK {
+		// There was some error sent to us from Redmine.
 		return nil
 	}
 
