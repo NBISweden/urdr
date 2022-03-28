@@ -19,6 +19,102 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/activities": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Proxy for the \"/enumerations/time_entry_activities.json\" Redmine endpoint",
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/favorites": {
+            "get": {
+                "description": "Get the favorites for the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get favorites",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.IssueActivity"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Stores the favorites for the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Store favorites",
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/issues": {
             "get": {
                 "consumes": [
@@ -135,7 +231,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/api.issueActivity"
+                                "$ref": "#/definitions/api.IssueActivity"
                             }
                         }
                     },
@@ -210,7 +306,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.activity": {
+        "api.Activity": {
             "type": "object",
             "properties": {
                 "id": {
@@ -221,7 +317,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.issue": {
+        "api.Issue": {
             "type": "object",
             "properties": {
                 "id": {
@@ -232,14 +328,17 @@ const docTemplate = `{
                 }
             }
         },
-        "api.issueActivity": {
+        "api.IssueActivity": {
             "type": "object",
             "properties": {
                 "activity": {
-                    "$ref": "#/definitions/api.activity"
+                    "$ref": "#/definitions/api.Activity"
+                },
+                "custom_name": {
+                    "type": "string"
                 },
                 "issue": {
-                    "$ref": "#/definitions/api.issue"
+                    "$ref": "#/definitions/api.Issue"
                 }
             }
         },
