@@ -12,6 +12,9 @@ import {
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
+  const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
+    []
+  );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
@@ -54,6 +57,26 @@ export const Report = () => {
   };
   const thisWeek = getFullWeek(today);
 
+  const getRecentIssues = async () => {
+    const issues: IssueActivityPair[] = await fetch(
+      `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: headers,
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error("Could not find recent issues.");
+        }
+      })
+      .catch((error) => console.log(error));
+    setRecentIssues(issues);
+  };
+
   const getRowTopics = async () => {
     const favorites: IssueActivityPair[] = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/favorites`,
@@ -72,22 +95,7 @@ export const Report = () => {
       })
       .catch((error) => console.log(error));
 
-    const issues: IssueActivityPair[] = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Could not find recent issues.");
-        }
-      })
-      .catch((error) => console.log(error));
+    const issues = [...recentIssues];
 
     if (!!favorites) {
       let nonFavIssues = [];
@@ -101,16 +109,19 @@ export const Report = () => {
           nonFavIssues.push(issue);
         }
       });
-      setRecentIssues(nonFavIssues);
+      setFilteredRecents(nonFavIssues);
       setFavorites(favorites);
     } else {
-      setRecentIssues(issues);
+      setFilteredRecents(issues);
     }
   };
 
   React.useEffect(() => {
-    getRowTopics();
+    getRecentIssues();
   }, []);
+  React.useEffect(() => {
+    getRowTopics();
+  }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = newTimeEntries.map((entry) => {
@@ -248,8 +259,8 @@ export const Report = () => {
           days={favorites.length > 0 ? [] : thisWeek}
           title="Recent issues"
         />
-        {recentIssues &&
-          recentIssues.map((recentIssue) => {
+        {filteredRecents &&
+          filteredRecents.map((recentIssue) => {
             const rowUpdates = newTimeEntries?.filter(
               (entry) =>
                 entry.issue_id === recentIssue.issue.id &&
