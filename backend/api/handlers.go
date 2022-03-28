@@ -38,7 +38,7 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	return true, nil
 }
 
-// fetchIssueSubjects() takes a list of issueActivity structs and
+// fetchIssueSubjects() takes a list of IssueActivity structs and
 // proceeds to fill out the "subject" for each issue by querying
 // Redmine.
 func fetchIssueSubjects(c *fiber.Ctx, issueActivities []IssueActivity) (bool, error) {
@@ -206,7 +206,7 @@ type IssueActivity struct {
 // @Description	Get recent issues that the user has spent time on
 // @Accept	json
 // @Produce	json
-// @Success	200	{array}	issueActivity
+// @Success	200	{array}	IssueActivity
 // @Failure	401	{string} error "Unauthorized"
 // @Failure	500	{string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
@@ -393,7 +393,7 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 // @Description	Get the favorites for the current user
 // @Accept	json
 // @Produce	json
-// @Success	200	{array}	issueActivity
+// @Success	200	{array}	IssueActivity
 // @Failure	401	{string} error "Unauthorized"
 // @Failure	500	{string} error "Internal Server Error"
 // @Router /api/favorites [get]
