@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { IdName, SNOWPACK_PUBLIC_API_URL } from "../model";
 import plus from "../icons/plus.svg";
+import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = () => {
+  const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -20,6 +22,9 @@ export const QuickAdd = () => {
       .then((res) => {
         if (res.ok) {
           return res.json();
+        } else if (res.status === 401) {
+          // Redirect to login page
+          navigate("/");
         } else {
           throw new Error("Could not find activities.");
         }
