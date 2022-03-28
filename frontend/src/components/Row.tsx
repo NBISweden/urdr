@@ -8,6 +8,7 @@ import {
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
+import { useNavigate } from "react-router-dom";
 
 export const Row = ({
   topic,
@@ -28,6 +29,7 @@ export const Row = ({
   saved: boolean;
   isFav: boolean;
 }) => {
+  const navigate = useNavigate();
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
   const [rowEntryIds, setRowEntryIds] = useState<number[]>([]);
@@ -58,7 +60,7 @@ export const Row = ({
           return res.json();
         } else if (res.status === 401) {
           // Redirect to login page
-          window.location.href = "/";
+          navigate("/");
         } else {
           throw new Error("Could not get time entries.");
         }

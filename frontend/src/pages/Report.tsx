@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   IssueActivityPair,
@@ -11,6 +12,7 @@ import {
 } from "../model";
 
 export const Report = () => {
+  const navigate = useNavigate();
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
@@ -142,7 +144,7 @@ export const Report = () => {
           return true;
         } else if (res.status === 401) {
           // Redirect to login page
-          window.location.href = "/";
+          navigate("/");
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -198,7 +200,7 @@ export const Report = () => {
           alert("Changes saved!");
         } else if (response.status === 401) {
           // Redirect to login page
-          window.location.href = "/";
+          navigate("/");
         } else {
           throw new Error("Time report failed.");
         }
