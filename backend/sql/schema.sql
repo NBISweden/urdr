@@ -25,8 +25,6 @@
 PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
 
-BEGIN;
-
 -- Settings.
 -- A "setting" is a "name" and a "value".  The "name" is the name of
 -- the setting, for example "tab" for specifying the wanted movement
@@ -82,5 +80,3 @@ CREATE TABLE favorite (
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
 );
-
-COMMIT;
