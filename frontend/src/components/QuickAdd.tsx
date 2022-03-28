@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export const QuickAdd = () => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const [issue, setIssue] = useState<Issue>();
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -41,6 +41,7 @@ export const QuickAdd = () => {
   }, []);
 
   const searchIssue = async (event) => {
+    console.log("Searching issue...");
     const issue = event.target.value;
     let result: { issues: Issue[] } = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/issues?issue_id=${issue}`,
@@ -59,9 +60,15 @@ export const QuickAdd = () => {
       })
       .catch((error) => console.log(error));
     if (result && result.issues.length > 0) {
-      setIssues(result.issues);
+      setIssue(result.issues[0]);
       console.log(result.issues);
     }
+  };
+
+  const handleAddIssue = (e) => {
+    console.log("Adding issue");
+
+    console.log(issue);
   };
 
   return (
@@ -76,14 +83,8 @@ export const QuickAdd = () => {
         min={0}
         onKeyUp={searchIssue}
         placeholder="Type issue number..."
-        list="issue-list"
+        title={(issue && issue.description) || ""}
       />
-      <datalist id="issue-list">
-        {issues &&
-          issues.map((issue) => {
-            return <option>{issue.description}</option>;
-          })}
-      </datalist>
 
       <select
         aria-label="Activity"
@@ -100,7 +101,7 @@ export const QuickAdd = () => {
             );
           })}
       </select>
-      <button className=" basic-button plus-button">
+      <button className=" basic-button plus-button" onClick={handleAddIssue}>
         <img src={plus} />
       </button>
     </div>
