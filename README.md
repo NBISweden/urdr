@@ -13,32 +13,32 @@
 ### Local Redmine setup
 
 As a prerequisite for running Urdr during development, you need to run
-a local installation of Redmine.  The NBIS Redmine installation is
+a local installation of Redmine. The NBIS Redmine installation is
 currently maintained in the
 [ops-redmine repository](https://github.com/NBISweden/ops-redmine).
 
 Follow
 [the instructions](https://github.com/NBISweden/ops-redmine/blob/main/README.md)
-to set up and run Redmine locally.  The repository may be cloned in a
+to set up and run Redmine locally. The repository may be cloned in a
 separate directory, away from where you cloned the `urdr` repository.
 
 The setup of Redmine includes importing a database dump of Redmine
-in your local Redmine database.  The database dump file should be
+in your local Redmine database. The database dump file should be
 named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
 
 ### Urdr setup
 
 In the top-most directory of the `urdr` repository, create the
-file `urdr.env`, using `urdr.env.default` as the template.  If you
+file `urdr.env`, using `urdr.env.default` as the template. If you
 are on Linux, you need to set the variable `REDMINE_URL` to the
-value `"http://172.17.0.1:3000"`.  The `SNOWPACK_PUBLIC_API_URL`
+value `"http://172.17.0.1:3000"`. The `SNOWPACK_PUBLIC_API_URL`
 variable should be set to the URL from which the service is publically
 accessible, e.g. `"http://localhost:4567"` during development.
 
 The database used by the Urdr backend containing the Urdr schema and
 default values is created automatically when it is first accessed by
-the backend Go code.  If this database, for whatever reason, needs to
+the backend Go code. If this database, for whatever reason, needs to
 be manually be re-created, you may do so using the following set of
 commands:
 
@@ -49,7 +49,7 @@ sqlite3 backend/database.db <backend/sql/setting-defaults.sql
 ```
 
 The name and location of the database file are configurable by setting
-`BACKEND_DB_PATH` in the `urdr.env` file.  The value of that variable is
+`BACKEND_DB_PATH` in the `urdr.env` file. The value of that variable is
 a pathname relative to the `backend` directory, and the default value is
 `./database.db`.
 
@@ -62,15 +62,10 @@ docker-compose up
 
 ## Tests
 
-There are tests for each part of the backend API, which can be tested by the following commands:
+There are tests for each part of the backend API, which can be tested by the following command:
 
 ```command
-go test -v urdr-api/internal/database
-```
-
-```command
-REDMINE_HOST=http://localhost USERNAME=user PASSWORD=password USER_ID=123 \
-go test -v urdr-api/internal/redmine
+go test -v ./...
 ```
 
 ## API specification
