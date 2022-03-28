@@ -15,11 +15,14 @@ func TestMain(m *testing.M) {
 		log.Fatalf("os.Chdir() failed: %v", err)
 	}
 
+	test_db_path := "./testdata/database.db"
+	_ = os.Remove(test_db_path)
+
 	err = config.Setup()
 	if err != nil {
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
 
-	config.Config.Database.Path = "./testdata/database.db"
+	config.Config.Database.Path = test_db_path
 	os.Exit(m.Run())
 }
