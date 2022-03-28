@@ -20,5 +20,6 @@ func TestMain(m *testing.M) {
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
 
+	config.Config.Database.Path = "./testdata/database.db"
 	os.Exit(m.Run())
 }
