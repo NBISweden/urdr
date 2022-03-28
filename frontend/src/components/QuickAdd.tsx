@@ -7,6 +7,7 @@ export const QuickAdd = () => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>();
+  const [classes, setClasses] = useState<string>("col-2 quick-add-input");
 
   let headers = new Headers();
   headers.set("Accept", "application/json");
@@ -42,9 +43,11 @@ export const QuickAdd = () => {
 
   const searchIssue = async (event) => {
     console.log("Searching issue...");
-    const issue = event.target.value;
+    const issue_str = event.target.value;
+    let classes = "col-2 quick-add-input ";
+
     let result: { issues: Issue[] } = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/issues?issue_id=${issue}`,
+      `${SNOWPACK_PUBLIC_API_URL}/api/issues?issue_id=${issue_str}`,
       {
         method: "GET",
         credentials: "include",
@@ -59,10 +62,13 @@ export const QuickAdd = () => {
         }
       })
       .catch((error) => console.log(error));
-    if (result && result.issues.length > 0) {
-      setIssue(result.issues[0]);
-      console.log(result.issues);
+    if (result) {
+      if (result.issues.length > 0) {
+        setIssue(result.issues[0]);
+        classes += " valid";
+      } else classes += " invalid";
     }
+    setClasses(classes);
   };
 
   const handleAddIssue = (e) => {
@@ -78,7 +84,7 @@ export const QuickAdd = () => {
       <input
         aria-label="Issue"
         id="input-issue"
-        className="col-2 quick-add-input"
+        className={classes}
         type="number"
         min={0}
         onKeyUp={searchIssue}
