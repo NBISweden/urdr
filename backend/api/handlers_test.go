@@ -33,10 +33,18 @@ type endpointTestTable []struct {
 }
 
 func TestMain(m *testing.M) {
-	err := config.Setup()
+
+	err := os.Chdir("../")
+	if err != nil {
+		log.Fatalf("os.Chdir() failed: %v", err)
+	}
+
+	err = config.Setup()
 	if err != nil {
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
+
+	config.Config.Database.Path = "./testdata/database.db"
 
 	app = api.Setup()
 
@@ -100,6 +108,22 @@ func Test_Handlers(t *testing.T) {
 	}
 
 	entryActsResponse, _ := json.Marshal(entryActs)
+
+	issueAct := []api.IssueActivity{
+		{
+			Issue: api.Issue{
+				Id:      1,
+				Subject: "test issue",
+			},
+			Activity: api.Activity{
+				Id:   1,
+				Name: "test activity",
+			},
+			CustomName: "test name",
+		},
+	}
+
+	issueActsResp, _ := json.Marshal(issueAct)
 
 	var err error
 
@@ -287,6 +311,49 @@ func Test_Handlers(t *testing.T) {
 			testRedmine:      badRedmine,
 			useSessionHeader: true,
 			statusCode:       fiber.StatusUnprocessableEntity,
+		},
+		{
+			name:             "favorites POST",
+			method:           "POST",
+			endpoint:         "/api/favorites",
+			testRedmine:      fakeRedmine,
+			requestBody:      string(issueActsResp),
+			useSessionHeader: true,
+			statusCode:       fiber.StatusNoContent,
+		},
+		{
+			name:             "favorites POST 401",
+			method:           "POST",
+			endpoint:         "/api/favorites",
+			testRedmine:      fakeRedmine,
+			requestBody:      string(issueActsResp),
+			useSessionHeader: false,
+			statusCode:       fiber.StatusUnauthorized,
+		},
+		{
+			name:             "favorites POST 422",
+			method:           "POST",
+			endpoint:         "/api/favorites",
+			testRedmine:      fakeRedmine,
+			requestBody:      string(issueActsResp[0]),
+			useSessionHeader: true,
+			statusCode:       fiber.StatusUnprocessableEntity,
+		},
+		{
+			name:             "favorites GET",
+			method:           "GET",
+			endpoint:         "/api/favorites",
+			testRedmine:      fakeRedmine,
+			useSessionHeader: true,
+			statusCode:       fiber.StatusOK,
+		},
+		{
+			name:             "favorites GET 401",
+			method:           "GET",
+			endpoint:         "/api/favorites",
+			testRedmine:      fakeRedmine,
+			useSessionHeader: false,
+			statusCode:       fiber.StatusUnauthorized,
 		},
 		{
 			name:             "Logout",
