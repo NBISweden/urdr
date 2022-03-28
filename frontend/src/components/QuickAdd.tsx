@@ -66,7 +66,10 @@ export const QuickAdd = () => {
       if (result.issues.length > 0) {
         setIssue(result.issues[0]);
         classes += " valid";
-      } else classes += " invalid";
+      } else {
+        classes += " invalid";
+        setIssue(undefined);
+      }
     }
     setClasses(classes);
   };
@@ -107,7 +110,11 @@ export const QuickAdd = () => {
             );
           })}
       </select>
-      <button className=" basic-button plus-button" onClick={handleAddIssue}>
+      <button
+        className=" basic-button plus-button"
+        onClick={handleAddIssue}
+        disabled={issue == undefined}
+      >
         <img src={plus} />
       </button>
     </div>
