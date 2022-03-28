@@ -20,6 +20,9 @@ export const QuickAdd = () => {
       .then((res) => {
         if (res.ok) {
           return res.json();
+        } else if (res.status === 401) {
+          // Redirect to login page
+          window.location.href = "/";
         } else {
           throw new Error("Could not find activities.");
         }

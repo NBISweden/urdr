@@ -140,6 +140,9 @@ export const Report = () => {
       .then((res) => {
         if (res.ok) {
           return true;
+        } else if (res.status === 401) {
+          // Redirect to login page
+          window.location.href = "/";
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -193,6 +196,9 @@ export const Report = () => {
         if (response.ok) {
           console.log("Time reported");
           alert("Changes saved!");
+        } else if (response.status === 401) {
+          // Redirect to login page
+          window.location.href = "/";
         } else {
           throw new Error("Time report failed.");
         }
