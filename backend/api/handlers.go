@@ -41,7 +41,7 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 // fetchIssueSubjects() takes a list of issueActivity structs and
 // proceeds to fill out the "subject" for each issue by querying
 // Redmine.
-func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, error) {
+func fetchIssueSubjects(c *fiber.Ctx, issueActivities []IssueActivity) (bool, error) {
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return false, err
 	}
@@ -73,7 +73,7 @@ func fetchIssueSubjects(c *fiber.Ctx, issueActivities []issueActivity) (bool, er
 	// Parse the response and fill out the subjects.
 
 	issuesResponse := struct {
-		Issues []issue `json:"issues"`
+		Issues []Issue `json:"issues"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
@@ -185,19 +185,19 @@ func logoutHandler(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-type issue struct {
+type Issue struct {
 	Id      int    `json:"id"`
 	Subject string `json:"subject"`
 }
 
-type activity struct {
+type Activity struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 
-type issueActivity struct {
-	Issue      issue    `json:"issue"`
-	Activity   activity `json:"activity"`
+type IssueActivity struct {
+	Issue      Issue    `json:"issue"`
+	Activity   Activity `json:"activity"`
 	CustomName string   `json:"custom_name"`
 }
 
@@ -236,7 +236,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// response.
 
 	timeEntriesResponse := struct {
-		TimeEntries []issueActivity `json:"time_entries"`
+		TimeEntries []IssueActivity `json:"time_entries"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &timeEntriesResponse); err != nil {
@@ -244,8 +244,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	seenIssueActivities := make(map[issueActivity]bool)
-	var issueActivities []issueActivity
+	seenIssueActivities := make(map[IssueActivity]bool)
+	var issueActivities []IssueActivity
 
 	for _, issueActivity := range timeEntriesResponse.TimeEntries {
 		if !seenIssueActivities[issueActivity] {
@@ -427,15 +427,15 @@ func getFavoritesHandler(c *fiber.Ctx) error {
 		return c.JSON([]struct{}{})
 	}
 
-	var issueActivities []issueActivity
+	var issueActivities []IssueActivity
 
 	for _, favorite := range favorites {
-		issueActivity := issueActivity{
-			Issue: issue{
+		issueActivity := IssueActivity{
+			Issue: Issue{
 				Id:      favorite.RedmineIssueId,
 				Subject: "",
 			},
-			Activity: activity{
+			Activity: Activity{
 				Id:   favorite.RedmineActivityId,
 				Name: "",
 			},
@@ -518,7 +518,7 @@ func postFavoritesHandler(c *fiber.Ctx) error {
 	}
 
 	// Parse the favoites from the query.
-	query := []issueActivity{}
+	query := []IssueActivity{}
 
 	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
