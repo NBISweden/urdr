@@ -1,25 +1,27 @@
 basePath: /
 definitions:
-  api.activity:
+  api.Activity:
     properties:
       id:
         type: integer
       name:
         type: string
     type: object
-  api.issue:
+  api.Issue:
     properties:
       id:
         type: integer
       subject:
         type: string
     type: object
-  api.issueActivity:
+  api.IssueActivity:
     properties:
       activity:
-        $ref: '#/definitions/api.activity'
+        $ref: '#/definitions/api.Activity'
+      custom_name:
+        type: string
       issue:
-        $ref: '#/definitions/api.issue'
+        $ref: '#/definitions/api.Issue'
     type: object
   api.user:
     properties:
@@ -35,6 +37,69 @@ info:
   title: Urdr API
   version: "1.0"
 paths:
+  /api/activities:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Proxy for the "/enumerations/time_entry_activities.json" Redmine endpoint
+  /api/favorites:
+    get:
+      consumes:
+      - application/json
+      description: Get the favorites for the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.IssueActivity'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get favorites
+    post:
+      consumes:
+      - application/json
+      description: Stores the favorites for the current user
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Store favorites
   /api/issues:
     get:
       consumes:
@@ -111,7 +176,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/api.issueActivity'
+              $ref: '#/definitions/api.IssueActivity'
             type: array
         "401":
           description: Unauthorized
