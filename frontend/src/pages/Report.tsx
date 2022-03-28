@@ -124,9 +124,7 @@ export const Report = () => {
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
-    const entries = newTimeEntries.map((entry) => {
-      return entry;
-    });
+    const entries = [...newTimeEntries];
     const existingEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
@@ -176,7 +174,7 @@ export const Report = () => {
       }
       getRowTopics();
     } else {
-      const favs = favorites.map((fav) => fav);
+      const favs = [...favorites];
       const removed = favs.find(
         (fav) =>
           fav.activity.id === topic.activity.id &&
