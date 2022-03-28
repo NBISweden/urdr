@@ -8,7 +8,6 @@ import (
 	_ "urdr-api/docs"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
@@ -29,14 +28,11 @@ func Setup() *fiber.App {
 	// Fiber instance
 	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{
-		AllowCredentials: true,
-	}))
-
 	store = session.New(session.Config{
-		Expiration:   time.Minute * 15,
-		KeyLookup:    "cookie:urdr_session",
-		CookieSecure: true,
+		Expiration:     time.Minute * 15,
+		KeyLookup:      "cookie:urdr_session",
+		CookieSecure:   true,
+		CookieSameSite: "Strict",
 	})
 
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
