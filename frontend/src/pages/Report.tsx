@@ -10,6 +10,7 @@ import {
   TimeEntry,
   SNOWPACK_PUBLIC_API_URL,
 } from "../model";
+import { HeaderUser } from "../components/HeaderUser";
 
 export const Report = () => {
   const navigate = useNavigate();
@@ -230,6 +231,7 @@ export const Report = () => {
 
   return (
     <>
+      <HeaderUser username={user ? user.login : ""} />
       {favorites.length > 0 ? (
         <section className="recent-container">
           <HeaderRow days={thisWeek} title="Favorites" />
