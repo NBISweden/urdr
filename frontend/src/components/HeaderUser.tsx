@@ -24,7 +24,6 @@ const logout = async () => {
 const showSettings = () => {
   return (
     <div class="settings-list" aria-labelledby="dropdownMenuLink">
-      <a class="dropdown-item">My settings</a>
       <a class="dropdown-item" onClick={logout}>
         Log out
       </a>
@@ -44,6 +43,7 @@ export const HeaderUser = ({ username }: { username: string }) => {
       <div className="p-2">
         <a
           class="btn basic-button dropdown-toggle"
+          id="dropdown-button"
           onClick={showSettingsClickHandle}
           data-toggle="dropdown"
           aria-haspopup="true"
