@@ -1,3 +1,5 @@
+import.meta.hot;
+
 // interfaces use snake case to follow Redmines variable names
 
 export interface User {

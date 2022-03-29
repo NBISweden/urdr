@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-import {
-  IssueActivityPair,
-  TimeEntry,
-  FetchedTimeEntry,
-  SNOWPACK_PUBLIC_API_URL,
-} from "../model";
+import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
+import { getApiEndpoint } from "../utils";
+
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
@@ -46,26 +43,9 @@ export const Row = ({
   });
 
   const getTimeEntries = async (params: URLSearchParams) => {
-    let entries: { time_entries: FetchedTimeEntry[] } = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/time_entries?${params}`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          console.log("success");
-          return res.json();
-        } else if (res.status === 401) {
-          // Redirect to login page
-          navigate("/");
-        } else {
-          throw new Error("Could not get time entries.");
-        }
-      })
-      .catch((error) => console.log(error));
+    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
+      `/api/time_entries?${params}`
+    );
     setRowEntries(entries.time_entries);
     setTimeout(() => onReset(), 100);
   };

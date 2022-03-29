@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { Header } from "../components/Header";
 import "../index.css";
-import { User, SNOWPACK_PUBLIC_API_URL } from "../model";
+import { User } from "../model";
+import { headers, SNOWPACK_PUBLIC_API_URL } from "../utils";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
@@ -13,13 +14,10 @@ export const Login = () => {
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
     // We are not doing account linking
-    let headers = new Headers();
     headers.set(
       "Authorization",
       "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
     );
-    headers.set("Accept", "application/json");
-    headers.set("Content-Type", "application/json");
 
     const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
       body: "",
