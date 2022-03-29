@@ -109,7 +109,7 @@ export const QuickAdd = () => {
       </select>
       <button
         className=" basic-button plus-button"
-        disabled={issue == undefined}
+        disabled={issue === undefined}
       >
         <img src={plus} />
       </button>
