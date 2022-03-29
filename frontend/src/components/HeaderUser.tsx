@@ -23,8 +23,8 @@ const logout = async () => {
 
 const showSettings = () => {
   return (
-    <div class="settings-list" aria-labelledby="dropdownMenuLink">
-      <a class="dropdown-item" onClick={logout}>
+    <div className="settings-list" aria-labelledby="dropdownMenuLink">
+      <a className="dropdown-item" onClick={logout}>
         Log out
       </a>
     </div>
@@ -32,17 +32,17 @@ const showSettings = () => {
 };
 
 export const HeaderUser = ({ username }: { username: string }) => {
-  const [userSettings, setUserSettings] = useState<boolean>(false);
+  const [showUserSettings, setShowUserSettings] = useState<boolean>(false);
 
   const showSettingsClickHandle = () => {
-    setUserSettings(!userSettings);
+    setShowUserSettings(!showUserSettings);
   };
 
   return (
     <div className="d-flex justify-content-end header-user">
       <div className="p-2">
         <a
-          class="btn basic-button dropdown-toggle"
+          className="btn basic-button dropdown-toggle"
           id="dropdown-button"
           onClick={showSettingsClickHandle}
           data-toggle="dropdown"
@@ -51,7 +51,7 @@ export const HeaderUser = ({ username }: { username: string }) => {
         >
           {username}
         </a>
-        {userSettings ? showSettings() : null}
+        {showUserSettings ? showSettings() : null}
       </div>
     </div>
   );
