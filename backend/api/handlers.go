@@ -38,10 +38,10 @@ func prepareRedmineRequest(c *fiber.Ctx) (bool, error) {
 	return true, nil
 }
 
-// fetchIssueSubjects() takes a list of IssueActivity structs and
+// fetchIssueSubjects() takes a list of Entry structs and
 // proceeds to fill out the "subject" for each issue by querying
 // Redmine.
-func fetchIssueSubjects(c *fiber.Ctx, issueActivities []IssueActivity) (bool, error) {
+func fetchIssueSubjects(c *fiber.Ctx, entries []Entry) (bool, error) {
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return false, err
 	}
@@ -49,8 +49,8 @@ func fetchIssueSubjects(c *fiber.Ctx, issueActivities []IssueActivity) (bool, er
 	seenIssueIds := make(map[int]bool)
 	var issueIds []string
 
-	for _, issueActivity := range issueActivities {
-		issueId := issueActivity.Issue.Id
+	for _, entry := range entries {
+		issueId := entry.Issue.Id
 		if !seenIssueIds[issueId] {
 			seenIssueIds[issueId] = true
 			issueIds = append(issueIds, fmt.Sprintf("%d", issueId))
@@ -81,13 +81,13 @@ func fetchIssueSubjects(c *fiber.Ctx, issueActivities []IssueActivity) (bool, er
 		return false, c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// Iterate over our issueActivities list and fill in the missing
+	// Iterate over our entries list and fill in the missing
 	// subject to each issue from the issuesResponse structure.
 
-	for i := range issueActivities {
+	for i := range entries {
 		for _, issue := range issuesResponse.Issues {
-			if issue.Id == issueActivities[i].Issue.Id {
-				issueActivities[i].Issue.Subject = issue.Subject
+			if issue.Id == entries[i].Issue.Id {
+				entries[i].Issue.Subject = issue.Subject
 				break
 			}
 		}
@@ -195,12 +195,12 @@ type Activity struct {
 	Name string `json:"name"`
 }
 
-type IssueActivity struct {
+type Entry struct {
 	Issue    Issue    `json:"issue"`
 	Activity Activity `json:"activity"`
 }
 
-type PriorityIssueActivity struct {
+type PriorityEntry struct {
 	Issue      Issue    `json:"issue"`
 	Activity   Activity `json:"activity"`
 	CustomName string   `json:"custom_name"`
@@ -212,7 +212,7 @@ type PriorityIssueActivity struct {
 // @Description	Get recent issues that the user has spent time on
 // @Accept	json
 // @Produce	json
-// @Success	200	{array}	IssueActivity
+// @Success	200	{array}	Entry
 // @Failure	401	{string} error "Unauthorized"
 // @Failure	500	{string} error "Internal Server Error"
 // @Router /api/recent_issues [get]
@@ -242,7 +242,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// response.
 
 	timeEntriesResponse := struct {
-		TimeEntries []IssueActivity `json:"time_entries"`
+		TimeEntries []Entry `json:"time_entries"`
 	}{}
 
 	if err := json.Unmarshal(c.Response().Body(), &timeEntriesResponse); err != nil {
@@ -250,31 +250,31 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	seenIssueActivities := make(map[IssueActivity]bool)
-	var issueActivities []IssueActivity
+	seenEntries := make(map[Entry]bool)
+	var entries []Entry
 
-	for _, issueActivity := range timeEntriesResponse.TimeEntries {
-		if !seenIssueActivities[issueActivity] {
-			seenIssueActivities[issueActivity] = true
-			issueActivities = append(issueActivities, issueActivity)
+	for _, entry := range timeEntriesResponse.TimeEntries {
+		if !seenEntries[entry] {
+			seenEntries[entry] = true
+			entries = append(entries, entry)
 		}
 	}
 
 	// Populate the issue subjects.
-	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
+	if ok, err := fetchIssueSubjects(c, entries); !ok {
 		return err
 	}
 
-	// Sort the issueActivities list on the issue IDs.
-	sort.Slice(issueActivities, func(i, j int) bool {
-		a := issueActivities[i]
-		b := issueActivities[j]
+	// Sort the entries list on the issue IDs.
+	sort.Slice(entries, func(i, j int) bool {
+		a := entries[i]
+		b := entries[j]
 
 		return (a.Issue.Id == b.Issue.Id && a.Activity.Id < b.Activity.Id) ||
 			a.Issue.Id > b.Issue.Id
 	})
 
-	return c.JSON(issueActivities)
+	return c.JSON(entries)
 }
 
 // getTimeEntriesHandler godoc
@@ -399,7 +399,7 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 // @Description	Get the favorites and hidden issues for the current user
 // @Accept	json
 // @Produce	json
-// @Success	200	{array}	IssueActivity
+// @Success	200	{array}	PriorityEntry
 // @Failure	401	{string} error "Unauthorized"
 // @Failure	500	{string} error "Internal Server Error"
 // @Router /api/priority_entries [get]
@@ -422,7 +422,7 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	priorityEntries, err := db.GetAllUserPrioityEntries(userId.(int))
+	dbPriorityEntries, err := db.GetAllUserPrioityEntries(userId.(int))
 	if err != nil {
 		log.Errorf("Failed to get priority entries for user ID %d: %v", userId.(int), err)
 		return c.SendStatus(fiber.StatusInternalServerError)
@@ -430,27 +430,27 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 
 	// If there are no priority entries,
 	// return empty array and bail out here.
-	if len(priorityEntries) == 0 {
+	if len(dbPriorityEntries) == 0 {
 		return c.JSON([]struct{}{})
 	}
 
-	var issueActivities []IssueActivity
+	var entries []Entry
 
-	for _, priorityEntry := range priorityEntries {
-		issueActivity := IssueActivity{
+	for _, dbPriorityEntry := range dbPriorityEntries {
+		entry := Entry{
 			Issue: Issue{
-				Id: priorityEntry.RedmineIssueId,
+				Id: dbPriorityEntry.RedmineIssueId,
 			},
 			Activity: Activity{
-				Id: priorityEntry.RedmineActivityId,
+				Id: dbPriorityEntry.RedmineActivityId,
 			},
 		}
 
-		issueActivities = append(issueActivities, issueActivity)
+		entries = append(entries, entry)
 	}
 
 	// Fetch the subjects for each issue.
-	if ok, err := fetchIssueSubjects(c, issueActivities); !ok {
+	if ok, err := fetchIssueSubjects(c, entries); !ok {
 		return err
 	}
 
@@ -477,26 +477,26 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	var priorityIssueActivities []PriorityIssueActivity
+	var priorityEntries []PriorityEntry
 
-	for i, priorityEntry := range priorityEntries {
-		priorityIssueActivity := PriorityIssueActivity{
-			Issue:      issueActivities[i].Issue,
-			Activity:   issueActivities[i].Activity,
-			CustomName: priorityEntry.Name,
-			IsHidden:   priorityEntry.IsHidden,
+	for i, dbPriorityEntry := range dbPriorityEntries {
+		priorityEntry := PriorityEntry{
+			Issue:      entries[i].Issue,
+			Activity:   entries[i].Activity,
+			CustomName: dbPriorityEntry.Name,
+			IsHidden:   dbPriorityEntry.IsHidden,
 		}
 		for _, activity := range activitiesResponse.Activities {
-			if activity.Id == priorityIssueActivity.Activity.Id {
-				priorityIssueActivity.Activity.Name = activity.Name
+			if activity.Id == priorityEntry.Activity.Id {
+				priorityEntry.Activity.Name = activity.Name
 				break
 			}
 		}
 
-		priorityIssueActivities = append(priorityIssueActivities, priorityIssueActivity)
+		priorityEntries = append(priorityEntries, priorityEntry)
 	}
 
-	return c.JSON(priorityIssueActivities)
+	return c.JSON(priorityEntries)
 }
 
 // postPriorityEntriesHandler() godoc
@@ -531,30 +531,30 @@ func postPriorityEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	// Parse the favoites from the query.
-	query := []PriorityIssueActivity{}
+	// Parse the entries from the query.
+	query := []PriorityEntry{}
 
 	if err := json.Unmarshal(c.Request().Body(), &query); err != nil {
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
-	// Create a list of database.Favorite entries from the
+	// Create a list of database.PriorityEntry entries from the
 	// parsed query.
 
-	var priorityEntries []database.PriorityEntry
+	var dbPriorityEntries []database.PriorityEntry
 
-	for _, priorityIssueActivity := range query {
-		priorityEntry := database.PriorityEntry{
-			RedmineIssueId:    priorityIssueActivity.Issue.Id,
-			RedmineActivityId: priorityIssueActivity.Activity.Id,
-			Name:              priorityIssueActivity.CustomName,
-			IsHidden:          priorityIssueActivity.IsHidden,
+	for _, priorityEntry := range query {
+		dbPriorityEntry := database.PriorityEntry{
+			RedmineIssueId:    priorityEntry.Issue.Id,
+			RedmineActivityId: priorityEntry.Activity.Id,
+			Name:              priorityEntry.CustomName,
+			IsHidden:          priorityEntry.IsHidden,
 		}
 
-		priorityEntries = append(priorityEntries, priorityEntry)
+		dbPriorityEntries = append(dbPriorityEntries, dbPriorityEntry)
 	}
 
-	if err := db.SetAllUserPriorityEntries(userId.(int), priorityEntries); err != nil {
+	if err := db.SetAllUserPriorityEntries(userId.(int), dbPriorityEntries); err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
