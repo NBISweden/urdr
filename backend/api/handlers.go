@@ -500,7 +500,7 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 }
 
 // postPriorityEntriesHandler() godoc
-// @Summary	Store priority issues (favorites or hidden issues)
+// @Summary	Store priority entries (favorites or hidden issues)
 // @Description	Stores the favorites and hidden issues for the current user
 // @Accept	json
 // @Produce	json
@@ -516,7 +516,7 @@ func postPriorityEntriesHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	// The priority issues are stored with the user's ID.
+	// The priority entries are stored with the user's ID.
 	userId := session.Get("user_id")
 	if userId == nil {
 		log.Error("Failed to get valid user ID from session")
