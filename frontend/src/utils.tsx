@@ -19,7 +19,9 @@ export const getApiEndpoint = async (endpoint) => {
         // Redirect to login page
         window.location.href = "/";
       } else {
-        throw new Error("Error accessing the endpoint.");
+        throw new Error(
+          "There was an error accessing the endpoint " + endpoint
+        );
       }
     })
     .catch((error) => console.log(error));
