@@ -17,7 +17,8 @@ type PriorityEntry struct {
 // a particular user.
 func (db *database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry, error) {
 	selectStmt := `
-		SELECT	redmine_issue_id,
+		SELECT
+			redmine_issue_id,
 			redmine_activity_id,
 			name,
 			is_hidden

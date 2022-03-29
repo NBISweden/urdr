@@ -6,16 +6,20 @@ import (
 	"urdr-api/internal/database"
 )
 
-func TestFavorites(t *testing.T) {
-	storeFaves := []database.PriorityEntry{
+func TestPriorityEntries(t *testing.T) {
+	storeEntries := []database.PriorityEntry{
 		{
 			RedmineIssueId:    1,
 			RedmineActivityId: 1,
-			Name:              "Test 1"},
+			Name:              "Test 1",
+			IsHidden:          true,
+		},
 		{
 			RedmineIssueId:    2,
 			RedmineActivityId: 1,
-			Name:              "Test 2"}}
+			Name:              "Test 2",
+			IsHidden:          false,
+		}}
 
 	db, err := database.New(config.Config.Database.Path)
 	if err != nil {
@@ -24,40 +28,40 @@ func TestFavorites(t *testing.T) {
 
 	err = db.DeleteAllUserPriorityEntries(1)
 	if err != nil {
-		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
+		t.Fatalf("DeleteAllUserPriorityEntries() failed: %v", err)
 	}
 
-	err = db.SetAllUserPriorityEntries(1, storeFaves)
+	err = db.SetAllUserPriorityEntries(1, storeEntries)
 	if err != nil {
-		t.Fatalf("SetAllUserFavorites() failed: %v", err)
+		t.Fatalf("SetAllUserPriorityEntries() failed: %v", err)
 	}
 
-	fetchFaves, err := db.GetAllUserPrioityEntries(1)
+	fetchEntries, err := db.GetAllUserPrioityEntries(1)
 	if err != nil {
-		t.Fatalf("GetAllUserFavorites() failed: %v", err)
+		t.Fatalf("GetAllUserPrioityEntries() failed: %v", err)
 	}
-	if len(fetchFaves) != len(storeFaves) {
-		t.Fatalf("GetAllUserFavorites() returned %d elements, expected %d",
-			len(fetchFaves), len(storeFaves))
+	if len(fetchEntries) != len(storeEntries) {
+		t.Fatalf("GetAllUserPrioityEntries() returned %d elements, expected %d",
+			len(fetchEntries), len(storeEntries))
 	}
-	for i, f := range fetchFaves {
-		if f != storeFaves[i] {
-			t.Fatalf("GetAllUserFavorites() returned %v, expected %v",
-				fetchFaves, storeFaves)
+	for i, f := range fetchEntries {
+		if f != storeEntries[i] {
+			t.Fatalf("GetAllUserPrioityEntries() returned %v, expected %v",
+				fetchEntries, storeEntries)
 		}
 	}
 
 	err = db.DeleteAllUserPriorityEntries(1)
 	if err != nil {
-		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
+		t.Fatalf("DeleteAllUserPriorityEntries() failed: %v", err)
 	}
 
-	fetchFaves, err = db.GetAllUserPrioityEntries(1)
+	fetchEntries, err = db.GetAllUserPrioityEntries(1)
 	if err != nil {
-		t.Fatalf("GetAllUserFavorites() failed: %v", err)
+		t.Fatalf("GetAllUserPrioityEntries() failed: %v", err)
 	}
-	if len(fetchFaves) != 0 {
-		t.Fatalf("GetAllUserFavorites() returned %d elements, expected %d",
-			len(fetchFaves), 0)
+	if len(fetchEntries) != 0 {
+		t.Fatalf("GetAllUGetAllUserPrioityEntrieserFavorites() returned %d elements, expected %d",
+			len(fetchEntries), 0)
 	}
 }
