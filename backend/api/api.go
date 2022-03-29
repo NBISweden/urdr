@@ -51,9 +51,9 @@ func Setup() *fiber.App {
 
 	app.Get("/api/activities", getActivitiesHandler)
 
-	app.Get("/api/favorites", getFavoritesHandler)
+	app.Get("/api/priority_entries", getPriorityEntriesHandler)
 
-	app.Post("/api/favorites", postFavoritesHandler)
+	app.Post("/api/priority_entries", postPriorityEntriesHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {

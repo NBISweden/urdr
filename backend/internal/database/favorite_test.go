@@ -7,7 +7,7 @@ import (
 )
 
 func TestFavorites(t *testing.T) {
-	storeFaves := []database.Favorite{
+	storeFaves := []database.PriorityEntry{
 		{
 			RedmineIssueId:    1,
 			RedmineActivityId: 1,
@@ -22,17 +22,17 @@ func TestFavorites(t *testing.T) {
 		t.Fatalf("database.New() returned unexpected error %q", err)
 	}
 
-	err = db.DeleteAllUserFavorites(1)
+	err = db.DeleteAllUserPriorityEntries(1)
 	if err != nil {
 		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
 	}
 
-	err = db.SetAllUserFavorites(1, storeFaves)
+	err = db.SetAllUserPriorityEntries(1, storeFaves)
 	if err != nil {
 		t.Fatalf("SetAllUserFavorites() failed: %v", err)
 	}
 
-	fetchFaves, err := db.GetAllUserFavorites(1)
+	fetchFaves, err := db.GetAllUserPrioityEntries(1)
 	if err != nil {
 		t.Fatalf("GetAllUserFavorites() failed: %v", err)
 	}
@@ -47,12 +47,12 @@ func TestFavorites(t *testing.T) {
 		}
 	}
 
-	err = db.DeleteAllUserFavorites(1)
+	err = db.DeleteAllUserPriorityEntries(1)
 	if err != nil {
 		t.Fatalf("DeleteAllUserFavorites() failed: %v", err)
 	}
 
-	fetchFaves, err = db.GetAllUserFavorites(1)
+	fetchFaves, err = db.GetAllUserPrioityEntries(1)
 	if err != nil {
 		t.Fatalf("GetAllUserFavorites() failed: %v", err)
 	}

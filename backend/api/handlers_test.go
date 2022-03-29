@@ -112,7 +112,7 @@ func Test_Handlers(t *testing.T) {
 
 	entryActsResponse, _ := json.Marshal(entryActs)
 
-	issueAct := []api.IssueActivity{
+	issueAct := []api.PriorityIssueActivity{
 		{
 			Issue: api.Issue{
 				Id:      1,

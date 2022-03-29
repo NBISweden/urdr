@@ -60,21 +60,23 @@ CREATE TABLE user_setting (
 		ON DELETE CASCADE
 );
 
--- Favorites.
+-- Priority entries
 -- https://github.com/NBISweden/urdr/issues/11
 -- https://github.com/NBISweden/urdr/issues/19
 --
--- A "favorite" is a combination of a Redmine issue and a Redmine
--- activity that a particular user has marked as a favorite.  We also
--- store a priority, which determines the relative positioning in the
--- user interface (it's essentially a sorting key).
+-- A "priority entry" is a combination of a Redmine issue and a Redmine
+-- activity that a particular user has marked as either a favorite or as
+-- a hidden entry.  We also store a sorting priority, which determines
+-- the relative positioning in the user interface (it's essentially a
+-- sorting key).
 
-DROP TABLE IF EXISTS favorite;
-CREATE TABLE favorite (
+DROP TABLE IF EXISTS priority_entry;
+CREATE TABLE priority_entry (
 	redmine_user_id INTEGER NOT NULL,
 	redmine_issue_id INTEGER NOT NULL,
 	redmine_activity_id INTEGER NOT NULL,
 	name TEXT,
+	is_hidden BOOLEAN,
 	priority INTEGER NOT NULL,
 
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
