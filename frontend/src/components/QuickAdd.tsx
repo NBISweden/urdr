@@ -57,6 +57,9 @@ export const QuickAdd = () => {
       .then((res) => {
         if (res.ok) {
           return res.json();
+        } else if (res.status === 401) {
+          // Redirect to login page
+          navigate("/");
         } else {
           throw new Error("Could not find issue.");
         }
@@ -72,12 +75,6 @@ export const QuickAdd = () => {
       }
     }
     setClasses(classes);
-  };
-
-  const handleAddIssue = (e) => {
-    console.log("Adding issue");
-
-    console.log(issue);
   };
 
   return (
@@ -112,7 +109,6 @@ export const QuickAdd = () => {
       </select>
       <button
         className=" basic-button plus-button"
-        onClick={handleAddIssue}
         disabled={issue == undefined}
       >
         <img src={plus} />
