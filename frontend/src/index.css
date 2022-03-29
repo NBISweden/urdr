@@ -43,6 +43,12 @@ input[type="number"] {
   margin: 0;
 }
 
+.header-user {
+  width: 100vw;
+  height: 3rem;
+  margin-bottom: 3rem;
+  background-color: #f4f4f4;
+}
 /* LOGIN */
 
 .login-wrapper {
