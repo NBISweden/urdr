@@ -62,7 +62,7 @@ export const Report = () => {
 
   const getRowTopics = async () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
-      "/api/favorites"
+      "/api/priority_entries"
     );
 
     const issues = [...recentIssues];
@@ -110,7 +110,7 @@ export const Report = () => {
   };
 
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
-    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/favorites`, {
+    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`, {
       method: "POST",
       credentials: "include",
       headers: headers,

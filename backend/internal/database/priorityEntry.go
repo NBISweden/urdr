@@ -2,23 +2,27 @@ package database
 
 import "fmt"
 
-// The Favorite type is a simple struct that encapsulates a "favorite",
-// i.e. a Redmine issue ID and a Redmine activity ID together with a
-// custom name.
-type Favorite struct {
+// The PriorityEntry type is a simple struct that encapsulates ai
+// "priority entry", i.e. a Redmine issue ID and a Redmine activity ID
+// together with a custom name to which a user has assigned the meaning
+// "favorite" or "hidden" using the UI.
+type PriorityEntry struct {
 	RedmineIssueId    int
 	RedmineActivityId int
 	Name              string
+	IsHidden          bool
 }
 
-// GetAllUserFavorites() returns a list of favorites for a particular
-// user.
-func (db *database) GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
+// GetAllUserPrioityEntries() returns a list of priority entries for
+// a particular user.
+func (db *database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry, error) {
 	selectStmt := `
-		SELECT	redmine_issue_id,
+		SELECT
+			redmine_issue_id,
 			redmine_activity_id,
-			name
-		FROM	favorite
+			name,
+			is_hidden
+		FROM	priority_entry
 		WHERE	redmine_user_id = ?
 		ORDER BY	priority`
 
@@ -34,29 +38,30 @@ func (db *database) GetAllUserFavorites(redmineUserId int) ([]Favorite, error) {
 	}
 	defer rows.Close()
 
-	var favorites []Favorite
+	var priorityEntries []PriorityEntry
 
 	for rows.Next() {
-		var favorite Favorite
+		var priorityEntry PriorityEntry
 
-		if err := rows.Scan(&favorite.RedmineIssueId,
-			&favorite.RedmineActivityId,
-			&favorite.Name); err != nil {
+		if err := rows.Scan(&priorityEntry.RedmineIssueId,
+			&priorityEntry.RedmineActivityId,
+			&priorityEntry.Name,
+			&priorityEntry.IsHidden); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
-		favorites = append(favorites, favorite)
+		priorityEntries = append(priorityEntries, priorityEntry)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
-	return favorites, nil
+	return priorityEntries, nil
 }
 
-// SetAllUserFavorites() replaces all stored favorites for the given
+// SetAllUserPriorityEntries() replaces all stored priority entries for the given
 // user by the ones provided in the list to this function.
-func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite) error {
+func (db *database) SetAllUserPriorityEntries(redmineUserId int, favorites []PriorityEntry) error {
 	tx, err := db.handle().Begin()
 	if err != nil {
 		return fmt.Errorf("sql.Begin() failed: %w", err)
@@ -65,7 +70,7 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	// tx.Commit() is a no-op.
 	defer func() { _ = tx.Rollback() }()
 
-	// Ideally, we'd call DeleteAllUserFavorites(redmineUserId)
+	// Ideally, we'd call DeleteAllUserPriorityEntries(redmineUserId)
 	// here, but we can't do that as we're in a transaction block.
 	// The statement object (stmt) in the other function is not
 	// related to the transaction here (coming from sql.Prepare()
@@ -74,7 +79,7 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	// errors.
 
 	deleteStmt := `
-		DELETE FROM favorite
+		DELETE FROM priority_entry
 		WHERE	redmine_user_id = ?`
 
 	stmt, err := tx.Prepare(deleteStmt)
@@ -88,13 +93,14 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	}
 
 	insertStmt := `
-		INSERT INTO favorite (
+		INSERT INTO priority_entry (
 			redmine_user_id, 
 			redmine_issue_id,
 			redmine_activity_id,
 			name,
+			is_hidden,
 			priority )
-		VALUES (?, ?, ?, ?, ?)`
+		VALUES (?, ?, ?, ?, ?, ?)`
 
 	stmt, err = tx.Prepare(insertStmt)
 	if err != nil {
@@ -102,11 +108,12 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	}
 	defer stmt.Close()
 
-	for priority, favorite := range favorites {
+	for priority, priorityEntry := range favorites {
 		if _, err := stmt.Exec(redmineUserId,
-			favorite.RedmineIssueId,
-			favorite.RedmineActivityId,
-			favorite.Name,
+			priorityEntry.RedmineIssueId,
+			priorityEntry.RedmineActivityId,
+			priorityEntry.Name,
+			priorityEntry.IsHidden,
 			priority); err != nil {
 			return fmt.Errorf("sql.Exec() failed: %w", err)
 		}
@@ -120,11 +127,11 @@ func (db *database) SetAllUserFavorites(redmineUserId int, favorites []Favorite)
 	return nil
 }
 
-// DeleteAllUserFavorites() removes all stored favorites for the given
-// user.
-func (db *database) DeleteAllUserFavorites(redmineUserId int) error {
+// DeleteAllUserPriorityEntries() removes all stored priority entries
+// for the given user.
+func (db *database) DeleteAllUserPriorityEntries(redmineUserId int) error {
 	deleteStmt := `
-		DELETE FROM favorite
+		DELETE FROM priority_entry
 		WHERE	redmine_user_id = ?`
 
 	stmt, err := db.handle().Prepare(deleteStmt)
