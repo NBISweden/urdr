@@ -43,6 +43,13 @@ input[type="number"] {
   margin: 0;
 }
 
+.header-user {
+  width: 100vw;
+  height: 3rem;
+  margin-bottom: 3rem;
+  background-color: #f4f4f4;
+}
+
 /* LOGIN */
 
 .login-wrapper {
@@ -100,6 +107,10 @@ input[type="number"] {
   box-shadow: 0 2px 4px hsl(0deg 0 12%);
   transition-duration: 0.2s;
   margin-left: 1rem;
+}
+
+.dropdown-button {
+  margin-right: 1rem;
 }
 
 .save-button {
