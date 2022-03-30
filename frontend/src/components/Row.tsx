@@ -26,7 +26,6 @@ export const Row = ({
   saved: boolean;
   isFav: boolean;
 }) => {
-  const navigate = useNavigate();
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
   const [rowEntryIds, setRowEntryIds] = useState<number[]>([]);

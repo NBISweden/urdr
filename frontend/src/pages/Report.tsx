@@ -111,7 +111,9 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
+        alert(error);
+        const favs = [...favorites];
+        setFavorites(favs);
         return false;
       });
     return saved;
@@ -185,6 +187,24 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
   const onDragEnd = () => {
     //TODO: Save new list of favorites
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const startIndex = result.source.index;
+    const endIndex = result.destination.index;
+
+    if (startIndex === endIndex) {
+      return;
+    }
+
+    const favs = [...favorites];
+    const [moved] = favs.splice(startIndex, 1);
+    favs.splice(endIndex, 0, moved);
+    setFavorites(favs);
+    saveFavorites(favs);
+    return;
   };
 
   return (
@@ -195,7 +215,7 @@ export const Report = () => {
         onWeekTravel={handleWeekTravel}
       />
       {favorites.length > 0 ? (
-        <DragDropContext>
+        <DragDropContext onDragEnd={onDragEnd}>
           <section className="recent-container">
             <HeaderRow days={currentWeekArray} title="Favorites" />
             <Droppable droppableId="favorites">
@@ -211,9 +231,9 @@ export const Report = () => {
                       return (
                         <>
                           <Draggable
-                            onDragEnd={onDragEnd}
                             draggableId={`${fav.issue.id}${fav.activity.id}`}
                             index={index}
+                            key={`${fav.issue.id}${fav.activity.id}-drag`}
                           >
                             {(provided) => (
                               <div
