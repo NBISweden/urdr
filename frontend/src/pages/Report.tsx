@@ -95,7 +95,6 @@ export const Report = () => {
       `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
       {
         method: "POST",
-        credentials: "include",
         headers: headers,
         body: JSON.stringify(newFavs),
       }
@@ -154,7 +153,6 @@ export const Report = () => {
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
-      credentials: "include",
       headers: headers,
     })
       .then((response) => {

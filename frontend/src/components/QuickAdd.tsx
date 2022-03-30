@@ -17,7 +17,10 @@ export const QuickAdd = ({ addIssueActivity }) => {
     let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
       "/api/activities"
     );
-    if (result) setActivities(result.time_entry_activities);
+    if (result) {
+      setActivities(result.time_entry_activities);
+      setActivity(result.time_entry_activities[0]);
+    }
     console.log(result);
   };
 
@@ -46,11 +49,10 @@ export const QuickAdd = ({ addIssueActivity }) => {
 
   const handleAdd = (e) => {
     console.log("Adding issue activity pair");
-    const pair_activity = activity ? activity : activities[0];
     const pair: IssueActivityPair = {
       issue: issue,
-      activity: pair_activity,
-      custom_name: issue.subject + "-" + pair_activity.name,
+      activity: activity,
+      custom_name: issue.subject + "-" + activity.name,
     };
     console.log(pair);
 
