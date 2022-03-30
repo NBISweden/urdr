@@ -44,77 +44,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/favorites": {
-            "get": {
-                "description": "Get the favorites for the current user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get favorites",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/api.IssueActivity"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Stores the favorites for the current user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Store favorites",
-                "responses": {
-                    "204": {
-                        "description": "No Content",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/api/issues": {
             "get": {
                 "consumes": [
@@ -215,6 +144,77 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/priority_entries": {
+            "get": {
+                "description": "Get the favorites and hidden issues for the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get priority entries (favorites or hidden issues)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/api.PriorityEntry"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Stores the favorites and hidden issues for the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Store priority entries (favorites or hidden issues)",
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/recent_issues": {
             "get": {
                 "description": "Get recent issues that the user has spent time on",
@@ -231,7 +231,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/api.IssueActivity"
+                                "$ref": "#/definitions/api.Entry"
                             }
                         }
                     },
@@ -317,6 +317,17 @@ const docTemplate = `{
                 }
             }
         },
+        "api.Entry": {
+            "type": "object",
+            "properties": {
+                "activity": {
+                    "$ref": "#/definitions/api.Activity"
+                },
+                "issue": {
+                    "$ref": "#/definitions/api.Issue"
+                }
+            }
+        },
         "api.Issue": {
             "type": "object",
             "properties": {
@@ -328,7 +339,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.IssueActivity": {
+        "api.PriorityEntry": {
             "type": "object",
             "properties": {
                 "activity": {
@@ -336,6 +347,9 @@ const docTemplate = `{
                 },
                 "custom_name": {
                     "type": "string"
+                },
+                "is_hidden": {
+                    "type": "boolean"
                 },
                 "issue": {
                     "$ref": "#/definitions/api.Issue"

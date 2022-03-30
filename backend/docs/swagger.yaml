@@ -7,6 +7,13 @@ definitions:
       name:
         type: string
     type: object
+  api.Entry:
+    properties:
+      activity:
+        $ref: '#/definitions/api.Activity'
+      issue:
+        $ref: '#/definitions/api.Issue'
+    type: object
   api.Issue:
     properties:
       id:
@@ -14,12 +21,14 @@ definitions:
       subject:
         type: string
     type: object
-  api.IssueActivity:
+  api.PriorityEntry:
     properties:
       activity:
         $ref: '#/definitions/api.Activity'
       custom_name:
         type: string
+      is_hidden:
+        type: boolean
       issue:
         $ref: '#/definitions/api.Issue'
     type: object
@@ -53,53 +62,6 @@ paths:
           schema:
             type: string
       summary: Proxy for the "/enumerations/time_entry_activities.json" Redmine endpoint
-  /api/favorites:
-    get:
-      consumes:
-      - application/json
-      description: Get the favorites for the current user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/api.IssueActivity'
-            type: array
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Get favorites
-    post:
-      consumes:
-      - application/json
-      description: Stores the favorites for the current user
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: No Content
-          schema:
-            type: string
-        "401":
-          description: Unauthorized
-          schema:
-            type: string
-        "422":
-          description: Unprocessable Entity
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Store favorites
   /api/issues:
     get:
       consumes:
@@ -164,6 +126,53 @@ paths:
           schema:
             type: string
       summary: Log out a user
+  /api/priority_entries:
+    get:
+      consumes:
+      - application/json
+      description: Get the favorites and hidden issues for the current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/api.PriorityEntry'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Get priority entries (favorites or hidden issues)
+    post:
+      consumes:
+      - application/json
+      description: Stores the favorites and hidden issues for the current user
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "422":
+          description: Unprocessable Entity
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Store priority entries (favorites or hidden issues)
   /api/recent_issues:
     get:
       consumes:
@@ -176,7 +185,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/api.IssueActivity'
+              $ref: '#/definitions/api.Entry'
             type: array
         "401":
           description: Unauthorized
