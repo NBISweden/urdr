@@ -195,6 +195,10 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+    
+  const addIssueActivityHandler = (pair) => {
+    const newRecentIssues = [...recentIssues, pair];
+    setRecentIssues(newRecentIssues);
   };
 
   const onDragEnd = (result) => {
@@ -314,7 +318,7 @@ export const Report = () => {
         </button>
       </section>
       <section className="recent-container">
-        <QuickAdd></QuickAdd>
+        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
       </section>
     </>
   );
