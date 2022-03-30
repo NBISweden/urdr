@@ -7,7 +7,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.12
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/fiber-swagger v1.2.0
-	github.com/swaggo/swag v1.8.0
+	github.com/swaggo/swag v1.8.1
 )
 
 require (
