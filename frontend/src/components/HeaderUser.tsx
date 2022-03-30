@@ -1,6 +1,6 @@
 import "../index.css";
 import React, { useState } from "react";
-import { SNOWPACK_PUBLIC_API_URL } from "../model";
+import { SNOWPACK_PUBLIC_API_URL } from "../utils";
 
 const logout = async () => {
   await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
