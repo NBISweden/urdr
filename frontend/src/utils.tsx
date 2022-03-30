@@ -9,7 +9,6 @@ headers.set("Content-Type", "application/json");
 export const getApiEndpoint = async (endpoint) => {
   let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
-    credentials: "include",
     headers: headers,
   })
     .then((res) => {
