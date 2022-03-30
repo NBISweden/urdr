@@ -42,12 +42,11 @@ export const HeaderUser = ({ username }: { username: string }) => {
     <div className="d-flex justify-content-end header-user">
       <div className="p-2">
         <a
-          className="btn basic-button dropdown-toggle"
-          id="dropdown-button"
+          className="btn basic-button dropdown-button dropdown-toggle"
           onClick={showSettingsClickHandle}
           data-toggle="dropdown"
           aria-haspopup="true"
-          aria-expanded="false"
+          aria-expanded={showUserSettings}
         >
           {username}
         </a>
