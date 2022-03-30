@@ -1,30 +1,20 @@
 import React, { useState } from "react";
-import { IdName, SNOWPACK_PUBLIC_API_URL } from "../model";
+import { IdName, Issue } from "../model";
+import { getApiEndpoint } from "../utils";
+
 import plus from "../icons/plus.svg";
+import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = () => {
+  const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
-  let headers = new Headers();
-  headers.set("Accept", "application/json");
-  headers.set("Content-Type", "application/json");
+  const [issue, setIssue] = useState<Issue>();
+  const [classes, setClasses] = useState<string>("col-2 quick-add-input");
 
   const getActivities = async () => {
-    let result: { time_entry_activities: IdName[] } = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/activities`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Could not find activities.");
-        }
-      })
-      .catch((error) => console.log(error));
+    let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
+      "/api/activities"
+    );
     if (result) setActivities(result.time_entry_activities);
     console.log(result);
   };
@@ -33,26 +23,46 @@ export const QuickAdd = () => {
     getActivities();
   }, []);
 
+  const searchIssue = async (event) => {
+    console.log("Searching issue...");
+    const issue_str = event.target.value;
+    let classes = "col-2 quick-add-input ";
+
+    const endpoint = `/api/issues?issue_id=${issue_str}`;
+    let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
+    if (result) {
+      if (result.issues.length > 0) {
+        setIssue(result.issues[0]);
+        classes += " valid";
+      } else {
+        classes += " invalid";
+        setIssue(undefined);
+      }
+    }
+    setClasses(classes);
+  };
+
   return (
     <div className="row">
       <h2>Quick add:</h2>
-      <label htmlFor="input-issue" className="accessibility-label">
-        Issue
-      </label>
+
       <input
+        aria-label="Issue"
         id="input-issue"
-        className="col-2 quick-add-input"
+        className={classes}
         type="number"
         min={0}
-        onChange={(event: any) => {
-          console.log(event);
-        }}
+        onKeyUp={searchIssue}
         placeholder="Type issue number..."
+        title={(issue && issue.description) || ""}
       />
-      <label htmlFor="select-activity" className="accessibility-label">
-        Activity
-      </label>
-      <select className="col-3" name="activity" id="select-activity">
+
+      <select
+        aria-label="Activity"
+        className="col-3"
+        name="activity"
+        id="select-activity"
+      >
         {activities &&
           activities.map((activity) => {
             return (
@@ -62,7 +72,10 @@ export const QuickAdd = () => {
             );
           })}
       </select>
-      <button className=" basic-button plus-button">
+      <button
+        className=" basic-button plus-button"
+        disabled={issue === undefined}
+      >
         <img src={plus} />
       </button>
     </div>

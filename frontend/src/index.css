@@ -43,6 +43,13 @@ input[type="number"] {
   margin: 0;
 }
 
+.header-user {
+  width: 100vw;
+  height: 3rem;
+  margin-bottom: 3rem;
+  background-color: #f4f4f4;
+}
+
 /* LOGIN */
 
 .login-wrapper {
@@ -102,6 +109,10 @@ input[type="number"] {
   margin-left: 1rem;
 }
 
+.dropdown-button {
+  margin-right: 1rem;
+}
+
 .save-button {
   margin: 2rem;
   padding: 1rem 1.5rem;
@@ -121,10 +132,6 @@ input[type="number"] {
 .save-button-container {
   display: flex;
   justify-content: end;
-}
-
-.accessibility-label {
-  display: none;
 }
 
 .plus-button {
@@ -147,4 +154,13 @@ input[type="number"] {
 .quick-add-input {
   padding: 0.5rem 0.75rem;
   margin: 0 1rem 0 3.75rem;
+  outline: none;
+}
+
+.invalid {
+  border: 2px solid red;
+}
+
+.valid {
+  border: 2px solid green;
 }

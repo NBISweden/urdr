@@ -3,14 +3,14 @@ import { useLocation } from "react-router-dom";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
-import {
-  User,
-  IssueActivityPair,
-  TimeEntry,
-  SNOWPACK_PUBLIC_API_URL,
-} from "../model";
+import { useNavigate } from "react-router-dom";
+import { HeaderUser } from "../components/HeaderUser";
+import { User, IssueActivityPair, TimeEntry } from "../model";
+import { SNOWPACK_PUBLIC_API_URL, getApiEndpoint, headers } from "../utils";
 
 export const Report = () => {
+  const navigate = useNavigate();
+
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -20,10 +20,6 @@ export const Report = () => {
   const [toggleSave, setToggleSave] = useState(false);
   let location = useLocation();
   const user: User = location.state as User;
-
-  let headers = new Headers();
-  headers.set("Accept", "application/json");
-  headers.set("Content-Type", "application/json");
 
   const today = new Date();
   const addDays = (date: Date, days: number) => {
@@ -58,42 +54,16 @@ export const Report = () => {
   const thisWeek = getFullWeek(today);
 
   const getRecentIssues = async () => {
-    const issues: IssueActivityPair[] = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/recent_issues`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Could not find recent issues.");
-        }
-      })
-      .catch((error) => console.log(error));
+    const issues: IssueActivityPair[] = await getApiEndpoint(
+      "/api/recent_issues"
+    );
     setRecentIssues(issues);
   };
 
   const getRowTopics = async () => {
-    const favorites: IssueActivityPair[] = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    )
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        } else {
-          throw new Error("Could not find favorites.");
-        }
-      })
-      .catch((error) => console.log(error));
+    const favorites: IssueActivityPair[] = await getApiEndpoint(
+      "/api/priority_entries"
+    );
 
     const issues = [...recentIssues];
 
@@ -149,6 +119,9 @@ export const Report = () => {
       .then((res) => {
         if (res.ok) {
           return true;
+        } else if (res.status === 401) {
+          // Redirect to login page
+          navigate("/");
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -202,6 +175,9 @@ export const Report = () => {
         if (response.ok) {
           console.log("Time reported");
           alert("Changes saved!");
+        } else if (response.status === 401) {
+          // Redirect to login page
+          navigate("/");
         } else {
           throw new Error("Time report failed.");
         }
@@ -222,6 +198,7 @@ export const Report = () => {
 
   return (
     <>
+      <HeaderUser username={user ? user.login : ""} />
       {favorites.length > 0 ? (
         <section className="recent-container">
           <HeaderRow days={thisWeek} title="Favorites" />
