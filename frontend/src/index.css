@@ -134,10 +134,6 @@ input[type="number"] {
   justify-content: end;
 }
 
-.accessibility-label {
-  display: none;
-}
-
 .plus-button {
   width: 5%;
 }
@@ -158,4 +154,13 @@ input[type="number"] {
 .quick-add-input {
   padding: 0.5rem 0.75rem;
   margin: 0 1rem 0 3.75rem;
+  outline: none;
+}
+
+.invalid {
+  border: 2px solid red;
+}
+
+.valid {
+  border: 2px solid green;
 }
