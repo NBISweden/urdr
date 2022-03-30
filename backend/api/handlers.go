@@ -45,6 +45,9 @@ func fetchIssueSubjects(c *fiber.Ctx, entries []Entry) (bool, error) {
 	var issueIds []string
 
 	for _, entry := range entries {
+		if entry.Issue.Subject != "" {
+			continue
+		}
 		issueId := entry.Issue.Id
 		if !seenIssueIds[issueId] {
 			seenIssueIds[issueId] = true
@@ -80,6 +83,9 @@ func fetchIssueSubjects(c *fiber.Ctx, entries []Entry) (bool, error) {
 	// subject to each issue from the issuesResponse structure.
 
 	for i := range entries {
+		if entries[i].Issue.Subject != "" {
+			continue
+		}
 		for _, issue := range issuesResponse.Issues {
 			if issue.Id == entries[i].Issue.Id {
 				entries[i].Issue.Subject = issue.Subject
