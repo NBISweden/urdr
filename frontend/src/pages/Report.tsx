@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -182,6 +183,8 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+  const onDragEnd = () => {
+    //TODO: Save new list of favorites
   };
 
   return (
@@ -192,32 +195,55 @@ export const Report = () => {
         onWeekTravel={handleWeekTravel}
       />
       {favorites.length > 0 ? (
-        <section className="recent-container">
-          <HeaderRow days={currentWeekArray} title="Favorites" />
-          {favorites &&
-            favorites.map((fav) => {
-              const rowUpdates = newTimeEntries?.filter(
-                (entry) =>
-                  entry.issue_id === fav.issue.id &&
-                  entry.activity_id === fav.activity.id
-              );
-              return (
-                <>
-                  <Row
-                    key={`${fav.issue.id}${fav.activity.id}`}
-                    topic={fav}
-                    onCellUpdate={handleCellUpdate}
-                    onToggleFav={handleToggleFav}
-                    days={currentWeekArray}
-                    rowUpdates={rowUpdates}
-                    onReset={handleReset}
-                    saved={toggleSave}
-                    isFav={true}
-                  />
-                </>
-              );
-            })}
-        </section>
+        <DragDropContext>
+          <section className="recent-container">
+            <HeaderRow days={currentWeekArray} title="Favorites" />
+            <Droppable droppableId="favorites">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {favorites &&
+                    favorites.map((fav, index) => {
+                      const rowUpdates = newTimeEntries?.filter(
+                        (entry) =>
+                          entry.issue_id === fav.issue.id &&
+                          entry.activity_id === fav.activity.id
+                      );
+                      return (
+                        <>
+                          <Draggable
+                            onDragEnd={onDragEnd}
+                            draggableId={`${fav.issue.id}${fav.activity.id}`}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Row
+                                  key={`${fav.issue.id}${fav.activity.id}`}
+                                  topic={fav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  days={thisWeek}
+                                  rowUpdates={rowUpdates}
+                                  onReset={handleReset}
+                                  saved={toggleSave}
+                                  isFav={true}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        </>
+                      );
+                    })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </section>
+        </DragDropContext>
       ) : (
         <div></div>
       )}
