@@ -52,7 +52,7 @@ export const Row = ({
 
   React.useEffect(() => {
     getTimeEntries(params);
-  }, [saved]);
+  }, [saved, days]);
 
   const findCurrentHours = (day: Date) => {
     let hours = 0;
