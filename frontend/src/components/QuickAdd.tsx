@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { IdName, Issue, IssueActivityPair } from "../model";
-import { getApiEndpoint } from "../utils";
-
+import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +9,11 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>();
   const [activity, setActivity] = useState<IdName>();
+  const [search, setSearch] = useState("");
+  // Debounce search term so that it only gives us latest value ...
+  // ... if searchTerm has not been updated within last 500ms.
+  // The goal is to only have the API call fire when user stops typing ...
+  const debouncedSearch = useDebounce(search, 600);
 
   const [classes, setClasses] = useState<string>("col-2 quick-add-input");
 
@@ -21,19 +25,17 @@ export const QuickAdd = ({ addIssueActivity }) => {
       setActivities(result.time_entry_activities);
       setActivity(result.time_entry_activities[0]);
     }
-    console.log(result);
   };
 
   React.useEffect(() => {
     getActivities();
   }, []);
 
-  const searchIssue = async (event) => {
+  const searchIssue = async () => {
     console.log("Searching issue...");
-    const issue_str = event.target.value;
     let classes = "col-2 quick-add-input ";
 
-    const endpoint = `/api/issues?issue_id=${issue_str}`;
+    const endpoint = `/api/issues?issue_id=${search}`;
     let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
     if (result) {
       if (result.issues.length > 0) {
@@ -51,6 +53,16 @@ export const QuickAdd = ({ addIssueActivity }) => {
     setClasses(classes);
   };
 
+  // Effect for API call
+  React.useEffect(
+    () => {
+      if (debouncedSearch) {
+        searchIssue();
+      } else setClasses("col-2 quick-add-input");
+    },
+    [debouncedSearch] // Only call effect if debounced search term changes
+  );
+
   const handleAdd = (e) => {
     const pair: IssueActivityPair = {
       issue: issue,
@@ -62,7 +74,6 @@ export const QuickAdd = ({ addIssueActivity }) => {
   };
 
   const handleSetActivity = (e) => {
-    console.log("settingActivity");
     const id = e.target.value;
     const activity = activities.find((e) => {
       return e.id == id;
@@ -80,7 +91,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         className={classes}
         type="number"
         min={0}
-        onKeyUp={searchIssue}
+        onChange={(e) => setSearch(e.target.value)}
         placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
       />
