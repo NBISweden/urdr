@@ -163,6 +163,10 @@ export const Report = () => {
         } else if (response.status === 401) {
           // Redirect to login page
           navigate("/");
+        } else if (response.status === 422) {
+          throw new Error(
+            `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
+          );
         } else {
           throw new Error("Time report failed.");
         }
