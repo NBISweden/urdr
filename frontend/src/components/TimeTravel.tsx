@@ -1,16 +1,13 @@
 import "../index.css";
 import React, { useState } from "react";
 import { weekNumber } from "weeknumber";
-import { getFullWeek } from "../utils";
 
 export const TimeTravel = ({
   weekTravelDay,
-  setWeekTravelDay,
-  setCurrentWeekArray,
+  onWeekTravel,
 }: {
   weekTravelDay: Date;
-  setWeekTravelDay: (date: Date) => void;
-  setCurrentWeekArray: (dates: Date[]) => void;
+  onWeekTravel: (newDay: Date) => void;
 }) => {
   const [currentWeek, setCurrentWeek] = useState<number>(
     weekNumber(weekTravelDay)
@@ -20,16 +17,14 @@ export const TimeTravel = ({
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() - 7)
     );
-    setWeekTravelDay(nextDate);
-    setCurrentWeekArray(getFullWeek(nextDate));
+    onWeekTravel(nextDate);
     setCurrentWeek(weekNumber(nextDate));
   };
   const nextWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() + 7)
     );
-    setWeekTravelDay(nextDate);
-    setCurrentWeekArray(getFullWeek(nextDate));
+    onWeekTravel(nextDate);
     setCurrentWeek(weekNumber(nextDate));
   };
 
@@ -39,7 +34,6 @@ export const TimeTravel = ({
         onClick={previousWeeksClickHandle}
         className="header-time-travel week-button"
       >
-        {" "}
         ◀ Previous week
       </a>
       <label className="header-time-travel"> Week {`${currentWeek}`}</label>

@@ -179,13 +179,17 @@ export const Report = () => {
     setNewTimeEntries([]);
   };
 
+  const handleWeekTravel = (newDay: Date) => {
+    setWeekTravelDay(newDay);
+    setCurrentWeekArray(getFullWeek(newDay));
+  };
+
   return (
     <>
       <HeaderUser username={user ? user.login : ""} />
       <TimeTravel
         weekTravelDay={weekTravelDay}
-        setWeekTravelDay={setWeekTravelDay}
-        setCurrentWeekArray={setCurrentWeekArray}
+        onWeekTravel={handleWeekTravel}
       />
       {favorites.length > 0 ? (
         <section className="recent-container">
