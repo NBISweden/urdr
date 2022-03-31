@@ -6,7 +6,13 @@ import { QuickAdd } from "../components/QuickAdd";
 import { useNavigate } from "react-router-dom";
 import { HeaderUser } from "../components/HeaderUser";
 import { User, IssueActivityPair, TimeEntry } from "../model";
-import { SNOWPACK_PUBLIC_API_URL, getApiEndpoint, headers } from "../utils";
+import {
+  SNOWPACK_PUBLIC_API_URL,
+  getApiEndpoint,
+  headers,
+  getFullWeek,
+} from "../utils";
+import { TimeTravel } from "../components/TimeTravel";
 
 export const Report = () => {
   const navigate = useNavigate();
@@ -18,44 +24,17 @@ export const Report = () => {
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
+  const today = new Date();
+  const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
+  const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   let location = useLocation();
   const user: User = location.state as User;
 
-  const today = new Date();
-  const addDays = (date: Date, days: number) => {
-    let result = new Date(date);
-    result.setDate(result.getDate() + days);
-    return result;
-  };
-  const getFullWeek = (today: Date): Date[] => {
-    let fullWeek = [];
-    const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6
-    let days = [];
-    if (todayDay === 0) {
-      days = [-6, -5, -4, -3, -2];
-    } else if (todayDay === 1) {
-      days = [0, 1, 2, 3, 4];
-    } else if (todayDay === 2) {
-      days = [-1, 0, 1, 2, 3];
-    } else if (todayDay === 3) {
-      days = [-2, -1, 0, 1, 2];
-    } else if (todayDay === 4) {
-      days = [-3, -2, -1, 0, 1];
-    } else if (todayDay === 5) {
-      days = [-4, -3, -2, -1, 0];
-    } else if (todayDay === 6) {
-      days = [-5, -4, -3, -2, -1];
-    }
-    days.forEach((day) => {
-      fullWeek.push(addDays(today, day));
-    });
-    return fullWeek;
-  };
-  const thisWeek = getFullWeek(today);
-
-  const getRecentIssues = async () => {
+  const getRecentIssuesWithinRange = async () => {
+    // Use Friday as limit for the query
+    const toDate: String = currentWeekArray[4].toISOString().split("T")[0];
     const issues: IssueActivityPair[] = await getApiEndpoint(
-      "/api/recent_issues"
+      `/api/recent_issues?to=${toDate}`
     );
     setRecentIssues(issues);
   };
@@ -87,9 +66,10 @@ export const Report = () => {
   };
 
   React.useEffect(() => {
-    getRecentIssues();
-  }, []);
+    getRecentIssuesWithinRange();
+  }, [weekTravelDay]);
   React.useEffect(() => {
+    console.log("recent issues", recentIssues);
     getRowTopics();
   }, [recentIssues]);
 
@@ -110,12 +90,15 @@ export const Report = () => {
   };
 
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
-    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`, {
-      method: "POST",
-      credentials: "include",
-      headers: headers,
-      body: JSON.stringify(newFavs),
-    })
+    const saved = await fetch(
+      `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: headers,
+        body: JSON.stringify(newFavs),
+      }
+    )
       .then((res) => {
         if (res.ok) {
           return true;
@@ -196,12 +179,21 @@ export const Report = () => {
     setNewTimeEntries([]);
   };
 
+  const handleWeekTravel = (newDay: Date) => {
+    setWeekTravelDay(newDay);
+    setCurrentWeekArray(getFullWeek(newDay));
+  };
+
   return (
     <>
       <HeaderUser username={user ? user.login : ""} />
+      <TimeTravel
+        weekTravelDay={weekTravelDay}
+        onWeekTravel={handleWeekTravel}
+      />
       {favorites.length > 0 ? (
         <section className="recent-container">
-          <HeaderRow days={thisWeek} title="Favorites" />
+          <HeaderRow days={currentWeekArray} title="Favorites" />
           {favorites &&
             favorites.map((fav) => {
               const rowUpdates = newTimeEntries?.filter(
@@ -216,7 +208,7 @@ export const Report = () => {
                     topic={fav}
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
-                    days={thisWeek}
+                    days={currentWeekArray}
                     rowUpdates={rowUpdates}
                     onReset={handleReset}
                     saved={toggleSave}
@@ -231,7 +223,7 @@ export const Report = () => {
       )}
       <section className="recent-container">
         <HeaderRow
-          days={favorites.length > 0 ? [] : thisWeek}
+          days={favorites.length > 0 ? [] : currentWeekArray}
           title="Recent issues"
         />
         {filteredRecents &&
@@ -248,7 +240,7 @@ export const Report = () => {
                   topic={recentIssue}
                   onCellUpdate={handleCellUpdate}
                   onToggleFav={handleToggleFav}
-                  days={thisWeek}
+                  days={currentWeekArray}
                   rowUpdates={rowUpdates}
                   onReset={handleReset}
                   saved={toggleSave}

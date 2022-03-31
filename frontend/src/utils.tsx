@@ -26,3 +26,33 @@ export const getApiEndpoint = async (endpoint) => {
     .catch((error) => console.log(error));
   return result;
 };
+
+const addDays = (date: Date, days: number) => {
+  let result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+export const getFullWeek = (today: Date): Date[] => {
+  let fullWeek = [];
+  const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6
+  let days = [];
+  if (todayDay === 0) {
+    days = [-6, -5, -4, -3, -2];
+  } else if (todayDay === 1) {
+    days = [0, 1, 2, 3, 4];
+  } else if (todayDay === 2) {
+    days = [-1, 0, 1, 2, 3];
+  } else if (todayDay === 3) {
+    days = [-2, -1, 0, 1, 2];
+  } else if (todayDay === 4) {
+    days = [-3, -2, -1, 0, 1];
+  } else if (todayDay === 5) {
+    days = [-4, -3, -2, -1, 0];
+  } else if (todayDay === 6) {
+    days = [-5, -4, -3, -2, -1];
+  }
+  days.forEach((day) => {
+    fullWeek.push(addDays(today, day));
+  });
+  return fullWeek;
+};

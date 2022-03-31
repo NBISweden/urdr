@@ -229,7 +229,8 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 	// sorting parameter to the request to make sure that we get the
 	// mest recent entries with regards to the "spent_on" value.
 
-	c.Request().URI().SetQueryString("limit=100&sort=spent_on:desc")
+	c.Request().URI().SetQueryString(fmt.Sprintf("limit=100&sort=spent_on:desc&%s",
+		c.Request().URI().QueryString()))
 
 	// The following sets the "X-Redmine-API-Key" header.
 	if err := getTimeEntriesHandler(c); err != nil {
