@@ -195,8 +195,8 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
-  const onDragEnd = () => {
-    //TODO: Save new list of favorites
+  };
+
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
@@ -256,7 +256,7 @@ export const Report = () => {
                                   topic={fav}
                                   onCellUpdate={handleCellUpdate}
                                   onToggleFav={handleToggleFav}
-                                  days={thisWeek}
+                                  days={currentWeekArray}
                                   rowUpdates={rowUpdates}
                                   saved={toggleSave}
                                   isFav={true}
