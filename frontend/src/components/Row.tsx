@@ -5,6 +5,7 @@ import { getApiEndpoint } from "../utils";
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
+import grip from "../icons/grip-vertical.svg";
 
 export const Row = ({
   topic,
@@ -86,7 +87,10 @@ export const Row = ({
   return (
     <>
       <div className="row issue-row">
-        <div className="col-5 ">
+        <div className="col-1 cell-container grip-container">
+          {isFav ? <img src={grip} className="grip" /> : <div></div>}
+        </div>
+        <div className="col-4 ">
           <p className="issue-label">
             {topic.custom_name
               ? `${topic.custom_name}`

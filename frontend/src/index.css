@@ -95,6 +95,11 @@ input[type="number"] {
   padding: 0.5rem;
 }
 
+.cell-container {
+  display: flex;
+  align-items: center;
+}
+
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 1.5rem;
@@ -107,7 +112,7 @@ input[type="number"] {
 .issue-label {
   background-color: white;
   padding: 0.5rem 0.75rem;
-  margin: 0 0 0 3.75rem;
+  margin: 0.5rem 0;
 }
 
 .basic-button {
@@ -161,6 +166,15 @@ input[type="number"] {
 
 .star {
   width: 1.7rem;
+}
+
+.grip-container {
+  justify-content: end;
+  padding: 0;
+}
+
+.grip {
+  height: 2rem;
 }
 
 .quick-add-input {
