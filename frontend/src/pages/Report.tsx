@@ -150,8 +150,8 @@ export const Report = () => {
     }
   };
 
-  const reportTime = (timeEntry: TimeEntry) => {
-    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
+  const reportTime = async (timeEntry: TimeEntry) => {
+    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
       credentials: "include",
@@ -160,7 +160,8 @@ export const Report = () => {
       .then((response) => {
         if (response.ok) {
           console.log("Time reported");
-          alert("Changes saved!");
+          // alert("Changes saved!");
+          return true;
         } else if (response.status === 401) {
           // Redirect to login page
           navigate("/");
@@ -168,18 +169,27 @@ export const Report = () => {
           throw new Error("Time report failed.");
         }
       })
-      .catch((error) => alert(error));
+      .catch((error) => {
+        alert(error);
+        return false;
+      });
+    return saved;
   };
 
   const handleSave = () => {
-    newTimeEntries.forEach((entry) => {
-      reportTime(entry);
+    const unsavedEntries = [];
+    newTimeEntries.forEach(async (entry) => {
+      const saved = await reportTime(entry);
+      if (!saved) {
+        unsavedEntries.push(entry);
+        return;
+      }
+      return;
     });
     setToggleSave(!toggleSave);
-  };
-
-  const handleReset = () => {
-    setNewTimeEntries([]);
+    setTimeout(() => {
+      setNewTimeEntries(unsavedEntries);
+    }, 1000);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -248,7 +258,6 @@ export const Report = () => {
                                   onToggleFav={handleToggleFav}
                                   days={thisWeek}
                                   rowUpdates={rowUpdates}
-                                  onReset={handleReset}
                                   saved={toggleSave}
                                   isFav={true}
                                 />
@@ -288,7 +297,6 @@ export const Report = () => {
                   onToggleFav={handleToggleFav}
                   days={currentWeekArray}
                   rowUpdates={rowUpdates}
-                  onReset={handleReset}
                   saved={toggleSave}
                   isFav={false}
                 />

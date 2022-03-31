@@ -5,14 +5,12 @@ import { getApiEndpoint } from "../utils";
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
-import { useNavigate } from "react-router-dom";
 
 export const Row = ({
   topic,
   days,
   rowUpdates,
   onCellUpdate,
-  onReset,
   onToggleFav,
   saved,
   isFav,
@@ -21,7 +19,6 @@ export const Row = ({
   days: Date[];
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
-  onReset: () => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   saved: boolean;
   isFav: boolean;
@@ -46,7 +43,6 @@ export const Row = ({
       `/api/time_entries?${params}`
     );
     setRowEntries(entries.time_entries);
-    setTimeout(() => onReset(), 100);
   };
 
   React.useEffect(() => {
