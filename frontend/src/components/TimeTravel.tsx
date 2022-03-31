@@ -9,8 +9,8 @@ export const TimeTravel = ({
   setCurrentWeekArray,
 }: {
   weekTravelDay: Date;
-  setWeekTravelDay: any;
-  setCurrentWeekArray: any;
+  setWeekTravelDay: (date: Date) => void;
+  setCurrentWeekArray: (dates: Date[]) => void;
 }) => {
   const [currentWeek, setCurrentWeek] = useState<number>(
     weekNumber(weekTravelDay)
