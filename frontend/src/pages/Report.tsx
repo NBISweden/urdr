@@ -72,6 +72,7 @@ export const Report = () => {
   React.useEffect(() => {
     console.log("recent issues", recentIssues);
     getRowTopics();
+    console.log(recentIssues);
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {

@@ -37,7 +37,11 @@ export const QuickAdd = ({ addIssueActivity }) => {
     let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
     if (result) {
       if (result.issues.length > 0) {
-        setIssue(result.issues[0]);
+        const issue: Issue = {
+          id: result.issues[0].id,
+          subject: result.issues[0].subject,
+        };
+        setIssue(issue);
         classes += " valid";
       } else {
         classes += " invalid";
@@ -48,13 +52,11 @@ export const QuickAdd = ({ addIssueActivity }) => {
   };
 
   const handleAdd = (e) => {
-    console.log("Adding issue activity pair");
     const pair: IssueActivityPair = {
       issue: issue,
       activity: activity,
       custom_name: issue.subject + "-" + activity.name,
     };
-    console.log(pair);
 
     addIssueActivity(pair);
   };
@@ -62,7 +64,9 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const handleSetActivity = (e) => {
     console.log("settingActivity");
     const id = e.target.value;
-    const activity = activities.find((e) => e.id === id);
+    const activity = activities.find((e) => {
+      return e.id == id;
+    });
     setActivity(activity);
   };
 
@@ -78,7 +82,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         min={0}
         onKeyUp={searchIssue}
         placeholder="Type issue number..."
-        title={(issue && issue.description) || ""}
+        title={(issue && issue.subject) || ""}
       />
 
       <select
