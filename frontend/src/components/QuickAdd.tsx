@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { IdName, Issue, IssueActivityPair } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
+import x from "../icons/x.svg";
+import check from "../icons/x.svg";
 
 import { useNavigate } from "react-router-dom";
 
@@ -93,6 +95,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
       />
+      <img src={classes.includes("valid") ? check : x} hidden={search == ""} />
       <select
         aria-label="Activity"
         className="col-3"

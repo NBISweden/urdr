@@ -184,9 +184,9 @@ input[type="number"] {
 }
 
 .invalid {
-  border: 2px solid red;
+  border: 2px solid hsl(17deg 91% 31%);
 }
 
 .valid {
-  border: 2px solid green;
+  border: 2px solid hsl(84deg 55% 33%);
 }
