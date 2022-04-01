@@ -99,6 +99,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
+        disabled={classes.includes("invalid")}
       >
         {activities &&
           activities.map((activity) => {
