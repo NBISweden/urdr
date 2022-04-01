@@ -95,7 +95,6 @@ export const Report = () => {
       `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
       {
         method: "POST",
-        credentials: "include",
         headers: headers,
         body: JSON.stringify(newFavs),
       }
@@ -154,7 +153,6 @@ export const Report = () => {
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
-      credentials: "include",
       headers: headers,
     })
       .then((response) => {
@@ -165,6 +163,10 @@ export const Report = () => {
         } else if (response.status === 401) {
           // Redirect to login page
           navigate("/");
+        } else if (response.status === 422) {
+          throw new Error(
+            `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
+          );
         } else {
           throw new Error("Time report failed.");
         }
@@ -195,6 +197,18 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+  };
+
+  const addIssueActivityHandler = (pair) => {
+    const recentIssue = recentIssues.find((e) => {
+      return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
+    });
+    if (recentIssue) {
+      alert("This issue/activity pair is already added");
+      return;
+    }
+    const newRecentIssues = [...recentIssues, pair];
+    setRecentIssues(newRecentIssues);
   };
 
   const onDragEnd = (result) => {
@@ -314,7 +328,7 @@ export const Report = () => {
         </button>
       </section>
       <section className="recent-container">
-        <QuickAdd></QuickAdd>
+        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
       </section>
     </>
   );
