@@ -51,6 +51,24 @@ input[type="number"] {
   background-color: #a7c947;
 }
 
+.react-datepicker__week .react-datepicker__day--selected {
+  background-color: #a7c947;
+}
+
+.react-datepicker__week .react-datepicker__day--in-range {
+  background-color: #a7c947;
+
+}
+.react-datepicker__month-container {
+}
+.react-datepicker-popper {
+}
+
+.header-week {
+  width: 100%;
+  text-align: center;
+}
+
 .label-week-day {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
