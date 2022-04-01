@@ -65,9 +65,9 @@ export const TimeTravel = ({
         customInput={<CustomDatePickerInput />}
         startDate={currentWeekArray[0]}
         endDate={currentWeekArray[4]}
-        selected={weekTravelDay}
         selectsRange
         locale={sv}
+        withPortal
       />
       <a
         onClick={nextWeeksClickHandle}
