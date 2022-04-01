@@ -41,11 +41,9 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 	if err != nil {
 		log.Errorf("Failed to get priority entries for user ID %d: %v", userId.(int), err)
 		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	// If there are no priority entries,
-	// return empty array and bail out here.
-	if len(dbPriorityEntries) == 0 {
+	} else if len(dbPriorityEntries) == 0 {
+		// If there are no priority entries,
+		// return empty array and bail out here.
 		return c.JSON([]struct{}{})
 	}
 
