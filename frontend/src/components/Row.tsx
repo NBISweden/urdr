@@ -5,14 +5,13 @@ import { getApiEndpoint } from "../utils";
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
-import { useNavigate } from "react-router-dom";
+import grip from "../icons/grip-vertical.svg";
 
 export const Row = ({
   topic,
   days,
   rowUpdates,
   onCellUpdate,
-  onReset,
   onToggleFav,
   saved,
   isFav,
@@ -21,12 +20,10 @@ export const Row = ({
   days: Date[];
   rowUpdates: TimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
-  onReset: () => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   saved: boolean;
   isFav: boolean;
 }) => {
-  const navigate = useNavigate();
   const [rowEntries, setRowEntries] = useState<FetchedTimeEntry[]>([]);
   const [rowHours, setRowHours] = useState<number[]>([0, 0, 0, 0, 0]);
   const [rowEntryIds, setRowEntryIds] = useState<number[]>([]);
@@ -47,7 +44,6 @@ export const Row = ({
       `/api/time_entries?${params}`
     );
     setRowEntries(entries.time_entries);
-    setTimeout(() => onReset(), 100);
   };
 
   React.useEffect(() => {
@@ -91,7 +87,10 @@ export const Row = ({
   return (
     <>
       <div className="row issue-row">
-        <div className="col-5 ">
+        <div className="col-1 cell-container grip-container">
+          {isFav ? <img src={grip} className="grip" /> : <div></div>}
+        </div>
+        <div className="col-4 ">
           <p className="issue-label">
             {topic.custom_name
               ? `${topic.custom_name}`

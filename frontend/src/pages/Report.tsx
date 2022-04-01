@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -110,7 +111,9 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        console.log(error);
+        alert(error);
+        const favs = [...favorites];
+        setFavorites(favs);
         return false;
       });
     return saved;
@@ -147,8 +150,8 @@ export const Report = () => {
     }
   };
 
-  const reportTime = (timeEntry: TimeEntry) => {
-    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
+  const reportTime = async (timeEntry: TimeEntry) => {
+    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
       credentials: "include",
@@ -157,7 +160,8 @@ export const Report = () => {
       .then((response) => {
         if (response.ok) {
           console.log("Time reported");
-          alert("Changes saved!");
+          // alert("Changes saved!");
+          return true;
         } else if (response.status === 401) {
           // Redirect to login page
           navigate("/");
@@ -165,23 +169,52 @@ export const Report = () => {
           throw new Error("Time report failed.");
         }
       })
-      .catch((error) => alert(error));
+      .catch((error) => {
+        alert(error);
+        return false;
+      });
+    return saved;
   };
 
   const handleSave = () => {
-    newTimeEntries.forEach((entry) => {
-      reportTime(entry);
+    const unsavedEntries = [];
+    newTimeEntries.forEach(async (entry) => {
+      const saved = await reportTime(entry);
+      if (!saved) {
+        unsavedEntries.push(entry);
+        return;
+      }
+      return;
     });
     setToggleSave(!toggleSave);
-  };
-
-  const handleReset = () => {
-    setNewTimeEntries([]);
+    setTimeout(() => {
+      setNewTimeEntries(unsavedEntries);
+    }, 1000);
   };
 
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const startIndex = result.source.index;
+    const endIndex = result.destination.index;
+
+    if (startIndex === endIndex) {
+      return;
+    }
+
+    const favs = [...favorites];
+    const [moved] = favs.splice(startIndex, 1);
+    favs.splice(endIndex, 0, moved);
+    setFavorites(favs);
+    saveFavorites(favs);
+    return;
   };
 
   return (
@@ -192,32 +225,54 @@ export const Report = () => {
         onWeekTravel={handleWeekTravel}
       />
       {favorites.length > 0 ? (
-        <section className="recent-container">
-          <HeaderRow days={currentWeekArray} title="Favorites" />
-          {favorites &&
-            favorites.map((fav) => {
-              const rowUpdates = newTimeEntries?.filter(
-                (entry) =>
-                  entry.issue_id === fav.issue.id &&
-                  entry.activity_id === fav.activity.id
-              );
-              return (
-                <>
-                  <Row
-                    key={`${fav.issue.id}${fav.activity.id}`}
-                    topic={fav}
-                    onCellUpdate={handleCellUpdate}
-                    onToggleFav={handleToggleFav}
-                    days={currentWeekArray}
-                    rowUpdates={rowUpdates}
-                    onReset={handleReset}
-                    saved={toggleSave}
-                    isFav={true}
-                  />
-                </>
-              );
-            })}
-        </section>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <section className="recent-container">
+            <HeaderRow days={currentWeekArray} title="Favorites" />
+            <Droppable droppableId="favorites">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {favorites &&
+                    favorites.map((fav, index) => {
+                      const rowUpdates = newTimeEntries?.filter(
+                        (entry) =>
+                          entry.issue_id === fav.issue.id &&
+                          entry.activity_id === fav.activity.id
+                      );
+                      return (
+                        <>
+                          <Draggable
+                            draggableId={`${fav.issue.id}${fav.activity.id}`}
+                            index={index}
+                            key={`${fav.issue.id}${fav.activity.id}-drag`}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Row
+                                  key={`${fav.issue.id}${fav.activity.id}`}
+                                  topic={fav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  days={currentWeekArray}
+                                  rowUpdates={rowUpdates}
+                                  saved={toggleSave}
+                                  isFav={true}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        </>
+                      );
+                    })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </section>
+        </DragDropContext>
       ) : (
         <div></div>
       )}
@@ -242,7 +297,6 @@ export const Report = () => {
                   onToggleFav={handleToggleFav}
                   days={currentWeekArray}
                   rowUpdates={rowUpdates}
-                  onReset={handleReset}
                   saved={toggleSave}
                   isFav={false}
                 />

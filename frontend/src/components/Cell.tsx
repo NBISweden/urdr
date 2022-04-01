@@ -15,7 +15,7 @@ export const Cell = ({
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   return (
-    <div className="col-1">
+    <div className="col-1 cell-container">
       <label
         htmlFor={`${topic.issue.id}${topic.activity.id}${date.toISOString()}`}
         hidden={true}
