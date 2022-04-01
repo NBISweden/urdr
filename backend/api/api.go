@@ -29,7 +29,7 @@ func Setup() *fiber.App {
 	app := fiber.New()
 
 	store = session.New(session.Config{
-		Expiration:     time.Minute * 15,
+		Expiration:     (7 * 24 /* A week in hours */) * time.Hour,
 		KeyLookup:      "cookie:urdr_session",
 		CookieSecure:   true,
 		CookieSameSite: "Strict",
