@@ -199,6 +199,13 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
     
   const addIssueActivityHandler = (pair) => {
+    const recentIssue = recentIssues.find((e) => {
+      return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
+    });
+    if (recentIssue) {
+      alert("This issue/activity pair is already added");
+      return;
+    }
     const newRecentIssues = [...recentIssues, pair];
     setRecentIssues(newRecentIssues);
   };

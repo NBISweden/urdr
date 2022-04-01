@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IdName, Issue, IssueActivityPair } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
+
 import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = ({ addIssueActivity }) => {
@@ -10,9 +11,6 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [issue, setIssue] = useState<Issue>();
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
-  // Debounce search term so that it only gives us latest value ...
-  // ... if searchTerm has not been updated within last 500ms.
-  // The goal is to only have the API call fire when user stops typing ...
   const debouncedSearch = useDebounce(search, 600);
 
   const [classes, setClasses] = useState<string>("col-2 quick-add-input");
@@ -95,7 +93,6 @@ export const QuickAdd = ({ addIssueActivity }) => {
         placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
       />
-
       <select
         aria-label="Activity"
         className="col-3"
