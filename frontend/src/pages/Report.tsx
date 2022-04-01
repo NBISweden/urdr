@@ -197,7 +197,8 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
-    
+  };
+
   const addIssueActivityHandler = (pair) => {
     const recentIssue = recentIssues.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
