@@ -67,6 +67,9 @@ export const TimeTravel = ({
         endDate={currentWeekArray[4]}
         selectsRange
         locale={sv}
+        showYearDropdown
+        monthsShown={2}
+        todayButton="Idag"
         withPortal
       />
       <a
