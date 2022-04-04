@@ -8,7 +8,7 @@ import (
 
 	_ "urdr-api/docs"
 	"urdr-api/internal/config"
-  "urdr-api/internal/database"
+	"urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
