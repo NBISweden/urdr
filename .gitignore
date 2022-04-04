@@ -1,9 +1,9 @@
 *.code-workspace
+*.db
 *.env
 .vscode/
 /backend/tmp/
 /backend/urdr
 /backend/vendor/
 /frontend/node_modules/
-database.db
 ops-redmine/
