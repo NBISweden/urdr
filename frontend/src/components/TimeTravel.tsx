@@ -38,10 +38,10 @@ export const TimeTravel = ({
     setCurrentWeek(weekNumber(nextDate));
   };
 
-  const CustomDatePickerInput = forwardRef(({ value, onClick }, ref) => (
-    <label onClick={onClick} className="header-time-travel" ref={ref}>
+  const CustomDatePickerInput = forwardRef(({ onClick }, ref) => (
+    <button onClick={onClick} className="header-time-travel" ref={ref}>
       Week {`${currentWeek}`}
-    </label>
+    </button>
   ));
 
   const isWeekday = (dt: Date) => {
