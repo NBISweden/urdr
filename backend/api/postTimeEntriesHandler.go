@@ -3,10 +3,12 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
+	log "github.com/sirupsen/logrus"
 )
 
 // postTimeEntriesHandler godoc
@@ -20,6 +22,18 @@ import (
 func postTimeEntriesHandler(c *fiber.Ctx) error {
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
+	}
+
+	if session, err := store.Get(c); err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	} else {
+		// Extend the session's expiry time to a week.
+		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
+
+		if err := session.Save(); err != nil {
+			log.Errorf("session.Save() failed: %v\n", err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
 	}
 
 	// Try pulling out the "id" and "hours" from the request, then

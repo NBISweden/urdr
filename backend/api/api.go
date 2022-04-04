@@ -8,10 +8,11 @@ import (
 
 	_ "urdr-api/docs"
 	"urdr-api/internal/config"
-	"urdr-api/internal/database"
+  "urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/sqlite3"
 )
 
 var store *session.Store
@@ -32,11 +33,18 @@ func Setup() *fiber.App {
 	// Fiber instance
 	app := fiber.New()
 
+	storage := sqlite3.New(sqlite3.Config{
+		Database:   config.Config.App.SessionDBPath,
+		Table:      "session",
+		GCInterval: 1 * time.Hour,
+	})
+
 	store = session.New(session.Config{
-		Expiration:     time.Minute * 15,
+		Expiration:     (7 * 24 /* A week in hours */) * time.Hour,
 		KeyLookup:      "cookie:urdr_session",
 		CookieSecure:   true,
 		CookieSameSite: "Strict",
+		Storage:        storage,
 	})
 
 	var err error
