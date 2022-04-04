@@ -1,12 +1,14 @@
 FROM golang:1.17.8-alpine3.15 as builder
 
+WORKDIR /app
+
 ENV GOPATH=$PWD
 ENV CGO_ENABLED=0 GOOS=linux
 
 COPY ./ .
 
-RUN go build -o ./urdr ./cmd
-RUN echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
+RUN go build -o ./urdr ./cmd && \
+    echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
 
 FROM scratch
 
