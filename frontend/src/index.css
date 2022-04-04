@@ -48,20 +48,23 @@ input[type="number"] {
 }
 
 .header-time-travel {
-  background-color: #a7c947;
+  background-color: hsl(76deg 55% 53%);
 }
 
 .react-datepicker__week .react-datepicker__day--selected {
-  background-color: #a7c947;
+  background-color: hsl(76deg 55% 53%);
 }
 
 .react-datepicker__week .react-datepicker__day--in-range {
-  background-color: #a7c947;
+  background-color: hsl(76deg 55% 53%);
+}
+.react-datepicker__week .react-datepicker__day:hover {
+  background-color: hsl(76deg 55% 70%);
+}
 
-}
-.react-datepicker__month-container {
-}
-.react-datepicker-popper {
+.react-datepicker__day.react-datepicker__day--keyboard-selected {
+  background-color: hsl(76deg 55% 70%);
+
 }
 
 .header-week {
