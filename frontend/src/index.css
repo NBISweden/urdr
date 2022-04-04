@@ -179,7 +179,7 @@ input[type="number"] {
 
 .quick-add-input {
   padding: 0.5rem 0.75rem;
-  margin: 0 1rem 0 3.75rem;
+  margin: 0 0 0 3.75rem;
   outline: none;
 }
 
@@ -189,4 +189,13 @@ input[type="number"] {
 
 .valid {
   border: 2px solid hsl(84deg 55% 33%);
+}
+
+.validation-icon {
+  width: 3%;
+  padding-left: 0;
+}
+
+.hiden {
+  visibility: hidden;
 }

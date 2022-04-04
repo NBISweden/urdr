@@ -3,7 +3,7 @@ import { IdName, Issue, IssueActivityPair } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
-import check from "../icons/x.svg";
+import check from "../icons/check.svg";
 
 import { useNavigate } from "react-router-dom";
 
@@ -13,9 +13,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [issue, setIssue] = useState<Issue>();
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 600);
-
-  const [classes, setClasses] = useState<string>("col-2 quick-add-input");
+  const debouncedSearch = useDebounce(search, 500);
 
   const getActivities = async () => {
     let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
@@ -33,7 +31,6 @@ export const QuickAdd = ({ addIssueActivity }) => {
 
   const searchIssue = async () => {
     console.log("Searching issue...");
-    let classes = "col-2 quick-add-input ";
 
     const endpoint = `/api/issues?issue_id=${search}`;
     let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
@@ -44,13 +41,8 @@ export const QuickAdd = ({ addIssueActivity }) => {
           subject: result.issues[0].subject,
         };
         setIssue(issue);
-        classes += " valid";
-      } else {
-        classes += " invalid";
-        setIssue(undefined);
       }
     }
-    setClasses(classes);
   };
 
   // Effect for API call
@@ -58,7 +50,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
     () => {
       if (debouncedSearch) {
         searchIssue();
-      } else setClasses("col-2 quick-add-input");
+      }
     },
     [debouncedSearch] // Only call effect if debounced search term changes
   );
@@ -81,28 +73,45 @@ export const QuickAdd = ({ addIssueActivity }) => {
     setActivity(activity);
   };
 
+  const getSearchClasses = () => {
+    let classes = "col-2 quick-add-input ";
+    if (search != "") classes += issue ? "valid" : "invalid";
+    return classes;
+  };
+
+  const getValidationIconSrc = () => {
+    let src = "";
+    if (search != "") src = issue ? check : x;
+    return src;
+  };
+
   return (
     <div className="row">
       <h2>Quick add:</h2>
-
       <input
         aria-label="Issue"
         id="input-issue"
-        className={classes}
+        className={getSearchClasses()}
         type="number"
         min={0}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setIssue(undefined);
+        }}
         placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
       />
-      <img src={classes.includes("valid") ? check : x} hidden={search == ""} />
+      <img
+        className={search == "" ? "validation-icon hiden" : "validation-icon"}
+        src={getValidationIconSrc()}
+      />
       <select
         aria-label="Activity"
         className="col-3"
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
-        disabled={classes.includes("invalid")}
+        disabled={search != "" && issue == undefined}
       >
         {activities &&
           activities.map((activity) => {
