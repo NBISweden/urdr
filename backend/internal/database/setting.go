@@ -18,7 +18,7 @@ type Setting struct {
 // getSetting() is an internal function that returns the setting struct
 // (setting ID, name and value), given the setting's name.  It returns
 // an error for illegal settings.
-func (db *database) getSetting(settingName string) (*Setting, error) {
+func (db *Database) getSetting(settingName string) (*Setting, error) {
 	if err := db.handle().Ping(); err != nil {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
@@ -76,7 +76,7 @@ func (db *database) getSetting(settingName string) (*Setting, error) {
 // user-specific value for a particular setting.  If there is no
 // user-specific value stored for the given user, then the default value
 // is returned, if there is one.
-func (db *database) GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
+func (db *Database) GetUserSetting(redmineUserId int, settingName string) (*Setting, error) {
 	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return nil, fmt.Errorf("getSetting() failed: %w", err)
@@ -125,7 +125,7 @@ func (db *database) GetUserSetting(redmineUserId int, settingName string) (*Sett
 // SetUserSetting() assigns the user-specific value for a particular
 // setting.  If there is already a user-specific value stored for the
 // given setting, the new value replaces the old value.
-func (db *database) SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
+func (db *Database) SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
 	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)
@@ -150,7 +150,7 @@ func (db *database) SetUserSetting(redmineUserId int, settingName string, settin
 
 // DeleteUserSetting() removes the user-specific value for a particular
 // setting.
-func (db *database) DeleteUserSetting(redmineUserId int, settingName string) error {
+func (db *Database) DeleteUserSetting(redmineUserId int, settingName string) error {
 	setting, err := db.getSetting(settingName)
 	if err != nil {
 		return fmt.Errorf("getSetting() failed: %w", err)

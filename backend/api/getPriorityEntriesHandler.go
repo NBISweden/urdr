@@ -2,8 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"urdr-api/internal/config"
-	"urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
@@ -29,12 +27,6 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 	if userId == nil {
 		log.Error("Failed to get valid user ID from session")
 		return c.SendStatus(fiber.StatusUnauthorized)
-	}
-
-	db, err := database.New(config.Config.Database.Path)
-	if err != nil {
-		log.Errorf("Failed to connect to database: %v", err)
-		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	dbPriorityEntries, err := db.GetAllUserPrioityEntries(userId.(int))

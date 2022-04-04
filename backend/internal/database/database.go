@@ -19,16 +19,16 @@ import (
 
 // A database contains a private method, handle(), that returns a handle
 // to the underlying database connection handle.
-type database struct {
+type Database struct {
 	handle func() *sql.DB
 }
 
 // New() connects to the database, returns a database object.
-func New(databasePath string) (*database, error) {
+func New(databasePath string) (*Database, error) {
 	initDB := false
 
 	if _, err := os.Stat(databasePath); err != nil {
-		log.Warningf("Database file not found at %q", databasePath)
+		log.Warningf("Database file not found at %v", databasePath)
 		initDB = true
 	}
 
@@ -82,5 +82,5 @@ func New(databasePath string) (*database, error) {
 		}
 	}
 
-	return &database{handle: func() *sql.DB { return handle }}, nil
+	return &Database{handle: func() *sql.DB { return handle }}, nil
 }

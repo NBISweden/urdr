@@ -1,17 +1,21 @@
 package api
 
 import (
+	"log"
 	"time"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	_ "urdr-api/docs"
+	"urdr-api/internal/config"
+	"urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 var store *session.Store
+var db *database.Database
 
 // @title Urdr API
 // @version 1.0
@@ -34,6 +38,13 @@ func Setup() *fiber.App {
 		CookieSecure:   true,
 		CookieSameSite: "Strict",
 	})
+
+	var err error
+	db, err = database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Fatalf("Failed to connect to backend database: %v", err)
+		return nil
+	}
 
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
