@@ -5,10 +5,10 @@ services:
 
   urdr:
     build:
+      dockerfile: ../production/Dockerfile
       context: ../backend
-      dockerfile: Dockerfile
     volumes:
-      - ./urdr.env:/app/urdr.env
+      - ../backend/:/go
     container_name: urdr
     expose:
       - "8080"
