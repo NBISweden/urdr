@@ -237,6 +237,7 @@ export const Report = () => {
       <TimeTravel
         weekTravelDay={weekTravelDay}
         onWeekTravel={handleWeekTravel}
+        currentWeekArray={currentWeekArray}
       />
       {favorites.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
