@@ -1,0 +1,22 @@
+---
+version: "3"
+
+services:
+
+  urdr:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./urdr.env:/app/urdr.env
+    container_name: urdr
+    expose:
+      - "8080"
+    ports:
+      - 8080:8080
+    restart: always
+    env_file:
+      - ./urdr.env
+
+volumes:
+  exclude: null
