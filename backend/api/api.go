@@ -6,6 +6,7 @@ import (
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	_ "urdr-api/docs"
+	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
@@ -30,7 +31,7 @@ func Setup() *fiber.App {
 	app := fiber.New()
 
 	storage := sqlite3.New(sqlite3.Config{
-		Database:   "session.db",
+		Database:   config.Config.App.SessionDBPath,
 		Table:      "session",
 		GCInterval: 1 * time.Hour,
 	})
