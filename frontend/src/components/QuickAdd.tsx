@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 export const QuickAdd = ({ addIssueActivity }) => {
   const navigate = useNavigate();
   const [activities, setActivities] = useState<IdName[]>([]);
-  const [issue, setIssue] = useState<Issue>();
+  const [issue, setIssue] = useState<Issue>(null);
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
@@ -96,7 +96,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         min={0}
         onChange={(e) => {
           setSearch(e.target.value);
-          setIssue(undefined);
+          setIssue(null);
         }}
         placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
@@ -111,7 +111,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
-        disabled={search != "" && issue == undefined}
+        disabled={search != "" && issue == null}
       >
         {activities &&
           activities.map((activity) => {
@@ -125,7 +125,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
       <button
         className=" basic-button plus-button"
         onClick={handleAdd}
-        disabled={issue === undefined}
+        disabled={issue == null}
       >
         <img src={plus} />
       </button>
