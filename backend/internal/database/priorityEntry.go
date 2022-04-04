@@ -15,7 +15,7 @@ type PriorityEntry struct {
 
 // GetAllUserPrioityEntries() returns a list of priority entries for
 // a particular user.
-func (db *database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry, error) {
+func (db *Database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry, error) {
 	selectStmt := `
 		SELECT
 			redmine_issue_id,
@@ -61,7 +61,7 @@ func (db *database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry
 
 // SetAllUserPriorityEntries() replaces all stored priority entries for the given
 // user by the ones provided in the list to this function.
-func (db *database) SetAllUserPriorityEntries(redmineUserId int, favorites []PriorityEntry) error {
+func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []PriorityEntry) error {
 	tx, err := db.handle().Begin()
 	if err != nil {
 		return fmt.Errorf("sql.Begin() failed: %w", err)
@@ -129,7 +129,7 @@ func (db *database) SetAllUserPriorityEntries(redmineUserId int, favorites []Pri
 
 // DeleteAllUserPriorityEntries() removes all stored priority entries
 // for the given user.
-func (db *database) DeleteAllUserPriorityEntries(redmineUserId int) error {
+func (db *Database) DeleteAllUserPriorityEntries(redmineUserId int) error {
 	deleteStmt := `
 		DELETE FROM priority_entry
 		WHERE	redmine_user_id = ?`

@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"urdr-api/internal/config"
 	"urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
@@ -31,14 +30,6 @@ func postPriorityEntriesHandler(c *fiber.Ctx) error {
 	if userId == nil {
 		log.Error("Failed to get valid user ID from session")
 		return c.SendStatus(fiber.StatusUnauthorized)
-	}
-
-	// Fetch a database connection.
-	// FIXME: Do we want to do this only once for a session somehow?
-	db, err := database.New(config.Config.Database.Path)
-	if err != nil {
-		log.Errorf("Failed to connect to database: %v", err)
-		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	// Parse the entries from the query.
