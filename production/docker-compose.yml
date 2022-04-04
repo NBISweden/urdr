@@ -8,7 +8,7 @@ services:
       dockerfile: ../production/Dockerfile
       context: ../backend
     volumes:
-      - ../backend/:/go
+        - ../backend/sql:/app/
     container_name: urdr
     expose:
       - "8080"
