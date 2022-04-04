@@ -41,6 +41,8 @@ func TestMain(m *testing.M) {
 
 	test_db_path := "./testdata/database.db"
 	_ = os.Remove(test_db_path)
+	test_sessiondb_path := "./testdata/session.db"
+	_ = os.Remove(test_sessiondb_path)
 
 	err = config.Setup()
 	if err != nil {
@@ -48,6 +50,7 @@ func TestMain(m *testing.M) {
 	}
 
 	config.Config.Database.Path = test_db_path
+	config.Config.App.SessionDBPath = test_sessiondb_path
 
 	app = api.Setup()
 
