@@ -74,12 +74,23 @@ input[type="number"] {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background-color: hsl(76deg 55% 53%);
   margin-bottom: 0.4rem;
 }
 
 .down-arrow {
   margin-left: 0.2rem;
+}
+
+.header-year {
+  font-size: 2.25rem;
+  color: hsl(186deg 92% 11%);
+  margin: 0 1rem;
+}
+
+.time-travel {
+  display: flex;
 }
 
 .header-week {
@@ -94,8 +105,13 @@ input[type="number"] {
 
 .week-button {
   background-color: transparent;
-  text-decoration: none;
-  color: black;
+  border: none;
+  padding: 0;
+  margin: 0 0.5rem;
+}
+
+.week-arrow {
+  height: 2rem;
 }
 
 /* LOGIN */

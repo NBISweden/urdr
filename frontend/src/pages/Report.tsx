@@ -234,6 +234,7 @@ export const Report = () => {
   return (
     <>
       <div className="report-header">
+        <p className="header-year">{today.getFullYear()}</p>
         <TimeTravel
           weekTravelDay={weekTravelDay}
           onWeekTravel={handleWeekTravel}
