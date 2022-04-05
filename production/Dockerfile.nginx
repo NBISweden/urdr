@@ -18,4 +18,4 @@ RUN npm run build
 FROM nginx:latest
 
 RUN mkdir -p /app/dist
-COPY --from=bundler --chown=www-data:www-data /home/node/app/build/dist /app/dist/
+COPY --from=bundler --chown=www-data:www-data /home/node/app/build/ /app/dist
