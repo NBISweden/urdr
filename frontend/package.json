@@ -17,8 +17,8 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "date-fns": "^2.28.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-datepicker": "^4.7.0"
