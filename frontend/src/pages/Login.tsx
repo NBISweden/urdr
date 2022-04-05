@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
-import { Header } from "../components/Header";
+import { LoginHeader } from "../components/LoginHeader";
 import "../index.css";
 import { User } from "../model";
 import { SNOWPACK_PUBLIC_API_URL } from "../utils";
@@ -48,7 +48,7 @@ export const Login = () => {
 
   return (
     <div className="login-wrapper">
-      <Header />
+      <LoginHeader />
       <form onSubmit={authenticateRedmine} className="login-form">
         <label htmlFor="username">Username</label>
         <input
