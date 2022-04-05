@@ -1,6 +1,7 @@
 import "../index.css";
 import React, { useState } from "react";
 import { SNOWPACK_PUBLIC_API_URL } from "../utils";
+import down from "../icons/caret-down-fill.svg";
 
 const logout = async () => {
   await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
@@ -39,19 +40,18 @@ export const HeaderUser = ({ username }: { username: string }) => {
   };
 
   return (
-    <div className="d-flex justify-content-end header-user">
-      <div className="p-2">
-        <a
-          className="btn basic-button dropdown-button dropdown-toggle"
-          onClick={showSettingsClickHandle}
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded={showUserSettings}
-        >
-          {username}
-        </a>
-        {showUserSettings ? showSettings() : null}
-      </div>
+    <div className="p-2">
+      <a
+        className="btn dropdown-button"
+        onClick={showSettingsClickHandle}
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded={showUserSettings}
+      >
+        {username}
+        <img src={down} className="down-arrow" />
+      </a>
+      {showUserSettings ? showSettings() : null}
     </div>
   );
 };

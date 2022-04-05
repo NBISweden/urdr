@@ -50,7 +50,7 @@ export const TimeTravel = ({
   };
 
   return (
-    <div className="d-flex justify-content-between header-time-travel">
+    <>
       <a
         onClick={previousWeeksClickHandle}
         className="header-time-travel week-button"
@@ -77,6 +77,6 @@ export const TimeTravel = ({
       >
         Next week ▶
       </a>
-    </div>
+    </>
   );
 };
