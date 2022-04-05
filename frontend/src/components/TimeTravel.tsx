@@ -68,7 +68,6 @@ export const TimeTravel = ({
         selectsRange
         locale={sv}
         showYearDropdown
-        monthsShown={2}
         todayButton="Idag"
         withPortal
       />
