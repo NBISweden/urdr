@@ -1,4 +1,4 @@
-# Deployment and production notes
+# Deployment and staging notes
 
 To obtain a new certificate use certbot:
 
@@ -15,7 +15,7 @@ Add a cronjob for root to automatically renew certs:
 To start the actual service do:
 
 ```shell
-cd production
+cd staging
 docker-compose up -d
 ```
 
