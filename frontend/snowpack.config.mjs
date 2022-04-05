@@ -13,9 +13,6 @@ export default {
     // {"match": "routes", "src": ".*", "dest": "/index.html"},
   ],
   optimize: {
-    bundle: true,
-    minify: true,
-    target: 'es2018',
   },
   packageOptions: {
     /* ... */
