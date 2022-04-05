@@ -70,6 +70,18 @@ input[type="number"] {
 }
 /* stylelint-enable selector-class-pattern */
 
+.report-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  background-color: hsl(76deg 55% 53%);
+  margin-bottom: 0.4rem;
+}
+
+.down-arrow {
+  margin-left: 0.2rem;
+}
+
 .header-week {
   width: 100%;
   text-align: center;
@@ -152,6 +164,10 @@ input[type="number"] {
 
 .dropdown-button {
   margin-right: 1rem;
+  background-color: hsl(186deg 30% 94%);
+  border: none;
+  border-radius: 2rem;
+  color: hsl(185deg 92% 11%);
 }
 
 .save-button {
