@@ -5,7 +5,7 @@ services:
 
   urdr:
     build:
-      dockerfile: ../production/Dockerfile
+      dockerfile: ../staging/Dockerfile
       context: ../backend
     volumes:
         - ../backend/sql:/app/
