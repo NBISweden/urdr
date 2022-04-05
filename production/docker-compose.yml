@@ -18,7 +18,10 @@ services:
     env_file:
       - ./urdr.env
   nginx:
-    image: nginx:latest
+    container_name: urdr-frontend
+    build:
+      dockerfile: ../production/Dockerfile.nginx
+      context: ../frontend
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
