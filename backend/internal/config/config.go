@@ -42,11 +42,11 @@ func Setup() error {
 	// Populate config structs, and use defaults if the needed
 	// variable is not in the environment.
 
-	Config.App.Host = getEnv("BACKEND_HOST", "127.0.0.1")
+	Config.App.Host = getEnv("BACKEND_HOST", "0.0.0.0")
 	Config.App.Port = getEnv("BACKEND_PORT", "8080")
 	Config.App.SessionDBPath = getEnv("SESSION_DB_PATH", "./session.db")
 
-	Config.Redmine.URL = getEnv("REDMINE_URL", "http://redmine:3000")
+	Config.Redmine.URL = getEnv("REDMINE_URL", "http://host.docker.internal:3000")
 
 	Config.Database.Path = getEnv("BACKEND_DB_PATH", "./database.db")
 
