@@ -4,6 +4,8 @@ import { getISOWeek } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
+import left from "../icons/caret-left-fill.svg";
+import right from "../icons/caret-right-fill.svg";
 
 export const TimeTravel = ({
   weekTravelDay,
@@ -50,13 +52,13 @@ export const TimeTravel = ({
   };
 
   return (
-    <>
-      <a
+    <div className="time-travel">
+      <button
         onClick={previousWeeksClickHandle}
         className="header-time-travel week-button"
       >
-        ◀ Previous week
-      </a>
+        <img src={left} alt="left arrow" className="week-arrow" />
+      </button>
       <DatePicker
         wrapperClassName="header-time-travel header-week"
         onChange={(date) => handleDateChange(date)}
@@ -71,12 +73,12 @@ export const TimeTravel = ({
         todayButton="Idag"
         withPortal
       />
-      <a
+      <button
         onClick={nextWeeksClickHandle}
         className="header-time-travel week-button"
       >
-        Next week ▶
-      </a>
-    </>
+        <img src={right} alt="right arrow" className="week-arrow" />
+      </button>
+    </div>
   );
 };
