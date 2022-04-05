@@ -6,8 +6,9 @@ WORKDIR /go
 
 COPY ./ .
 
-RUN apk add gcc=10.3.1_git20211027-r0 \
-    musl-dev=1.2.2-r7
+RUN apk --update add gcc=10.3.1_git20211027-r0 \
+    musl-dev=1.2.2-r7 --no-cache && \
+    rm -rf /var/cache/apk/*
 
 RUN go build -o ./urdr ./cmd && \
     echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
