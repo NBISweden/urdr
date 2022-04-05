@@ -1,6 +1,6 @@
 import "../index.css";
 import React, { useState, forwardRef } from "react";
-import { weekNumber } from "weeknumber";
+import { getISOWeek } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
@@ -15,11 +15,11 @@ export const TimeTravel = ({
   currentWeekArray: Date[];
 }) => {
   const [currentWeek, setCurrentWeek] = useState<number>(
-    weekNumber(weekTravelDay)
+    getISOWeek(weekTravelDay)
   );
 
   const handleDateChange = (dates: Date[]) => {
-    setCurrentWeek(weekNumber(dates[0]));
+    setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
   };
 
@@ -28,14 +28,14 @@ export const TimeTravel = ({
       weekTravelDay.setDate(weekTravelDay.getDate() - 7)
     );
     onWeekTravel(nextDate);
-    setCurrentWeek(weekNumber(nextDate));
+    setCurrentWeek(getISOWeek(nextDate));
   };
   const nextWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() + 7)
     );
     onWeekTravel(nextDate);
-    setCurrentWeek(weekNumber(nextDate));
+    setCurrentWeek(getISOWeek(nextDate));
   };
 
   const CustomDatePickerInput = forwardRef(({ onClick }, ref) => (
