@@ -1,15 +1,14 @@
 import React from "react";
 
-export const HeaderRow = ({ title, days }: { title: string; days: Date[] }) => {
+export const HeaderRow = ({ days }: { days: Date[] }) => {
   const dayStrings = days.map((day) => {
     return day.toISOString().split("T")[0];
   });
   return (
     <div className="row">
-      <h2 className="col-6">{title}</h2>
-      {dayStrings.map((day) => {
+      {dayStrings.map((day, index) => {
         return (
-          <p key={day} className="col-1">
+          <p key={day} className={index === 0 ? "col-1 offset-6" : "col-1"}>
             {day}
           </p>
         );
