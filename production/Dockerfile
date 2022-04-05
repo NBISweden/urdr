@@ -2,9 +2,12 @@ FROM golang:1.17.8-alpine3.15 as builder
 
 ENV GOPATH=$PWD
 
+WORKDIR /go
+
 COPY ./ .
 
-RUN apk add gcc musl-dev
+RUN apk add gcc=10.3.1_git20211027-r0 \
+    musl-dev=1.2.2-r7
 
 RUN go build -o ./urdr ./cmd && \
     echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
