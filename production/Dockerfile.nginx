@@ -8,6 +8,7 @@ RUN npm ci
 
 FROM node:17.6-slim as bundler
 
+ENV SNOWPACK_PUBLIC_API_URL=""
 USER node
 RUN mkdir /home/node/app
 WORKDIR /home/node/app
