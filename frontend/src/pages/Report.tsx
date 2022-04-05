@@ -241,8 +241,8 @@ export const Report = () => {
       />
       {favorites.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
-          <section className="recent-container">
-            <HeaderRow days={currentWeekArray} title="Favorites" />
+          <section className="favorites-container">
+            <HeaderRow days={currentWeekArray} />
             <Droppable droppableId="favorites">
               {(provided) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -292,10 +292,7 @@ export const Report = () => {
         <div></div>
       )}
       <section className="recent-container">
-        <HeaderRow
-          days={favorites.length > 0 ? [] : currentWeekArray}
-          title="Recent issues"
-        />
+        <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
             const rowUpdates = newTimeEntries?.filter(

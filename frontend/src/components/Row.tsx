@@ -86,7 +86,7 @@ export const Row = ({
 
   return (
     <>
-      <div className="row issue-row">
+      <div className="row">
         <div className="col-1 cell-container grip-container">
           {isFav ? <img src={grip} className="grip" /> : <div></div>}
         </div>
