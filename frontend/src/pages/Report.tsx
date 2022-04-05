@@ -16,6 +16,8 @@ import {
   removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
+import { format as formatDate } from "date-fns";
+import { AuthContext } from "../components/AuthProvider";
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
@@ -30,7 +32,7 @@ export const Report = () => {
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
   const location = useLocation();
-  const user: User = location.state as User;
+  const user: User = React.useContext(AuthContext);
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
