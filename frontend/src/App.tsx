@@ -21,17 +21,18 @@ export const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/" element={<Login />} />
-
               <Route path="/login" element={<Login />} />
-              <Route
-                path="/report"
-                element={
-                  <ProtectedRoute>
-                    <Report />
-                  </ProtectedRoute>
-                }
-              />
+              {["/report", "/"].map((path) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    <ProtectedRoute>
+                      <Report />
+                    </ProtectedRoute>
+                  }
+                />
+              ))}
             </Routes>
           </AuthProvider>
         </BrowserRouter>
