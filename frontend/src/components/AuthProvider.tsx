@@ -26,27 +26,40 @@ export const AuthProvider = ({ children }) => {
     })
       .then((response) => {
         if (response.ok) {
-          console.log(response);
           return response.json();
         } else {
           console.log("Error: login failed");
         }
       })
       .catch((error) => console.log("An error occured.", error));
-    console.log(user);
 
     return user;
   };
 
   const handleLogin = async (username, password) => {
-    console.log(username, password);
     const user = await authenticateRedmine(username, password);
 
     setUser(user);
     return user;
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
+      method: "POST",
+    })
+      .then((res) => {
+        if (res.ok) {
+          return true;
+        } else {
+          throw new Error("Could not log out.");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        return false;
+      });
+    // Redirect to login page
+    window.location.href = "/";
     setUser(null);
   };
 

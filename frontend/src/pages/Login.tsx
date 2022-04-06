@@ -18,7 +18,7 @@ export const Login = () => {
 
     const user = await onLogin(username, password);
 
-    if (!user.login) {
+    if (!user) {
       setUsername("");
       setPassword("");
       console.log("Something went wrong!");
