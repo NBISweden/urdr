@@ -47,10 +47,6 @@ input[type="number"] {
   width: 100vw;
 }
 
-.header-time-travel {
-  background-color: hsl(76deg 55% 53%);
-}
-
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
 .react-datepicker__week .react-datepicker__day--selected {
@@ -79,10 +75,6 @@ input[type="number"] {
   margin-bottom: 0.4rem;
 }
 
-.down-arrow {
-  margin-left: 0.2rem;
-}
-
 .header-year {
   font-size: 2.25rem;
   color: hsl(186deg 92% 11%);
@@ -93,17 +85,32 @@ input[type="number"] {
   display: flex;
 }
 
-.header-week {
-  width: 100%;
-  text-align: center;
-}
-
 .label-week-day {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
 .week-button {
+  background-color: hsl(186deg 30% 94%);
+  color: hsl(185deg 92% 11%);
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 1rem;
+  margin: 1.3rem 0;
+}
+
+.week-button svg {
+  margin-right: 0.5rem;
+}
+
+.week-button:hover {
+  color: hsl(185deg 92% 20%);
+}
+
+.week-arrow-button {
   background-color: transparent;
   border: none;
   padding: 0;
@@ -186,6 +193,14 @@ input[type="number"] {
   border: none;
   border-radius: 2rem;
   color: hsl(185deg 92% 11%);
+}
+
+.dropdown-button svg {
+  margin-left: 0.2rem;
+}
+
+.dropdown-button:hover {
+  color: hsl(185deg 92% 20%);
 }
 
 .save-button {
