@@ -6,16 +6,15 @@ import { Buffer } from "buffer";
 export const AuthContext = React.createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState(null);
+  const [user, setUser] = React.useState();
 
   React.useEffect(() => {
     const user = JSON.parse(window.localStorage.getItem("user"));
-    console.log(user);
-    if (user) setUser(user);
+    setUser(user);
   }, []);
 
   React.useEffect(() => {
-    if (user) window.localStorage.setItem("user", JSON.stringify(user));
+    window.localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
   const handleLogin = async (username, password) => {
@@ -46,9 +45,10 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
     return user;
   };
+  // This will only listen to changes on value
 
   const handleLogout = async () => {
-    fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
+    const logout = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
       method: "POST",
     })
       .then((res) => {
@@ -63,8 +63,10 @@ export const AuthProvider = ({ children }) => {
         return false;
       });
     // Redirect to login page
-    window.location.href = "/login";
     setUser(null);
+    return () => {
+      navigate("/login");
+    };
   };
 
   const value = {

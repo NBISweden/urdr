@@ -7,8 +7,8 @@ import { AuthProvider, AuthContext } from "./components/AuthProvider";
 const ProtectedRoute = ({ children }) => {
   const { user } = React.useContext(AuthContext);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  if (user === null) {
+    return <Navigate to="/login" />;
   }
 
   return children;
@@ -17,9 +17,9 @@ const ProtectedRoute = ({ children }) => {
 export const App = () => {
   return (
     <>
-      <AuthProvider>
-        <React.StrictMode>
-          <BrowserRouter>
+      <React.StrictMode>
+        <BrowserRouter>
+          <AuthProvider>
             <Routes>
               <Route path="/" element={<Login />} />
 
@@ -33,9 +33,9 @@ export const App = () => {
                 }
               />
             </Routes>
-          </BrowserRouter>
-        </React.StrictMode>
-      </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </React.StrictMode>
     </>
   );
 };

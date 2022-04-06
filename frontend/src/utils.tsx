@@ -2,6 +2,7 @@ import.meta.hot;
 import React, { useState } from "react";
 import { IssueActivityPair } from "./model";
 import { AuthContext } from "./components/AuthProvider";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
@@ -18,8 +19,10 @@ export const getApiEndpoint = async (endpoint) => {
       if (res.ok) {
         return res.json();
       } else if (res.status === 401) {
-        // Redirect to login page
-        window.location.href = "/login";
+        return () => {
+          const navigate = useNavigate();
+          navigate("/login");
+        };
       } else {
         throw new Error(
           "There was an error accessing the endpoint " + endpoint
@@ -27,6 +30,7 @@ export const getApiEndpoint = async (endpoint) => {
       }
     })
     .catch((error) => console.log(error));
+
   return result;
 };
 

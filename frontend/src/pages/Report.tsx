@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
-import { useNavigate } from "react-router-dom";
 import { HeaderUser } from "../components/HeaderUser";
 import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
@@ -143,8 +142,10 @@ export const Report = () => {
         if (res.ok) {
           return true;
         } else if (res.status === 401) {
-          // Redirect to login page
-          navigate("/login");
+          return () => {
+            const navigate = useNavigate();
+            navigate("/login");
+          };
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -199,8 +200,10 @@ export const Report = () => {
           console.log("Time reported");
           return true;
         } else if (response.status === 401) {
-          // Redirect to login page
-          navigate("/login");
+          return () => {
+            const navigate = useNavigate();
+            navigate("/login");
+          };
         } else if (response.status === 422) {
           throw new Error(
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
