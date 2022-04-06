@@ -179,6 +179,12 @@ export const Report = () => {
   };
 
   const handleSave = () => {
+    if (newTimeEntries.length === 0) {
+      alert(
+        "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
+      );
+      return;
+    }
     const unsavedEntries = [];
     newTimeEntries.forEach(async (entry) => {
       const saved = await reportTime(entry);
@@ -320,11 +326,7 @@ export const Report = () => {
           })}
       </section>
       <section className="save-button-container">
-        <button
-          className="basic-button save-button"
-          onClick={handleSave}
-          disabled={newTimeEntries.length === 0}
-        >
+        <button className="basic-button save-button" onClick={handleSave}>
           Save changes
         </button>
       </section>

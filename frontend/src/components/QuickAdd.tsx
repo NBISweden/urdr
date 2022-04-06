@@ -56,6 +56,11 @@ export const QuickAdd = ({ addIssueActivity }) => {
   );
 
   const handleAdd = (e) => {
+    if (issue === null) {
+      alert(
+        "We couldn't add anything. Make sure to type a valid issue number and choose an activity."
+      );
+    }
     const pair: IssueActivityPair = {
       issue: issue,
       activity: activity,
@@ -122,11 +127,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
             );
           })}
       </select>
-      <button
-        className=" basic-button plus-button"
-        onClick={handleAdd}
-        disabled={issue === null}
-      >
+      <button className=" basic-button plus-button" onClick={handleAdd}>
         <img src={plus} />
       </button>
     </div>
