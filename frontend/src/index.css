@@ -121,6 +121,35 @@ input[type="number"] {
   height: 2rem;
 }
 
+.settings-wrapper {
+  position: relative;
+}
+
+.settings-box {
+  position: absolute;
+  right: 1rem;
+  top: 3.3rem;
+  background-color: hsl(186deg 30% 94%);
+  padding: 0.8rem;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+}
+
+.settings-list-item {
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.settings-list-link {
+  padding: 0.3rem 2.5rem 0.3rem 0.8rem;
+  border: none;
+  border-radius: 3px;
+}
+
+.settings-list-link:hover {
+  background-color: hsl(186deg 30% 86%);
+}
+
 /* LOGIN */
 
 .login-wrapper {
