@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    setUser,
     onLogin: handleLogin,
     onLogout: handleLogout,
   };

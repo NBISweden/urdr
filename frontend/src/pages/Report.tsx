@@ -29,14 +29,9 @@ export const Report = () => {
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-<<<<<<< HEAD
   const navigate = useNavigate();
   const location = useLocation();
-  const user: User = React.useContext(AuthContext);
-=======
-  let location = useLocation();
-  const { user } = React.useContext(AuthContext);
->>>>>>> created protected route
+  const { user, setUser } = React.useContext(AuthContext);
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
@@ -142,10 +137,7 @@ export const Report = () => {
         if (res.ok) {
           return true;
         } else if (res.status === 401) {
-          return () => {
-            const navigate = useNavigate();
-            navigate("/login");
-          };
+          setUser(null);
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -200,10 +192,7 @@ export const Report = () => {
           console.log("Time reported");
           return true;
         } else if (response.status === 401) {
-          return () => {
-            const navigate = useNavigate();
-            navigate("/login");
-          };
+          setUser(null);
         } else if (response.status === 422) {
           throw new Error(
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
