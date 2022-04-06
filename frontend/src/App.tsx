@@ -1,8 +1,18 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
-import { AuthProvider } from "./components/AuthProvider";
+import { AuthProvider, AuthContext } from "./components/AuthProvider";
+
+const ProtectedRoute = ({ children }) => {
+  const { user } = React.useContext(AuthContext);
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 export const App = () => {
   return (
@@ -13,7 +23,14 @@ export const App = () => {
             <Routes>
               <Route path="/" element={<Login />} />
 
-              <Route path="/report" element={<Report />} />
+              <Route
+                path="/report"
+                element={
+                  <ProtectedRoute>
+                    <Report />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </React.StrictMode>

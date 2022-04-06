@@ -30,9 +30,14 @@ export const Report = () => {
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
+<<<<<<< HEAD
   const navigate = useNavigate();
   const location = useLocation();
   const user: User = React.useContext(AuthContext);
+=======
+  let location = useLocation();
+  const { user } = React.useContext(AuthContext);
+>>>>>>> created protected route
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
@@ -102,7 +107,11 @@ export const Report = () => {
     getRecentIssuesWithinRange();
   }, [weekTravelDay]);
   React.useEffect(() => {
+<<<<<<< HEAD
     getRowData();
+=======
+    getRowTopics();
+>>>>>>> created protected route
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
