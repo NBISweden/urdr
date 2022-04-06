@@ -8,7 +8,17 @@ export const AuthContext = React.createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = React.useState(null);
 
-  const authenticateRedmine = async (username, password) => {
+  React.useEffect(() => {
+    const user = JSON.parse(window.localStorage.getItem("user"));
+    console.log(user);
+    if (user) setUser(user);
+  }, []);
+
+  React.useEffect(() => {
+    if (user) window.localStorage.setItem("user", JSON.stringify(user));
+  }, [user]);
+
+  const handleLogin = async (username, password) => {
     // We are not doing account linking
     let headers = new Headers();
     headers.set("Accept", "application/json");
@@ -33,12 +43,6 @@ export const AuthProvider = ({ children }) => {
       })
       .catch((error) => console.log("An error occured.", error));
 
-    return user;
-  };
-
-  const handleLogin = async (username, password) => {
-    const user = await authenticateRedmine(username, password);
-
     setUser(user);
     return user;
   };
@@ -59,7 +63,7 @@ export const AuthProvider = ({ children }) => {
         return false;
       });
     // Redirect to login page
-    window.location.href = "/";
+    window.location.href = "/login";
     setUser(null);
   };
 

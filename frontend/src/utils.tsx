@@ -1,6 +1,7 @@
 import.meta.hot;
 import React, { useState } from "react";
 import { IssueActivityPair } from "./model";
+import { AuthContext } from "./components/AuthProvider";
 
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
@@ -18,7 +19,7 @@ export const getApiEndpoint = async (endpoint) => {
         return res.json();
       } else if (res.status === 401) {
         // Redirect to login page
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         throw new Error(
           "There was an error accessing the endpoint " + endpoint

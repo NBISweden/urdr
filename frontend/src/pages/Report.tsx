@@ -144,7 +144,7 @@ export const Report = () => {
           return true;
         } else if (res.status === 401) {
           // Redirect to login page
-          navigate("/");
+          navigate("/login");
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -200,7 +200,7 @@ export const Report = () => {
           return true;
         } else if (response.status === 401) {
           // Redirect to login page
-          navigate("/");
+          navigate("/login");
         } else if (response.status === 422) {
           throw new Error(
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`

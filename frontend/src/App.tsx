@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
   const { user } = React.useContext(AuthContext);
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -23,6 +23,7 @@ export const App = () => {
             <Routes>
               <Route path="/" element={<Login />} />
 
+              <Route path="/login" element={<Login />} />
               <Route
                 path="/report"
                 element={
