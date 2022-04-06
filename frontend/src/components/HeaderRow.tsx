@@ -7,7 +7,7 @@ import {
 
 export const HeaderRow = ({ days }: { days: Date[] }) => {
   const { width } = useViewport();
-  const breakpoint = 1044;
+  const breakpoint = 1267; // below this, the default date format "Mon 24/12" won't fit
   const longDayStrings = days.map((day) => {
     return getLongCustomDateString(day);
   });
