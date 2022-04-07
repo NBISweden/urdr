@@ -11,12 +11,13 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    const user = JSON.parse(window.localStorage.getItem("user"));
+    let user = window.localStorage.getItem("user");
+    if (user) user = JSON.parse(user);
     setUser(user);
   }, []);
 
   React.useEffect(() => {
-    window.localStorage.setItem("user", JSON.stringify(user));
+    if (user) window.localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
   const handleLogin = async (username, password) => {

@@ -12,6 +12,7 @@ export const Login = () => {
   const { onLogin } = React.useContext(AuthContext);
 
   const authenticateRedmine = async (event) => {
+    event?.preventDefault();
     const user = await onLogin(username, password);
 
     if (!user) {
