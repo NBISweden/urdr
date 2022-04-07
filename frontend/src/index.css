@@ -132,7 +132,7 @@ input[type="number"] {
   background-color: hsl(186deg 30% 94%);
   padding: 0.8rem;
   border-radius: 5px;
-  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+  box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
 }
 
 .settings-list-item {
