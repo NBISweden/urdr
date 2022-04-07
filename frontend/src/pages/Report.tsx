@@ -123,6 +123,7 @@ export const Report = () => {
   };
 
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
+    let logout = false;
     const saved = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
       {
@@ -135,7 +136,7 @@ export const Report = () => {
         if (res.ok) {
           return true;
         } else if (res.status === 401) {
-          logoutFrontend();
+          logout = true;
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -146,6 +147,7 @@ export const Report = () => {
         setFavorites(favs);
         return false;
       });
+    if (logout) logoutFrontend();
     return saved;
   };
 
