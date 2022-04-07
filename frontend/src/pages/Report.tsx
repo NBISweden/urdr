@@ -158,7 +158,6 @@ export const Report = () => {
       .then((response) => {
         if (response.ok) {
           console.log("Time reported");
-          // alert("Changes saved!");
           return true;
         } else if (response.status === 401) {
           // Redirect to login page
@@ -168,7 +167,7 @@ export const Report = () => {
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
           );
         } else {
-          throw new Error("Time report failed.");
+          throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
         }
       })
       .catch((error) => {
@@ -194,6 +193,9 @@ export const Report = () => {
       }
       return;
     });
+    if (unsavedEntries.length === 0) {
+      alert("All changes were saved!");
+    }
     setToggleSave(!toggleSave);
     setTimeout(() => {
       setNewTimeEntries(unsavedEntries);
