@@ -64,33 +64,33 @@ export const getLongCustomDateString = (day: Date) => {
     const dayNumber = day.getDay();
     switch (dayNumber) {
       case 1:
-        "Mon";
+        dayString = "Mon";
         break;
       case 2:
-        "Tue";
+        dayString = "Tue";
         break;
       case 3:
-        "Wed";
+        dayString = "Wed";
         break;
       case 4:
-        "Thu";
+        dayString = "Thu";
         break;
       case 5:
-        "Fri";
+        dayString = "Fri";
         break;
       default:
-        "";
+        dayString = "";
     }
     return dayString;
   };
   const weekDay = getWeekDay();
   const date = day.getDate();
-  const month = day.getMonth();
+  const month = day.getMonth() + 1;
   return `${weekDay} ${date}/${month}`;
 };
 
 export const getShortCustomDateString = (day: Date) => {
-  return `${day.getDate()}/${day.getMonth()}`;
+  return `${day.getDate()}/${day.getMonth() + 1}`;
 };
 
 export const useDebounce = (value, delay) => {
