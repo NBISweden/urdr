@@ -58,6 +58,41 @@ export const getFullWeek = (today: Date): Date[] => {
   return fullWeek;
 };
 
+export const getLongCustomDateString = (day: Date) => {
+  const getWeekDay = () => {
+    let dayString = "";
+    const dayNumber = day.getDay();
+    switch (dayNumber) {
+      case 1:
+        dayString = "Mon";
+        break;
+      case 2:
+        dayString = "Tue";
+        break;
+      case 3:
+        dayString = "Wed";
+        break;
+      case 4:
+        dayString = "Thu";
+        break;
+      case 5:
+        dayString = "Fri";
+        break;
+      default:
+        dayString = "";
+    }
+    return dayString;
+  };
+  const weekDay = getWeekDay();
+  const date = day.getDate();
+  const month = day.getMonth() + 1;
+  return `${weekDay} ${date}/${month}`;
+};
+
+export const getShortCustomDateString = (day: Date) => {
+  return `${day.getDate()}/${day.getMonth() + 1}`;
+};
+
 export const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
   React.useEffect(() => {
@@ -73,4 +108,21 @@ export const useDebounce = (value, delay) => {
     };
   }, [value, delay]);
   return debouncedValue;
+};
+
+export const useViewport = () => {
+  const [width, setWidth] = React.useState(window.innerWidth);
+
+  React.useEffect(() => {
+    // Whenever the window is resized, the "width" state veriable will be updated
+    const handleWindowResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleWindowResize);
+
+    // Clean-up: Return a function from the effect that removes the event listener...
+    // ...when the user leaves the page and the component unmounts.
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, []);
+
+  // Return the width so we can use it in our components
+  return { width };
 };
