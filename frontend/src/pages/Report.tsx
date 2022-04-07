@@ -233,12 +233,15 @@ export const Report = () => {
 
   return (
     <>
-      <HeaderUser username={user ? user.login : ""} />
-      <TimeTravel
-        weekTravelDay={weekTravelDay}
-        onWeekTravel={handleWeekTravel}
-        currentWeekArray={currentWeekArray}
-      />
+      <div className="report-header">
+        <p className="header-year">{weekTravelDay.getFullYear()}</p>
+        <TimeTravel
+          weekTravelDay={weekTravelDay}
+          onWeekTravel={handleWeekTravel}
+          currentWeekArray={currentWeekArray}
+        />
+        <HeaderUser username={user ? user.login : ""} />
+      </div>
       {favorites.length > 0 ? (
         <DragDropContext onDragEnd={onDragEnd}>
           <section className="recent-container">

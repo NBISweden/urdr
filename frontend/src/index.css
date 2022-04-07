@@ -47,10 +47,6 @@ input[type="number"] {
   width: 100vw;
 }
 
-.header-time-travel {
-  background-color: hsl(76deg 55% 53%);
-}
-
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
 .react-datepicker__week .react-datepicker__day--selected {
@@ -70,9 +66,23 @@ input[type="number"] {
 }
 /* stylelint-enable selector-class-pattern */
 
-.header-week {
+.report-header {
   width: 100%;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: hsl(76deg 55% 53%);
+  margin-bottom: 0.4rem;
+}
+
+.header-year {
+  font-size: 2.25rem;
+  color: hsl(186deg 92% 11%);
+  margin: 0 1rem;
+}
+
+.time-travel {
+  display: flex;
 }
 
 .label-week-day {
@@ -81,9 +91,63 @@ input[type="number"] {
 }
 
 .week-button {
+  background-color: hsl(186deg 30% 94%);
+  color: hsl(185deg 92% 11%);
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 1rem;
+  margin: 1.3rem 0;
+}
+
+.week-button svg {
+  margin-right: 0.5rem;
+}
+
+.week-button:hover {
+  color: hsl(185deg 92% 20%);
+}
+
+.week-arrow-button {
   background-color: transparent;
-  text-decoration: none;
-  color: black;
+  border: none;
+  padding: 0;
+  margin: 0 0.5rem;
+}
+
+.week-arrow {
+  height: 2rem;
+}
+
+.settings-wrapper {
+  position: relative;
+}
+
+.settings-box {
+  position: absolute;
+  right: 1rem;
+  top: 3.3rem;
+  background-color: hsl(186deg 30% 94%);
+  padding: 0.8rem;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
+}
+
+.settings-list-item {
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.settings-list-link {
+  padding: 0.3rem 2.5rem 0.3rem 0.8rem;
+  border: none;
+  border-radius: 3px;
+}
+
+.settings-list-link:hover {
+  background-color: hsl(186deg 30% 86%);
 }
 
 /* LOGIN */
@@ -152,6 +216,18 @@ input[type="number"] {
 
 .dropdown-button {
   margin-right: 1rem;
+  background-color: hsl(186deg 30% 94%);
+  border: none;
+  border-radius: 2rem;
+  color: hsl(185deg 92% 11%);
+}
+
+.dropdown-button svg {
+  margin-left: 0.2rem;
+}
+
+.dropdown-button:hover {
+  color: hsl(185deg 92% 20%);
 }
 
 .save-button {
