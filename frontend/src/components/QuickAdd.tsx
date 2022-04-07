@@ -4,7 +4,7 @@ import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
-
+import { AuthContext } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = ({ addIssueActivity }) => {
@@ -14,10 +14,12 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
+  const { logoutFrontend } = React.useContext(AuthContext);
 
   const getActivities = async () => {
     let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
-      "/api/activities"
+      "/api/activities",
+      logoutFrontend
     );
     if (result) {
       setActivities(result.time_entry_activities);
@@ -33,7 +35,10 @@ export const QuickAdd = ({ addIssueActivity }) => {
     console.log("Searching issue...");
 
     const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
-    let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
+    let result: { issues: Issue[] } = await getApiEndpoint(
+      endpoint,
+      logoutFrontend
+    );
     if (result) {
       if (result.issues.length > 0) {
         const issue: Issue = {
@@ -60,16 +65,14 @@ export const QuickAdd = ({ addIssueActivity }) => {
       alert(
         "We couldn't add anything. Make sure to type a valid issue number and choose an activity."
       );
-    }
-    else
-    {
-	const pair: IssueActivityPair = {
-	      issue: issue,
-	      activity: activity,
-	      custom_name: issue.subject + "-" + activity.name,
-  	};
+    } else {
+      const pair: IssueActivityPair = {
+        issue: issue,
+        activity: activity,
+        custom_name: issue.subject + "-" + activity.name,
+      };
 
-	addIssueActivity(pair);
+      addIssueActivity(pair);
     }
   };
 
@@ -130,7 +133,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
           })}
       </select>
       <button className=" basic-button plus-button" onClick={handleAdd}>
-        <img src={plus} alt="Add line"/>
+        <img src={plus} alt="Add line" />
       </button>
     </div>
   );

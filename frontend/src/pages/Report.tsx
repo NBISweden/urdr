@@ -15,7 +15,6 @@ import {
   removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
-import { format as formatDate } from "date-fns";
 import { AuthContext } from "../components/AuthProvider";
 
 export const Report = () => {
@@ -31,13 +30,14 @@ export const Report = () => {
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, setUser } = React.useContext(AuthContext);
+  const { user, logoutFrontend } = React.useContext(AuthContext);
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
     const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
     const issues: IssueActivityPair[] = await getApiEndpoint(
-      `/api/recent_issues?to=${toDate}`
+      `/api/recent_issues?to=${toDate}`,
+      logoutFrontend
     );
     setRecentIssues(issues);
   };
@@ -50,7 +50,8 @@ export const Report = () => {
       to: formatDate(days[4], "yyyy-MM-dd"),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`
+      `/api/time_entries?${params}`,
+      logoutFrontend
     );
     return entries.time_entries;
   };
@@ -73,7 +74,8 @@ export const Report = () => {
 
   const getRowData = async () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
-      "/api/priority_entries"
+      "/api/priority_entries",
+      logoutFrontend
     );
     const issues = [...recentIssues];
     if (!!favorites) {
@@ -101,11 +103,7 @@ export const Report = () => {
     getRecentIssuesWithinRange();
   }, [weekTravelDay]);
   React.useEffect(() => {
-<<<<<<< HEAD
     getRowData();
-=======
-    getRowTopics();
->>>>>>> created protected route
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
@@ -137,7 +135,7 @@ export const Report = () => {
         if (res.ok) {
           return true;
         } else if (res.status === 401) {
-          setUser(null);
+          logoutFrontend();
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -182,6 +180,7 @@ export const Report = () => {
   };
 
   const reportTime = async (timeEntry: TimeEntry) => {
+    let logout = false;
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
@@ -192,7 +191,7 @@ export const Report = () => {
           console.log("Time reported");
           return true;
         } else if (response.status === 401) {
-          setUser(null);
+          logout = true;
         } else if (response.status === 422) {
           throw new Error(
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
@@ -205,6 +204,7 @@ export const Report = () => {
         alert(error);
         return false;
       });
+    if (logout) logoutFrontend();
     return saved;
   };
 

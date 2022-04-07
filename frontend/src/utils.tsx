@@ -11,7 +11,8 @@ export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
 
-export const getApiEndpoint = async (endpoint) => {
+export const getApiEndpoint = async (endpoint, logoutFrontend) => {
+  let logout = false;
   let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
     headers: headers,
@@ -20,8 +21,7 @@ export const getApiEndpoint = async (endpoint) => {
       if (res.ok) {
         return res.json();
       } else if (res.status === 401) {
-        const { setUser } = React.useContext(AuthContext);
-        setUser(null);
+        logout = true;
       } else {
         throw new Error(
           "There was an error accessing the endpoint " + endpoint
@@ -29,7 +29,7 @@ export const getApiEndpoint = async (endpoint) => {
       }
     })
     .catch((error) => console.log(error));
-
+  if (logout) logoutFrontend();
   return result;
 };
 

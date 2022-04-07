@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { User } from "../model";
 import { SNOWPACK_PUBLIC_API_URL } from "../utils";
 import { Buffer } from "buffer";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = React.createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = React.useState();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const user = JSON.parse(window.localStorage.getItem("user"));
@@ -63,15 +65,17 @@ export const AuthProvider = ({ children }) => {
         return false;
       });
     // Redirect to login page
+    logoutFrontend();
+  };
+
+  const logoutFrontend = () => {
     setUser(null);
-    return () => {
-      navigate("/login");
-    };
+    navigate("/login");
   };
 
   const value = {
     user,
-    setUser,
+    logoutFrontend: logoutFrontend,
     onLogin: handleLogin,
     onLogout: handleLogout,
   };
