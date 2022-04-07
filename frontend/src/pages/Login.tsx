@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { LoginHeader } from "../components/LoginHeader";
 import "../index.css";
-import { User } from "../model";
-import { SNOWPACK_PUBLIC_API_URL } from "../utils";
 import { AuthContext } from "../components/AuthProvider";
 
 export const Login = () => {
@@ -14,8 +12,6 @@ export const Login = () => {
   const { onLogin } = React.useContext(AuthContext);
 
   const authenticateRedmine = async (event) => {
-    event?.preventDefault();
-
     const user = await onLogin(username, password);
 
     if (!user) {

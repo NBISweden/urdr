@@ -1,18 +1,9 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
-import { AuthProvider, AuthContext } from "./components/AuthProvider";
-
-const ProtectedRoute = ({ children }) => {
-  const { user } = React.useContext(AuthContext);
-
-  if (user === null) {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
-};
+import { AuthProvider } from "./components/AuthProvider";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 export const App = () => {
   return (
@@ -21,7 +12,6 @@ export const App = () => {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/login" element={<Login />} />
               {["/report", "/"].map((path) => (
                 <Route
                   key={path}
@@ -33,6 +23,7 @@ export const App = () => {
                   }
                 />
               ))}
+              <Route path="/login" element={<Login />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>
