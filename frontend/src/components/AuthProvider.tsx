@@ -64,16 +64,12 @@ export const AuthProvider = ({ children }) => {
         console.log(error);
         return false;
       });
-  };
-
-  const logoutFrontend = () => {
-    setUser(null);
-    navigate("/login");
+    return logout;
   };
 
   const value = {
     user,
-    logoutFrontend: logoutFrontend,
+    setUser: setUser,
     onLogin: handleLogin,
     logoutBackend: handleLogout,
   };

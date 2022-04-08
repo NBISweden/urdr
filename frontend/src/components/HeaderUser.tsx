@@ -5,7 +5,7 @@ import down from "../icons/caret-down-fill.svg";
 import { AuthContext } from "../components/AuthProvider";
 
 export const HeaderUser = ({ username }: { username: string }) => {
-  const { logoutBackend, logoutFrontend } = React.useContext(AuthContext);
+  const { logoutBackend, setUser } = React.useContext(AuthContext);
 
   const [showUserSettings, setShowUserSettings] = useState<boolean>(false);
 
@@ -13,10 +13,9 @@ export const HeaderUser = ({ username }: { username: string }) => {
     setShowUserSettings(!showUserSettings);
   };
 
-  const logout = (event) => {
-    event.preventDefault();
-    const logout = logoutBackend();
-    if (logout) logoutFrontend();
+  const logout = async (e) => {
+    const logout = await logoutBackend();
+    if (logout) setUser(null);
   };
 
   const showSettings = () => {

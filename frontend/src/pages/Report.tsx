@@ -29,15 +29,15 @@ export const Report = () => {
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user, logoutFrontend } = React.useContext(AuthContext);
+  let location = useLocation();
+  const { user, setUser } = React.useContext(AuthContext);
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
     const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
     const issues: IssueActivityPair[] = await getApiEndpoint(
       `/api/recent_issues?to=${toDate}`,
-      logoutFrontend
+      setUser
     );
     setRecentIssues(issues);
   };
@@ -51,7 +51,7 @@ export const Report = () => {
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
       `/api/time_entries?${params}`,
-      logoutFrontend
+      setUser
     );
     return entries.time_entries;
   };
@@ -75,7 +75,7 @@ export const Report = () => {
   const getRowData = async () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
       "/api/priority_entries",
-      logoutFrontend
+      setUser
     );
     const issues = [...recentIssues];
     if (!!favorites) {
@@ -147,7 +147,7 @@ export const Report = () => {
         setFavorites(favs);
         return false;
       });
-    if (logout) logoutFrontend();
+    if (logout) setUser(null);
     return saved;
   };
 
@@ -206,7 +206,7 @@ export const Report = () => {
         alert(error);
         return false;
       });
-    if (logout) logoutFrontend();
+    if (logout) setUser(null);
     return saved;
   };
 

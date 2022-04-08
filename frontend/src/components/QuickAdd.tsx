@@ -14,12 +14,12 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const { logoutFrontend } = React.useContext(AuthContext);
+  const { setUser } = React.useContext(AuthContext);
 
   const getActivities = async () => {
     let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
       "/api/activities",
-      logoutFrontend
+      setUser
     );
     if (result) {
       setActivities(result.time_entry_activities);
@@ -35,10 +35,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
     console.log("Searching issue...");
 
     const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
-    let result: { issues: Issue[] } = await getApiEndpoint(
-      endpoint,
-      logoutFrontend
-    );
+    let result: { issues: Issue[] } = await getApiEndpoint(endpoint, setUser);
     if (result) {
       if (result.issues.length > 0) {
         const issue: Issue = {
