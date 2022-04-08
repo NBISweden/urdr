@@ -13,9 +13,10 @@ export const HeaderUser = ({ username }: { username: string }) => {
     setShowUserSettings(!showUserSettings);
   };
 
-  const logout = () => {
-    logoutBackend();
-    logoutFrontend();
+  const logout = (event) => {
+    event.preventDefault();
+    const logout = logoutBackend();
+    if (logout) logoutFrontend();
   };
 
   const showSettings = () => {
