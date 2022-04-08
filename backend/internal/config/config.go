@@ -2,9 +2,6 @@ package config
 
 import (
 	"os"
-
-	"github.com/joho/godotenv"
-	log "github.com/sirupsen/logrus"
 )
 
 // Config is a global configuration value store
@@ -12,40 +9,46 @@ var Config ConfigMap
 
 // ConfigMap stores all different configs
 type ConfigMap struct {
-	App     AppConfig
-	Redmine RedmineConfig
+	App      AppConfig
+	Redmine  RedmineConfig
+	Database DatabaseConfig
 }
 
 type AppConfig struct {
-	Host string
-	Port string
+	Host          string
+	Port          string
+	SessionDBPath string
 }
 
 type RedmineConfig struct {
-	Host   string
-	Port   string
-	ApiKey string
+	URL string
 }
 
-// GetEnv returns given os.Getenv value, or a default value if os.Getenv is empty
-func GetEnv(key string, def string) string {
-	if value := os.Getenv(key); value != "" {
+type DatabaseConfig struct {
+	Path string
+}
+
+// getEnv() returns given environment variable's value, or a default
+// value if the environment variable does not exist.
+func getEnv(key string, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
-	return def
+	return defaultValue
 }
 
-// LoadConfig populates ConfigMap with data
-func LoadConfig(c *ConfigMap) {
-	// Load settings from .env
-	err := godotenv.Load(GetEnv("DOT_ENV_FILE", ".env"))
-	if err != nil {
-		log.Errorf("failed to load environment variables from .env, %s", err)
-	}
-	// Populate config structs, place defaults if empty in .env
-	c.App.Host = GetEnv("APP_HOST", "127.0.0.1")
-	c.App.Port = GetEnv("APP_PORT", "8080")
-	c.Redmine.Host = GetEnv("REDMINE_HOST", "redmine")
-	c.Redmine.Port = GetEnv("REDMINE_PORT", "3000")
-	c.Redmine.ApiKey = GetEnv("REDMINE_ADMIN_TOKEN", "")
+// Setup populates ConfigMap with data
+func Setup() error {
+	// Populate config structs, and use defaults if the needed
+	// variable is not in the environment.
+
+	Config.App.Host = getEnv("BACKEND_HOST", "0.0.0.0")
+	Config.App.Port = getEnv("BACKEND_PORT", "8080")
+	Config.App.SessionDBPath = getEnv("SESSION_DB_PATH", "./session.db")
+
+	Config.Redmine.URL = getEnv("REDMINE_URL", "http://host.docker.internal:3000")
+
+	Config.Database.Path = getEnv("BACKEND_DB_PATH", "./database.db")
+
+	return nil
 }

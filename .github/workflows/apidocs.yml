@@ -1,0 +1,31 @@
+name: API docs
+
+on: [push]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.17]
+    steps:
+
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
+      - name: Get swag
+        run: |
+          go get -u github.com/swaggo/swag/cmd/swag
+        working-directory: backend
+
+      - name: Check that docs can be created
+        run: swag init -g api/api.go
+        working-directory: backend

@@ -1,70 +1,82 @@
 package api
 
 import (
-	cfg "urdr-api/internal/config"
-	redmine "urdr-api/internal/redmine"
+	"log"
+	"time"
+
+	fiberSwagger "github.com/swaggo/fiber-swagger"
+
+	_ "urdr-api/docs"
+	"urdr-api/internal/config"
+	"urdr-api/internal/database"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	log "github.com/sirupsen/logrus"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/sqlite3"
 )
 
-func Setup(redmineConf cfg.RedmineConfig) *fiber.App {
+var store *session.Store
+var db *database.Database
+
+// @title Urdr API
+// @version 1.0
+// @description This is the Urdr API.
+
+// @contact.name National Bioinformatics Infrastructure Sweden
+// @contact.url https://www.nbis.se
+
+// @host localhost:8080
+// @securityDefinitions.basic BasicAuth
+// @BasePath /
+func Setup() *fiber.App {
+
 	// Fiber instance
 	app := fiber.New()
-	// Or extend your config for customization
-	app.Use(cors.New(cors.Config{
-		AllowCredentials: true,
-	}))
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+	storage := sqlite3.New(sqlite3.Config{
+		Database:   config.Config.App.SessionDBPath,
+		Table:      "session",
+		GCInterval: 1 * time.Hour,
 	})
 
-	app.Get("/issues", func(c *fiber.Ctx) error {
-		issuesJson, err := redmine.ListIssues(redmineConf)
-		if err != nil {
-			c.Response().SetBodyString(err.Error())
-			return c.SendStatus(500)
-		}
-		return c.JSON(issuesJson)
+	store = session.New(session.Config{
+		Expiration:     (7 * 24 /* A week in hours */) * time.Hour,
+		KeyLookup:      "cookie:urdr_session",
+		CookieSecure:   true,
+		CookieSameSite: "Strict",
+		Storage:        storage,
 	})
 
-	app.Post("/api/login", func(c *fiber.Ctx) error {
-		authHeader := c.Get("Authorization")
-		res := redmine.Login(authHeader, redmineConf)
-		if res == true {
-			log.Info("Logged in user")
-			return c.SendStatus(200)
-		} else {
-			log.Info("Log in failed")
-			return c.SendStatus(401)
-		}
-	})
+	var err error
+	db, err = database.New(config.Config.Database.Path)
+	if err != nil {
+		log.Fatalf("Failed to connect to backend database: %v", err)
+		return nil
+	}
 
-	app.Post("/api/report", func(c *fiber.Ctx) error {
-		var r redmine.TimeEntry
-		err := c.BodyParser(&r)
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
-		if err != nil {
-			return err
-		}
+	app.Post("/api/login", loginHandler)
 
-		log.Infof("Received time entry: %s", r)
+	app.Post("/api/logout", logoutHandler)
 
-		err = redmine.CreateTimeEntry(redmineConf, r)
-		if err == nil {
-			log.Info("time entry created")
-			return c.SendStatus(200)
-		} else {
-			log.Info("time entry creation failed")
-			return c.SendStatus(401)
-		}
-	})
+	app.Get("/api/recent_issues", recentIssuesHandler)
+
+	app.Get("/api/time_entries", getTimeEntriesHandler)
+
+	app.Post("/api/time_entries", postTimeEntriesHandler)
+
+	app.Get("/api/issues", getIssuesHandler)
+
+	app.Get("/api/activities", getActivitiesHandler)
+
+	app.Get("/api/priority_entries", getPriorityEntriesHandler)
+
+	app.Post("/api/priority_entries", postPriorityEntriesHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
-		return c.SendStatus(404) // => 404 "Not Found"
+		return c.SendStatus(fiber.StatusNotFound) // => 404 "Not Found"
 	})
 
 	// Return the configured app

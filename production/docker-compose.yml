@@ -1,0 +1,31 @@
+---
+version: "3"
+
+services:
+
+  urdr:
+    build:
+      dockerfile: ../production/Dockerfile
+      context: ../backend
+    volumes:
+        - ../backend/:/app
+    container_name: urdr
+    expose:
+      - "8080"
+    ports:
+      - 8080:8080
+    restart: always
+    env_file:
+      - ./urdr.env
+  nginx:
+    container_name: urdr-frontend
+    build:
+      dockerfile: ../production/Dockerfile.nginx
+      context: ../frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - 4567:80
+
+volumes:
+  exclude: null

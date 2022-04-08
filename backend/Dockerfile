@@ -1,17 +1,18 @@
-FROM golang:1.16.2-alpine3.13 as builder
+FROM golang:1.17.8-stretch
 
-ENV GOPATH=$PWD
-ENV CGO_ENABLED=0
+ENV XDG_CACHE_HOME='/tmp/.cache'
 
-COPY . .
+WORKDIR /app
 
-RUN go build -o ./urdr ./cmd
-RUN echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-FROM scratch
+RUN apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install --no-install-recommends -y git='1:2.*'; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*; \
+    curl --fail --location \
+    'https://raw.githubusercontent.com/cosmtrek/air/v1.29.0/install.sh' | \
+    sh -e -s v1.29.0 && cp -v ./bin/air /bin/air
 
-COPY --from=builder /go/passwd /etc/passwd
-COPY --from=builder /go/urdr* /usr/bin/
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-
-USER 65534
+CMD ["air"]
