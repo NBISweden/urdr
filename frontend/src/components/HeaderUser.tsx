@@ -5,7 +5,7 @@ import down from "../icons/caret-down-fill.svg";
 import { AuthContext } from "../components/AuthProvider";
 
 export const HeaderUser = ({ username }: { username: string }) => {
-  const { onLogout } = React.useContext(AuthContext);
+  const { logoutBackend, logoutFrontend } = React.useContext(AuthContext);
 
   const [showUserSettings, setShowUserSettings] = useState<boolean>(false);
 
@@ -13,11 +13,16 @@ export const HeaderUser = ({ username }: { username: string }) => {
     setShowUserSettings(!showUserSettings);
   };
 
+  const logout = () => {
+    logoutBackend();
+    logoutFrontend();
+  };
+
   const showSettings = () => {
     return (
       <ul className="settings-box" aria-labelledby="dropdownMenuLink">
         <li className="settings-list-item">
-          <a className="dropdown-item settings-list-link" onClick={onLogout}>
+          <a className="dropdown-item settings-list-link" onClick={logout}>
             Logout
           </a>
         </li>

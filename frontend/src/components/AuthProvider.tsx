@@ -64,8 +64,6 @@ export const AuthProvider = ({ children }) => {
         console.log(error);
         return false;
       });
-    // Redirect to login page
-    logoutFrontend();
   };
 
   const logoutFrontend = () => {
@@ -77,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     user,
     logoutFrontend: logoutFrontend,
     onLogin: handleLogin,
-    onLogout: handleLogout,
+    logoutBackend: handleLogout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
