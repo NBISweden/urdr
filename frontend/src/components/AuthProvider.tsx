@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
     );
 
     const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
-      body: "",
       method: "POST",
       credentials: "include",
       headers: headers,
