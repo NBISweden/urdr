@@ -14,6 +14,7 @@ import {
   getFullWeek,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
+import { format as formatDate } from "date-fns";
 
 export const Report = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export const Report = () => {
 
   const getRecentIssuesWithinRange = async () => {
     // Use Friday as limit for the query
-    const toDate: String = currentWeekArray[4].toISOString().split("T")[0];
+    const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
     const issues: IssueActivityPair[] = await getApiEndpoint(
       `/api/recent_issues?to=${toDate}`
     );
