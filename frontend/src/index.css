@@ -266,6 +266,12 @@ input[type="number"] {
   width: 1.7rem;
 }
 
+.star-button {
+  background-color: hsl(0deg 0% 97%);
+  border: none;
+  display: flex;
+}
+
 .grip-container {
   justify-content: end;
   padding: 0;

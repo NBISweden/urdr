@@ -99,12 +99,14 @@ export const Row = ({
           </p>
         </div>
         <div className="col-1 star-container">
+	<button type="button" className="star-button" onClick={() => onToggleFav(topic)}>
           <img
             src={isFav ? fillStar : star}
-            onClick={() => onToggleFav(topic)}
             className="star"
             role="button"
+            alt="Make Favourite"
           />
+	  </button>
         </div>
         {days.map((day, i) => {
           return (
