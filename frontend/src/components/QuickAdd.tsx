@@ -61,13 +61,16 @@ export const QuickAdd = ({ addIssueActivity }) => {
         "We couldn't add anything. Make sure to type a valid issue number and choose an activity."
       );
     }
-    const pair: IssueActivityPair = {
-      issue: issue,
-      activity: activity,
-      custom_name: issue.subject + "-" + activity.name,
-    };
+    else
+    {
+	const pair: IssueActivityPair = {
+	      issue: issue,
+	      activity: activity,
+	      custom_name: issue.subject + "-" + activity.name,
+  	};
 
-    addIssueActivity(pair);
+	addIssueActivity(pair);
+    }
   };
 
   const handleSetActivity = (e) => {
@@ -116,7 +119,6 @@ export const QuickAdd = ({ addIssueActivity }) => {
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
-        disabled={search !== "" && issue === null}
       >
         {activities &&
           activities.map((activity) => {
@@ -128,7 +130,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
           })}
       </select>
       <button className=" basic-button plus-button" onClick={handleAdd}>
-        <img src={plus} />
+        <img src={plus} alt="Add line"/>
       </button>
     </div>
   );
