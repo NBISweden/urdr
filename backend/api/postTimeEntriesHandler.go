@@ -77,7 +77,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	if session, err := store.Get(c); err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	} else {
-		c.Response().Reset()
 		// Extend the session's expiry time to a week.
 		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
 		session.Regenerate()
