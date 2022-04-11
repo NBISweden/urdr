@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import { getApiEndpoint } from "../utils";
+import { format as formatDate } from "date-fns";
 
 import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
@@ -35,8 +36,8 @@ export const Row = ({
   let params = new URLSearchParams({
     issue_id: `${topic.issue.id}`,
     activity_id: `${topic.activity.id}`,
-    from: `${days[0].toISOString().split("T")[0]}`,
-    to: `${days[4].toISOString().split("T")[0]}`,
+    from: formatDate(days[0], "yyyy-MM-dd"),
+    to: formatDate(days[4], "yyyy-MM-dd"),
   });
 
   const getTimeEntries = async (params: URLSearchParams) => {
@@ -53,11 +54,11 @@ export const Row = ({
   const findCurrentHours = (day: Date) => {
     let hours = 0;
     let entry: TimeEntry | FetchedTimeEntry = rowUpdates?.find(
-      (entry) => entry.spent_on === day.toISOString().split("T")[0]
+      (entry) => entry.spent_on === formatDate(day, "yyyy-MM-dd")
     );
     if (!entry && rowEntries && rowEntries.length > 0) {
       entry = rowEntries?.find(
-        (entry) => entry.spent_on === day.toISOString().split("T")[0]
+        (entry) => entry.spent_on === formatDate(day, "yyyy-MM-dd")
       );
     }
     if (entry) {
@@ -69,7 +70,7 @@ export const Row = ({
   const findEntryId = (day: Date) => {
     let id = 0;
     let entry = rowEntries?.find(
-      (entry) => entry.spent_on === day.toISOString().split("T")[0]
+      (entry) => entry.spent_on === formatDate(day, "yyyy-MM-dd")
     );
     if (entry) {
       id = entry.id;
@@ -108,7 +109,10 @@ export const Row = ({
         {days.map((day, i) => {
           return (
             <Cell
-              key={`${topic.issue.id}${topic.activity.id}${day.toISOString()}`}
+              key={`${topic.issue.id}${topic.activity.id}${formatDate(
+                day,
+                "yyyy-MM-dd"
+              )}`}
               topic={topic}
               date={day}
               onCellUpdate={onCellUpdate}

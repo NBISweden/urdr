@@ -1,5 +1,6 @@
 import React from "react";
 import { IssueActivityPair, TimeEntry } from "../model";
+import { format as formatDate } from "date-fns";
 
 export const Cell = ({
   topic,
@@ -17,7 +18,10 @@ export const Cell = ({
   return (
     <div className="col-1 cell-container">
       <label
-        htmlFor={`${topic.issue.id}${topic.activity.id}${date.toISOString()}`}
+        htmlFor={`${topic.issue.id}${topic.activity.id}${formatDate(
+          date,
+          "yyyy-MM-dd"
+        )}`}
         hidden={true}
       >
         Time spent on {`${topic.issue.subject} ${topic.activity.name}`}
@@ -25,7 +29,10 @@ export const Cell = ({
       </label>
       <input
         type="number"
-        id={`${topic.issue.id}${topic.activity.id}${date.toISOString()}`}
+        id={`${topic.issue.id}${topic.activity.id}${formatDate(
+          date,
+          "yyyy-MM-dd"
+        )}`}
         min={0}
         onChange={(event: any) => {
           onCellUpdate({
@@ -34,7 +41,7 @@ export const Cell = ({
             activity_id: topic.activity.id,
             hours: +event.target.value,
             comments: "",
-            spent_on: date.toISOString().split("T")[0],
+            spent_on: formatDate(date, "yyyy-MM-dd"),
           });
         }}
         className="cell"
