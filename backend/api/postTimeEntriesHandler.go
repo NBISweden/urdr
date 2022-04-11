@@ -73,14 +73,14 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		log.Errorf("proxy.Do() failed: %v\n", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-	c.Response().Reset()
 
 	if session, err := store.Get(c); err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	} else {
-		log.Debug("Session: ", session)
+		c.Response().Reset()
 		// Extend the session's expiry time to a week.
 		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
+		session.Regenerate()
 
 		if err := session.Save(); err != nil {
 			log.Errorf("session.Save() failed: %v\n", err)
