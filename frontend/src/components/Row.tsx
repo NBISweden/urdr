@@ -104,7 +104,7 @@ export const Row = ({
             src={isFav ? fillStar : star}
             className="star"
             role="button"
-            alt="Make Favourite"
+            alt={isFav ? "Remove from favorites" : "Make favorite"}
           />
 	  </button>
         </div>
