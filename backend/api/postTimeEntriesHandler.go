@@ -79,7 +79,10 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	} else {
 		// Extend the session's expiry time to a week.
 		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
-		session.Regenerate()
+		if err := session.Regenerate(); err != nil {
+			log.Errorf("session.Regenerate() failed: %v\n", err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
 
 		if err := session.Save(); err != nil {
 			log.Errorf("session.Save() failed: %v\n", err)
