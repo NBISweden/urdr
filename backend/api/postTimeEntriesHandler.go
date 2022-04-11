@@ -24,18 +24,6 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	if session, err := store.Get(c); err != nil {
-		return c.SendStatus(fiber.StatusInternalServerError)
-	} else {
-		// Extend the session's expiry time to a week.
-		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
-
-		if err := session.Save(); err != nil {
-			log.Errorf("session.Save() failed: %v\n", err)
-			return c.SendStatus(fiber.StatusInternalServerError)
-		}
-	}
-
 	// Try pulling out the "id" and "hours" from the request, then
 	// decide how to proxy the request to Redmine.
 
@@ -81,5 +69,23 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 	// Set correct method before proxying.
 	c.Request().Header.SetMethod(method)
 
-	return proxy.Do(c, redmineURL)
+	if err := proxy.Do(c, redmineURL); err != nil {
+		log.Errorf("proxy.Do() failed: %v\n", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	c.Response().Reset()
+
+	if session, err := store.Get(c); err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	} else {
+		log.Debug("Session: ", session)
+		// Extend the session's expiry time to a week.
+		session.SetExpiry((7 * 24 /* A week in hours */) * time.Hour)
+
+		if err := session.Save(); err != nil {
+			log.Errorf("session.Save() failed: %v\n", err)
+			return c.SendStatus(fiber.StatusInternalServerError)
+		}
+	}
+	return nil
 }
