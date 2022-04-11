@@ -400,7 +400,7 @@ func Test_Handlers(t *testing.T) {
 				t.Errorf("StatusCode was incorrect, got: %d, want: %d.", statusCode, tt.statusCode)
 			}
 
-			if tt.name == "Login" {
+			if tt.name == "Login" || tt.name == "Time entry POST" {
 				urdrSessionHeader = resp.Header.Get("Set-Cookie")
 			}
 
