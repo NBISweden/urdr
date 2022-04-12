@@ -21,5 +21,6 @@ COPY --from=builder /go/passwd /etc/passwd
 COPY --from=builder /go/urdr* /usr/bin/
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
-
 CMD [ "urdr" ]
+
+USER 65534
