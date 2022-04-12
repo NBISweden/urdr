@@ -92,21 +92,28 @@ export const Row = ({
           {isFav ? <img src={grip} className="grip" /> : <div></div>}
         </div>
         <div className="col-4 ">
-          <p className="issue-label">
-            {topic.custom_name
-              ? `${topic.custom_name}`
-              : `${topic.issue.subject} - ${topic.activity.name}`}
-          </p>
+          <div className="issue-label">
+            <p className="issue-label-text">{`# ${topic.issue.id}`}</p>
+            <p className="issue-label-text">
+              {topic.custom_name
+                ? `${topic.custom_name}`
+                : `${topic.issue.subject} - ${topic.activity.name}`}
+            </p>
+          </div>
         </div>
         <div className="col-1 star-container">
-	<button type="button" className="star-button" onClick={() => onToggleFav(topic)}>
-          <img
-            src={isFav ? fillStar : star}
-            className="star"
-            role="button"
-            alt={isFav ? "Remove from favorites" : "Make favorite"}
-          />
-	  </button>
+          <button
+            type="button"
+            className="star-button"
+            onClick={() => onToggleFav(topic)}
+          >
+            <img
+              src={isFav ? fillStar : star}
+              className="star"
+              role="button"
+              alt={isFav ? "Remove from favorites" : "Make favorite"}
+            />
+          </button>
         </div>
         {days.map((day, i) => {
           return (
