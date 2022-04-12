@@ -20,7 +20,7 @@ func getIssuesHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	redmineURL := fmt.Sprintf("%s/issues.json?%s",
+	redmineURL := fmt.Sprintf("%s/issues.json?status_id=*&%s",
 		config.Config.Redmine.URL, c.Request().URI().QueryString())
 
 	return proxy.Do(c, redmineURL)
