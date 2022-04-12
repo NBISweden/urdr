@@ -12,6 +12,7 @@ import {
   getApiEndpoint,
   headers,
   getFullWeek,
+  removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { format as formatDate } from "date-fns";
@@ -131,22 +132,21 @@ export const Report = () => {
         console.log("Something went wrong with adding a favorite!");
         return;
       }
-      getRowTopics();
-    } else {
-      const favs = [...favorites];
-      const removed = favs.find(
-        (fav) =>
-          fav.activity.id === topic.activity.id &&
-          fav.issue.id === topic.issue.id
+      setFavorites([...favorites, topic]);
+      const shortenedRecents = removeIssueActivityPair(
+        [...filteredRecents],
+        topic
       );
-      const index = favs.indexOf(removed);
-      favs.splice(index, 1);
-      const saved = await saveFavorites(favs);
+      setFilteredRecents(shortenedRecents);
+    } else {
+      const shortenedFavs = removeIssueActivityPair([...favorites], topic);
+      const saved = await saveFavorites(shortenedFavs);
       if (!saved) {
         console.log("Something went wrong with removing a favorite!");
         return;
       }
-      getRowTopics();
+      setFavorites(shortenedFavs);
+      setFilteredRecents([topic, ...filteredRecents]);
     }
   };
 
