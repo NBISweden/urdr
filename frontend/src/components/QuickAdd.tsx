@@ -32,7 +32,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const searchIssue = async () => {
     console.log("Searching issue...");
 
-    const endpoint = `/api/issues?issue_id=${search}`;
+    const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
     let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
     if (result) {
       if (result.issues.length > 0) {
