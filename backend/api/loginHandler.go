@@ -60,7 +60,7 @@ func loginHandler(c *fiber.Ctx) error {
 		log.Errorf("Failed to save session: %v", err)
 	}
 
-	log.Debugf("Logged in user %v", loginResponse)
+	log.Debugf("Logged in user %s", loginResponse.User.Login)
 
 	return c.JSON(user{
 		Login: loginResponse.User.Login,
