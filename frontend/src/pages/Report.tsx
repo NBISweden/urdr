@@ -6,7 +6,7 @@ import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { useNavigate } from "react-router-dom";
 import { HeaderUser } from "../components/HeaderUser";
-import { User, IssueActivityPair, TimeEntry } from "../model";
+import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
@@ -25,6 +25,7 @@ export const Report = () => {
     []
   );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
+  const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toggleSave, setToggleSave] = useState(false);
   const today = new Date();
@@ -75,6 +76,39 @@ export const Report = () => {
     console.log("recent issues", recentIssues);
     getRowTopics();
   }, [recentIssues]);
+
+  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
+    console.log("getting time entries");
+    let params = new URLSearchParams({
+      issue_id: `${rowTopic.issue.id}`,
+      activity_id: `${rowTopic.activity.id}`,
+      from: formatDate(days[0], "yyyy-MM-dd"),
+      to: formatDate(days[4], "yyyy-MM-dd"),
+    });
+    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
+      `/api/time_entries?${params}`
+    );
+    return entries.time_entries;
+  };
+
+  React.useEffect(() => {
+    if (!(!!favorites && !!filteredRecents && !!currentWeekArray)) {
+      return;
+    }
+    const getAllEntries = async () => {
+      let allEntries = [];
+      for await (let fav of favorites) {
+        const favEntries = await getTimeEntries(fav, currentWeekArray);
+        allEntries.push(...favEntries);
+      }
+      for await (let recent of filteredRecents) {
+        const recentEntries = await getTimeEntries(recent, currentWeekArray);
+        allEntries.push(...recentEntries);
+      }
+      setTimeEntries(allEntries);
+    };
+    getAllEntries();
+  }, [favorites, filteredRecents, currentWeekArray]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
