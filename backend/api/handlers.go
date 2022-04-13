@@ -56,7 +56,8 @@ func fetchIssueSubjects(c *fiber.Ctx, entries []Entry) (bool, error) {
 	// the issue subjects for the issue IDs in the issueIds list.
 
 	c.Request().URI().SetQueryString(
-		fmt.Sprintf("issue_id=%s", strings.Join(issueIds, ",")))
+		fmt.Sprintf("issue_id=%s&status_id=*",
+			strings.Join(issueIds, ",")))
 
 	c.Response().Reset()
 	if err := getIssuesHandler(c); err != nil {
