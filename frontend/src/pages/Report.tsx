@@ -43,7 +43,37 @@ export const Report = () => {
     setRecentIssues(issues);
   };
 
-  const getRowTopics = async () => {
+  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
+    console.log("getting time entries");
+    let params = new URLSearchParams({
+      issue_id: `${rowTopic.issue.id}`,
+      activity_id: `${rowTopic.activity.id}`,
+      from: formatDate(days[0], "yyyy-MM-dd"),
+      to: formatDate(days[4], "yyyy-MM-dd"),
+    });
+    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
+      `/api/time_entries?${params}`
+    );
+    return entries.time_entries;
+  };
+
+  const getAllEntries = async (
+    favs: IssueActivityPair[],
+    recents: IssueActivityPair[]
+  ) => {
+    let allEntries = [];
+    for await (let fav of favs) {
+      const favEntries = await getTimeEntries(fav, currentWeekArray);
+      allEntries.push(...favEntries);
+    }
+    for await (let recent of recents) {
+      const recentEntries = await getTimeEntries(recent, currentWeekArray);
+      allEntries.push(...recentEntries);
+    }
+    setTimeEntries(allEntries);
+  };
+
+  const getRowData = async () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
       "/api/priority_entries"
     );
@@ -62,9 +92,11 @@ export const Report = () => {
           nonFavIssues.push(issue);
         }
       });
+      getAllEntries(favorites, nonFavIssues);
       setFilteredRecents(nonFavIssues);
       setFavorites(favorites);
     } else {
+      getAllEntries([], issues);
       setFilteredRecents(issues);
     }
   };
@@ -74,41 +106,8 @@ export const Report = () => {
   }, [weekTravelDay]);
   React.useEffect(() => {
     console.log("recent issues", recentIssues);
-    getRowTopics();
+    getRowData();
   }, [recentIssues]);
-
-  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    console.log("getting time entries");
-    let params = new URLSearchParams({
-      issue_id: `${rowTopic.issue.id}`,
-      activity_id: `${rowTopic.activity.id}`,
-      from: formatDate(days[0], "yyyy-MM-dd"),
-      to: formatDate(days[4], "yyyy-MM-dd"),
-    });
-    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`
-    );
-    return entries.time_entries;
-  };
-
-  React.useEffect(() => {
-    if (!(!!favorites && !!filteredRecents && !!currentWeekArray)) {
-      return;
-    }
-    const getAllEntries = async () => {
-      let allEntries = [];
-      for await (let fav of favorites) {
-        const favEntries = await getTimeEntries(fav, currentWeekArray);
-        allEntries.push(...favEntries);
-      }
-      for await (let recent of filteredRecents) {
-        const recentEntries = await getTimeEntries(recent, currentWeekArray);
-        allEntries.push(...recentEntries);
-      }
-      setTimeEntries(allEntries);
-    };
-    getAllEntries();
-  }, [favorites, filteredRecents, currentWeekArray]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
@@ -274,6 +273,51 @@ export const Report = () => {
     return;
   };
 
+  const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let rowHours = [];
+    days.map((day) => {
+      let hours = 0;
+      let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
+        (entry) =>
+          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.issue_id === rowTopic.issue.id &&
+          entry.activity_id === rowTopic.activity.id
+      );
+      if (!entry && timeEntries && timeEntries.length > 0) {
+        entry = timeEntries?.find(
+          (entry) =>
+            entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+            entry.issue.id === rowTopic.issue.id &&
+            entry.activity.id === rowTopic.activity.id
+        );
+      }
+      if (entry) {
+        hours = entry.hours;
+      }
+      rowHours.push(hours);
+      return;
+    });
+    return rowHours;
+  };
+
+  const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let rowEntryIds = [];
+    days.map((day) => {
+      let id = 0;
+      let entry = timeEntries?.find(
+        (entry) =>
+          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.issue.id === rowTopic.issue.id &&
+          entry.activity.id === rowTopic.activity.id
+      );
+      if (entry) {
+        id = entry.id;
+      }
+      rowEntryIds.push(id);
+    });
+    return rowEntryIds;
+  };
+
   return (
     <>
       <div className="report-header">
@@ -294,10 +338,10 @@ export const Report = () => {
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {favorites &&
                     favorites.map((fav, index) => {
-                      const rowUpdates = newTimeEntries?.filter(
-                        (entry) =>
-                          entry.issue_id === fav.issue.id &&
-                          entry.activity_id === fav.activity.id
+                      const rowHours = findRowHours(fav, currentWeekArray);
+                      const rowEntryIds = findRowEntryIds(
+                        fav,
+                        currentWeekArray
                       );
                       return (
                         <>
@@ -318,7 +362,8 @@ export const Report = () => {
                                   onCellUpdate={handleCellUpdate}
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
-                                  rowUpdates={rowUpdates}
+                                  rowHours={rowHours}
+                                  rowEntryIds={rowEntryIds}
                                   saved={toggleSave}
                                   isFav={true}
                                 />
@@ -341,11 +386,8 @@ export const Report = () => {
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
-            const rowUpdates = newTimeEntries?.filter(
-              (entry) =>
-                entry.issue_id === recentIssue.issue.id &&
-                entry.activity_id === recentIssue.activity.id
-            );
+            const rowHours = findRowHours(recentIssue, currentWeekArray);
+            const rowEntryIds = findRowEntryIds(recentIssue, currentWeekArray);
             return (
               <>
                 <Row
@@ -354,7 +396,8 @@ export const Report = () => {
                   onCellUpdate={handleCellUpdate}
                   onToggleFav={handleToggleFav}
                   days={currentWeekArray}
-                  rowUpdates={rowUpdates}
+                  rowHours={rowHours}
+                  rowEntryIds={rowEntryIds}
                   saved={toggleSave}
                   isFav={false}
                 />
