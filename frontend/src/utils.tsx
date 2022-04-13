@@ -1,5 +1,6 @@
 import.meta.hot;
 import React, { useState } from "react";
+import { IssueActivityPair } from "./model";
 
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
@@ -91,6 +92,21 @@ export const getLongCustomDateString = (day: Date) => {
 
 export const getShortCustomDateString = (day: Date) => {
   return `${day.getDate()}/${day.getMonth() + 1}`;
+};
+
+// Removes an IssueActivityPair object from an array of these objects.
+// Returns the shortened array.
+export const removeIssueActivityPair = (
+  pairs: IssueActivityPair[],
+  item: IssueActivityPair
+): IssueActivityPair[] => {
+  const removed = pairs.find(
+    (pair) =>
+      pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
+  );
+  const index = pairs.indexOf(removed);
+  pairs.splice(index, 1);
+  return pairs;
 };
 
 export const useDebounce = (value, delay) => {
