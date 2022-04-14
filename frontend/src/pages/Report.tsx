@@ -211,7 +211,7 @@ export const Report = () => {
     return saved;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (newTimeEntries.length === 0) {
       alert(
         "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
@@ -219,14 +219,12 @@ export const Report = () => {
       return;
     }
     const unsavedEntries = [];
-    newTimeEntries.forEach(async (entry) => {
+    for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
       if (!saved) {
         unsavedEntries.push(entry);
-        return;
       }
-      return;
-    });
+    }
     if (unsavedEntries.length === 0) {
       alert("All changes were saved!");
     }
