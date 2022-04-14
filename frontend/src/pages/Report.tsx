@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -15,11 +16,8 @@ import {
   removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
-import { format as formatDate } from "date-fns";
 
 export const Report = () => {
-  const navigate = useNavigate();
-
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -30,7 +28,8 @@ export const Report = () => {
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  let location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const user: User = location.state as User;
 
   const getRecentIssuesWithinRange = async () => {
@@ -43,7 +42,6 @@ export const Report = () => {
   };
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    console.log("getting time entries");
     let params = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
@@ -76,9 +74,7 @@ export const Report = () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
       "/api/priority_entries"
     );
-
     const issues = [...recentIssues];
-
     if (!!favorites) {
       let nonFavIssues = [];
       issues.forEach((issue, index) => {
@@ -104,7 +100,6 @@ export const Report = () => {
     getRecentIssuesWithinRange();
   }, [weekTravelDay]);
   React.useEffect(() => {
-    console.log("recent issues", recentIssues);
     getRowData();
   }, [recentIssues]);
 
@@ -259,14 +254,11 @@ export const Report = () => {
     if (!result.destination) {
       return;
     }
-
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
-
     if (startIndex === endIndex) {
       return;
     }
-
     const favs = [...favorites];
     const [moved] = favs.splice(startIndex, 1);
     favs.splice(endIndex, 0, moved);
