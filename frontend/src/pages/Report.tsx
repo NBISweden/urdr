@@ -27,7 +27,6 @@ export const Report = () => {
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
-  const [toggleSave, setToggleSave] = useState(false);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
@@ -228,10 +227,8 @@ export const Report = () => {
     if (unsavedEntries.length === 0) {
       alert("All changes were saved!");
     }
-    setToggleSave(!toggleSave);
-    setTimeout(() => {
-      setNewTimeEntries(unsavedEntries);
-    }, 1000);
+    await getAllEntries(favorites, filteredRecents);
+    setNewTimeEntries(unsavedEntries);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -369,7 +366,6 @@ export const Report = () => {
                                   days={currentWeekArray}
                                   rowHours={rowHours}
                                   rowEntryIds={rowEntryIds}
-                                  saved={toggleSave}
                                   isFav={true}
                                 />
                               </div>
@@ -403,7 +399,6 @@ export const Report = () => {
                   days={currentWeekArray}
                   rowHours={rowHours}
                   rowEntryIds={rowEntryIds}
-                  saved={toggleSave}
                   isFav={false}
                 />
               </>

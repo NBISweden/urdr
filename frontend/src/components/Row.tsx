@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
-import { getApiEndpoint } from "../utils";
+import React from "react";
+import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 
 import { Cell } from "./Cell";
@@ -15,7 +14,6 @@ export const Row = ({
   rowEntryIds,
   onCellUpdate,
   onToggleFav,
-  saved,
   isFav,
 }: {
   topic: IssueActivityPair;
@@ -24,7 +22,6 @@ export const Row = ({
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
-  saved: boolean;
   isFav: boolean;
 }) => {
   return (
