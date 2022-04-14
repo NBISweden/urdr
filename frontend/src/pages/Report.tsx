@@ -240,15 +240,22 @@ export const Report = () => {
   };
 
   const addIssueActivityHandler = (pair) => {
-    const recentIssue = recentIssues.find((e) => {
+    let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
+    if (!recentIssue) {
+      recentIssue = favorites.find((e) => {
+        return (
+          e.issue.id === pair.issue.id && e.activity.id === pair.activity.id
+        );
+      });
+    }
     if (recentIssue) {
       alert("This issue/activity pair is already added");
       return;
     }
-    const newRecentIssues = [...recentIssues, pair];
-    setRecentIssues(newRecentIssues);
+    const newRecentIssues = [...filteredRecents, pair];
+    setFilteredRecents(newRecentIssues);
   };
 
   const onDragEnd = (result) => {
