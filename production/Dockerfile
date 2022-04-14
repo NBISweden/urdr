@@ -11,7 +11,7 @@ RUN apk --update add gcc=10.3.1_git20211027-r0 \
     rm -rf /var/cache/apk/*
 
 RUN go build -o ./urdr ./cmd && \
-    echo "nobody:x:65534:65534:nobody:/:/sbin/nologin" > passwd
+    echo "urdr:x:1001:1001:urdr:/:/sbin/nologin" > passwd
 
 FROM alpine:3.15
 
