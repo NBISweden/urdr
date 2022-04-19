@@ -1,5 +1,7 @@
 # Deployment and production notes
 
+## Certificates
+
 To renew certificates manually use:
 
 ```shell
@@ -16,10 +18,26 @@ If the certificates do not exist then run:
 		--agree-tos
 ```
 
-To start the actual service do:
+## Service user
+
+Before starting the service, you need to create the following user:
+
+```shell
+/usr/sbin/useradd -u 1001 -g 1001 -m urdr
+```
+
+## Build and deployment
+
+To build the needed images do:
 
 ```shell
 cd production
+docker-compose build --no-cache
+```
+
+To start the actual service do:
+
+```shell
 docker-compose up -d
 ```
 
