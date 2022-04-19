@@ -32,16 +32,6 @@ export const Report = () => {
   let location = useLocation();
   const { user, setUser } = React.useContext(AuthContext);
 
-  const getRecentIssuesWithinRange = async () => {
-    // Use Friday as limit for the query
-    const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
-    const issues: IssueActivityPair[] = await getApiEndpoint(
-      `/api/recent_issues?to=${toDate}`,
-      setUser
-    );
-    setRecentIssues(issues);
-  };
-
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
@@ -100,10 +90,57 @@ export const Report = () => {
   };
 
   React.useEffect(() => {
-    getRecentIssuesWithinRange();
+    let didCancel = false;
+    let issues = null;
+    const setRecentIssuesWithinRange = async () => {
+      // Use Friday as limit for the query
+      const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
+      const issues: IssueActivityPair[] = await getApiEndpoint(
+        `/api/recent_issues?to=${toDate}`,
+        setUser
+      );
+      if (!didCancel) setRecentIssues(issues);
+    };
+    setRecentIssuesWithinRange();
+
+    return () => {
+      didCancel = true;
+    };
   }, [weekTravelDay]);
+
   React.useEffect(() => {
+    let didCancel = false;
+
+    const getRowData = async () => {
+      const favorites: IssueActivityPair[] = await getApiEndpoint(
+        "/api/priority_entries",
+        setUser
+      );
+
+      const issues = [...recentIssues];
+
+      if (!!favorites && !didCancel) {
+        let nonFavIssues = [];
+        issues.forEach((issue, index) => {
+          let match = favorites.find(
+            (fav) =>
+              fav.issue.id === issue.issue.id &&
+              fav.activity.id === issue.activity.id
+          );
+          if (!match) {
+            nonFavIssues.push(issue);
+          }
+        });
+        setFilteredRecents(nonFavIssues);
+        setFavorites(favorites);
+      } else {
+        setFilteredRecents(issues);
+      }
+    };
     getRowData();
+    return () => {
+      didCancel = true;
+    };
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
@@ -389,9 +426,6 @@ export const Report = () => {
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
-            console.log(
-              `${recentIssue.issue.subject}-${recentIssue.activity.name}`
-            );
             return (
               <Row
                 key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
