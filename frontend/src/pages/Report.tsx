@@ -267,6 +267,12 @@ export const Report = () => {
     return;
   };
 
+  /*
+  Returns an array with five numbers representing the number of hours 
+  to be displayed in the five cells of a row.
+  Checks first for new time entries, i.e. unsaved changes,
+  and, if there are none, for entries from the database for the respective cell.
+  */
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
@@ -294,6 +300,11 @@ export const Report = () => {
     return rowHours;
   };
 
+  /*
+  Returns an array of five numbers representing Redmine's entry ids of 
+  entries displayed in a row. 
+  If there is no entry in the database, id is 0.
+  */
   const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowEntryIds = [];
     days.map((day) => {
