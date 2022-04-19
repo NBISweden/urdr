@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { useNavigate } from "react-router-dom";
 import { HeaderUser } from "../components/HeaderUser";
-import { User, IssueActivityPair, TimeEntry } from "../model";
+import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
@@ -15,22 +16,20 @@ import {
   removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
-import { format as formatDate } from "date-fns";
 
 export const Report = () => {
-  const navigate = useNavigate();
-
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
   );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
+  const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
-  const [toggleSave, setToggleSave] = useState(false);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  let location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const user: User = location.state as User;
 
   const getRecentIssuesWithinRange = async () => {
@@ -42,13 +41,40 @@ export const Report = () => {
     setRecentIssues(issues);
   };
 
-  const getRowTopics = async () => {
+  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
+    let params = new URLSearchParams({
+      issue_id: `${rowTopic.issue.id}`,
+      activity_id: `${rowTopic.activity.id}`,
+      from: formatDate(days[0], "yyyy-MM-dd"),
+      to: formatDate(days[4], "yyyy-MM-dd"),
+    });
+    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
+      `/api/time_entries?${params}`
+    );
+    return entries.time_entries;
+  };
+
+  const getAllEntries = async (
+    favs: IssueActivityPair[],
+    recents: IssueActivityPair[]
+  ) => {
+    let allEntries = [];
+    for await (let fav of favs) {
+      const favEntries = await getTimeEntries(fav, currentWeekArray);
+      allEntries.push(...favEntries);
+    }
+    for await (let recent of recents) {
+      const recentEntries = await getTimeEntries(recent, currentWeekArray);
+      allEntries.push(...recentEntries);
+    }
+    setTimeEntries(allEntries);
+  };
+
+  const getRowData = async () => {
     const favorites: IssueActivityPair[] = await getApiEndpoint(
       "/api/priority_entries"
     );
-
     const issues = [...recentIssues];
-
     if (!!favorites) {
       let nonFavIssues = [];
       issues.forEach((issue, index) => {
@@ -61,9 +87,11 @@ export const Report = () => {
           nonFavIssues.push(issue);
         }
       });
+      getAllEntries(favorites, nonFavIssues);
       setFilteredRecents(nonFavIssues);
       setFavorites(favorites);
     } else {
+      getAllEntries([], issues);
       setFilteredRecents(issues);
     }
   };
@@ -72,8 +100,7 @@ export const Report = () => {
     getRecentIssuesWithinRange();
   }, [weekTravelDay]);
   React.useEffect(() => {
-    console.log("recent issues", recentIssues);
-    getRowTopics();
+    getRowData();
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
@@ -178,7 +205,7 @@ export const Report = () => {
     return saved;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (newTimeEntries.length === 0) {
       alert(
         "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
@@ -186,21 +213,17 @@ export const Report = () => {
       return;
     }
     const unsavedEntries = [];
-    newTimeEntries.forEach(async (entry) => {
+    for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
       if (!saved) {
         unsavedEntries.push(entry);
-        return;
       }
-      return;
-    });
+    }
     if (unsavedEntries.length === 0) {
       alert("All changes were saved!");
     }
-    setToggleSave(!toggleSave);
-    setTimeout(() => {
-      setNewTimeEntries(unsavedEntries);
-    }, 1000);
+    await getAllEntries(favorites, filteredRecents);
+    setNewTimeEntries(unsavedEntries);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -209,35 +232,95 @@ export const Report = () => {
   };
 
   const addIssueActivityHandler = (pair) => {
-    const recentIssue = recentIssues.find((e) => {
+    let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
+    if (!recentIssue) {
+      recentIssue = favorites.find((e) => {
+        return (
+          e.issue.id === pair.issue.id && e.activity.id === pair.activity.id
+        );
+      });
+    }
     if (recentIssue) {
       alert("This issue/activity pair is already added");
       return;
     }
-    const newRecentIssues = [...recentIssues, pair];
-    setRecentIssues(newRecentIssues);
+    const newRecentIssues = [...filteredRecents, pair];
+    setFilteredRecents(newRecentIssues);
   };
 
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
     }
-
     const startIndex = result.source.index;
     const endIndex = result.destination.index;
-
     if (startIndex === endIndex) {
       return;
     }
-
     const favs = [...favorites];
     const [moved] = favs.splice(startIndex, 1);
     favs.splice(endIndex, 0, moved);
     setFavorites(favs);
     saveFavorites(favs);
     return;
+  };
+
+  /*
+  Returns an array with five numbers representing the number of hours 
+  to be displayed in the five cells of a row.
+  Checks first for new time entries, i.e. unsaved changes,
+  and, if there are none, for entries from the database for the respective cell.
+  */
+  const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let rowHours = [];
+    days.map((day) => {
+      let hours = 0;
+      let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
+        (entry) =>
+          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.issue_id === rowTopic.issue.id &&
+          entry.activity_id === rowTopic.activity.id
+      );
+      if (!entry && timeEntries && timeEntries.length > 0) {
+        entry = timeEntries?.find(
+          (entry) =>
+            entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+            entry.issue.id === rowTopic.issue.id &&
+            entry.activity.id === rowTopic.activity.id
+        );
+      }
+      if (entry) {
+        hours = entry.hours;
+      }
+      rowHours.push(hours);
+      return;
+    });
+    return rowHours;
+  };
+
+  /*
+  Returns an array of five numbers representing Redmine's entry ids of 
+  entries displayed in a row. 
+  If there is no entry in the database, id is 0.
+  */
+  const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let rowEntryIds = [];
+    days.map((day) => {
+      let id = 0;
+      let entry = timeEntries?.find(
+        (entry) =>
+          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.issue.id === rowTopic.issue.id &&
+          entry.activity.id === rowTopic.activity.id
+      );
+      if (entry) {
+        id = entry.id;
+      }
+      rowEntryIds.push(id);
+    });
+    return rowEntryIds;
   };
 
   return (
@@ -260,10 +343,10 @@ export const Report = () => {
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {favorites &&
                     favorites.map((fav, index) => {
-                      const rowUpdates = newTimeEntries?.filter(
-                        (entry) =>
-                          entry.issue_id === fav.issue.id &&
-                          entry.activity_id === fav.activity.id
+                      const rowHours = findRowHours(fav, currentWeekArray);
+                      const rowEntryIds = findRowEntryIds(
+                        fav,
+                        currentWeekArray
                       );
                       return (
                         <>
@@ -284,8 +367,8 @@ export const Report = () => {
                                   onCellUpdate={handleCellUpdate}
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
-                                  rowUpdates={rowUpdates}
-                                  saved={toggleSave}
+                                  rowHours={rowHours}
+                                  rowEntryIds={rowEntryIds}
                                   isFav={true}
                                 />
                               </div>
@@ -307,11 +390,8 @@ export const Report = () => {
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
-            const rowUpdates = newTimeEntries?.filter(
-              (entry) =>
-                entry.issue_id === recentIssue.issue.id &&
-                entry.activity_id === recentIssue.activity.id
-            );
+            const rowHours = findRowHours(recentIssue, currentWeekArray);
+            const rowEntryIds = findRowEntryIds(recentIssue, currentWeekArray);
             return (
               <>
                 <Row
@@ -320,8 +400,8 @@ export const Report = () => {
                   onCellUpdate={handleCellUpdate}
                   onToggleFav={handleToggleFav}
                   days={currentWeekArray}
-                  rowUpdates={rowUpdates}
-                  saved={toggleSave}
+                  rowHours={rowHours}
+                  rowEntryIds={rowEntryIds}
                   isFav={false}
                 />
               </>
