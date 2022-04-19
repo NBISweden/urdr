@@ -4,11 +4,12 @@ version: "3"
 services:
 
   urdr:
+    user: urdr
     build:
       dockerfile: ../production/Dockerfile
       context: ../backend
     volumes:
-        - ../backend/:/app
+      - ../backend/:/app
     container_name: urdr
     expose:
       - "8080"
