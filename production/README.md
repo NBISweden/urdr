@@ -1,21 +1,25 @@
 # Deployment and production notes
 
-To obtain a new certificate use certbot:
+To renew certificates manually use:
 
 ```shell
-certbot --nginx -d urdr-test.nbis.se
+    certbot renew -n --quiet
 ```
 
-Add a cronjob for root to automatically renew certs:
+If the certificates do not exist then run:
 
 ```shell
-0 */12 * * * root /usr/bin/certbot renew > /dev/null 2>&1
+    certbot certonly -n \
+		-d urdr-test.nbis.se \
+		-d urdr-test-redmine.nbis.se \
+		--nginx \
+		--agree-tos
 ```
 
 To start the actual service do:
 
 ```shell
-cd production 
+cd production
 docker-compose up -d
 ```
 
