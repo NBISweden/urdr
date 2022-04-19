@@ -62,33 +62,6 @@ export const Report = () => {
     setTimeEntries(allEntries);
   };
 
-  const getRowData = async () => {
-    const favorites: IssueActivityPair[] = await getApiEndpoint(
-      "/api/priority_entries",
-      setUser
-    );
-    const issues = [...recentIssues];
-    if (!!favorites) {
-      let nonFavIssues = [];
-      issues.forEach((issue, index) => {
-        let match = favorites.find(
-          (fav) =>
-            fav.issue.id === issue.issue.id &&
-            fav.activity.id === issue.activity.id
-        );
-        if (!match) {
-          nonFavIssues.push(issue);
-        }
-      });
-      getAllEntries(favorites, nonFavIssues);
-      setFilteredRecents(nonFavIssues);
-      setFavorites(favorites);
-    } else {
-      getAllEntries([], issues);
-      setFilteredRecents(issues);
-    }
-  };
-
   React.useEffect(() => {
     let didCancel = false;
     let issues = null;
@@ -116,10 +89,8 @@ export const Report = () => {
         "/api/priority_entries",
         setUser
       );
-
       const issues = [...recentIssues];
-
-      if (!!favorites && !didCancel) {
+      if (!!favorites) {
         let nonFavIssues = [];
         issues.forEach((issue, index) => {
           let match = favorites.find(
@@ -131,9 +102,13 @@ export const Report = () => {
             nonFavIssues.push(issue);
           }
         });
-        setFilteredRecents(nonFavIssues);
-        setFavorites(favorites);
-      } else {
+        if (!didCancel) {
+          getAllEntries(favorites, nonFavIssues);
+          setFilteredRecents(nonFavIssues);
+          setFavorites(favorites);
+        }
+      } else if (!didCancel) {
+        getAllEntries([], issues);
         setFilteredRecents(issues);
       }
     };
