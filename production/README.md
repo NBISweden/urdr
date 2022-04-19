@@ -12,10 +12,10 @@ If the certificates do not exist then run:
 
 ```shell
     certbot certonly -n \
-		-d urdr-test.nbis.se \
-		-d urdr-test-redmine.nbis.se \
-		--nginx \
-		--agree-tos
+    -d urdr-test.nbis.se \
+    -d urdr-test-redmine.nbis.se \
+    --nginx \
+    --agree-tos
 ```
 
 ## Service user
@@ -35,7 +35,7 @@ cd production
 docker-compose build --no-cache
 ```
 
-To start the actual service do:
+To start the actual services do:
 
 ```shell
 docker-compose up -d

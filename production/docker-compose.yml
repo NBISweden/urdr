@@ -9,7 +9,7 @@ services:
       dockerfile: ../production/Dockerfile
       context: ../backend
     volumes:
-        - ../backend/:/app
+      - ../backend/:/app
     container_name: urdr
     expose:
       - "8080"
