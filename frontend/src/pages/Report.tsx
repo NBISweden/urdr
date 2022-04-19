@@ -339,7 +339,7 @@ export const Report = () => {
         />
         <HeaderUser username={user ? user.login : ""} />
       </div>
-      {favorites.length > 0 ? (
+      {favorites && favorites.length > 0 && (
         <DragDropContext onDragEnd={onDragEnd}>
           <section className="favorites-container">
             <HeaderRow days={currentWeekArray} />
@@ -349,35 +349,33 @@ export const Report = () => {
                   {favorites &&
                     favorites.map((fav, index) => {
                       return (
-                        <>
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={findRowHours(fav, currentWeekArray)}
-                                  rowEntryIds={findRowEntryIds(
-                                    fav,
-                                    currentWeekArray
-                                  )}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        </>
+                        <Draggable
+                          draggableId={`${fav.issue.id}${fav.activity.id}`}
+                          index={index}
+                          key={`${fav.issue.id}${fav.activity.id}-drag`}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <Row
+                                key={`${fav.issue.id}${fav.activity.id}`}
+                                topic={fav}
+                                onCellUpdate={handleCellUpdate}
+                                onToggleFav={handleToggleFav}
+                                days={currentWeekArray}
+                                rowHours={findRowHours(fav, currentWeekArray)}
+                                rowEntryIds={findRowEntryIds(
+                                  fav,
+                                  currentWeekArray
+                                )}
+                                isFav={true}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
                       );
                     })}
                   {provided.placeholder}
@@ -386,26 +384,25 @@ export const Report = () => {
             </Droppable>
           </section>
         </DragDropContext>
-      ) : (
-        <div></div>
       )}
       <section className="recent-container">
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
+            console.log(
+              `${recentIssue.issue.subject}-${recentIssue.activity.name}`
+            );
             return (
-              <>
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue, currentWeekArray)}
-                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
-                  isFav={false}
-                />
-              </>
+              <Row
+                key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                topic={recentIssue}
+                onCellUpdate={handleCellUpdate}
+                onToggleFav={handleToggleFav}
+                days={currentWeekArray}
+                rowHours={findRowHours(recentIssue, currentWeekArray)}
+                rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                isFav={false}
+              />
             );
           })}
       </section>
