@@ -11,9 +11,12 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   React.useEffect(() => {
+    let didCancel = false;
     let user = window.localStorage.getItem("user");
-    if (user) user = JSON.parse(user);
-    setUser(user);
+    if (!didCancel && user) setUser(JSON.parse(user));
+    return () => {
+      didCancel = true;
+    };
   }, []);
 
   React.useEffect(() => {
