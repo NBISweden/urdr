@@ -348,11 +348,6 @@ export const Report = () => {
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {favorites &&
                     favorites.map((fav, index) => {
-                      const rowHours = findRowHours(fav, currentWeekArray);
-                      const rowEntryIds = findRowEntryIds(
-                        fav,
-                        currentWeekArray
-                      );
                       return (
                         <>
                           <Draggable
@@ -372,8 +367,11 @@ export const Report = () => {
                                   onCellUpdate={handleCellUpdate}
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
-                                  rowHours={rowHours}
-                                  rowEntryIds={rowEntryIds}
+                                  rowHours={findRowHours(fav, currentWeekArray)}
+                                  rowEntryIds={findRowEntryIds(
+                                    fav,
+                                    currentWeekArray
+                                  )}
                                   isFav={true}
                                 />
                               </div>
@@ -395,8 +393,6 @@ export const Report = () => {
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
-            const rowHours = findRowHours(recentIssue, currentWeekArray);
-            const rowEntryIds = findRowEntryIds(recentIssue, currentWeekArray);
             return (
               <>
                 <Row
@@ -405,8 +401,8 @@ export const Report = () => {
                   onCellUpdate={handleCellUpdate}
                   onToggleFav={handleToggleFav}
                   days={currentWeekArray}
-                  rowHours={rowHours}
-                  rowEntryIds={rowEntryIds}
+                  rowHours={findRowHours(recentIssue, currentWeekArray)}
+                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
                   isFav={false}
                 />
               </>

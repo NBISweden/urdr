@@ -1,10 +1,6 @@
 import.meta.hot;
 import React, { useState } from "react";
 import { IssueActivityPair } from "./model";
-import { AuthContext } from "./components/AuthProvider";
-import { Navigate, useNavigate } from "react-router-dom";
-import { AuthContext } from "./components/AuthProvider";
-
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
 export let headers = new Headers();
