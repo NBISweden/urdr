@@ -7,7 +7,8 @@ export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
 
-export const getApiEndpoint = async (endpoint, setUser) => {
+export const getApiEndpoint = async (endpoint, context) => {
+  if (context.user === null) return null;
   let logout = false;
   let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
@@ -25,7 +26,7 @@ export const getApiEndpoint = async (endpoint, setUser) => {
       }
     })
     .catch((error) => console.log(error));
-  if (logout) setUser(null);
+  if (logout) context.setUser(null);
   return result;
 };
 

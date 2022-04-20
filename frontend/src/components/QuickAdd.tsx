@@ -14,14 +14,14 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-  const { setUser } = React.useContext(AuthContext);
+  const context = React.useContext(AuthContext);
 
   React.useEffect(() => {
     let didCancel = false;
     const loadActivities = async () => {
       let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
         "/api/activities",
-        setUser
+        context
       );
       if (!didCancel && result) {
         setActivities(result.time_entry_activities);
@@ -45,7 +45,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
           const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
           let result: { issues: Issue[] } = await getApiEndpoint(
             endpoint,
-            setUser
+            context
           );
           if (!didCancel) {
             if (result.issues.length > 0) {

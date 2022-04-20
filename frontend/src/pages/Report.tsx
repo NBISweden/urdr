@@ -30,7 +30,7 @@ export const Report = () => {
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
   let location = useLocation();
-  const { user, setUser } = React.useContext(AuthContext);
+  const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
@@ -41,7 +41,7 @@ export const Report = () => {
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
       `/api/time_entries?${params}`,
-      setUser
+      context
     );
     if (entries) return entries.time_entries;
     return null;
@@ -71,7 +71,7 @@ export const Report = () => {
       const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
       const issues: IssueActivityPair[] = await getApiEndpoint(
         `/api/recent_issues?to=${toDate}`,
-        setUser
+        context
       );
       if (!didCancel) setRecentIssues(issues);
     };
@@ -88,7 +88,7 @@ export const Report = () => {
     const getRowData = async () => {
       const favorites: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
-        setUser
+        context
       );
       const issues = [...recentIssues];
       if (!!favorites) {
@@ -160,7 +160,7 @@ export const Report = () => {
         setFavorites(favs);
         return false;
       });
-    if (logout) setUser(null);
+    if (logout) context.setUser(null);
     return saved;
   };
 
@@ -219,7 +219,7 @@ export const Report = () => {
         alert(error);
         return false;
       });
-    if (logout) setUser(null);
+    if (logout) context.setUser(null);
     return saved;
   };
 
@@ -350,7 +350,7 @@ export const Report = () => {
           onWeekTravel={handleWeekTravel}
           currentWeekArray={currentWeekArray}
         />
-        <HeaderUser username={user ? user.login : ""} />
+        <HeaderUser username={context.user ? context.user.login : ""} />
       </div>
       {favorites && favorites.length > 0 && (
         <DragDropContext onDragEnd={onDragEnd}>
