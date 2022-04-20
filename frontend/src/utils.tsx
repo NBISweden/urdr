@@ -1,13 +1,15 @@
 import.meta.hot;
 import React, { useState } from "react";
-
+import { IssueActivityPair } from "./model";
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
 
-export const getApiEndpoint = async (endpoint) => {
+export const getApiEndpoint = async (endpoint, context) => {
+  if (context.user === null) return null;
+  let logout = false;
   let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
     headers: headers,
@@ -16,8 +18,7 @@ export const getApiEndpoint = async (endpoint) => {
       if (res.ok) {
         return res.json();
       } else if (res.status === 401) {
-        // Redirect to login page
-        window.location.href = "/";
+        logout = true;
       } else {
         throw new Error(
           "There was an error accessing the endpoint " + endpoint
@@ -25,6 +26,7 @@ export const getApiEndpoint = async (endpoint) => {
       }
     })
     .catch((error) => console.log(error));
+  if (logout) context.setUser(null);
   return result;
 };
 
@@ -91,6 +93,21 @@ export const getLongCustomDateString = (day: Date) => {
 
 export const getShortCustomDateString = (day: Date) => {
   return `${day.getDate()}/${day.getMonth() + 1}`;
+};
+
+// Removes an IssueActivityPair object from an array of these objects.
+// Returns the shortened array.
+export const removeIssueActivityPair = (
+  pairs: IssueActivityPair[],
+  item: IssueActivityPair
+): IssueActivityPair[] => {
+  const removed = pairs.find(
+    (pair) =>
+      pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
+  );
+  const index = pairs.indexOf(removed);
+  pairs.splice(index, 1);
+  return pairs;
 };
 
 export const useDebounce = (value, delay) => {

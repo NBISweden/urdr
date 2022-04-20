@@ -203,6 +203,12 @@ input[type="number"] {
   background-color: white;
   padding: 0.5rem 0.75rem;
   margin: 0.5rem 0;
+  display: flex;
+}
+
+.issue-label-text {
+  margin: 0;
+  min-width: 4rem;
 }
 
 .basic-button {
@@ -264,6 +270,12 @@ input[type="number"] {
 
 .star {
   width: 1.7rem;
+}
+
+.star-button {
+  background-color: hsl(0deg 0% 97%);
+  border: none;
+  display: flex;
 }
 
 .grip-container {

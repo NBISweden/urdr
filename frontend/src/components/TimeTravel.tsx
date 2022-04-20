@@ -77,7 +77,6 @@ export const TimeTravel = ({
         locale={sv}
         showYearDropdown
         todayButton="Idag"
-        withPortal
       />
       <button onClick={nextWeeksClickHandle} className="week-arrow-button">
         <img src={right} alt="right arrow" className="week-arrow" />

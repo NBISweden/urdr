@@ -3,47 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { LoginHeader } from "../components/LoginHeader";
 import "../index.css";
-import { User } from "../model";
-import { SNOWPACK_PUBLIC_API_URL } from "../utils";
+import { AuthContext } from "../components/AuthProvider";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { onLogin } = React.useContext(AuthContext);
 
   const authenticateRedmine = async (event) => {
     event?.preventDefault();
-    // We are not doing account linking
-    let headers = new Headers();
-    headers.set("Accept", "application/json");
-    headers.set("Content-Type", "application/json");
-    headers.set(
-      "Authorization",
-      "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
-    );
-
-    const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
-      body: "",
-      method: "POST",
-      credentials: "include",
-      headers: headers,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          console.log("Error: login failed");
-          setUsername("");
-          setPassword("");
-        }
-      })
-      .catch((error) => console.log("An error occured.", error));
+    const user = await onLogin(username, password);
 
     if (!user) {
+      setUsername("");
+      setPassword("");
       console.log("Something went wrong!");
       return;
     }
-    navigate("/report", { state: user });
+    navigate("/report");
   };
 
   return (
