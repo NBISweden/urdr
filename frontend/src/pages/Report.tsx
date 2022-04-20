@@ -43,7 +43,8 @@ export const Report = () => {
       `/api/time_entries?${params}`,
       setUser
     );
-    return entries.time_entries;
+    if (entries) return entries.time_entries;
+    return null;
   };
 
   const getAllEntries = async (
@@ -57,7 +58,7 @@ export const Report = () => {
     }
     for await (let recent of recents) {
       const recentEntries = await getTimeEntries(recent, currentWeekArray);
-      allEntries.push(...recentEntries);
+      if (recentEntries) allEntries.push(...recentEntries);
     }
     setTimeEntries(allEntries);
   };

@@ -23,7 +23,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         "/api/activities",
         setUser
       );
-      if (!didCancel) {
+      if (!didCancel && result) {
         setActivities(result.time_entry_activities);
         setActivity(result.time_entry_activities[0]);
       }
