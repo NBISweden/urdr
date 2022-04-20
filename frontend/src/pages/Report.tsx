@@ -232,6 +232,11 @@ export const Report = () => {
     }
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
+      if (typeof entry.hours === "string") {
+        entry.hours === ""
+          ? (entry.hours = 0)
+          : (entry.hours = parseFloat(entry.hours));
+      }
       const saved = await reportTime(entry);
       if (!saved) {
         unsavedEntries.push(entry);
