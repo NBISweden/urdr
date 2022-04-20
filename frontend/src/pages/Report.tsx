@@ -209,7 +209,7 @@ export const Report = () => {
           logout = true;
         } else if (response.status === 422) {
           throw new Error(
-            `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
+            `Invalid issue-activity combination for (${timeEntry.issue_id}) or invalid amount of time entered`
           );
         } else {
           throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
