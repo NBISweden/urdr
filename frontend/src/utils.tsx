@@ -1,14 +1,15 @@
 import.meta.hot;
 import React, { useState } from "react";
 import { IssueActivityPair } from "./model";
-
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
 
-export const getApiEndpoint = async (endpoint) => {
+export const getApiEndpoint = async (endpoint, context) => {
+  if (context.user === null) return null;
+  let logout = false;
   let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
     headers: headers,
@@ -17,8 +18,7 @@ export const getApiEndpoint = async (endpoint) => {
       if (res.ok) {
         return res.json();
       } else if (res.status === 401) {
-        // Redirect to login page
-        window.location.href = "/";
+        logout = true;
       } else {
         throw new Error(
           "There was an error accessing the endpoint " + endpoint
@@ -26,6 +26,7 @@ export const getApiEndpoint = async (endpoint) => {
       }
     })
     .catch((error) => console.log(error));
+  if (logout) context.setUser(null);
   return result;
 };
 

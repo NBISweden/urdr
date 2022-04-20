@@ -4,7 +4,7 @@ import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
-
+import { AuthContext } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 export const QuickAdd = ({ addIssueActivity }) => {
@@ -14,43 +14,54 @@ export const QuickAdd = ({ addIssueActivity }) => {
   const [activity, setActivity] = useState<IdName>();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 500);
-
-  const getActivities = async () => {
-    let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
-      "/api/activities"
-    );
-    if (result) {
-      setActivities(result.time_entry_activities);
-      setActivity(result.time_entry_activities[0]);
-    }
-  };
+  const context = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    getActivities();
-  }, []);
-
-  const searchIssue = async () => {
-    console.log("Searching issue...");
-
-    const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
-    let result: { issues: Issue[] } = await getApiEndpoint(endpoint);
-    if (result) {
-      if (result.issues.length > 0) {
-        const issue: Issue = {
-          id: result.issues[0].id,
-          subject: result.issues[0].subject,
-        };
-        setIssue(issue);
+    let didCancel = false;
+    const loadActivities = async () => {
+      let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
+        "/api/activities",
+        context
+      );
+      if (!didCancel && result) {
+        setActivities(result.time_entry_activities);
+        setActivity(result.time_entry_activities[0]);
       }
-    }
-  };
+    };
+
+    loadActivities();
+    return () => {
+      didCancel = true;
+    };
+  }, []);
 
   // Effect for API call
   React.useEffect(
     () => {
-      if (debouncedSearch) {
-        searchIssue();
-      }
+      let didCancel = false;
+      const searchIssue = async () => {
+        console.log("Searching issue...");
+        if (debouncedSearch) {
+          const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
+          let result: { issues: Issue[] } = await getApiEndpoint(
+            endpoint,
+            context
+          );
+          if (!didCancel) {
+            if (result.issues.length > 0) {
+              const issue: Issue = {
+                id: result.issues[0].id,
+                subject: result.issues[0].subject,
+              };
+              setIssue(issue);
+            }
+          }
+        }
+      };
+      searchIssue();
+      return () => {
+        didCancel = true;
+      };
     },
     [debouncedSearch] // Only call effect if debounced search term changes
   );
@@ -60,16 +71,14 @@ export const QuickAdd = ({ addIssueActivity }) => {
       alert(
         "We couldn't add anything. Make sure to type a valid issue number and choose an activity."
       );
-    }
-    else
-    {
-	const pair: IssueActivityPair = {
-	      issue: issue,
-	      activity: activity,
-	      custom_name: issue.subject + "-" + activity.name,
-  	};
+    } else {
+      const pair: IssueActivityPair = {
+        issue: issue,
+        activity: activity,
+        custom_name: issue.subject + "-" + activity.name,
+      };
 
-	addIssueActivity(pair);
+      addIssueActivity(pair);
     }
   };
 
@@ -130,7 +139,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
           })}
       </select>
       <button className=" basic-button plus-button" onClick={handleAdd}>
-        <img src={plus} alt="Add line"/>
+        <img src={plus} alt="Add line" />
       </button>
     </div>
   );

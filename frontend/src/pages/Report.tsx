@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
-import { useNavigate } from "react-router-dom";
 import { HeaderUser } from "../components/HeaderUser";
 import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
@@ -16,6 +15,7 @@ import {
   removeIssueActivityPair,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
+import { AuthContext } from "../components/AuthProvider";
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
@@ -29,17 +29,8 @@ export const Report = () => {
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
-  const location = useLocation();
-  const user: User = location.state as User;
-
-  const getRecentIssuesWithinRange = async () => {
-    // Use Friday as limit for the query
-    const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
-    const issues: IssueActivityPair[] = await getApiEndpoint(
-      `/api/recent_issues?to=${toDate}`
-    );
-    setRecentIssues(issues);
-  };
+  let location = useLocation();
+  const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
@@ -49,9 +40,11 @@ export const Report = () => {
       to: formatDate(days[4], "yyyy-MM-dd"),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`
+      `/api/time_entries?${params}`,
+      context
     );
-    return entries.time_entries;
+    if (entries) return entries.time_entries;
+    return null;
   };
 
   const getAllEntries = async (
@@ -65,42 +58,65 @@ export const Report = () => {
     }
     for await (let recent of recents) {
       const recentEntries = await getTimeEntries(recent, currentWeekArray);
-      allEntries.push(...recentEntries);
+      if (recentEntries) allEntries.push(...recentEntries);
     }
     setTimeEntries(allEntries);
   };
 
-  const getRowData = async () => {
-    const favorites: IssueActivityPair[] = await getApiEndpoint(
-      "/api/priority_entries"
-    );
-    const issues = [...recentIssues];
-    if (!!favorites) {
-      let nonFavIssues = [];
-      issues.forEach((issue, index) => {
-        let match = favorites.find(
-          (fav) =>
-            fav.issue.id === issue.issue.id &&
-            fav.activity.id === issue.activity.id
-        );
-        if (!match) {
-          nonFavIssues.push(issue);
-        }
-      });
-      getAllEntries(favorites, nonFavIssues);
-      setFilteredRecents(nonFavIssues);
-      setFavorites(favorites);
-    } else {
-      getAllEntries([], issues);
-      setFilteredRecents(issues);
-    }
-  };
+  React.useEffect(() => {
+    let didCancel = false;
+    let issues = null;
+    const setRecentIssuesWithinRange = async () => {
+      // Use Friday as limit for the query
+      const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
+      const issues: IssueActivityPair[] = await getApiEndpoint(
+        `/api/recent_issues?to=${toDate}`,
+        context
+      );
+      if (!didCancel) setRecentIssues(issues);
+    };
+    setRecentIssuesWithinRange();
+
+    return () => {
+      didCancel = true;
+    };
+  }, [weekTravelDay]);
 
   React.useEffect(() => {
-    getRecentIssuesWithinRange();
-  }, [weekTravelDay]);
-  React.useEffect(() => {
+    let didCancel = false;
+
+    const getRowData = async () => {
+      const favorites: IssueActivityPair[] = await getApiEndpoint(
+        "/api/priority_entries",
+        context
+      );
+      const issues = [...recentIssues];
+      if (!!favorites) {
+        let nonFavIssues = [];
+        issues.forEach((issue, index) => {
+          let match = favorites.find(
+            (fav) =>
+              fav.issue.id === issue.issue.id &&
+              fav.activity.id === issue.activity.id
+          );
+          if (!match) {
+            nonFavIssues.push(issue);
+          }
+        });
+        if (!didCancel) {
+          getAllEntries(favorites, nonFavIssues);
+          setFilteredRecents(nonFavIssues);
+          setFavorites(favorites);
+        }
+      } else if (!didCancel) {
+        getAllEntries([], issues);
+        setFilteredRecents(issues);
+      }
+    };
     getRowData();
+    return () => {
+      didCancel = true;
+    };
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
@@ -120,6 +136,7 @@ export const Report = () => {
   };
 
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
+    let logout = false;
     const saved = await fetch(
       `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
       {
@@ -132,8 +149,7 @@ export const Report = () => {
         if (res.ok) {
           return true;
         } else if (res.status === 401) {
-          // Redirect to login page
-          navigate("/");
+          logout = true;
         } else {
           throw new Error("Could not save favorites.");
         }
@@ -144,6 +160,7 @@ export const Report = () => {
         setFavorites(favs);
         return false;
       });
+    if (logout) context.setUser(null);
     return saved;
   };
 
@@ -178,6 +195,7 @@ export const Report = () => {
   };
 
   const reportTime = async (timeEntry: TimeEntry) => {
+    let logout = false;
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
@@ -188,8 +206,7 @@ export const Report = () => {
           console.log("Time reported");
           return true;
         } else if (response.status === 401) {
-          // Redirect to login page
-          navigate("/");
+          logout = true;
         } else if (response.status === 422) {
           throw new Error(
             `Issue ${timeEntry.issue_id} does not allow to register time on this activity`
@@ -202,6 +219,7 @@ export const Report = () => {
         alert(error);
         return false;
       });
+    if (logout) context.setUser(null);
     return saved;
   };
 
@@ -332,9 +350,9 @@ export const Report = () => {
           onWeekTravel={handleWeekTravel}
           currentWeekArray={currentWeekArray}
         />
-        <HeaderUser username={user ? user.login : ""} />
+        <HeaderUser username={context.user ? context.user.login : ""} />
       </div>
-      {favorites.length > 0 ? (
+      {favorites && favorites.length > 0 && (
         <DragDropContext onDragEnd={onDragEnd}>
           <section className="favorites-container">
             <HeaderRow days={currentWeekArray} />
@@ -343,38 +361,34 @@ export const Report = () => {
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {favorites &&
                     favorites.map((fav, index) => {
-                      const rowHours = findRowHours(fav, currentWeekArray);
-                      const rowEntryIds = findRowEntryIds(
-                        fav,
-                        currentWeekArray
-                      );
                       return (
-                        <>
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={rowHours}
-                                  rowEntryIds={rowEntryIds}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        </>
+                        <Draggable
+                          draggableId={`${fav.issue.id}${fav.activity.id}`}
+                          index={index}
+                          key={`${fav.issue.id}${fav.activity.id}-drag`}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <Row
+                                key={`${fav.issue.id}${fav.activity.id}`}
+                                topic={fav}
+                                onCellUpdate={handleCellUpdate}
+                                onToggleFav={handleToggleFav}
+                                days={currentWeekArray}
+                                rowHours={findRowHours(fav, currentWeekArray)}
+                                rowEntryIds={findRowEntryIds(
+                                  fav,
+                                  currentWeekArray
+                                )}
+                                isFav={true}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
                       );
                     })}
                   {provided.placeholder}
@@ -383,28 +397,22 @@ export const Report = () => {
             </Droppable>
           </section>
         </DragDropContext>
-      ) : (
-        <div></div>
       )}
       <section className="recent-container">
         <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
         {filteredRecents &&
           filteredRecents.map((recentIssue) => {
-            const rowHours = findRowHours(recentIssue, currentWeekArray);
-            const rowEntryIds = findRowEntryIds(recentIssue, currentWeekArray);
             return (
-              <>
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  days={currentWeekArray}
-                  rowHours={rowHours}
-                  rowEntryIds={rowEntryIds}
-                  isFav={false}
-                />
-              </>
+              <Row
+                key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                topic={recentIssue}
+                onCellUpdate={handleCellUpdate}
+                onToggleFav={handleToggleFav}
+                days={currentWeekArray}
+                rowHours={findRowHours(recentIssue, currentWeekArray)}
+                rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                isFav={false}
+              />
             );
           })}
       </section>

@@ -6,6 +6,7 @@ import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
+import { AuthContext } from "../components/AuthProvider";
 
 export const Row = ({
   topic,
