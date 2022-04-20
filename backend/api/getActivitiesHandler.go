@@ -1,7 +1,9 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
+	"sort"
 	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
@@ -24,5 +26,30 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 		config.Config.Redmine.URL)
 
 	// Proxy the request to Redmine
-	return proxy.Do(c, redmineURL)
+	if err := proxy.Do(c, redmineURL); err != nil {
+		return err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return nil
+	}
+
+	activitiesResponse := struct {
+		TimeEntryActivities []struct {
+			Id        int    `json:"id"`
+			Name      string `json:"name"`
+			IsDefault bool   `json:"is_default"`
+			Active    bool   `json:"active"`
+		} `json:"time_entry_activities"`
+	}{}
+
+	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
+		c.Response().Reset()
+		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// Sort the activities list alphabetically on the name.
+	sort.Slice(activitiesResponse.TimeEntryActivities, func(i, j int) bool {
+		return activitiesResponse.TimeEntryActivities[i].Name < activitiesResponse.TimeEntryActivities[j].Name
+	})
+
+	return c.JSON(activitiesResponse)
 }
