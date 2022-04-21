@@ -40,7 +40,7 @@ export const Cell = ({
             .replace(/[^0-9.]/g, "")
             .replace(/^(\d{3})\d+/, "$1")
             .replace(/(\.\d{2}).*$/, "$1")
-            .replace(/(\..*?)\..*/g, "$1");
+            .replace(/(\..*?)\..*/, "$1");
           onCellUpdate({
             id: entryId,
             issue_id: topic.issue.id,
