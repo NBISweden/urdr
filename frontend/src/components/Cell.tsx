@@ -39,6 +39,7 @@ export const Cell = ({
           event.target.value = event.target.value
             .replace(/[^0-9.]/g, "")
             .replace(/^(\d{3})\d+/, "$1")
+            .replace(/(\.\d{2}).*$/, "$1")
             .replace(/(\..*?)\..*/g, "$1");
           onCellUpdate({
             id: entryId,
