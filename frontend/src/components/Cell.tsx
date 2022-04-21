@@ -38,7 +38,7 @@ export const Cell = ({
           //with an unlimited number of decimals behind the delimiter
           event.target.value = event.target.value
             .replace(/[^0-9.]/g, "")
-            .replace(/(^\d{3})\d/g, "$1")
+            .replace(/^(\d{3})\d+/, "$1")
             .replace(/(\..*?)\..*/g, "$1");
           onCellUpdate({
             id: entryId,
