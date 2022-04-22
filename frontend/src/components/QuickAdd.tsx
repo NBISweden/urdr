@@ -5,10 +5,12 @@ import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
-import { useNavigate } from "react-router-dom";
 
-export const QuickAdd = ({ addIssueActivity }) => {
-  const navigate = useNavigate();
+export const QuickAdd = ({
+  addIssueActivity,
+}: {
+  addIssueActivity: (pair: IssueActivityPair) => void;
+}) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
   const [activity, setActivity] = useState<IdName>();

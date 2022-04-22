@@ -266,7 +266,7 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
   };
 
-  const addIssueActivityHandler = (pair) => {
+  const addIssueActivityHandler = (pair: IssueActivityPair) => {
     let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
