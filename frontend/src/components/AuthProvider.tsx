@@ -21,6 +21,7 @@ export const AuthProvider = ({ children }) => {
 
   React.useEffect(() => {
     if (user) window.localStorage.setItem("user", JSON.stringify(user));
+    else window.localStorage.removeItem("user");
   }, [user]);
 
   const handleLogin = async (username, password) => {
