@@ -6,6 +6,7 @@ import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
+import eye from "../icons/eye-slash.svg";
 
 export const Row = ({
   topic,
@@ -14,6 +15,7 @@ export const Row = ({
   rowEntryIds,
   onCellUpdate,
   onToggleFav,
+  onHide,
   isFav,
 }: {
   topic: IssueActivityPair;
@@ -22,6 +24,7 @@ export const Row = ({
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  onHide?: (topic: IssueActivityPair) => void;
   isFav: boolean;
 }) => {
   return (
@@ -53,6 +56,22 @@ export const Row = ({
               alt={isFav ? "Remove from favorites" : "Make favorite"}
             />
           </button>
+          {!isFav ? (
+            <button
+              type="button"
+              className="star-button"
+              onClick={() => onHide(topic)}
+            >
+              <img
+                src={eye}
+                className="star"
+                role="button"
+                alt={"Hide this row"}
+              />
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
         {days.map((day, i) => {
           return (

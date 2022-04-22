@@ -22,6 +22,7 @@ export const Report = () => {
     []
   );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
+  const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
@@ -101,9 +102,11 @@ export const Report = () => {
         });
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
+          const hidden = priorityIssues.filter((issue) => issue.is_hidden);
           getAllEntries(favorites, nonPrioIssues);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
+          setHidden(hidden);
         }
       } else if (!didCancel) {
         getAllEntries([], issues);
@@ -188,6 +191,18 @@ export const Report = () => {
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
+    }
+  };
+
+  const handleHide = async (topic: IssueActivityPair) => {
+    topic.is_hidden = true;
+    const saved = await saveFavorites([...favorites, ...hidden, topic]);
+    if (!saved) {
+      console.log("Something went wrong with hiding the row");
+      return;
+    } else {
+      const newRecents = removeIssueActivityPair([...filteredRecents], topic);
+      setFilteredRecents(newRecents);
     }
   };
 
@@ -410,6 +425,7 @@ export const Report = () => {
                 topic={recentIssue}
                 onCellUpdate={handleCellUpdate}
                 onToggleFav={handleToggleFav}
+                onHide={handleHide}
                 days={currentWeekArray}
                 rowHours={findRowHours(recentIssue, currentWeekArray)}
                 rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
