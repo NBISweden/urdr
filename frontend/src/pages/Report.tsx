@@ -349,7 +349,7 @@ export const Report = () => {
   return (
     <>
       <div className="report-header">
-        <p className="header-year">{weekTravelDay.getFullYear()}</p>
+        <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
         <TimeTravel
           weekTravelDay={weekTravelDay}
           onWeekTravel={handleWeekTravel}

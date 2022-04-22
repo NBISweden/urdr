@@ -29,7 +29,7 @@ export const Row = ({
     <>
       <div className="row">
         <div className="col-1 cell-container grip-container">
-          {isFav ? <img src={grip} className="grip" /> : <div></div>}
+          {isFav ? <img src={grip} className="grip" alt="grip to change row sorting" /> : <div></div>}
         </div>
         <div className="col-4 ">
           <div className="issue-label">

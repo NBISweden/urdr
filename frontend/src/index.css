@@ -212,7 +212,7 @@ input[type="number"] {
 }
 
 .basic-button {
-  background-color: hsl(84deg 55% 33%);
+  background-color: rgb(62, 87, 25);
   color: white;
   border: none;
   border-radius: 4px;

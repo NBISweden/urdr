@@ -121,6 +121,8 @@ export const QuickAdd = ({ addIssueActivity }) => {
       <img
         className={search === "" ? "validation-icon hiden" : "validation-icon"}
         src={getValidationIconSrc()}
+        alt="Validity"
+        aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
         aria-label="Activity"
