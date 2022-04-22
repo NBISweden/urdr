@@ -289,7 +289,12 @@ export const Report = () => {
     if (existingHidden) {
       const newHiddens = removeIssueActivityPair([...hidden], pair);
       const saved = await saveFavorites([...favorites, ...newHiddens]);
-      if (saved) {
+      if (!saved) {
+        console.log(
+          "Something went wrong with adding the issue (was previously hidden)."
+        );
+        return;
+      } else {
         setHidden(newHiddens);
       }
     }
