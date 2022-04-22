@@ -27,6 +27,7 @@ export const Report = () => {
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
+  const [showUnsavedMessage, setShowUnsavedMessage] = useState<boolean>(false);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const navigate = useNavigate();
   let location = useLocation();
@@ -120,6 +121,7 @@ export const Report = () => {
   }, [recentIssues]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
+    setShowUnsavedMessage(true);
     const entries = [...newTimeEntries];
     const existingEntry = entries.find(
       (entry) =>
@@ -247,6 +249,7 @@ export const Report = () => {
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
+    setShowUnsavedMessage(false);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -422,6 +425,11 @@ export const Report = () => {
           })}
       </section>
       <section className="save-button-container">
+        {showUnsavedMessage && (
+          <div class="unsaved-alert-p">
+            <p>⚠ You have unsaved changes</p>
+          </div>
+        )}
         <button className="basic-button save-button" onClick={handleSave}>
           Save changes
         </button>
