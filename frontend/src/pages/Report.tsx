@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { HeaderUser } from "../components/HeaderUser";
-import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
+import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
@@ -28,8 +27,6 @@ export const Report = () => {
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  const navigate = useNavigate();
-  let location = useLocation();
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
@@ -65,7 +62,6 @@ export const Report = () => {
 
   React.useEffect(() => {
     let didCancel = false;
-    let issues = null;
     const setRecentIssuesWithinRange = async () => {
       // Use Friday as limit for the query
       const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
@@ -93,7 +89,7 @@ export const Report = () => {
       const issues = [...recentIssues];
       if (!!favorites) {
         let nonFavIssues = [];
-        issues.forEach((issue, index) => {
+        issues.forEach((issue) => {
           let match = favorites.find(
             (fav) =>
               fav.issue.id === issue.issue.id &&
@@ -299,7 +295,7 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours = 0;
+      let hours: string | number = 0;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
