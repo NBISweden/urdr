@@ -82,26 +82,27 @@ export const Report = () => {
     let didCancel = false;
 
     const getRowData = async () => {
-      const favorites: IssueActivityPair[] = await getApiEndpoint(
+      const priorityIssues: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
         context
       );
       const issues = [...recentIssues];
-      if (!!favorites) {
-        let nonFavIssues = [];
+      if (!!priorityIssues) {
+        let nonPrioIssues = [];
         issues.forEach((issue) => {
-          let match = favorites.find(
+          let match = priorityIssues.find(
             (fav) =>
               fav.issue.id === issue.issue.id &&
               fav.activity.id === issue.activity.id
           );
           if (!match) {
-            nonFavIssues.push(issue);
+            nonPrioIssues.push(issue);
           }
         });
         if (!didCancel) {
-          getAllEntries(favorites, nonFavIssues);
-          setFilteredRecents(nonFavIssues);
+          const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
+          getAllEntries(favorites, nonPrioIssues);
+          setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
         }
       } else if (!didCancel) {
