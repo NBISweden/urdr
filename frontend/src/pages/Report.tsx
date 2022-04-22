@@ -266,7 +266,7 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
   };
 
-  const addIssueActivityHandler = (pair: IssueActivityPair) => {
+  const addIssueActivityHandler = async (pair: IssueActivityPair) => {
     let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
@@ -283,6 +283,16 @@ export const Report = () => {
     }
     const newRecentIssues = [...filteredRecents, pair];
     setFilteredRecents(newRecentIssues);
+    const existingHidden = hidden.find((e) => {
+      return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
+    });
+    if (existingHidden) {
+      const newHiddens = removeIssueActivityPair([...hidden], pair);
+      const saved = await saveFavorites([...favorites, ...newHiddens]);
+      if (saved) {
+        setHidden(newHiddens);
+      }
+    }
   };
 
   const onDragEnd = (result) => {

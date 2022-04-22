@@ -78,6 +78,7 @@ export const QuickAdd = ({
         issue: issue,
         activity: activity,
         custom_name: issue.subject + "-" + activity.name,
+        is_hidden: false,
       };
 
       addIssueActivity(pair);
