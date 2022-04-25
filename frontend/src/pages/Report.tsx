@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { HeaderUser } from "../components/HeaderUser";
-import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
+import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
@@ -23,13 +22,12 @@ export const Report = () => {
     []
   );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
+  const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  const navigate = useNavigate();
-  let location = useLocation();
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
@@ -65,7 +63,6 @@ export const Report = () => {
 
   React.useEffect(() => {
     let didCancel = false;
-    let issues = null;
     const setRecentIssuesWithinRange = async () => {
       // Use Friday as limit for the query
       const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
@@ -86,27 +83,30 @@ export const Report = () => {
     let didCancel = false;
 
     const getRowData = async () => {
-      const favorites: IssueActivityPair[] = await getApiEndpoint(
+      const priorityIssues: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
         context
       );
       const issues = [...recentIssues];
-      if (!!favorites) {
-        let nonFavIssues = [];
-        issues.forEach((issue, index) => {
-          let match = favorites.find(
+      if (!!priorityIssues) {
+        let nonPrioIssues = [];
+        issues.forEach((issue) => {
+          let match = priorityIssues.find(
             (fav) =>
               fav.issue.id === issue.issue.id &&
               fav.activity.id === issue.activity.id
           );
           if (!match) {
-            nonFavIssues.push(issue);
+            nonPrioIssues.push(issue);
           }
         });
         if (!didCancel) {
-          getAllEntries(favorites, nonFavIssues);
-          setFilteredRecents(nonFavIssues);
+          const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
+          const hidden = priorityIssues.filter((issue) => issue.is_hidden);
+          getAllEntries(favorites, nonPrioIssues);
+          setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
+          setHidden(hidden);
         }
       } else if (!didCancel) {
         getAllEntries([], issues);
@@ -171,7 +171,7 @@ export const Report = () => {
     );
     if (!existingFav) {
       topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
-      const saved = await saveFavorites([...favorites, topic]);
+      const saved = await saveFavorites([...favorites, topic, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with adding a favorite!");
         return;
@@ -184,13 +184,27 @@ export const Report = () => {
       setFilteredRecents(shortenedRecents);
     } else {
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
-      const saved = await saveFavorites(shortenedFavs);
+      const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with removing a favorite!");
         return;
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
+    }
+  };
+
+  const handleHide = async (topic: IssueActivityPair) => {
+    topic.is_hidden = true;
+    topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
+    const saved = await saveFavorites([...favorites, ...hidden, topic]);
+    if (!saved) {
+      console.log("Something went wrong with hiding the row");
+      return;
+    } else {
+      const newRecents = removeIssueActivityPair([...filteredRecents], topic);
+      setFilteredRecents(newRecents);
+      setHidden([...hidden, topic]);
     }
   };
 
@@ -254,7 +268,7 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
   };
 
-  const addIssueActivityHandler = (pair) => {
+  const addIssueActivityHandler = async (pair: IssueActivityPair) => {
     let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
@@ -271,6 +285,21 @@ export const Report = () => {
     }
     const newRecentIssues = [...filteredRecents, pair];
     setFilteredRecents(newRecentIssues);
+    const existingHidden = hidden.find((e) => {
+      return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
+    });
+    if (existingHidden) {
+      const newHiddens = removeIssueActivityPair([...hidden], pair);
+      const saved = await saveFavorites([...favorites, ...newHiddens]);
+      if (!saved) {
+        console.log(
+          "Something went wrong with adding the issue (was previously hidden)."
+        );
+        return;
+      } else {
+        setHidden(newHiddens);
+      }
+    }
   };
 
   const onDragEnd = (result) => {
@@ -299,7 +328,7 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours = 0;
+      let hours: string | number = 0;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
@@ -350,86 +379,87 @@ export const Report = () => {
   return (
     <>
       <header>
-        <div className="report-header">
+      <div className="report-header">
           <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
-          <TimeTravel
-            weekTravelDay={weekTravelDay}
-            onWeekTravel={handleWeekTravel}
-            currentWeekArray={currentWeekArray}
-          />
-          <HeaderUser username={context.user ? context.user.login : ""} />
-        </div>
+        <TimeTravel
+          weekTravelDay={weekTravelDay}
+          onWeekTravel={handleWeekTravel}
+          currentWeekArray={currentWeekArray}
+        />
+        <HeaderUser username={context.user ? context.user.login : ""} />
+      </div>
       </header>
       <main>
-        {favorites && favorites.length > 0 && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <section className="favorites-container">
-              <HeaderRow days={currentWeekArray} />
-              <Droppable droppableId="favorites">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {favorites &&
-                      favorites.map((fav, index) => {
-                        return (
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={findRowHours(fav, currentWeekArray)}
-                                  rowEntryIds={findRowEntryIds(
-                                    fav,
-                                    currentWeekArray
-                                  )}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </section>
-          </DragDropContext>
-        )}
-        <section className="recent-container">
-          <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
-          {filteredRecents &&
-            filteredRecents.map((recentIssue) => {
-              return (
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue, currentWeekArray)}
-                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
-                  isFav={false}
-                />
-              );
-            })}
-        </section>
-        <section className="save-button-container">
-          <button className="basic-button save-button" onClick={handleSave}>
-            Save changes
-          </button>
-        </section>
+      {favorites && favorites.length > 0 && (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <section className="favorites-container">
+            <HeaderRow days={currentWeekArray} />
+            <Droppable droppableId="favorites">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {favorites &&
+                    favorites.map((fav, index) => {
+                      return (
+                        <Draggable
+                          draggableId={`${fav.issue.id}${fav.activity.id}`}
+                          index={index}
+                          key={`${fav.issue.id}${fav.activity.id}-drag`}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <Row
+                                key={`${fav.issue.id}${fav.activity.id}`}
+                                topic={fav}
+                                onCellUpdate={handleCellUpdate}
+                                onToggleFav={handleToggleFav}
+                                days={currentWeekArray}
+                                rowHours={findRowHours(fav, currentWeekArray)}
+                                rowEntryIds={findRowEntryIds(
+                                  fav,
+                                  currentWeekArray
+                                )}
+                                isFav={true}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </section>
+        </DragDropContext>
+      )}
+      <section className="recent-container">
+        <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
+        {filteredRecents &&
+          filteredRecents.map((recentIssue) => {
+            return (
+              <Row
+                key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                topic={recentIssue}
+                onCellUpdate={handleCellUpdate}
+                onToggleFav={handleToggleFav}
+                onHide={handleHide}
+                days={currentWeekArray}
+                rowHours={findRowHours(recentIssue, currentWeekArray)}
+                rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                isFav={false}
+              />
+            );
+          })}
+      </section>
+      <section className="save-button-container">
+        <button className="basic-button save-button" onClick={handleSave}>
+          Save changes
+        </button>
+      </section>
       </main>
       <section className="recent-container">
         <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
