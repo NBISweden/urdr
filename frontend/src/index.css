@@ -310,8 +310,8 @@ input[type="number"] {
   visibility: hidden;
 }
 
- /* The unsaved changes alert message box */
- .unsaved-alert-p {
+/* The unsaved changes alert message box */
+.unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
-  margin: 3rem 1rem 2rem 1rem;
+  margin: 3rem 1rem 2rem;
 }
