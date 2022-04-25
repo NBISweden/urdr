@@ -7,6 +7,8 @@ export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
 
+export const dateFormat = "yyyy-MM-dd";
+
 export const getApiEndpoint = async (endpoint, context) => {
   if (context.user === null) return null;
   let logout = false;

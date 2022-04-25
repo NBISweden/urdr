@@ -1,6 +1,7 @@
 import React from "react";
 import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
+import { dateFormat } from "../utils";
 
 export const Cell = ({
   topic,
@@ -30,7 +31,7 @@ export const Cell = ({
       activity_id: topic.activity.id,
       hours: hours,
       comments: "",
-      spent_on: formatDate(date, "yyyy-MM-dd"),
+      spent_on: formatDate(date, dateFormat),
     });
   };
 

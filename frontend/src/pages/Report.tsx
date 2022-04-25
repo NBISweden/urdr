@@ -12,10 +12,10 @@ import {
   headers,
   getFullWeek,
   removeIssueActivityPair,
+  dateFormat,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
-import { DateSumCell } from "../components/DateSumCell";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -23,7 +23,6 @@ const beforeUnloadHandler = (event) => {
 };
 
 export const Report = () => {
-  const dateFormat = "yyyy-MM-dd";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -387,6 +386,18 @@ export const Report = () => {
     return rowEntryIds;
   };
 
+  const getTotalHours = (date) => {
+    let count: number = 0;
+    console.log(timeEntries);
+    timeEntries.map((entry) => {
+      if (entry.hours && entry.spent_on === date) {
+        count += entry.hours;
+        console.log(count);
+      }
+    });
+
+    return count;
+  };
   if (context.user === null) return <></>;
   return (
     <>
@@ -472,13 +483,24 @@ export const Report = () => {
             <div className="col-6"></div>
             {currentWeekArray &&
               currentWeekArray.map((date) => {
-                return <DateSumCell date={date} />;
+                const dateStr = formatDate(date, dateFormat);
+                return (
+                  <div key={dateStr} className="col-1 cell-container">
+                    <input
+                      type="text"
+                      id={dateStr}
+                      className="cell"
+                      value={getTotalHours(dateStr)}
+                      disabled
+                    />
+                  </div>
+                );
               })}
           </div>
         </section>
         <section className="save-button-container">
           {showUnsavedMessage && (
-            <div class="unsaved-alert-p">
+            <div className="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
           )}
