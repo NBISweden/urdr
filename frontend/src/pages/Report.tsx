@@ -16,6 +16,11 @@ import {
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
 
+const beforeUnloadHandler = (event) => {
+  event.preventDefault();
+  event.returnValue = "";
+};
+
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
@@ -27,6 +32,7 @@ export const Report = () => {
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
+  const [showUnsavedMessage, setShowUnsavedMessage] = useState<boolean>(false);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const context = React.useContext(AuthContext);
 
@@ -119,7 +125,15 @@ export const Report = () => {
     };
   }, [recentIssues]);
 
+  React.useEffect(() => {
+    window.removeEventListener("beforeunload", beforeUnloadHandler, true);
+    if (showUnsavedMessage) {
+      window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [showUnsavedMessage]);
+
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
+    setShowUnsavedMessage(true);
     const entries = [...newTimeEntries];
     const existingEntry = entries.find(
       (entry) =>
@@ -261,6 +275,7 @@ export const Report = () => {
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
+    setShowUnsavedMessage(false);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -456,6 +471,11 @@ export const Report = () => {
           })}
       </section>
       <section className="save-button-container">
+        {showUnsavedMessage && (
+          <div class="unsaved-alert-p">
+            <p role="status">⚠ You have unsaved changes</p>
+          </div>
+        )}
         <button className="basic-button save-button" onClick={handleSave}>
           Save changes
         </button>
