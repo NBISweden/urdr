@@ -18,16 +18,17 @@ export const Cell = ({
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
     //with an unlimited number of decimals behind the delimiter
-    event.target.value = event.target.value
+    let hours = event.target.value
       .replace(/[^0-9.]/g, "")
       .replace(/^(\d{3})\d+/, "$1")
       .replace(/(\.\d{2}).*$/, "$1")
       .replace(/(\..*?)\..*/, "$1");
+    hours = hours == "" ? 0 : parseInt(hours);
     onCellUpdate({
       id: entryId,
       issue_id: topic.issue.id,
       activity_id: topic.activity.id,
-      hours: event.target.value,
+      hours: hours,
       comments: "",
       spent_on: formatDate(date, "yyyy-MM-dd"),
     });

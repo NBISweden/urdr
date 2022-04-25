@@ -23,6 +23,7 @@ const beforeUnloadHandler = (event) => {
 };
 
 export const Report = () => {
+  const dateFormat = "yyyy-MM-dd";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -41,8 +42,8 @@ export const Report = () => {
     let params = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
-      from: formatDate(days[0], "yyyy-MM-dd"),
-      to: formatDate(days[4], "yyyy-MM-dd"),
+      from: formatDate(days[0], dateFormat),
+      to: formatDate(days[4], dateFormat),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
       `/api/time_entries?${params}`,
@@ -72,7 +73,7 @@ export const Report = () => {
     let didCancel = false;
     const setRecentIssuesWithinRange = async () => {
       // Use Friday as limit for the query
-      const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
+      const toDate: String = formatDate(currentWeekArray[4], dateFormat);
       const issues: IssueActivityPair[] = await getApiEndpoint(
         `/api/recent_issues?to=${toDate}`,
         context
@@ -261,11 +262,6 @@ export const Report = () => {
     }
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
-      if (typeof entry.hours === "string") {
-        entry.hours === ""
-          ? (entry.hours = 0)
-          : (entry.hours = parseFloat(entry.hours));
-      }
       const saved = await reportTime(entry);
       if (!saved) {
         unsavedEntries.push(entry);
@@ -347,14 +343,14 @@ export const Report = () => {
       let hours: string | number = 0;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
-          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue_id === rowTopic.issue.id &&
           entry.activity_id === rowTopic.activity.id
       );
       if (!entry && timeEntries && timeEntries.length > 0) {
         entry = timeEntries?.find(
           (entry) =>
-            entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+            entry.spent_on === formatDate(day, dateFormat) &&
             entry.issue.id === rowTopic.issue.id &&
             entry.activity.id === rowTopic.activity.id
         );
@@ -379,7 +375,7 @@ export const Report = () => {
       let id = 0;
       let entry = timeEntries?.find(
         (entry) =>
-          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue.id === rowTopic.issue.id &&
           entry.activity.id === rowTopic.activity.id
       );
