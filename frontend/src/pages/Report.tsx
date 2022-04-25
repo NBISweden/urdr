@@ -171,7 +171,7 @@ export const Report = () => {
     );
     if (!existingFav) {
       topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
-      const saved = await saveFavorites([...favorites, topic]);
+      const saved = await saveFavorites([...favorites, topic, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with adding a favorite!");
         return;
@@ -184,7 +184,7 @@ export const Report = () => {
       setFilteredRecents(shortenedRecents);
     } else {
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
-      const saved = await saveFavorites(shortenedFavs);
+      const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with removing a favorite!");
         return;
@@ -196,6 +196,7 @@ export const Report = () => {
 
   const handleHide = async (topic: IssueActivityPair) => {
     topic.is_hidden = true;
+    topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
     const saved = await saveFavorites([...favorites, ...hidden, topic]);
     if (!saved) {
       console.log("Something went wrong with hiding the row");
@@ -203,6 +204,7 @@ export const Report = () => {
     } else {
       const newRecents = removeIssueActivityPair([...filteredRecents], topic);
       setFilteredRecents(newRecents);
+      setHidden([...hidden, topic]);
     }
   };
 
