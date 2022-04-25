@@ -5,10 +5,12 @@ import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
-import { useNavigate } from "react-router-dom";
 
-export const QuickAdd = ({ addIssueActivity }) => {
-  const navigate = useNavigate();
+export const QuickAdd = ({
+  addIssueActivity,
+}: {
+  addIssueActivity: (pair: IssueActivityPair) => void;
+}) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
   const [activity, setActivity] = useState<IdName>();
@@ -76,6 +78,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
         issue: issue,
         activity: activity,
         custom_name: issue.subject + "-" + activity.name,
+        is_hidden: false,
       };
 
       addIssueActivity(pair);
@@ -106,7 +109,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
     <div className="row">
       <h2>Quick add:</h2>
       <input
-        aria-label="Issue"
+        aria-labelledby="input-issue"
         id="input-issue"
         className={getSearchClasses()}
         type="number"
@@ -121,6 +124,8 @@ export const QuickAdd = ({ addIssueActivity }) => {
       <img
         className={search === "" ? "validation-icon hiden" : "validation-icon"}
         src={getValidationIconSrc()}
+        alt="Validity"
+        aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
         aria-label="Activity"
