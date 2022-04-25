@@ -346,6 +346,7 @@ export const Report = () => {
     return rowEntryIds;
   };
 
+  if (context.user === null) return <></>;
   return (
     <>
       <header>
