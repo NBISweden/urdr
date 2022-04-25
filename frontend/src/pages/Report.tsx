@@ -375,10 +375,12 @@ export const Report = () => {
     return rowEntryIds;
   };
 
+  if (context.user === null) return <></>;
   return (
     <>
+      <header>
       <div className="report-header">
-        <p className="header-year">{weekTravelDay.getFullYear()}</p>
+          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
         <TimeTravel
           weekTravelDay={weekTravelDay}
           onWeekTravel={handleWeekTravel}
@@ -386,6 +388,8 @@ export const Report = () => {
         />
         <HeaderUser username={context.user ? context.user.login : ""} />
       </div>
+      </header>
+      <main>
       {favorites && favorites.length > 0 && (
         <DragDropContext onDragEnd={onDragEnd}>
           <section className="favorites-container">
@@ -456,6 +460,7 @@ export const Report = () => {
           Save changes
         </button>
       </section>
+      </main>
       <section className="recent-container">
         <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
       </section>

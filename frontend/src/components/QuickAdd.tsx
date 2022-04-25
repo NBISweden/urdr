@@ -109,7 +109,7 @@ export const QuickAdd = ({
     <div className="row">
       <h2>Quick add:</h2>
       <input
-        aria-label="Issue"
+        aria-labelledby="input-issue"
         id="input-issue"
         className={getSearchClasses()}
         type="number"
@@ -124,6 +124,8 @@ export const QuickAdd = ({
       <img
         className={search === "" ? "validation-icon hiden" : "validation-icon"}
         src={getValidationIconSrc()}
+        alt="Validity"
+        aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
         aria-label="Activity"
