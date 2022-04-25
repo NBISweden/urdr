@@ -106,7 +106,7 @@ export const QuickAdd = ({ addIssueActivity }) => {
     <div className="row">
       <h2>Quick add:</h2>
       <input
-        aria-label="Issue"
+        aria-labelledby="input-issue"
         id="input-issue"
         className={getSearchClasses()}
         type="number"
