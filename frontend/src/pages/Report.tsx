@@ -439,7 +439,7 @@ export const Report = () => {
       <section className="save-button-container">
         {showUnsavedMessage && (
           <div class="unsaved-alert-p">
-            <p>⚠ You have unsaved changes</p>
+            <p role="status">⚠ You have unsaved changes</p>
           </div>
         )}
         <button className="basic-button save-button" onClick={handleSave}>
