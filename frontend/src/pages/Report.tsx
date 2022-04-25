@@ -17,6 +17,11 @@ import {
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
 
+const beforeUnloadHandler = (event) => {
+  event.preventDefault();
+  event.returnValue = "";
+};
+
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
@@ -119,6 +124,13 @@ export const Report = () => {
       didCancel = true;
     };
   }, [recentIssues]);
+
+  React.useEffect(() => {
+    window.removeEventListener("beforeunload", beforeUnloadHandler, true);
+    if (showUnsavedMessage) {
+      window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [showUnsavedMessage]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     setShowUnsavedMessage(true);
