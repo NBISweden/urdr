@@ -15,6 +15,24 @@ export const Cell = ({
   entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
+  const onCellChange = (event: any) => {
+    //makes sure that users can only input positive numbers up to 999.99999999...
+    //with an unlimited number of decimals behind the delimiter
+    event.target.value = event.target.value
+      .replace(/[^0-9.]/g, "")
+      .replace(/^(\d{3})\d+/, "$1")
+      .replace(/(\.\d{2}).*$/, "$1")
+      .replace(/(\..*?)\..*/, "$1");
+    onCellUpdate({
+      id: entryId,
+      issue_id: topic.issue.id,
+      activity_id: topic.activity.id,
+      hours: event.target.value,
+      comments: "",
+      spent_on: formatDate(date, "yyyy-MM-dd"),
+    });
+  };
+
   return (
     <div className="col-1 cell-container">
       <label
@@ -33,23 +51,7 @@ export const Cell = ({
           date,
           "yyyy-MM-dd"
         )}`}
-        onChange={(event: any) => {
-          //makes sure that users can only input positive numbers up to 999.99999999...
-          //with an unlimited number of decimals behind the delimiter
-          event.target.value = event.target.value
-            .replace(/[^0-9.]/g, "")
-            .replace(/^(\d{3})\d+/, "$1")
-            .replace(/(\.\d{2}).*$/, "$1")
-            .replace(/(\..*?)\..*/, "$1");
-          onCellUpdate({
-            id: entryId,
-            issue_id: topic.issue.id,
-            activity_id: topic.activity.id,
-            hours: event.target.value,
-            comments: "",
-            spent_on: formatDate(date, "yyyy-MM-dd"),
-          });
-        }}
+        onChange={onCellChange}
         className="cell"
         value={hours === 0 ? "" : hours}
       />
