@@ -33,7 +33,6 @@ export const Report = () => {
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
-  const [showUnsavedMessage, setShowUnsavedMessage] = useState<boolean>(false);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const context = React.useContext(AuthContext);
 
@@ -128,13 +127,12 @@ export const Report = () => {
 
   React.useEffect(() => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
-    if (showUnsavedMessage) {
+    if (newTimeEntries.length > 0) {
       window.addEventListener("beforeunload", beforeUnloadHandler, true);
     }
-  }, [showUnsavedMessage]);
+  }, [newTimeEntries]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
-    setShowUnsavedMessage(true);
     const entries = [...newTimeEntries];
     //check if there is a new entry for same cell
     const existingNewEntry = entries.find(
@@ -306,7 +304,6 @@ export const Report = () => {
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
-    setShowUnsavedMessage(false);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -546,8 +543,8 @@ export const Report = () => {
           </div>
         </section>
         <section className="save-button-container">
-          {showUnsavedMessage && (
-            <div className="unsaved-alert-p">
+          {newTimeEntries.length > 0 && (
+            <div class="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
           )}
