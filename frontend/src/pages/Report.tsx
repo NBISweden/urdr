@@ -388,12 +388,25 @@ export const Report = () => {
 
   const getTotalHours = (date) => {
     let count: number = 0;
-    console.log(timeEntries);
-    timeEntries.map((entry) => {
-      if (entry.hours && entry.spent_on === date) {
-        count += entry.hours;
-        console.log(count);
-      }
+    const dateEntries = timeEntries.filter(
+      (entry) =>
+        entry.spent_on === date &&
+        newTimeEntries.filter(
+          (newEntry) =>
+            newEntry.spent_on === date &&
+            newEntry.activity_id === entry.activity.id &&
+            newEntry.issue_id === entry.issue.id
+        ).length == 0
+    );
+    const newDateEntries = newTimeEntries.filter(
+      (entry) => entry.spent_on === date
+    );
+
+    dateEntries.map((entry) => {
+      if (entry.spent_on === date) count += entry.hours;
+    });
+    newDateEntries.map((entry) => {
+      if (entry.spent_on === date) count += entry.hours;
     });
 
     return count;
@@ -480,7 +493,9 @@ export const Report = () => {
         </section>
         <section className="recent-container ">
           <div className="row">
-            <div className="col-6"></div>
+            <div className="col-6">
+              <h3>Total</h3>
+            </div>
             {currentWeekArray &&
               currentWeekArray.map((date) => {
                 const dateStr = formatDate(date, dateFormat);
