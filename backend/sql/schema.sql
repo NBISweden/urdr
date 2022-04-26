@@ -77,3 +77,23 @@ CREATE TABLE priority_entry (
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
 );
+
+-- Activity limitations
+-- https://github.com/NBISweden/urdr/issues/338
+--
+-- Not all activities can be used together with every issue.  Some
+-- activities are not "active" for certain projects.  The table stores
+-- the combinations of project IDs and activity IDs that are explicitly
+-- inactivated.  Any combination not listed is active by default.
+-- An activity listed with a zero project ID is deactivated for all
+-- projects (zero is used rather than NULL to avoid issues with the
+-- UNIQUE constraint).
+
+DROP TABLE IF EXISTS deactivated;
+CREATE TABLE deactivated (
+	redmine_project_id INTEGER NOT NULL,
+	redmine_activity_id INTEGER NOT NULL,
+
+	UNIQUE (redmine_project_id, redmine_activity_id)
+		ON CONFLICT REPLACE
+);
