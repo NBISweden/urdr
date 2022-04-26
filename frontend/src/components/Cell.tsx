@@ -19,22 +19,21 @@ export const Cell = ({
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
     //with an unlimited number of decimals behind the delimiter
-    let hours = event.target.value
+    event.target.value = event.target.value
       .replace(/[^0-9.]/g, "")
       .replace(/^(\d{3})\d+/, "$1")
       .replace(/(\.\d{2}).*$/, "$1")
       .replace(/(\..*?)\..*/, "$1");
-    hours = hours == "" ? 0 : parseInt(hours);
+
     onCellUpdate({
       id: entryId,
       issue_id: topic.issue.id,
       activity_id: topic.activity.id,
-      hours: hours,
+      hours: event.target.value === "" ? 0 : parseFloat(event.target.value),
       comments: "",
       spent_on: formatDate(date, dateFormat),
     });
   };
-
   return (
     <div className="col-1 cell-container">
       <label
@@ -55,7 +54,7 @@ export const Cell = ({
         )}`}
         onChange={onCellChange}
         className="cell"
-        value={hours === 0 ? "" : hours}
+        defaultValue={hours === 0 ? "" : hours}
       />
     </div>
   );
