@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	//log "github.com/sirupsen/logrus"
 	"sort"
 )
 
@@ -75,6 +74,5 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return (a.Issue.Id == b.Issue.Id && a.Activity.Id < b.Activity.Id) ||
 			a.Issue.Id > b.Issue.Id
 	})
-	//log.Debugf("ENTRIES: %v\n", entries)
 	return c.JSON(entries)
 }
