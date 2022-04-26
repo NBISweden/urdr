@@ -3,9 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
-
 	"github.com/gofiber/fiber/v2"
+	//log "github.com/sirupsen/logrus"
+	"sort"
 )
 
 // recentIssuesHandler godoc
@@ -75,6 +75,6 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 		return (a.Issue.Id == b.Issue.Id && a.Activity.Id < b.Activity.Id) ||
 			a.Issue.Id > b.Issue.Id
 	})
-
+	//log.Debugf("ENTRIES: %v\n", entries)
 	return c.JSON(entries)
 }
