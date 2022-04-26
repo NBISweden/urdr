@@ -1,11 +1,11 @@
--- A proposed relational database schema for Urdr, storing the data that
--- is not kept by Redmine by default but that we need to be persistent
--- between sessions.
+-- The relational database schema for Urdr, storing the data that is not
+-- kept by Redmine by default but that we need to be persistent between
+-- sessions.
 --
 -- We assume that this file is used to initialize a SQLite database.
--- From the command line, this could be done using the following command
--- (which creates the database file "database.db" if it does not already
--- exist):
+-- The Go code does thes automatically, but you may also do so from the
+-- command line, using the following command (which creates the database
+-- file "database.db" if it does not already exist):
 --
 --	sqlite3 database.db <sql/schema.sql
 --
@@ -16,11 +16,6 @@
 -- The "sqlite3" command line utility is part of the "sqlite3" package
 -- on Ubuntu.  The utility is part of the macOS base system and does not
 -- need to be installed separately.
-
--- FIXME:
--- The datatype for the fields whose names start with "redmine_" are
--- currently unknown, so we assume that they are INTEGER in the schema
--- below.
 
 PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
