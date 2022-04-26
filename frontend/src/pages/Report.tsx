@@ -135,14 +135,49 @@ export const Report = () => {
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     setShowUnsavedMessage(true);
     const entries = [...newTimeEntries];
-    const existingEntry = entries.find(
+    //check if there is a new entry for same cell
+    const existingNewEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
         entry.activity_id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
-    if (existingEntry) {
-      entries.splice(entries.indexOf(existingEntry), 1, timeEntry);
+    // check if there is an entry in the db for this cell
+    const existingOldEntry = timeEntries.find(
+      (entry) =>
+        entry.issue.id === timeEntry.issue_id &&
+        entry.activity.id === timeEntry.activity_id &&
+        entry.spent_on === timeEntry.spent_on
+    );
+    // check if this exact entry is already in the db
+    const duplicate = timeEntries.find(
+      (entry) =>
+        entry.issue.id === timeEntry.issue_id &&
+        entry.activity.id === timeEntry.activity_id &&
+        entry.spent_on === timeEntry.spent_on &&
+        entry.hours === +timeEntry.hours
+    );
+    // check if the cell was cleared or 0 was entered
+    const zeroHours = timeEntry.hours === "" || timeEntry.hours === "0";
+
+    if (!existingOldEntry && zeroHours) {
+      // the user clears a cell that is already empty in the db
+      if (!existingNewEntry) {
+        // no change was ever recorded for this cell: do nothing
+        return;
+      }
+      // changes were recorded for this cell: remove them
+      entries.splice(entries.indexOf(existingNewEntry), 1);
+      setNewTimeEntries(entries);
+    } else if (duplicate && existingNewEntry) {
+      // the user changes a cell back to what is already in the db:
+      // remove previously recorded change for this cell
+      entries.splice(entries.indexOf(existingNewEntry), 1);
+      setNewTimeEntries(entries);
+    } else if (!duplicate && existingNewEntry) {
+      // the user modifies a changed cell with a newer value that is different from the db:
+      // replace earlier change for this cell with new entry
+      entries.splice(entries.indexOf(existingNewEntry), 1, timeEntry);
       setNewTimeEntries(entries);
     } else {
       setNewTimeEntries([...entries, timeEntry]);
@@ -394,92 +429,92 @@ export const Report = () => {
   return (
     <>
       <header>
-      <div className="report-header">
+        <div className="report-header">
           <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
-        <TimeTravel
-          weekTravelDay={weekTravelDay}
-          onWeekTravel={handleWeekTravel}
-          currentWeekArray={currentWeekArray}
-        />
-        <HeaderUser username={context.user ? context.user.login : ""} />
-      </div>
+          <TimeTravel
+            weekTravelDay={weekTravelDay}
+            onWeekTravel={handleWeekTravel}
+            currentWeekArray={currentWeekArray}
+          />
+          <HeaderUser username={context.user ? context.user.login : ""} />
+        </div>
       </header>
       <main>
-      {favorites && favorites.length > 0 && (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <section className="favorites-container">
-            <HeaderRow days={currentWeekArray} />
-            <Droppable droppableId="favorites">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {favorites &&
-                    favorites.map((fav, index) => {
-                      return (
-                        <Draggable
-                          draggableId={`${fav.issue.id}${fav.activity.id}`}
-                          index={index}
-                          key={`${fav.issue.id}${fav.activity.id}-drag`}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              <Row
-                                key={`${fav.issue.id}${fav.activity.id}`}
-                                topic={fav}
-                                onCellUpdate={handleCellUpdate}
-                                onToggleFav={handleToggleFav}
-                                days={currentWeekArray}
-                                rowHours={findRowHours(fav, currentWeekArray)}
-                                rowEntryIds={findRowEntryIds(
-                                  fav,
-                                  currentWeekArray
-                                )}
-                                isFav={true}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </section>
-        </DragDropContext>
-      )}
-      <section className="recent-container">
-        <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
-        {filteredRecents &&
-          filteredRecents.map((recentIssue) => {
-            return (
-              <Row
-                key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                topic={recentIssue}
-                onCellUpdate={handleCellUpdate}
-                onToggleFav={handleToggleFav}
-                onHide={handleHide}
-                days={currentWeekArray}
-                rowHours={findRowHours(recentIssue, currentWeekArray)}
-                rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
-                isFav={false}
-              />
-            );
-          })}
-      </section>
-      <section className="save-button-container">
-        {showUnsavedMessage && (
-          <div class="unsaved-alert-p">
-            <p role="status">⚠ You have unsaved changes</p>
-          </div>
+        {favorites && favorites.length > 0 && (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <section className="favorites-container">
+              <HeaderRow days={currentWeekArray} />
+              <Droppable droppableId="favorites">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {favorites &&
+                      favorites.map((fav, index) => {
+                        return (
+                          <Draggable
+                            draggableId={`${fav.issue.id}${fav.activity.id}`}
+                            index={index}
+                            key={`${fav.issue.id}${fav.activity.id}-drag`}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Row
+                                  key={`${fav.issue.id}${fav.activity.id}`}
+                                  topic={fav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  days={currentWeekArray}
+                                  rowHours={findRowHours(fav, currentWeekArray)}
+                                  rowEntryIds={findRowEntryIds(
+                                    fav,
+                                    currentWeekArray
+                                  )}
+                                  isFav={true}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </section>
+          </DragDropContext>
         )}
-        <button className="basic-button save-button" onClick={handleSave}>
-          Save changes
-        </button>
-      </section>
+        <section className="recent-container">
+          <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
+          {filteredRecents &&
+            filteredRecents.map((recentIssue) => {
+              return (
+                <Row
+                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                  topic={recentIssue}
+                  onCellUpdate={handleCellUpdate}
+                  onToggleFav={handleToggleFav}
+                  onHide={handleHide}
+                  days={currentWeekArray}
+                  rowHours={findRowHours(recentIssue, currentWeekArray)}
+                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                  isFav={false}
+                />
+              );
+            })}
+        </section>
+        <section className="save-button-container">
+          {showUnsavedMessage && (
+            <div class="unsaved-alert-p">
+              <p role="status">⚠ You have unsaved changes</p>
+            </div>
+          )}
+          <button className="basic-button save-button" onClick={handleSave}>
+            Save changes
+          </button>
+        </section>
       </main>
       <section className="recent-container">
         <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
