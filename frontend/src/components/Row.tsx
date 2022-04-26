@@ -93,6 +93,15 @@ export const Row = ({
             />
           );
         })}
+        <div className="col-1 cell-container">
+          <input
+            type="text"
+            id={`${topic.issue.id}${topic.activity.id}-total`}
+            className="cell"
+            value={0}
+            disabled
+          />
+        </div>
       </div>
     </>
   );

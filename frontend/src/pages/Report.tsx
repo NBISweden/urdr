@@ -484,7 +484,9 @@ export const Report = () => {
           </DragDropContext>
         )}
         <section className="recent-container">
-          <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
+          {favorites.length == 0 && (
+            <HeaderRow days={currentWeekArray}></HeaderRow>
+          )}
           {filteredRecents &&
             filteredRecents.map((recentIssue) => {
               return (
