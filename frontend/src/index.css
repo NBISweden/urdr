@@ -293,6 +293,10 @@ input[type="number"] {
   outline: none;
 }
 
+.not-outline {
+  outline: none;
+}
+
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }

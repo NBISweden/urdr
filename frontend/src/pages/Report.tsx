@@ -398,14 +398,11 @@ export const Report = () => {
             newEntry.issue_id === entry.issue.id
         ).length == 0
     );
-    const newDateEntries = newTimeEntries.filter(
-      (entry) => entry.spent_on === date
-    );
 
     dateEntries.map((entry) => {
-      if (entry.spent_on === date) count += entry.hours;
+      count += entry.hours;
     });
-    newDateEntries.map((entry) => {
+    newTimeEntries.map((entry) => {
       if (entry.spent_on === date) count += entry.hours;
     });
 
@@ -504,9 +501,9 @@ export const Report = () => {
                     <input
                       type="text"
                       id={dateStr}
-                      className="cell"
+                      className="cell not-outline"
                       value={getTotalHours(dateStr)}
-                      disabled
+                      readOnly
                     />
                   </div>
                 );
