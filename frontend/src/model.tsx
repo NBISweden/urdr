@@ -30,7 +30,7 @@ export interface TimeEntry {
   id: number;
   issue_id: number;
   activity_id: number;
-  hours: number | string;
+  hours: number;
   comments: string;
   spent_on: string;
 }

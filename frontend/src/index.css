@@ -191,6 +191,7 @@ input[type="number"] {
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 0.5rem 1.5rem 2.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .favorites-container {
@@ -290,6 +291,10 @@ input[type="number"] {
 .quick-add-input {
   padding: 0.5rem 0.75rem;
   margin: 0 0 0 3.75rem;
+  outline: none;
+}
+
+.not-outline {
   outline: none;
 }
 

@@ -7,6 +7,7 @@ import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
 import eye from "../icons/eye-slash.svg";
+import { dateFormat } from "../utils";
 
 export const Row = ({
   topic,
@@ -31,7 +32,11 @@ export const Row = ({
     <>
       <div className="row">
         <div className="col-1 cell-container grip-container">
-          {isFav ? <img src={grip} className="grip" alt="grip to change row sorting" /> : <div></div>}
+          {isFav ? (
+            <img src={grip} className="grip" alt="grip to change row sorting" />
+          ) : (
+            <div></div>
+          )}
         </div>
         <div className="col-4 ">
           <div className="issue-label">
@@ -78,7 +83,7 @@ export const Row = ({
             <Cell
               key={`${topic.issue.id}${topic.activity.id}${formatDate(
                 day,
-                "yyyy-MM-dd"
+                dateFormat
               )}`}
               topic={topic}
               date={day}
