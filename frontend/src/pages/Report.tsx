@@ -491,7 +491,7 @@ export const Report = () => {
         <section className="recent-container ">
           <div className="row">
             <div className="col-6">
-              <h3>Total</h3>
+              <h2>Total</h2>
             </div>
             {currentWeekArray &&
               currentWeekArray.map((date) => {
