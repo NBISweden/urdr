@@ -157,7 +157,7 @@ export const Report = () => {
     // In both cases don't add the new entry.
     if (
       (existingOldEntry && existingOldEntry.hours === +timeEntry.hours) ||
-      (!existingOldEntry && (timeEntry.hours === "" || timeEntry.hours === "0"))
+      (!existingOldEntry && timeEntry.hours === 0)
     ) {
       setNewTimeEntries([...entries]);
     } else {
@@ -353,7 +353,7 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours: string | number = null;
+      let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
