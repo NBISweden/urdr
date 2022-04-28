@@ -35,7 +35,10 @@ fi
 {
 	docker-compose -f "$1" exec -T -- postgres \
 		psql -U redmine |
-	sqlite3 "$2" '.import /dev/stdin invalid_entry'
+	sqlite3 "$2" \
+		'DELETE FROM invalid_entry' \
+		'.import /dev/stdin invalid_entry' \
+		'VACUUM'
 } <<'END_COPY'
 COPY (
 	(
