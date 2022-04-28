@@ -526,7 +526,7 @@ export const Report = () => {
         </section>
         <section className="save-button-container">
           {newTimeEntries.length > 0 && (
-            <div class="unsaved-alert-p">
+            <div className="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
           )}
