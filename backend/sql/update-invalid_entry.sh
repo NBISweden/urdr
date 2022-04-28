@@ -38,14 +38,22 @@ fi
 	sqlite3 "$2" '.import /dev/stdin invalid_entry'
 } <<'END_COPY'
 COPY (
-	SELECT DISTINCT
-		i.id, e.parent_id 
-	FROM	issues AS i 
-	JOIN	enumerations AS e USING (project_id) 
-	WHERE	e.type = 'TimeEntryActivity' 
-	AND NOT	e.active 
-	ORDER BY
-		i.id, e.parent_id
+	(
+		SELECT	0, e.id
+		FROM	enumerations AS e
+		WHERE	e.type = 'TimeEntryActivity'
+		AND	e.name = 'Design'
+		AND	e.project_id IS NULL
+	)
+	UNION
+	(
+		SELECT DISTINCT
+			i.id, e.parent_id
+		FROM	issues AS i
+		JOIN	enumerations AS e USING (project_id)
+		WHERE	e.type = 'TimeEntryActivity'
+		AND NOT	e.active
+	)
 )
 TO	STDOUT
 WITH	csv
