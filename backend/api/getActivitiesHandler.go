@@ -18,6 +18,11 @@ import (
 // @Failure	500	{string}	error "Internal Server Error"
 // @Router /api/activities [get]
 func getActivitiesHandler(c *fiber.Ctx) error {
+	redmineIssueId, err := c.ParamsInt("issue_id")
+	if err != nil {
+		redmineIssueId = 0
+	}
+
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
 	}
@@ -44,6 +49,17 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
 		c.Response().Reset()
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	activities := activitiesResponse.TimeEntryActivities
+	activitiesResponse.TimeEntryActivities =
+		activitiesResponse.TimeEntryActivities[:0]
+
+	for _, i := range activities {
+		if !db.IsInvalidEntry(redmineIssueId, i.Id) {
+			activitiesResponse.TimeEntryActivities =
+				append(activitiesResponse.TimeEntryActivities)
+		}
 	}
 
 	// Sort the activities list alphabetically on the name.
