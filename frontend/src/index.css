@@ -325,6 +325,10 @@ input[type="number"] {
   display: flex;
 }
 
-.input-field {
-  flex: 1;
+.comment-button {
+  background-image: url("/dist/icons/comment-button.svg");
+  background-repeat: no-repeat;
+  background-color: white;
+  border: 1px solid hsl(0deg 0% 83%);
+  margin-left: 0.1em;
 }

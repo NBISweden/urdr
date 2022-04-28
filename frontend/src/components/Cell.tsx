@@ -55,15 +55,10 @@ export const Cell = ({
             "yyyy-MM-dd"
           )}`}
           onChange={onCellChange}
-          className="cell input-field"
+          className="cell"
           defaultValue={hours === 0 ? "" : hours}
         />
-        <button
-          style={{
-            backgroundImage: `url("/dist/icons/comment-button.svg")`,
-          }}
-          type="button"
-        ></button>
+        <button className="comment-button" type="button"></button>
       </div>
     </div>
   );
