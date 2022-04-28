@@ -141,6 +141,10 @@ export const Report = () => {
         entry.activity_id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
+    // if yes, remove it
+    if (existingNewEntry) {
+      entries.splice(entries.indexOf(existingNewEntry), 1);
+    }
     // check if there is an entry in the db for this cell
     const existingOldEntry = timeEntries.find(
       (entry) =>
@@ -148,36 +152,14 @@ export const Report = () => {
         entry.activity.id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
-    // check if this exact entry is already in the db
-    const duplicate = timeEntries.find(
-      (entry) =>
-        entry.issue.id === timeEntry.issue_id &&
-        entry.activity.id === timeEntry.activity_id &&
-        entry.spent_on === timeEntry.spent_on &&
-        entry.hours === +timeEntry.hours
-    );
-    // check if the cell was cleared or 0 was entered
-    const zeroHours = timeEntry.hours === "" || timeEntry.hours === "0";
-
-    if (!existingOldEntry && zeroHours) {
-      // the user clears a cell that is already empty in the db
-      if (!existingNewEntry) {
-        // no change was ever recorded for this cell: do nothing
-        return;
-      }
-      // changes were recorded for this cell: remove them
-      entries.splice(entries.indexOf(existingNewEntry), 1);
-      setNewTimeEntries(entries);
-    } else if (duplicate && existingNewEntry) {
-      // the user changes a cell back to what is already in the db:
-      // remove previously recorded change for this cell
-      entries.splice(entries.indexOf(existingNewEntry), 1);
-      setNewTimeEntries(entries);
-    } else if (!duplicate && existingNewEntry) {
-      // the user modifies a changed cell with a newer value that is different from the db:
-      // replace earlier change for this cell with new entry
-      entries.splice(entries.indexOf(existingNewEntry), 1, timeEntry);
-      setNewTimeEntries(entries);
+    // if there is one, check if it has the same hours.
+    // If there is none, check if the new entry's hours are 0.
+    // In both cases don't add the new entry.
+    if (
+      (existingOldEntry && existingOldEntry.hours === +timeEntry.hours) ||
+      (!existingOldEntry && (timeEntry.hours === "" || timeEntry.hours === "0"))
+    ) {
+      setNewTimeEntries([...entries]);
     } else {
       setNewTimeEntries([...entries, timeEntry]);
     }
@@ -371,7 +353,7 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours: number = 0;
+      let hours: string | number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
