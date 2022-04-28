@@ -134,7 +134,7 @@ export const Report = () => {
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
-    //check if there is a new entry for same cell
+    //check if there already is a new entry for same cell
     const existingNewEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
@@ -152,9 +152,9 @@ export const Report = () => {
         entry.activity.id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
-    // if there is one, check if it has the same hours.
-    // If there is none, check if the new entry's hours are 0.
-    // In both cases don't add the new entry.
+    // If there is one, check if it has the same hours.
+    // If there is none, check if the incoming entry's hours are 0.
+    // In both cases don't add the incoming entry.
     if (
       (existingOldEntry && existingOldEntry.hours === +timeEntry.hours) ||
       (!existingOldEntry && timeEntry.hours === 0)
