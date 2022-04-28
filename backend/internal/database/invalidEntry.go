@@ -47,3 +47,20 @@ func (db *Database) loadAllInvalidEntries() error {
 
 	return nil
 }
+
+func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bool {
+	if invalidActivities == nil {
+		if err := db.loadAllInvalidEntries(); err != nil {
+			fmt.Printf("database.loadAllInvalidEntries() failed: %v\n", err)
+			return false
+		}
+	}
+
+	for _, i := range invalidActivities[redmineIssueId] {
+		if i == redmineActivityId {
+			return true
+		}
+	}
+
+	return false
+}
