@@ -320,3 +320,11 @@ input[type="number"] {
   color: hsl(26deg 91% 42%); /* Red */
   margin: 3rem 1rem 2rem;
 }
+
+.flex-container {
+  display: flex;
+}
+
+.input-field {
+  flex: 1;
+}

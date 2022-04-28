@@ -2,6 +2,7 @@ import React from "react";
 import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 import { dateFormat } from "../utils";
+import commentbtn from "../icons/comment-button.svg";
 
 export const Cell = ({
   topic,
@@ -46,16 +47,24 @@ export const Cell = ({
         Time spent on {`${topic.issue.subject} ${topic.activity.name}`}
         on {`${date}`}
       </label>
-      <input
-        type="text"
-        id={`${topic.issue.id}${topic.activity.id}${formatDate(
-          date,
-          "yyyy-MM-dd"
-        )}`}
-        onChange={onCellChange}
-        className="cell"
-        defaultValue={hours === 0 ? "" : hours}
-      />
+      <div class="flex-container">
+        <input
+          type="text"
+          id={`${topic.issue.id}${topic.activity.id}${formatDate(
+            date,
+            "yyyy-MM-dd"
+          )}`}
+          onChange={onCellChange}
+          className="cell input-field"
+          defaultValue={hours === 0 ? "" : hours}
+        />
+        <button
+          style={{
+            backgroundImage: `url("/dist/icons/comment-button.svg")`,
+          }}
+          type="button"
+        ></button>
+      </div>
     </div>
   );
 };
