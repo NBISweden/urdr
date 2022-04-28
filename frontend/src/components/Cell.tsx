@@ -54,11 +54,7 @@ export const Cell = ({
         )}`}
         onChange={onCellChange}
         className="cell"
-<<<<<<< HEAD
-        defaultValue={hours === 0 ? "" : hours}
-=======
-        value={hours}
->>>>>>> simplify cell update
+        defaultValue={hours}
       />
     </div>
   );
