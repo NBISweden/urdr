@@ -54,7 +54,7 @@ export const Cell = ({
         )}`}
         onChange={onCellChange}
         className="cell"
-        defaultValue={hours === 0 ? "" : hours}
+        defaultValue={hours}
       />
     </div>
   );

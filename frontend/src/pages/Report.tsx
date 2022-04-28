@@ -33,7 +33,6 @@ export const Report = () => {
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
-  const [showUnsavedMessage, setShowUnsavedMessage] = useState<boolean>(false);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const context = React.useContext(AuthContext);
 
@@ -128,23 +127,39 @@ export const Report = () => {
 
   React.useEffect(() => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
-    if (showUnsavedMessage) {
+    if (newTimeEntries.length > 0) {
       window.addEventListener("beforeunload", beforeUnloadHandler, true);
     }
-  }, [showUnsavedMessage]);
+  }, [newTimeEntries]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
-    setShowUnsavedMessage(true);
     const entries = [...newTimeEntries];
-    const existingEntry = entries.find(
+    //check if there already is a new entry for same cell
+    const existingNewEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
         entry.activity_id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
-    if (existingEntry) {
-      entries.splice(entries.indexOf(existingEntry), 1, timeEntry);
-      setNewTimeEntries(entries);
+    // if yes, remove it
+    if (existingNewEntry) {
+      entries.splice(entries.indexOf(existingNewEntry), 1);
+    }
+    // check if there is an entry in the db for this cell
+    const existingOldEntry = timeEntries.find(
+      (entry) =>
+        entry.issue.id === timeEntry.issue_id &&
+        entry.activity.id === timeEntry.activity_id &&
+        entry.spent_on === timeEntry.spent_on
+    );
+    // If there is one, check if it has the same hours.
+    // If there is none, check if the incoming entry's hours are 0.
+    // In both cases don't add the incoming entry.
+    if (
+      (existingOldEntry && existingOldEntry.hours === +timeEntry.hours) ||
+      (!existingOldEntry && timeEntry.hours === 0)
+    ) {
+      setNewTimeEntries([...entries]);
     } else {
       setNewTimeEntries([...entries, timeEntry]);
     }
@@ -271,7 +286,6 @@ export const Report = () => {
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
-    setShowUnsavedMessage(false);
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -339,7 +353,7 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours: number = 0;
+      let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
@@ -511,7 +525,7 @@ export const Report = () => {
           </div>
         </section>
         <section className="save-button-container">
-          {showUnsavedMessage && (
+          {newTimeEntries.length > 0 && (
             <div className="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
