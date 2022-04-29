@@ -325,25 +325,6 @@ input[type="number"] {
   position: relative;
 }
 
-.triangle {
-  height: 8rem;
-  width: 8rem;
-  background: linear-gradient(
-    to top right,
-    transparent 50%,
-    hsl(276deg 46% 16%) 0
-  );
-  height: 25%;
-  width: 25%;
-  background-color: white;
-  border: 1px solid hsl(0deg 0% 83%);
-  margin-left: 0.1em;
-  position: absolute;
-  border-left: none;
-  border-bottom: none;
-  top: 0;
-  right: 0;
-}
 
 .comment-button {
   background-image: url("/dist/icons/comment-button.svg");
