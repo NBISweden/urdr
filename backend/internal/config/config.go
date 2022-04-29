@@ -46,7 +46,7 @@ func Setup() error {
 	Config.App.Port = getEnv("BACKEND_PORT", "8080")
 	Config.App.SessionDBPath = getEnv("SESSION_DB_PATH", "./session.db")
 
-	Config.Redmine.URL = getEnv("REDMINE_URL", "http://host.docker.internal:3000")
+	Config.Redmine.URL = getEnv("SNOWPACK_PUBLIC_REDMINE_URL", "http://host.docker.internal:3000")
 
 	Config.Database.Path = getEnv("BACKEND_DB_PATH", "./database.db")
 
