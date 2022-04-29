@@ -412,7 +412,6 @@ export const Report = () => {
             newEntry.issue_id === entry.issue.id
         ).length == 0
     );
-
     dateEntries.map((entry) => {
       count += entry.hours;
     });
@@ -422,6 +421,33 @@ export const Report = () => {
 
     return count;
   };
+
+  const getRowSum = (pair: IssueActivityPair) => {
+    let count = 0;
+    const rowEntries = timeEntries.filter(
+      (entry) =>
+        pair.activity.id === entry.activity.id &&
+        pair.issue.id === entry.issue.id &&
+        newTimeEntries.filter(
+          (newEntry) =>
+            newEntry.spent_on === entry.spent_on &&
+            newEntry.activity_id === pair.activity.id &&
+            newEntry.issue_id === pair.issue.id
+        ).length == 0
+    );
+    rowEntries.map((entry) => {
+      count += entry.hours;
+    });
+    newTimeEntries.map((entry) => {
+      if (
+        pair.activity.id === entry.activity_id &&
+        pair.issue.id === entry.issue_id
+      )
+        count += entry.hours;
+    });
+    return count;
+  };
+
   if (context.user === null) return <></>;
   return (
     <>
@@ -469,6 +495,7 @@ export const Report = () => {
                                     fav,
                                     currentWeekArray
                                   )}
+                                  getRowSum={getRowSum}
                                   isFav={true}
                                 />
                               </div>
@@ -499,6 +526,7 @@ export const Report = () => {
                   days={currentWeekArray}
                   rowHours={findRowHours(recentIssue, currentWeekArray)}
                   rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                  getRowSum={getRowSum}
                   isFav={false}
                 />
               );

@@ -17,6 +17,7 @@ export const Row = ({
   onCellUpdate,
   onToggleFav,
   onHide,
+  getRowSum,
   isFav,
 }: {
   topic: IssueActivityPair;
@@ -25,7 +26,9 @@ export const Row = ({
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  getRowSum: (pair: IssueActivityPair) => number;
   onHide?: (topic: IssueActivityPair) => void;
+
   isFav: boolean;
 }) => {
   return (
@@ -97,9 +100,9 @@ export const Row = ({
           <input
             type="text"
             id={`${topic.issue.id}${topic.activity.id}-total`}
-            className="cell"
-            value={0}
-            disabled
+            className="cell not-outline"
+            value={getRowSum(topic)}
+            readOnly
           />
         </div>
       </div>
