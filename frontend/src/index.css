@@ -307,8 +307,8 @@ input[type="number"] {
 }
 
 .validation-icon {
-  width: 3%;
-  padding-left: 0;
+  width: 3.5rem;
+  margin-left: -2.8rem;
 }
 
 .hiden {
