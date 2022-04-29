@@ -26,9 +26,9 @@ export const HeaderRow = ({ days }: { days: Date[] }) => {
             </p>
           );
         })}
-        <p className="col-1">
+        <div className="col-1">
           <h2>Total</h2>
-        </p>
+        </div>
       </>
     );
   };

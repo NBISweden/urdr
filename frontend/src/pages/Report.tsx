@@ -400,7 +400,16 @@ export const Report = () => {
     return rowEntryIds;
   };
 
-  const getTotalHours = (date) => {
+  const getTotalHoursWeek = () => {
+    let count = 0;
+    currentWeekArray.map((date) => {
+      const dateStr = formatDate(date, dateFormat);
+      count += getTotalHours(dateStr);
+    });
+    return count;
+  };
+
+  const getTotalHours = (date: string) => {
     let count: number = 0;
     const dateEntries = timeEntries.filter(
       (entry) =>
@@ -552,6 +561,14 @@ export const Report = () => {
                   </div>
                 );
               })}
+            <div className="col-1 cell-container">
+              <input
+                type="text"
+                className="cell not-outline"
+                value={getTotalHoursWeek()}
+                readOnly
+              />
+            </div>
           </div>
         </section>
         <section className="save-button-container">
