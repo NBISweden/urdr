@@ -2,29 +2,29 @@
   box-sizing: border-box;
 }
 
-/* INCLUDING FONT "LATO" LOCALLY*/
+/* INCLUDING FONT "LATO" LOCALLY */
 
-/*Lato Light*/
+/* Lato Light */
 @font-face {
-  font-family: "Lato";
+  font-family: Lato;
   src: url("/frontend/src/fonts/Lato-Light.woff") format("woff");
   src: url("/frontend/src/fonts/Lato-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
 }
 
-/*Lato Regular*/
+/* Lato Regular */
 @font-face {
-  font-family: "Lato";
+  font-family: Lato;
   src: url("/frontend/src/fonts/Lato-Regular.woff") format("woff");
   src: url("/frontend/src/fonts/Lato-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
 
-/*Lato Bold*/
+/* Lato Bold */
 @font-face {
-  font-family: "Lato";
+  font-family: Lato;
   src: url("/frontend/src/fonts/Lato-Bold.woff") format("woff");
   src: url("/frontend/src/fonts/Lato-Bold.woff2") format("woff2");
   font-weight: 700;
