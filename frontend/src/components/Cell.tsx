@@ -47,7 +47,7 @@ export const Cell = ({
         Time spent on {`${topic.issue.subject} ${topic.activity.name}`}
         on {`${date}`}
       </label>
-      <div class="flex-container">
+      <div class="comment-container">
         <input
           type="text"
           id={`${topic.issue.id}${topic.activity.id}${formatDate(
