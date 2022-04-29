@@ -18,6 +18,7 @@ export interface IssueActivityPair {
   activity: IdName;
   issue: Issue;
   custom_name: string;
+  is_hidden: boolean;
 }
 
 export interface Issue {

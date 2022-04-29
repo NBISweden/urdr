@@ -191,6 +191,7 @@ input[type="number"] {
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 0.5rem 1.5rem 2.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .favorites-container {
@@ -212,7 +213,7 @@ input[type="number"] {
 }
 
 .basic-button {
-  background-color: hsl(84deg 55% 33%);
+  background-color: hsl(90deg 55% 23%);
   color: white;
   border: none;
   border-radius: 4px;
@@ -293,6 +294,10 @@ input[type="number"] {
   outline: none;
 }
 
+.not-outline {
+  outline: none;
+}
+
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }
@@ -308,4 +313,10 @@ input[type="number"] {
 
 .hiden {
   visibility: hidden;
+}
+
+/* The unsaved changes alert message box */
+.unsaved-alert-p {
+  color: hsl(26deg 91% 42%); /* Red */
+  margin: 3rem 1rem 2rem;
 }

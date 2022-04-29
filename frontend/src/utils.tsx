@@ -2,10 +2,13 @@ import.meta.hot;
 import React, { useState } from "react";
 import { IssueActivityPair } from "./model";
 export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
+export const { SNOWPACK_PUBLIC_REDMINE_URL } = __SNOWPACK_ENV__;
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
 headers.set("Content-Type", "application/json");
+
+export const dateFormat = "yyyy-MM-dd";
 
 export const getApiEndpoint = async (endpoint, context) => {
   if (context.user === null) return null;

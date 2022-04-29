@@ -1,21 +1,26 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { HeaderUser } from "../components/HeaderUser";
-import { User, IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
+import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
   headers,
   getFullWeek,
   removeIssueActivityPair,
+  dateFormat,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+
+const beforeUnloadHandler = (event) => {
+  event.preventDefault();
+  event.returnValue = "";
+};
 
 export const Report = () => {
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
@@ -23,21 +28,20 @@ export const Report = () => {
     []
   );
   const [favorites, setFavorites] = useState<IssueActivityPair[]>([]);
+  const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  const navigate = useNavigate();
-  let location = useLocation();
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
-      from: formatDate(days[0], "yyyy-MM-dd"),
-      to: formatDate(days[4], "yyyy-MM-dd"),
+      from: formatDate(days[0], dateFormat),
+      to: formatDate(days[4], dateFormat),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
       `/api/time_entries?${params}`,
@@ -65,10 +69,9 @@ export const Report = () => {
 
   React.useEffect(() => {
     let didCancel = false;
-    let issues = null;
     const setRecentIssuesWithinRange = async () => {
       // Use Friday as limit for the query
-      const toDate: String = formatDate(currentWeekArray[4], "yyyy-MM-dd");
+      const toDate: String = formatDate(currentWeekArray[4], dateFormat);
       const issues: IssueActivityPair[] = await getApiEndpoint(
         `/api/recent_issues?to=${toDate}`,
         context
@@ -86,27 +89,30 @@ export const Report = () => {
     let didCancel = false;
 
     const getRowData = async () => {
-      const favorites: IssueActivityPair[] = await getApiEndpoint(
+      const priorityIssues: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
         context
       );
       const issues = [...recentIssues];
-      if (!!favorites) {
-        let nonFavIssues = [];
-        issues.forEach((issue, index) => {
-          let match = favorites.find(
+      if (!!priorityIssues) {
+        let nonPrioIssues = [];
+        issues.forEach((issue) => {
+          let match = priorityIssues.find(
             (fav) =>
               fav.issue.id === issue.issue.id &&
               fav.activity.id === issue.activity.id
           );
           if (!match) {
-            nonFavIssues.push(issue);
+            nonPrioIssues.push(issue);
           }
         });
         if (!didCancel) {
-          getAllEntries(favorites, nonFavIssues);
-          setFilteredRecents(nonFavIssues);
+          const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
+          const hidden = priorityIssues.filter((issue) => issue.is_hidden);
+          getAllEntries(favorites, nonPrioIssues);
+          setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
+          setHidden(hidden);
         }
       } else if (!didCancel) {
         getAllEntries([], issues);
@@ -119,17 +125,41 @@ export const Report = () => {
     };
   }, [recentIssues]);
 
+  React.useEffect(() => {
+    window.removeEventListener("beforeunload", beforeUnloadHandler, true);
+    if (newTimeEntries.length > 0) {
+      window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [newTimeEntries]);
+
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
-    const existingEntry = entries.find(
+    //check if there already is a new entry for same cell
+    const existingNewEntry = entries.find(
       (entry) =>
         entry.issue_id === timeEntry.issue_id &&
         entry.activity_id === timeEntry.activity_id &&
         entry.spent_on === timeEntry.spent_on
     );
-    if (existingEntry) {
-      entries.splice(entries.indexOf(existingEntry), 1, timeEntry);
-      setNewTimeEntries(entries);
+    // if yes, remove it
+    if (existingNewEntry) {
+      entries.splice(entries.indexOf(existingNewEntry), 1);
+    }
+    // check if there is an entry in the db for this cell
+    const existingOldEntry = timeEntries.find(
+      (entry) =>
+        entry.issue.id === timeEntry.issue_id &&
+        entry.activity.id === timeEntry.activity_id &&
+        entry.spent_on === timeEntry.spent_on
+    );
+    // If there is one, check if it has the same hours.
+    // If there is none, check if the incoming entry's hours are 0.
+    // In both cases don't add the incoming entry.
+    if (
+      (existingOldEntry && existingOldEntry.hours === +timeEntry.hours) ||
+      (!existingOldEntry && timeEntry.hours === 0)
+    ) {
+      setNewTimeEntries([...entries]);
     } else {
       setNewTimeEntries([...entries, timeEntry]);
     }
@@ -171,7 +201,7 @@ export const Report = () => {
     );
     if (!existingFav) {
       topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
-      const saved = await saveFavorites([...favorites, topic]);
+      const saved = await saveFavorites([...favorites, topic, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with adding a favorite!");
         return;
@@ -184,13 +214,27 @@ export const Report = () => {
       setFilteredRecents(shortenedRecents);
     } else {
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
-      const saved = await saveFavorites(shortenedFavs);
+      const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
         console.log("Something went wrong with removing a favorite!");
         return;
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
+    }
+  };
+
+  const handleHide = async (topic: IssueActivityPair) => {
+    topic.is_hidden = true;
+    topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
+    const saved = await saveFavorites([...favorites, ...hidden, topic]);
+    if (!saved) {
+      console.log("Something went wrong with hiding the row");
+      return;
+    } else {
+      const newRecents = removeIssueActivityPair([...filteredRecents], topic);
+      setFilteredRecents(newRecents);
+      setHidden([...hidden, topic]);
     }
   };
 
@@ -249,7 +293,7 @@ export const Report = () => {
     setCurrentWeekArray(getFullWeek(newDay));
   };
 
-  const addIssueActivityHandler = (pair) => {
+  const addIssueActivityHandler = async (pair: IssueActivityPair) => {
     let recentIssue = filteredRecents.find((e) => {
       return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
     });
@@ -266,6 +310,21 @@ export const Report = () => {
     }
     const newRecentIssues = [...filteredRecents, pair];
     setFilteredRecents(newRecentIssues);
+    const existingHidden = hidden.find((e) => {
+      return e.issue.id === pair.issue.id && e.activity.id === pair.activity.id;
+    });
+    if (existingHidden) {
+      const newHiddens = removeIssueActivityPair([...hidden], pair);
+      const saved = await saveFavorites([...favorites, ...newHiddens]);
+      if (!saved) {
+        console.log(
+          "Something went wrong with adding the issue (was previously hidden)."
+        );
+        return;
+      } else {
+        setHidden(newHiddens);
+      }
+    }
   };
 
   const onDragEnd = (result) => {
@@ -294,17 +353,17 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowHours = [];
     days.map((day) => {
-      let hours = 0;
+      let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
-          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue_id === rowTopic.issue.id &&
           entry.activity_id === rowTopic.activity.id
       );
       if (!entry && timeEntries && timeEntries.length > 0) {
         entry = timeEntries?.find(
           (entry) =>
-            entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+            entry.spent_on === formatDate(day, dateFormat) &&
             entry.issue.id === rowTopic.issue.id &&
             entry.activity.id === rowTopic.activity.id
         );
@@ -329,7 +388,7 @@ export const Report = () => {
       let id = 0;
       let entry = timeEntries?.find(
         (entry) =>
-          entry.spent_on === formatDate(day, "yyyy-MM-dd") &&
+          entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue.id === rowTopic.issue.id &&
           entry.activity.id === rowTopic.activity.id
       );
@@ -341,86 +400,141 @@ export const Report = () => {
     return rowEntryIds;
   };
 
+  const getTotalHours = (date) => {
+    let count: number = 0;
+    const dateEntries = timeEntries.filter(
+      (entry) =>
+        entry.spent_on === date &&
+        newTimeEntries.filter(
+          (newEntry) =>
+            newEntry.spent_on === date &&
+            newEntry.activity_id === entry.activity.id &&
+            newEntry.issue_id === entry.issue.id
+        ).length == 0
+    );
+
+    dateEntries.map((entry) => {
+      count += entry.hours;
+    });
+    newTimeEntries.map((entry) => {
+      if (entry.spent_on === date) count += entry.hours;
+    });
+
+    return count;
+  };
+  if (context.user === null) return <></>;
   return (
     <>
-      <div className="report-header">
-        <p className="header-year">{weekTravelDay.getFullYear()}</p>
-        <TimeTravel
-          weekTravelDay={weekTravelDay}
-          onWeekTravel={handleWeekTravel}
-          currentWeekArray={currentWeekArray}
-        />
-        <HeaderUser username={context.user ? context.user.login : ""} />
-      </div>
-      {favorites && favorites.length > 0 && (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <section className="favorites-container">
-            <HeaderRow days={currentWeekArray} />
-            <Droppable droppableId="favorites">
-              {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {favorites &&
-                    favorites.map((fav, index) => {
-                      return (
-                        <Draggable
-                          draggableId={`${fav.issue.id}${fav.activity.id}`}
-                          index={index}
-                          key={`${fav.issue.id}${fav.activity.id}-drag`}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                            >
-                              <Row
-                                key={`${fav.issue.id}${fav.activity.id}`}
-                                topic={fav}
-                                onCellUpdate={handleCellUpdate}
-                                onToggleFav={handleToggleFav}
-                                days={currentWeekArray}
-                                rowHours={findRowHours(fav, currentWeekArray)}
-                                rowEntryIds={findRowEntryIds(
-                                  fav,
-                                  currentWeekArray
-                                )}
-                                isFav={true}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </section>
-        </DragDropContext>
-      )}
-      <section className="recent-container">
-        <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
-        {filteredRecents &&
-          filteredRecents.map((recentIssue) => {
-            return (
-              <Row
-                key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                topic={recentIssue}
-                onCellUpdate={handleCellUpdate}
-                onToggleFav={handleToggleFav}
-                days={currentWeekArray}
-                rowHours={findRowHours(recentIssue, currentWeekArray)}
-                rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
-                isFav={false}
-              />
-            );
-          })}
-      </section>
-      <section className="save-button-container">
-        <button className="basic-button save-button" onClick={handleSave}>
-          Save changes
-        </button>
-      </section>
+      <header>
+        <div className="report-header">
+          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+          <TimeTravel
+            weekTravelDay={weekTravelDay}
+            onWeekTravel={handleWeekTravel}
+            currentWeekArray={currentWeekArray}
+          />
+          <HeaderUser username={context.user ? context.user.login : ""} />
+        </div>
+      </header>
+      <main>
+        {favorites && favorites.length > 0 && (
+          <DragDropContext onDragEnd={onDragEnd}>
+            <section className="favorites-container">
+              <HeaderRow days={currentWeekArray} />
+              <Droppable droppableId="favorites">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {favorites &&
+                      favorites.map((fav, index) => {
+                        return (
+                          <Draggable
+                            draggableId={`${fav.issue.id}${fav.activity.id}`}
+                            index={index}
+                            key={`${fav.issue.id}${fav.activity.id}-drag`}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <Row
+                                  key={`${fav.issue.id}${fav.activity.id}`}
+                                  topic={fav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  days={currentWeekArray}
+                                  rowHours={findRowHours(fav, currentWeekArray)}
+                                  rowEntryIds={findRowEntryIds(
+                                    fav,
+                                    currentWeekArray
+                                  )}
+                                  isFav={true}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        );
+                      })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </section>
+          </DragDropContext>
+        )}
+        <section className="recent-container">
+          <HeaderRow days={favorites.length > 0 ? [] : currentWeekArray} />
+          {filteredRecents &&
+            filteredRecents.map((recentIssue) => {
+              return (
+                <Row
+                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                  topic={recentIssue}
+                  onCellUpdate={handleCellUpdate}
+                  onToggleFav={handleToggleFav}
+                  onHide={handleHide}
+                  days={currentWeekArray}
+                  rowHours={findRowHours(recentIssue, currentWeekArray)}
+                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                  isFav={false}
+                />
+              );
+            })}
+        </section>
+        <section className="recent-container ">
+          <div className="row">
+            <div className="col-6">
+              <h2>Total</h2>
+            </div>
+            {currentWeekArray &&
+              currentWeekArray.map((date) => {
+                const dateStr = formatDate(date, dateFormat);
+                return (
+                  <div key={dateStr} className="col-1 cell-container">
+                    <input
+                      type="text"
+                      id={dateStr}
+                      className="cell not-outline"
+                      value={getTotalHours(dateStr)}
+                      readOnly
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </section>
+        <section className="save-button-container">
+          {newTimeEntries.length > 0 && (
+            <div className="unsaved-alert-p">
+              <p role="status">⚠ You have unsaved changes</p>
+            </div>
+          )}
+          <button className="basic-button save-button" onClick={handleSave}>
+            Save changes
+          </button>
+        </section>
+      </main>
       <section className="recent-container">
         <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
       </section>

@@ -6,7 +6,9 @@ import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
-import { AuthContext } from "../components/AuthProvider";
+import eye from "../icons/eye-slash.svg";
+import { dateFormat } from "../utils";
+import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
 
 export const Row = ({
   topic,
@@ -15,6 +17,7 @@ export const Row = ({
   rowEntryIds,
   onCellUpdate,
   onToggleFav,
+  onHide,
   isFav,
 }: {
   topic: IssueActivityPair;
@@ -23,17 +26,28 @@ export const Row = ({
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  onHide?: (topic: IssueActivityPair) => void;
   isFav: boolean;
 }) => {
   return (
     <>
       <div className="row">
         <div className="col-1 cell-container grip-container">
-          {isFav ? <img src={grip} className="grip" /> : <div></div>}
+          {isFav ? (
+            <img src={grip} className="grip" alt="grip to change row sorting" />
+          ) : (
+            <div></div>
+          )}
         </div>
         <div className="col-4 ">
           <div className="issue-label">
-            <p className="issue-label-text">{`# ${topic.issue.id}`}</p>
+            <p className="issue-label-text">
+              <a
+                href={
+                  `${SNOWPACK_PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`
+                }
+              >{`# ${topic.issue.id}`}</a>
+            </p>
             <p className="issue-label-text">
               {topic.custom_name
                 ? `${topic.custom_name}`
@@ -54,13 +68,29 @@ export const Row = ({
               alt={isFav ? "Remove from favorites" : "Make favorite"}
             />
           </button>
+          {!isFav ? (
+            <button
+              type="button"
+              className="star-button"
+              onClick={() => onHide(topic)}
+            >
+              <img
+                src={eye}
+                className="star"
+                role="button"
+                alt={"Hide this row"}
+              />
+            </button>
+          ) : (
+            <></>
+          )}
         </div>
         {days.map((day, i) => {
           return (
             <Cell
               key={`${topic.issue.id}${topic.activity.id}${formatDate(
                 day,
-                "yyyy-MM-dd"
+                dateFormat
               )}`}
               topic={topic}
               date={day}
