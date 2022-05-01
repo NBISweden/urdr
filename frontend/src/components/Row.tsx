@@ -8,6 +8,7 @@ import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
 import eye from "../icons/eye-slash.svg";
 import { dateFormat } from "../utils";
+import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
 
 export const Row = ({
   topic,
@@ -17,6 +18,7 @@ export const Row = ({
   onCellUpdate,
   onToggleFav,
   onHide,
+  getRowSum,
   isFav,
 }: {
   topic: IssueActivityPair;
@@ -25,7 +27,9 @@ export const Row = ({
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  getRowSum: (pair: IssueActivityPair) => number;
   onHide?: (topic: IssueActivityPair) => void;
+
   isFav: boolean;
 }) => {
   return (
@@ -40,7 +44,13 @@ export const Row = ({
         </div>
         <div className="col-4 ">
           <div className="issue-label">
-            <p className="issue-label-text">{`# ${topic.issue.id}`}</p>
+            <p className="issue-label-text">
+              <a
+                href={
+                  `${SNOWPACK_PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`
+                }
+              >{`# ${topic.issue.id}`}</a>
+            </p>
             <p className="issue-label-text">
               {topic.custom_name
                 ? `${topic.custom_name}`
@@ -93,6 +103,15 @@ export const Row = ({
             />
           );
         })}
+        <div className="col-1 cell-container">
+          <input
+            type="text"
+            id={`${topic.issue.id}${topic.activity.id}-total`}
+            className="cell not-outline"
+            value={getRowSum(topic)}
+            readOnly
+          />
+        </div>
       </div>
     </>
   );

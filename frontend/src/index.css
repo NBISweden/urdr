@@ -2,6 +2,35 @@
   box-sizing: border-box;
 }
 
+/* INCLUDING FONT "LATO" LOCALLY */
+
+/* Lato Light */
+@font-face {
+  font-family: Lato;
+  src: url("/dist/fonts/Lato-Light.woff") format("woff");
+  src: url("/dist/fonts/Lato-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Lato Regular */
+@font-face {
+  font-family: Lato;
+  src: url("/dist/fonts/Lato-Regular.woff") format("woff");
+  src: url("/dist/fonts/Lato-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Lato Bold */
+@font-face {
+  font-family: Lato;
+  src: url("/dist/fonts/Lato-Bold.woff") format("woff");
+  src: url("/dist/fonts/Lato-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
 body {
   margin: 0;
   font-family: Lato, sans-serif;
@@ -307,8 +336,8 @@ input[type="number"] {
 }
 
 .validation-icon {
-  width: 3%;
-  padding-left: 0;
+  width: 3.5rem;
+  margin-left: -2.8rem;
 }
 
 .hiden {
