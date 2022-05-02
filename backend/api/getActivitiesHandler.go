@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
+	"github.com/sirupsen/logrus"
 )
 
 // getActivitiesHandler godoc
@@ -22,6 +23,9 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	if err != nil {
 		redmineIssueId = 0
 	}
+
+	logrus.Debugf("Gtting activities for issue_id=%d\n",
+		redmineIssueId)
 
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
@@ -49,6 +53,11 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
 		c.Response().Reset()
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
+	}
+
+	// Bypass filtering if we don't have a real issue ID.
+	if redmineIssueId == 0 {
+		return c.JSON(activitiesResponse)
 	}
 
 	activities := activitiesResponse.TimeEntryActivities

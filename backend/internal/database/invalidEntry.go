@@ -1,6 +1,10 @@
 package database
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/sirupsen/logrus"
+)
 
 // invalidActivities is a map that maps Redmine issue IDs onto arrays of
 // invalid Redmine activity IDs for that issue ID.
@@ -49,6 +53,9 @@ func (db *Database) loadAllInvalidEntries() error {
 }
 
 func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bool {
+	logrus.Debugf("Testing issue_id=%d, activity_id=%d\n",
+		redmineIssueId, redmineActivityId)
+
 	if invalidActivities == nil {
 		if err := db.loadAllInvalidEntries(); err != nil {
 			fmt.Printf("database.loadAllInvalidEntries() failed: %v\n", err)
