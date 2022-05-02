@@ -19,10 +19,13 @@ export const QuickAdd = ({
   const context = React.useContext(AuthContext);
 
   React.useEffect(() => {
+    console.log("searching activities...");
+    let endpoint = "/api/activities";
+    if (issue) endpoint += "?issue=" + issue;
     let didCancel = false;
     const loadActivities = async () => {
       let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
-        "/api/activities",
+        endpoint,
         context
       );
       if (!didCancel && result) {
@@ -35,14 +38,13 @@ export const QuickAdd = ({
     return () => {
       didCancel = true;
     };
-  }, []);
+  }, [issue]);
 
   // Effect for API call
   React.useEffect(
     () => {
       let didCancel = false;
       const searchIssue = async () => {
-        console.log("Searching issue...");
         if (debouncedSearch) {
           const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
           let result: { issues: Issue[] } = await getApiEndpoint(
