@@ -2,12 +2,11 @@ package database
 
 import (
 	"fmt"
-
-	"github.com/sirupsen/logrus"
 )
 
-// invalidActivities is a map that maps Redmine issue IDs onto arrays of
-// invalid Redmine activity IDs for that issue ID.
+// invalidActivities is a map that maps a Redmine issue ID to a set of
+// Redmine activity IDs.  If an activity ID is present for an issue ID,
+// then that combination of issue and activity is invalid.
 var invalidActivities map[int][]int
 
 // loadAllInvalidEntries() loads the static list of invalid combinations
@@ -16,11 +15,13 @@ var invalidActivities map[int][]int
 // map is later used by IsInvalidEntry().
 func (db *Database) loadAllInvalidEntries() error {
 	selectStmt := `
-		SELECT	redmine_issue_id,
-				redmine_activity_id
-		FROM	invalid_entry
+		SELECT
+			redmine_issue_id,
+			redmine_activity_id
+		FROM
+			invalid_entry
 		ORDER BY
-				redmine_issue_id, redmine_activity_id`
+			redmine_issue_id, redmine_activity_id`
 
 	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
