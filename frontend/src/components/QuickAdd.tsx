@@ -21,7 +21,7 @@ export const QuickAdd = ({
   React.useEffect(() => {
     console.log("searching activities...");
     let endpoint = "/api/activities";
-    if (issue) endpoint += "?issue=" + issue.id;
+    if (issue) endpoint += "?issue_id=" + issue.id;
     let didCancel = false;
     const loadActivities = async () => {
       let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
