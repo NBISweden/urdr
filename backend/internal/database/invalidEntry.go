@@ -18,7 +18,9 @@ func (db *Database) loadAllInvalidEntries() error {
 	selectStmt := `
 		SELECT	redmine_issue_id,
 				redmine_activity_id
-		FROM	invalid_entry`
+		FROM	invalid_entry
+		ORDER BY
+				redmine_issue_id, redmine_activity_id`
 
 	stmt, err := db.handle().Prepare(selectStmt)
 	if err != nil {
@@ -43,7 +45,8 @@ func (db *Database) loadAllInvalidEntries() error {
 		}
 
 		invalidActivities[redmineIssueId] =
-			append(invalidActivities[redmineIssueId], redmineActivityId)
+			append(invalidActivities[redmineIssueId],
+				redmineActivityId)
 	}
 	if err := rows.Err(); err != nil {
 		return fmt.Errorf("sql.Next() failed: %w", err)
@@ -53,9 +56,6 @@ func (db *Database) loadAllInvalidEntries() error {
 }
 
 func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bool {
-	logrus.Debugf("Testing issue_id=%d, activity_id=%d\n",
-		redmineIssueId, redmineActivityId)
-
 	if invalidActivities == nil {
 		if err := db.loadAllInvalidEntries(); err != nil {
 			fmt.Printf("database.loadAllInvalidEntries() failed: %v\n", err)
@@ -66,7 +66,10 @@ func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bo
 	for _, i := range invalidActivities[redmineIssueId] {
 		if i == redmineActivityId {
 			return true
+		} else if i > redmineActivityId {
+			break
 		}
+
 	}
 
 	return false
