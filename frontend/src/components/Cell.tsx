@@ -1,22 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 import { dateFormat } from "../utils";
-import commentbtn from "../icons/comment-button.svg";
 
 export const Cell = ({
   topic,
   date,
   hours,
+  comments,
   entryId,
   onCellUpdate,
 }: {
   topic: IssueActivityPair;
   date: Date;
   hours: number;
+  comments: string;
   entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
+  const [showCommentInput, setShowCommentInput] = useState<boolean>(false);
+  const onCommentButtonClick = () => {
+    setShowCommentInput(!showCommentInput);
+  };
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
     //with an unlimited number of decimals behind the delimiter
@@ -31,7 +36,7 @@ export const Cell = ({
       issue_id: topic.issue.id,
       activity_id: topic.activity.id,
       hours: event.target.value === "" ? 0 : parseFloat(event.target.value),
-      comments: "",
+      comments: comments,
       spent_on: formatDate(date, dateFormat),
     });
   };
@@ -58,7 +63,14 @@ export const Cell = ({
           className="cell"
           defaultValue={hours === 0 ? "" : hours}
         />
-        <button className="comment-button" type="button"></button>
+        {hours > 0 && (
+          <button
+            className={comments === "" ? "comment comment-unfilled" : "comment"}
+            type="button"
+            onClick={() => onCommentButtonClick()}
+          ></button>
+        )}
+        {showCommentInput && <input type="text" className="cell" />}
       </div>
     </div>
   );

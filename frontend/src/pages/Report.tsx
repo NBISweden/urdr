@@ -378,14 +378,16 @@ export const Report = () => {
   };
 
   /*
-  Returns an array of five numbers representing Redmine's entry ids of 
-  entries displayed in a row. 
+  Returns an object with Redmine's entry ids and comments of
+  entries displayed in a row.
   If there is no entry in the database, id is 0.
   */
-  const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
+  const findRowMetadata = (rowTopic: IssueActivityPair, days: Date[]) => {
     let rowEntryIds = [];
+    let comments = [];
     days.map((day) => {
       let id = 0;
+      let comment = "";
       let entry = timeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
@@ -394,10 +396,12 @@ export const Report = () => {
       );
       if (entry) {
         id = entry.id;
+        comment = entry.comments;
       }
       rowEntryIds.push(id);
+      comments.push(comment);
     });
-    return rowEntryIds;
+    return { ids: rowEntryIds, comments: comments };
   };
 
   const getTotalHoursWeek = () => {
@@ -481,6 +485,10 @@ export const Report = () => {
                   <div {...provided.droppableProps} ref={provided.innerRef}>
                     {favorites &&
                       favorites.map((fav, index) => {
+                        const rowMetadata = findRowMetadata(
+                          fav,
+                          currentWeekArray
+                        );
                         return (
                           <Draggable
                             draggableId={`${fav.issue.id}${fav.activity.id}`}
@@ -500,10 +508,8 @@ export const Report = () => {
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
                                   rowHours={findRowHours(fav, currentWeekArray)}
-                                  rowEntryIds={findRowEntryIds(
-                                    fav,
-                                    currentWeekArray
-                                  )}
+                                  rowComments={rowMetadata.comments}
+                                  rowEntryIds={rowMetadata.ids}
                                   getRowSum={getRowSum}
                                   isFav={true}
                                 />
@@ -525,6 +531,10 @@ export const Report = () => {
           )}
           {filteredRecents &&
             filteredRecents.map((recentIssue) => {
+              const rowMetadata = findRowMetadata(
+                recentIssue,
+                currentWeekArray
+              );
               return (
                 <Row
                   key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
@@ -534,7 +544,8 @@ export const Report = () => {
                   onHide={handleHide}
                   days={currentWeekArray}
                   rowHours={findRowHours(recentIssue, currentWeekArray)}
-                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                  rowComments={rowMetadata.comments}
+                  rowEntryIds={rowMetadata.ids}
                   getRowSum={getRowSum}
                   isFav={false}
                 />

@@ -14,6 +14,7 @@ export const Row = ({
   topic,
   days,
   rowHours,
+  rowComments,
   rowEntryIds,
   onCellUpdate,
   onToggleFav,
@@ -24,6 +25,7 @@ export const Row = ({
   topic: IssueActivityPair;
   days: Date[];
   rowHours: number[];
+  rowComments: string[];
   rowEntryIds: number[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
@@ -99,6 +101,7 @@ export const Row = ({
               date={day}
               onCellUpdate={onCellUpdate}
               hours={rowHours[i]}
+              comments={rowComments[i]}
               entryId={rowEntryIds[i]}
             />
           );
