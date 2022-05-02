@@ -4,28 +4,35 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
-	"github.com/sirupsen/logrus"
 )
 
+type TimeEntryActivityResponse struct {
+	TimeEntryActivities []struct {
+		Id        int    `json:"id"`
+		Name      string `json:"name"`
+		IsDefault bool   `json:"is_default"`
+		Active    bool   `json:"active"`
+	} `json:"time_entry_activities"`
+}
+
 // getActivitiesHandler godoc
-// @Summary	Proxy for the "/enumerations/time_entry_activities.json" Redmine endpoint
+// @Summary	(Mostly) a proxy for the "/enumerations/time_entry_activities.json" Redmine endpoint
 // @Accept	json
 // @Produce	json
 // @Failure	401	{string}	error "Unauthorized"
 // @Failure	500	{string}	error "Internal Server Error"
-// @Router /api/activities [get]
+// @Router	/api/activities	[get]
+// @Param	session_id	query	string	false	"Issue ID"	default(0)
 func getActivitiesHandler(c *fiber.Ctx) error {
-	redmineIssueId, err := c.ParamsInt("issue_id")
+	redmineIssueId, err := strconv.Atoi(c.Query("issue_id", "0"))
 	if err != nil {
-		redmineIssueId = 0
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-
-	logrus.Debugf("Gtting activities for issue_id=%d\n",
-		redmineIssueId)
 
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
@@ -41,40 +48,33 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 		return nil
 	}
 
-	activitiesResponse := struct {
-		TimeEntryActivities []struct {
-			Id        int    `json:"id"`
-			Name      string `json:"name"`
-			IsDefault bool   `json:"is_default"`
-			Active    bool   `json:"active"`
-		} `json:"time_entry_activities"`
-	}{}
+	activitiesResponse := TimeEntryActivityResponse{}
 
 	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
 		c.Response().Reset()
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
 
+	// Sort the activities list alphabetically on the name.
+	sort.Slice(activitiesResponse.TimeEntryActivities, func(i, j int) bool {
+		return activitiesResponse.TimeEntryActivities[i].Name <
+			activitiesResponse.TimeEntryActivities[j].Name
+	})
+
 	// Bypass filtering if we don't have a real issue ID.
 	if redmineIssueId == 0 {
+		// Return all activities.
 		return c.JSON(activitiesResponse)
 	}
 
-	activities := activitiesResponse.TimeEntryActivities
-	activitiesResponse.TimeEntryActivities =
-		activitiesResponse.TimeEntryActivities[:0]
+	filteredActivities := TimeEntryActivityResponse{}
 
-	for _, i := range activities {
-		if !db.IsInvalidEntry(redmineIssueId, i.Id) {
-			activitiesResponse.TimeEntryActivities =
-				append(activitiesResponse.TimeEntryActivities)
+	for _, activity := range activitiesResponse.TimeEntryActivities {
+		if !db.IsInvalidEntry(redmineIssueId, activity.Id) {
+			filteredActivities.TimeEntryActivities =
+				append(filteredActivities.TimeEntryActivities, activity)
 		}
 	}
 
-	// Sort the activities list alphabetically on the name.
-	sort.Slice(activitiesResponse.TimeEntryActivities, func(i, j int) bool {
-		return activitiesResponse.TimeEntryActivities[i].Name < activitiesResponse.TimeEntryActivities[j].Name
-	})
-
-	return c.JSON(activitiesResponse)
+	return c.JSON(filteredActivities)
 }
