@@ -351,9 +351,9 @@ export const Report = () => {
   Checks first for new time entries, i.e. unsaved changes,
   and, if there are none, for entries from the database for the respective cell.
   */
-  const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
+  const findRowHours = (rowTopic: IssueActivityPair) => {
     let rowHours = [];
-    days.map((day) => {
+    currentWeekArray.map((day) => {
       let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
@@ -437,29 +437,11 @@ export const Report = () => {
   };
 
   const getRowSum = (pair: IssueActivityPair) => {
-    let count = 0;
-    const rowEntries = timeEntries.filter(
-      (entry) =>
-        pair.activity.id === entry.activity.id &&
-        pair.issue.id === entry.issue.id &&
-        newTimeEntries.filter(
-          (newEntry) =>
-            newEntry.spent_on === entry.spent_on &&
-            newEntry.activity_id === pair.activity.id &&
-            newEntry.issue_id === pair.issue.id
-        ).length == 0
+    const sum = findRowHours(pair).reduce(
+      (previousValue, currentValue) => previousValue + currentValue,
+      0
     );
-    rowEntries.map((entry) => {
-      count += entry.hours;
-    });
-    newTimeEntries.map((entry) => {
-      if (
-        pair.activity.id === entry.activity_id &&
-        pair.issue.id === entry.issue_id
-      )
-        count += entry.hours;
-    });
-    return count;
+    return sum;
   };
 
   if (context.user === null) return <></>;
@@ -508,7 +490,7 @@ export const Report = () => {
                                   onCellUpdate={handleCellUpdate}
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
-                                  rowHours={findRowHours(fav, currentWeekArray)}
+                                  rowHours={findRowHours(fav)}
                                   rowComments={rowMetadata.comments}
                                   rowEntryIds={rowMetadata.ids}
                                   getRowSum={getRowSum}
@@ -544,7 +526,7 @@ export const Report = () => {
                   onToggleFav={handleToggleFav}
                   onHide={handleHide}
                   days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue, currentWeekArray)}
+                  rowHours={findRowHours(recentIssue)}
                   rowComments={rowMetadata.comments}
                   rowEntryIds={rowMetadata.ids}
                   getRowSum={getRowSum}
