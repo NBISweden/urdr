@@ -16,6 +16,7 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import { useParams } from "react-router";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -31,6 +32,7 @@ export const Report = () => {
   const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
+  const { year, week } = useParams();
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
