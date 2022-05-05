@@ -33,9 +33,9 @@ export const Report = () => {
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const { year, week } = useParams();
-  const today = new Date();
-  const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
-  const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
+  const date = new Date();
+  const [weekTravelDay, setWeekTravelDay] = useState<Date>(date);
+  const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(date));
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
