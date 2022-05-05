@@ -358,7 +358,6 @@ input[type="number"] {
   position: relative;
 }
 
-
 .comment {
   background-image: url("/dist/icons/comment-button.svg");
   background-repeat: no-repeat;
@@ -373,7 +372,6 @@ input[type="number"] {
   top: 0;
   right: 0;
 }
-
 
 .close-btn {
   height: 1.5em;
