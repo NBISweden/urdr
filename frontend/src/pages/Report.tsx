@@ -150,7 +150,8 @@ export const Report = () => {
       (entry) =>
         entry.issue.id === timeEntry.issue_id &&
         entry.activity.id === timeEntry.activity_id &&
-        entry.spent_on === timeEntry.spent_on
+        entry.spent_on === timeEntry.spent_on &&
+        entry.comments === timeEntry.comments
     );
     // If there is one, check if it has the same hours.
     // If there is none, check if the incoming entry's hours are 0.

@@ -354,13 +354,17 @@ input[type="number"] {
   position: relative;
 }
 
+.comment-container-2 {
+  position: relative;
+}
+
 
 .comment {
   background-image: url("/dist/icons/comment-button.svg");
   background-repeat: no-repeat;
-  background-position: right;
-  height: 25%;
-  width: 25%;
+  background-position: top right;
+  height: 1.5em;
+  width: 1.5em;
   background-color: white;
   border: 1px solid hsl(0deg 0% 83%);
   border-left: none;
@@ -370,6 +374,32 @@ input[type="number"] {
   right: 0;
 }
 
+
+.close-btn {
+  height: 1.5em;
+  width: 1.5em;
+  border: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+}
+
+.close-img {
+  position: inherit;
+  height: inherit;
+  width: inherit;
+  top: 0;
+  right: 0;
+}
+
 .comment-unfilled {
   background-image: url("/dist/icons/comment-button-fade.svg");
+}
+
+.comment-area {
+  width: 100%;
+  border: 1px solid hsl(0deg 0% 83%);
+  padding: 0.5rem;
+  resize: none;
 }

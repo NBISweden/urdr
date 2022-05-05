@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 import { dateFormat } from "../utils";
+import x from "../icons/x.svg";
 
 export const Cell = ({
   topic,
@@ -18,9 +19,19 @@ export const Cell = ({
   entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
-  const [showCommentInput, setShowCommentInput] = useState<boolean>(false);
+  const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
   const onCommentButtonClick = () => {
-    setShowCommentInput(!showCommentInput);
+    setShowCommentArea(!showCommentArea);
+  };
+  const onCommentUpdate = (e: any) => {
+    onCellUpdate({
+      id: entryId,
+      issue_id: topic.issue.id,
+      activity_id: topic.activity.id,
+      hours: hours,
+      comments: e.target.value,
+      spent_on: formatDate(date, dateFormat),
+    });
   };
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
@@ -70,7 +81,27 @@ export const Cell = ({
             onClick={() => onCommentButtonClick()}
           ></button>
         )}
-        {showCommentInput && <input type="text" className="cell" />}
+        {showCommentArea && (
+          <div className="comment-container-2">
+            <label htmlFor="comments" hidden={true}></label>
+            <textarea
+              autoFocus
+              className="comment-area"
+              onChange={onCommentUpdate}
+              placeholder="Comments"
+              name="comments"
+              rows={1}
+              defaultValue={comments}
+            />
+            <button
+              className="close-btn"
+              type="button"
+              onClick={() => onCommentButtonClick()}
+            >
+              <img src={x} className="close-img" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
