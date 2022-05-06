@@ -391,7 +391,7 @@ input[type="number"] {
 }
 
 .comment-unfilled {
-  border-color: transparent hsl(0deg 0% 75%) transparent;
+  border-color: transparent hsl(0deg 0% 83%) transparent;
 }
 
 .comment-area {
