@@ -106,6 +106,7 @@ export const Row = ({
         <div className="col-1 cell-container">
           <input
             type="text"
+            aria-labelledby={`total of hours spent on the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
             id={`${topic.issue.id}${topic.activity.id}-total`}
             className="cell not-outline"
             value={getRowSum(topic)}
