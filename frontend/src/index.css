@@ -363,7 +363,6 @@ input[type="number"] {
   border-style: inset;
   width: 0;
   height: 0;
-  border-style: solid;
   padding: 0;
   border-width: 0 0.8em 0.8em 0;
   border-color: transparent hsl(0deg 0% 15%) transparent;
