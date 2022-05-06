@@ -20,7 +20,7 @@ export const Cell = ({
   onCellUpdate: (timeEntry: TimeEntry) => void;
 }) => {
   const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
-  const [areaComments, setAreaComments] = useState<string>(comments);
+  const [areaComments, setAreaComments] = useState<string>(null);
   const onCommentButtonClick = () => {
     setShowCommentArea(!showCommentArea);
   };
@@ -31,7 +31,7 @@ export const Cell = ({
       issue_id: topic.issue.id,
       activity_id: topic.activity.id,
       hours: hours,
-      comments: areaComments,
+      comments: e.target.value,
       spent_on: formatDate(date, dateFormat),
     });
   };
@@ -94,7 +94,7 @@ export const Cell = ({
               placeholder="Comments"
               name="comments"
               rows={1}
-              defaultValue={areaComments}
+              defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
               className="close-btn"
