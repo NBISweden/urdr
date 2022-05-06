@@ -359,15 +359,14 @@ input[type="number"] {
 }
 
 .comment {
-  background-image: url("/dist/icons/comment-button.svg");
-  background-repeat: no-repeat;
-  background-position: top right;
-  height: 1.5em;
-  width: 1.5em;
-  background-color: white;
-  border: 1px solid hsl(0deg 0% 83%);
-  border-left: none;
-  border-bottom: none;
+  background-color: transparent;
+  border-style: inset;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  padding: 0;
+  border-width: 0 0.8em 0.8em 0;
+  border-color: transparent hsl(0deg 0% 15%) transparent;
   position: absolute;
   top: 0;
   right: 0;
@@ -392,7 +391,7 @@ input[type="number"] {
 }
 
 .comment-unfilled {
-  background-image: url("/dist/icons/comment-button-fade.svg");
+  border-color: transparent hsl(0deg 0% 75%) transparent;
 }
 
 .comment-area {
