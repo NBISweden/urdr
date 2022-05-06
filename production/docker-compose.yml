@@ -23,6 +23,9 @@ services:
     build:
       dockerfile: ../production/Dockerfile.nginx
       context: ../frontend
+      args:
+        - SNOWPACK_PUBLIC_API_URL=${SNOWPACK_PUBLIC_API_URL}
+        - SNOWPACK_PUBLIC_REDMINE_URL=${SNOWPACK_PUBLIC_REDMINE_URL}
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
