@@ -82,7 +82,7 @@ export const Cell = ({
           ></button>
         )}
         {showCommentArea && (
-          <div className="comment-container-2">
+          <div className="area-container">
             <label htmlFor="comments" hidden={true}></label>
             <textarea
               autoFocus
