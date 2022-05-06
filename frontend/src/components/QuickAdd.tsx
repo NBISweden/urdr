@@ -19,7 +19,6 @@ export const QuickAdd = ({
   const context = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    console.log("searching activities...");
     let endpoint = "/api/activities";
     if (issue) endpoint += "?issue_id=" + issue.id;
     let didCancel = false;
