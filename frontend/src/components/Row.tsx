@@ -1,5 +1,5 @@
 import React from "react";
-import { IssueActivityPair, TimeEntry } from "../model";
+import { FetchedTimeEntry, IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 
 import { Cell } from "./Cell";
@@ -14,8 +14,7 @@ export const Row = ({
   topic,
   days,
   rowHours,
-  rowComments,
-  rowEntryIds,
+  rowEntries,
   onCellUpdate,
   onToggleFav,
   onHide,
@@ -25,8 +24,7 @@ export const Row = ({
   topic: IssueActivityPair;
   days: Date[];
   rowHours: number[];
-  rowComments: string[];
-  rowEntryIds: number[];
+  rowEntries: FetchedTimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   getRowSum: (pair: IssueActivityPair) => number;
@@ -101,8 +99,8 @@ export const Row = ({
               date={day}
               onCellUpdate={onCellUpdate}
               hours={rowHours[i]}
-              comments={rowComments[i]}
-              entryId={rowEntryIds[i]}
+              comments={rowEntries[i] ? rowEntries[i].comments : ""}
+              entryId={rowEntries[i] ? rowEntries[i].id : 0}
             />
           );
         })}
