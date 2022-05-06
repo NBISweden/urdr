@@ -11,7 +11,6 @@ import {
   getApiEndpoint,
   headers,
   getFullWeek,
-  removeIssueActivityPair,
   dateFormat,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
@@ -437,6 +436,21 @@ export const Report = () => {
       0
     );
     return sum;
+  };
+
+  // Removes an IssueActivityPair object from an array of these objects.
+  // Returns the shortened array.
+  const removeIssueActivityPair = (
+    pairs: IssueActivityPair[],
+    item: IssueActivityPair
+  ): IssueActivityPair[] => {
+    const removed = pairs.find(
+      (pair) =>
+        pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
+    );
+    const index = pairs.indexOf(removed);
+    pairs.splice(index, 1);
+    return pairs;
   };
 
   if (context.user === null) return <></>;
