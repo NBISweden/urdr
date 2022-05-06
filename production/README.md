@@ -32,7 +32,7 @@ To build the needed images do:
 
 ```shell
 cd production
-docker-compose build --no-cache
+docker-compose --env-file urdr.env build --no-cache
 ```
 
 To start the actual services do:
