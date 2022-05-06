@@ -98,7 +98,13 @@ export const Cell = ({
               type="button"
               onClick={() => onCommentButtonClick()}
             >
-              <img src={x} className="close-img" />
+              <img
+                src={x}
+                role="button"
+                alt="Close comment area"
+                aria-label="Button for hiding comment area"
+                className="close-img"
+              />
             </button>
           </div>
         )}
