@@ -1,11 +1,12 @@
 import "../index.css";
 import React, { useState, forwardRef } from "react";
-import { getISOWeek } from "date-fns";
+import { getISOWeek, getISOWeekYear } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
 import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const TimeTravel = ({
   weekTravelDay,
@@ -19,10 +20,19 @@ export const TimeTravel = ({
   const [currentWeek, setCurrentWeek] = useState<number>(
     getISOWeek(weekTravelDay)
   );
+  // Change current week if weekTravelDay has changed.
+  // This is needed to make the datepicker respond to browser back- and forward-button navigation.
+  React.useEffect(() => {
+    setCurrentWeek(getISOWeek(weekTravelDay));
+  }, [weekTravelDay]);
+
+  const navigate = useNavigate();
+  const urlparams = useParams();
 
   const handleDateChange = (dates: Date[]) => {
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
+    navigate(`/report/${dates[0].getFullYear()}/${getISOWeek(dates[0])}`);
   };
 
   const previousWeeksClickHandle = () => {
@@ -31,13 +41,16 @@ export const TimeTravel = ({
     );
     onWeekTravel(nextDate);
     setCurrentWeek(getISOWeek(nextDate));
+    navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
   };
+
   const nextWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() + 7)
     );
     onWeekTravel(nextDate);
     setCurrentWeek(getISOWeek(nextDate));
+    navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
   };
 
   const CustomDatePickerInput = forwardRef(({ onClick }, ref) => (
@@ -64,7 +77,7 @@ export const TimeTravel = ({
   return (
     <div className="time-travel">
       <button onClick={previousWeeksClickHandle} className="week-arrow-button">
-        <img src={left} alt="left arrow" className="week-arrow" />
+        <img src={left} alt="switch to previous week" className="week-arrow" />
       </button>
       <DatePicker
         onChange={(date) => handleDateChange(date)}
@@ -79,7 +92,7 @@ export const TimeTravel = ({
         todayButton="Idag"
       />
       <button onClick={nextWeeksClickHandle} className="week-arrow-button">
-        <img src={right} alt="right arrow" className="week-arrow" />
+        <img src={right} alt="switch to next week" className="week-arrow" />
       </button>
     </div>
   );

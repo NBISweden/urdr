@@ -38,6 +38,7 @@ const addDays = (date: Date, days: number) => {
   result.setDate(result.getDate() + days);
   return result;
 };
+
 export const getFullWeek = (today: Date): Date[] => {
   let fullWeek = [];
   const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { format as formatDate } from "date-fns";
+import { format as formatDate, getISOWeek, setISOWeek } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -15,6 +15,7 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import { useNavigate, useParams } from "react-router-dom";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -22,6 +23,9 @@ const beforeUnloadHandler = (event) => {
 };
 
 export const Report = () => {
+  const urlparams = useParams();
+  let navigate = useNavigate();
+
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -30,20 +34,55 @@ export const Report = () => {
   const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
-  const today = new Date();
+
+  // Get year/week either from URL parameters or current time.
+  // Use today as date if nor year or week are valid numbers.
+  const thisYear: number = new Date().getFullYear();
+  let yearnum: number = thisYear;
+  if (urlparams.year.match(/^\d+$/)) {
+    yearnum = Number(urlparams.year);
+    if (isNaN(yearnum)) {
+      yearnum = thisYear;
+    }
+  }
+
+  // Assume current week/date
+  let today = new Date();
+  const thisWeek: number = getISOWeek(new Date());
+  let weeknum = thisWeek;
+
+  // If week parameter is a valid number between 1-53, change the "today" value.
+  weeknum = Number(urlparams.week);
+  if (isNaN(weeknum)) {
+    weeknum = thisWeek;
+  } else if (weeknum >= 1 && weeknum <= 53) {
+    today = setISOWeek(new Date(yearnum, 7, 7), weeknum);
+  }
+
+  // Set weeks for timetravel when weeknum has changed
+  React.useEffect(() => {
+    setWeekTravelDay(today);
+    setCurrentWeekArray(getFullWeek(today));
+    //setCurrentWeek(weeknum);
+  }, [weeknum]);
+
+  // Change displayed "Timetravel content" based on found year/week
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const context = React.useContext(AuthContext);
+  // const [currentWeek, setCurrentWeek] = useState<number>(
+  //   getISOWeek(weekTravelDay)
+  // );
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    let params = new URLSearchParams({
+    let queryparams = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
       from: formatDate(days[0], dateFormat),
       to: formatDate(days[4], dateFormat),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`,
+      `/api/time_entries?${queryparams}`,
       context
     );
     if (entries) return entries.time_entries;
@@ -451,6 +490,8 @@ export const Report = () => {
   };
 
   if (context.user === null) return <></>;
+
+  // Main content
   return (
     <>
       <header>
