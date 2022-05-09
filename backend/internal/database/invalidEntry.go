@@ -67,6 +67,8 @@ func (db *Database) loadAllInvalidEntries() error {
 	return nil
 }
 
+// IsInvalidEntry() will return true if the combination of Redmine issue
+// ID and Redmine activity ID is invalid.
 func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bool {
 	if invalidActivities == nil {
 		if err := db.loadAllInvalidEntries(); err != nil {
