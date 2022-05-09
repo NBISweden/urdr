@@ -67,9 +67,9 @@ func (db *Database) loadAllInvalidEntries() error {
 	return nil
 }
 
-// IsInvalidEntry() will return true if the combination of Redmine issue
+// IsValidEntry() will return false if the combination of Redmine issue
 // ID and Redmine activity ID is invalid.
-func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bool {
+func (db *Database) IsValidEntry(redmineIssueId int, redmineActivityId int) bool {
 	if invalidActivities == nil {
 		if err := db.loadAllInvalidEntries(); err != nil {
 			fmt.Printf("database.loadAllInvalidEntries() failed: %v\n", err)
@@ -78,17 +78,17 @@ func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bo
 	}
 
 	if alwaysInvalidActivities[redmineActivityId] {
-		return true
+		return false
 	}
 
 	for _, i := range invalidActivities[redmineIssueId] {
 		if i == redmineActivityId {
-			return true
+			return false
 		} else if i > redmineActivityId {
 			break
 		}
 
 	}
 
-	return false
+	return true
 }

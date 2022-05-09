@@ -70,7 +70,7 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	filteredActivities := TimeEntryActivityResponse{}
 
 	for _, activity := range activitiesResponse.TimeEntryActivities {
-		if !db.IsInvalidEntry(redmineIssueId, activity.Id) {
+		if db.IsValidEntry(redmineIssueId, activity.Id) {
 			filteredActivities.TimeEntryActivities =
 				append(filteredActivities.TimeEntryActivities, activity)
 		}

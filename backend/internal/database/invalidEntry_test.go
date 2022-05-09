@@ -52,29 +52,37 @@ func TestIsInvalidEntry(t *testing.T) {
 				redmineIssueId:    2000,
 				redmineActivityId: 35,
 			},
-			want: true,
+			want: false,
 		},
 		{
-			name: "Not invalid issue+activity",
+			name: "Valid issue+activity",
 			args: args{
 				redmineIssueId:    1900,
 				redmineActivityId: 35,
 			},
+			want: true,
+		},
+		{
+			name: "Design activity (never valid)",
+			args: args{
+				redmineIssueId:    1, // Issue ID 1 does not exist in DB
+				redmineActivityId: 8, // Activity ID 8 always invalid
+			},
 			want: false,
 		},
 		{
-			name: "Design activity (always invalid)",
+			name: "Non-design activity on other issue",
 			args: args{
-				redmineIssueId:    1, // NOTE: Issue ID 1 does not exist
-				redmineActivityId: 8,
+				redmineIssueId:    1, // Issue ID 1 does not exist in DB
+				redmineActivityId: 9, // Activity ID 9 is not always invalid
 			},
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := db.IsInvalidEntry(tt.args.redmineIssueId, tt.args.redmineActivityId); got != tt.want {
-				t.Errorf("Database.IsInvalidEntry() = %v, want %v", got, tt.want)
+			if got := db.IsValidEntry(tt.args.redmineIssueId, tt.args.redmineActivityId); got != tt.want {
+				t.Errorf("Database.IsValidEntry() = %v, want %v", got, tt.want)
 			}
 		})
 	}
