@@ -16,6 +16,8 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { css } from "@emotion/react";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -37,6 +39,16 @@ export const Report = () => {
   const [showToast, setShowToast] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
+  const [showSpinner, setShowSpinner] = useState(false);
+
+  const override = css`
+    display: block;
+    margin: 0 auto;
+  `;
+
+  const toggleLoadingPage = (state: boolean) => {
+    setShowSpinner(state);
+  };
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
@@ -287,6 +299,7 @@ export const Report = () => {
       );
       return;
     }
+    toggleLoadingPage(true);
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
@@ -294,13 +307,14 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
+    await getAllEntries(favorites, filteredRecents);
+    setNewTimeEntries(unsavedEntries);
+    toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
       setShowToast(true);
     } else if (unsavedEntries.length > 0) {
       setShowUnsavedWarning(true);
     }
-    await getAllEntries(favorites, filteredRecents);
-    setNewTimeEntries(unsavedEntries);
   };
 
   const handleCloseToast = () => {
@@ -603,6 +617,19 @@ export const Report = () => {
           <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
         </section>
       </main>
+      <section className="recent-container">
+        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+      </section>
+      <ClimbingBoxLoader
+        color="hsl(76deg 55% 53%)"
+        css={override}
+        loading={showSpinner}
+        size={10}
+        width={3}
+        height={3}
+        radius={2}
+        margin={2}
+      ></ClimbingBoxLoader>
     </>
   );
 };
