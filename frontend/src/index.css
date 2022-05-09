@@ -402,6 +402,7 @@ input[type="number"] {
   padding: 0.2rem;
   resize: none;
 }
+
 .toast-box {
   width: 20rem;
   height: 5rem;
@@ -409,7 +410,7 @@ input[type="number"] {
   bottom: 20px;
   left: 20px;
   background: hsl(76deg 55% 65%);
-  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+  box-shadow: 0 5px 15px 0 hsla(0deg, 0%, 0%, 15%);
   border-radius: 4px;
   padding: 0.2rem;
   padding-left: 1rem;
