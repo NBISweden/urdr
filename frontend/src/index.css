@@ -350,7 +350,6 @@ input[type="number"] {
   margin: 3rem 1rem 2rem;
 }
 
-<<<<<<< HEAD
 .comment-container {
   position: relative;
 }
@@ -402,7 +401,7 @@ input[type="number"] {
   border: 1px solid hsl(0deg 0% 83%);
   padding: 0.2rem;
   resize: none;
-=======
+}
 .toast-box {
   width: 20rem;
   height: 5rem;
@@ -431,5 +430,4 @@ input[type="number"] {
 
 .toast-button img {
   width: 1.5rem;
->>>>>>> create toast component
 }
