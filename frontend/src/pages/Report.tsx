@@ -149,7 +149,8 @@ export const Report = () => {
       (entry) =>
         entry.issue.id === timeEntry.issue_id &&
         entry.activity.id === timeEntry.activity_id &&
-        entry.spent_on === timeEntry.spent_on
+        entry.spent_on === timeEntry.spent_on &&
+        entry.comments === timeEntry.comments
     );
     // If there is one, check if it has the same hours.
     // If there is none, check if the incoming entry's hours are 0.
@@ -377,26 +378,22 @@ export const Report = () => {
   };
 
   /*
-  Returns an array of five numbers representing Redmine's entry ids of 
-  entries displayed in a row. 
+  Returns an object with Redmine's entry ids and comments of
+  entries displayed in a row.
   If there is no entry in the database, id is 0.
   */
-  const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
-    let rowEntryIds = [];
+  const findRowEntries = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let entries = [];
     days.map((day) => {
-      let id = 0;
       let entry = timeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue.id === rowTopic.issue.id &&
           entry.activity.id === rowTopic.activity.id
-      );
-      if (entry) {
-        id = entry.id;
-      }
-      rowEntryIds.push(id);
+      )!;
+      entries.push(entry);
     });
-    return rowEntryIds;
+    return entries;
   };
 
   const getTotalHoursWeek = () => {
@@ -477,6 +474,10 @@ export const Report = () => {
                   <div {...provided.droppableProps} ref={provided.innerRef}>
                     {favorites &&
                       favorites.map((fav, index) => {
+                        const rowEntries = findRowEntries(
+                          fav,
+                          currentWeekArray
+                        );
                         return (
                           <Draggable
                             draggableId={`${fav.issue.id}${fav.activity.id}`}
@@ -496,10 +497,7 @@ export const Report = () => {
                                   onToggleFav={handleToggleFav}
                                   days={currentWeekArray}
                                   rowHours={findRowHours(fav)}
-                                  rowEntryIds={findRowEntryIds(
-                                    fav,
-                                    currentWeekArray
-                                  )}
+                                  rowEntries={rowEntries}
                                   getRowSum={getRowSum}
                                   isFav={true}
                                 />
@@ -521,6 +519,7 @@ export const Report = () => {
           )}
           {filteredRecents &&
             filteredRecents.map((recentIssue) => {
+              const rowEntries = findRowEntries(recentIssue, currentWeekArray);
               return (
                 <Row
                   key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
@@ -530,7 +529,7 @@ export const Report = () => {
                   onHide={handleHide}
                   days={currentWeekArray}
                   rowHours={findRowHours(recentIssue)}
-                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
+                  rowEntries={rowEntries}
                   getRowSum={getRowSum}
                   isFav={false}
                 />

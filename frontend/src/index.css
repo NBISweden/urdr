@@ -349,3 +349,56 @@ input[type="number"] {
   color: hsl(26deg 91% 42%); /* Red */
   margin: 3rem 1rem 2rem;
 }
+
+.comment-container {
+  position: relative;
+}
+
+.area-container {
+  width: 6%;
+  position: fixed;
+  z-index: 1;
+  margin-bottom: 0.5rem;
+}
+
+.comment {
+  background-color: transparent;
+  border-style: inset;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border-width: 0 0.8em 0.8em 0;
+  border-color: transparent hsl(0deg 0% 15%) transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.close-btn {
+  height: 1.5em;
+  width: 1.5em;
+  border: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+}
+
+.close-img {
+  position: inherit;
+  height: inherit;
+  width: inherit;
+  top: 0;
+  right: 0;
+}
+
+.comment-unfilled {
+  border-color: transparent hsl(0deg 0% 83%) transparent;
+}
+
+.comment-area {
+  width: 100%;
+  border: 1px solid hsl(0deg 0% 83%);
+  padding: 0.2rem;
+  resize: none;
+}
