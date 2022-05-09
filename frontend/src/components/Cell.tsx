@@ -80,7 +80,7 @@ export const Cell = ({
           <button
             className={comments === "" ? "comment comment-unfilled" : "comment"}
             type="button"
-            title="Show comment area"
+            title="Toggle comment area"
             onClick={() => onCommentButtonClick()}
           ></button>
         )}
