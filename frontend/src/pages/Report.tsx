@@ -585,11 +585,11 @@ export const Report = () => {
           <button className="basic-button save-button" onClick={handleSave}>
             Save changes
           </button>
+          {showToast && <Toast onCloseToast={handleCloseToast} />}
         </section>
         <section className="recent-container">
           <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
         </section>
-        {showToast && <Toast onCloseToast={handleCloseToast} />}
       </main>
     </>
   );
