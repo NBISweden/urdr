@@ -98,6 +98,7 @@ export const Cell = ({
             />
             <button
               className="close-btn"
+              title="Close comment area"
               type="button"
               onClick={() => onCommentButtonClick()}
             >
