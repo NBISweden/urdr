@@ -9,6 +9,12 @@ import (
 // then that combination of issue and activity is invalid.
 var invalidActivities map[int][]int
 
+// alwaysInvalidActivities is a map of Redmine activity IDs that are
+// always invalid, in combination with any Redmine issue ID.  In the
+// backend database, these are stored as Redmine activity IDs related to
+// Redmine issues with ID zero.
+var alwaysInvalidActivities map[int]bool
+
 // loadAllInvalidEntries() loads the static list of invalid combinations
 // of Redmine issue IDs and Redmine activity IDs from the backend
 // database into the package-global invalidActivities structure.  This
@@ -36,6 +42,7 @@ func (db *Database) loadAllInvalidEntries() error {
 	defer rows.Close()
 
 	invalidActivities = make(map[int][]int)
+	alwaysInvalidActivities = make(map[int]bool)
 
 	for rows.Next() {
 		var redmineIssueId int
@@ -45,9 +52,13 @@ func (db *Database) loadAllInvalidEntries() error {
 			return fmt.Errorf("sql.Scan() failed: %w", err)
 		}
 
-		invalidActivities[redmineIssueId] =
-			append(invalidActivities[redmineIssueId],
-				redmineActivityId)
+		if redmineIssueId == 0 {
+			alwaysInvalidActivities[redmineActivityId] = true
+		} else {
+			invalidActivities[redmineIssueId] =
+				append(invalidActivities[redmineIssueId],
+					redmineActivityId)
+		}
 	}
 	if err := rows.Err(); err != nil {
 		return fmt.Errorf("sql.Next() failed: %w", err)
@@ -62,6 +73,10 @@ func (db *Database) IsInvalidEntry(redmineIssueId int, redmineActivityId int) bo
 			fmt.Printf("database.loadAllInvalidEntries() failed: %v\n", err)
 			return false
 		}
+	}
+
+	if alwaysInvalidActivities[redmineActivityId] {
+		return true
 	}
 
 	for _, i := range invalidActivities[redmineIssueId] {
