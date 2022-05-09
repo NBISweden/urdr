@@ -350,6 +350,7 @@ input[type="number"] {
   margin: 3rem 1rem 2rem;
 }
 
+<<<<<<< HEAD
 .comment-container {
   position: relative;
 }
@@ -401,4 +402,34 @@ input[type="number"] {
   border: 1px solid hsl(0deg 0% 83%);
   padding: 0.2rem;
   resize: none;
+=======
+.toast-box {
+  width: 20rem;
+  height: 5rem;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: hsl(76deg 55% 65%);
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+  border-radius: 4px;
+  padding: 0.2rem;
+  padding-left: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.toast-message {
+  margin: auto;
+  color: hsl(107deg 55% 15%);
+}
+
+.toast-button {
+  background-color: transparent;
+  border: none;
+}
+
+.toast-button img {
+  width: 1.5rem;
+>>>>>>> create toast component
 }
