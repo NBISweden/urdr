@@ -482,110 +482,127 @@ export const Report = () => {
   if (context.user === null) return <></>;
   return (
     <>
-      <header>
-        <div className="report-header">
-          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
-          <TimeTravel
-            weekTravelDay={weekTravelDay}
-            onWeekTravel={handleWeekTravel}
-            currentWeekArray={currentWeekArray}
-          />
-          <HeaderUser username={context.user ? context.user.login : ""} />
-        </div>
-      </header>
-      <main>
-        {favorites && favorites.length > 0 && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <section className="favorites-container">
-              <HeaderRow days={currentWeekArray} />
-              <Droppable droppableId="favorites">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {favorites &&
-                      favorites.map((fav, index) => {
-                        const rowEntries = findRowEntries(
-                          fav,
-                          currentWeekArray
-                        );
-                        return (
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={findRowHours(fav)}
-                                  rowEntries={rowEntries}
-                                  getRowSum={getRowSum}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </section>
-          </DragDropContext>
-        )}
-        <section className="recent-container">
-          {favorites.length == 0 && (
-            <HeaderRow days={currentWeekArray}></HeaderRow>
+      <LoadingOverlay
+        active={showSpinner}
+        spinner={
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={showSpinner}
+            size={15}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          ></ClimbingBoxLoader>
+        }
+      >
+        <header>
+          <div className="report-header">
+            <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+            <TimeTravel
+              weekTravelDay={weekTravelDay}
+              onWeekTravel={handleWeekTravel}
+              currentWeekArray={currentWeekArray}
+            />
+            <HeaderUser username={context.user ? context.user.login : ""} />
+          </div>
+        </header>
+        <main>
+          {favorites && favorites.length > 0 && (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <section className="favorites-container">
+                <HeaderRow days={currentWeekArray} />
+                <Droppable droppableId="favorites">
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {favorites &&
+                        favorites.map((fav, index) => {
+                          const rowEntries = findRowEntries(
+                            fav,
+                            currentWeekArray
+                          );
+                          return (
+                            <Draggable
+                              draggableId={`${fav.issue.id}${fav.activity.id}`}
+                              index={index}
+                              key={`${fav.issue.id}${fav.activity.id}-drag`}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Row
+                                    key={`${fav.issue.id}${fav.activity.id}`}
+                                    topic={fav}
+                                    onCellUpdate={handleCellUpdate}
+                                    onToggleFav={handleToggleFav}
+                                    days={currentWeekArray}
+                                    rowHours={findRowHours(fav)}
+                                    rowEntries={rowEntries}
+                                    getRowSum={getRowSum}
+                                    isFav={true}
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </section>
+            </DragDropContext>
           )}
-          {filteredRecents &&
-            filteredRecents.map((recentIssue) => {
-              const rowEntries = findRowEntries(recentIssue, currentWeekArray);
-              return (
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  onHide={handleHide}
-                  days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue)}
-                  rowEntries={rowEntries}
-                  getRowSum={getRowSum}
-                  isFav={false}
-                />
-              );
-            })}
-        </section>
-        <section className="recent-container ">
-          <div className="row">
-            <div className="col-6">
-              <h2>Total</h2>
-            </div>
-            {currentWeekArray &&
-              currentWeekArray.map((date) => {
-                const dateStr = formatDate(date, dateFormat);
+          <section className="recent-container">
+            {favorites.length == 0 && (
+              <HeaderRow days={currentWeekArray}></HeaderRow>
+            )}
+            {filteredRecents &&
+              filteredRecents.map((recentIssue) => {
+                const rowEntries = findRowEntries(
+                  recentIssue,
+                  currentWeekArray
+                );
                 return (
-                  <div key={dateStr} className="col-1 cell-container">
-                    <input
-                      aria-labelledby={`total of hours spent during the day ${dateStr}`}
-                      type="text"
-                      id={dateStr}
-                      className="cell not-outline"
-                      value={getTotalHours(dateStr)}
-                      readOnly
-                    />
-                  </div>
+                  <Row
+                    key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                    topic={recentIssue}
+                    onCellUpdate={handleCellUpdate}
+                    onToggleFav={handleToggleFav}
+                    onHide={handleHide}
+                    days={currentWeekArray}
+                    rowHours={findRowHours(recentIssue)}
+                    rowEntries={rowEntries}
+                    getRowSum={getRowSum}
+                    isFav={false}
+                  />
                 );
               })}
+          </section>
+          <section className="recent-container ">
+            <div className="row">
+              <div className="col-6">
+                <h2>Total</h2>
+              </div>
+              {currentWeekArray &&
+                currentWeekArray.map((date) => {
+                  const dateStr = formatDate(date, dateFormat);
+                  return (
+                    <div key={dateStr} className="col-1 cell-container">
+                      <input
+                        aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                        type="text"
+                        id={dateStr}
+                        className="cell not-outline"
+                        value={getTotalHours(dateStr)}
+                        readOnly
+                      />
+                    </div>
+                  );
+                })}
             <div className="col-1 cell-container">
               <input
                 aria-labelledby="total of hours spent during the week"
@@ -608,23 +625,12 @@ export const Report = () => {
           </button>
           {showToast && <Toast onCloseToast={handleCloseToast} />}
         </section>
+        </main>
+>>>>>>> 01379c8 (Add overlay when displaying spinner)
         <section className="recent-container">
           <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
         </section>
-      </main>
-      <section className="recent-container">
-        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
-      </section>
-      <ClimbingBoxLoader
-        color="hsl(76deg 55% 53%)"
-        className="loading"
-        loading={showSpinner}
-        size={10}
-        width={3}
-        height={3}
-        radius={2}
-        margin={2}
-      ></ClimbingBoxLoader>
+      </LoadingOverlay>
     </>
   );
 };
