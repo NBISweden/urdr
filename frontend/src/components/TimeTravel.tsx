@@ -47,7 +47,6 @@ export const TimeTravel = ({
   const handleDateChange = (dates: Date[]) => {
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
-    navigate(`/report/${dates[0].getFullYear()}/${getISOWeek(dates[0])}`);
     navigate(`/report/${getISOWeekYear(dates[0])}/${getISOWeek(dates[0])}`);
   };
 
