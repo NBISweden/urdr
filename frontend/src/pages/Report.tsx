@@ -35,6 +35,7 @@ export const Report = () => {
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const [showToast, setShowToast] = useState(false);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
@@ -130,6 +131,14 @@ export const Report = () => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
     if (newTimeEntries.length > 0) {
       window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [newTimeEntries]);
+
+  React.useEffect(() => {
+    if (newTimeEntries.length > 0) {
+      setShowUnsavedWarning(true);
+    } else {
+      setShowUnsavedWarning(false);
     }
   }, [newTimeEntries]);
 
@@ -271,6 +280,7 @@ export const Report = () => {
 
   const handleSave = async () => {
     setShowToast(false);
+    setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
       alert(
         "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
@@ -286,6 +296,8 @@ export const Report = () => {
     }
     if (unsavedEntries.length === 0) {
       setShowToast(true);
+    } else if (unsavedEntries.length > 0) {
+      setShowUnsavedWarning(true);
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
@@ -577,7 +589,7 @@ export const Report = () => {
           </div>
         </section>
         <section className="save-button-container">
-          {newTimeEntries.length > 0 && (
+          {showUnsavedWarning && (
             <div className="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
