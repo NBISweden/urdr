@@ -604,33 +604,32 @@ export const Report = () => {
                     </div>
                   );
                 })}
-            <div className="col-1 cell-container">
-              <input
-                aria-labelledby="total of hours spent during the week"
-                type="text"
-                className="cell not-outline"
-                value={getTotalHoursWeek()}
-                readOnly
-              />
+              <div className="col-1 cell-container">
+                <input
+                  aria-labelledby="total of hours spent during the week"
+                  type="text"
+                  className="cell not-outline"
+                  value={getTotalHoursWeek()}
+                  readOnly
+                />
+              </div>
             </div>
-          </div>
-        </section>
-        <section className="save-button-container">
-          {showUnsavedWarning && (
-            <div className="unsaved-alert-p">
-              <p role="status">⚠ You have unsaved changes</p>
-            </div>
-          )}
-          <button className="basic-button save-button" onClick={handleSave}>
-            Save changes
-          </button>
-          {showToast && <Toast onCloseToast={handleCloseToast} />}
-        </section>
+          </section>
+          <section className="save-button-container">
+            {showUnsavedWarning && (
+              <div className="unsaved-alert-p">
+                <p role="status">⚠ You have unsaved changes</p>
+              </div>
+            )}
+            <button className="basic-button save-button" onClick={handleSave}>
+              Save changes
+            </button>
+            {showToast && <Toast onCloseToast={handleCloseToast} />}
+          </section>
+          <section className="recent-container">
+            <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+          </section>
         </main>
->>>>>>> 01379c8 (Add overlay when displaying spinner)
-        <section className="recent-container">
-          <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
-        </section>
       </LoadingOverlay>
     </>
   );
