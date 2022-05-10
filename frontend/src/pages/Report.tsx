@@ -4,6 +4,7 @@ import { format as formatDate } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
+import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
 import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
@@ -33,6 +34,8 @@ export const Report = () => {
   const today = new Date();
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
+  const [showToast, setShowToast] = useState(false);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
@@ -128,6 +131,14 @@ export const Report = () => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
     if (newTimeEntries.length > 0) {
       window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [newTimeEntries]);
+
+  React.useEffect(() => {
+    if (newTimeEntries.length > 0) {
+      setShowUnsavedWarning(true);
+    } else {
+      setShowUnsavedWarning(false);
     }
   }, [newTimeEntries]);
 
@@ -268,6 +279,8 @@ export const Report = () => {
   };
 
   const handleSave = async () => {
+    setShowToast(false);
+    setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
       alert(
         "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
@@ -282,10 +295,17 @@ export const Report = () => {
       }
     }
     if (unsavedEntries.length === 0) {
-      alert("All changes were saved!");
+      setShowToast(true);
+    } else if (unsavedEntries.length > 0) {
+      setShowUnsavedWarning(true);
     }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
+  };
+
+  const handleCloseToast = () => {
+    setShowToast(false);
+    return;
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -569,7 +589,7 @@ export const Report = () => {
           </div>
         </section>
         <section className="save-button-container">
-          {newTimeEntries.length > 0 && (
+          {showUnsavedWarning && (
             <div className="unsaved-alert-p">
               <p role="status">⚠ You have unsaved changes</p>
             </div>
@@ -577,11 +597,12 @@ export const Report = () => {
           <button className="basic-button save-button" onClick={handleSave}>
             Save changes
           </button>
+          {showToast && <Toast onCloseToast={handleCloseToast} />}
+        </section>
+        <section className="recent-container">
+          <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
         </section>
       </main>
-      <section className="recent-container">
-        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
-      </section>
     </>
   );
 };
