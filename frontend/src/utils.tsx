@@ -39,6 +39,7 @@ const addDays = (date: Date, days: number) => {
   return result;
 };
 
+// Return array of all days in the same week as supplied date
 export const getFullWeek = (today: Date): Date[] => {
   let fullWeek = [];
   const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6

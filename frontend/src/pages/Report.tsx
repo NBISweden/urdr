@@ -22,6 +22,7 @@ const beforeUnloadHandler = (event) => {
   event.returnValue = "";
 };
 
+// The report page
 export const Report = () => {
   const urlparams = useParams();
   let navigate = useNavigate();
@@ -63,17 +64,14 @@ export const Report = () => {
   React.useEffect(() => {
     setWeekTravelDay(today);
     setCurrentWeekArray(getFullWeek(today));
-    //setCurrentWeek(weeknum);
   }, [weeknum]);
 
   // Change displayed "Timetravel content" based on found year/week
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const context = React.useContext(AuthContext);
-  // const [currentWeek, setCurrentWeek] = useState<number>(
-  //   getISOWeek(weekTravelDay)
-  // );
 
+  // Retrieve time entries via api
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let queryparams = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
@@ -89,6 +87,7 @@ export const Report = () => {
     return null;
   };
 
+  // Retrieve time entries and recent entries
   const getAllEntries = async (
     favs: IssueActivityPair[],
     recents: IssueActivityPair[]
@@ -105,6 +104,7 @@ export const Report = () => {
     setTimeEntries(allEntries);
   };
 
+  // If weekTravelDay changes, do this...
   React.useEffect(() => {
     let didCancel = false;
     const setRecentIssuesWithinRange = async () => {
@@ -123,6 +123,7 @@ export const Report = () => {
     };
   }, [weekTravelDay]);
 
+  // If recentIssues has changed, do this...
   React.useEffect(() => {
     let didCancel = false;
 
@@ -163,6 +164,7 @@ export const Report = () => {
     };
   }, [recentIssues]);
 
+  // If the newTimeEntries have changed...
   React.useEffect(() => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
     if (newTimeEntries.length > 0) {
@@ -170,6 +172,7 @@ export const Report = () => {
     }
   }, [newTimeEntries]);
 
+  //
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
     //check if there already is a new entry for same cell
@@ -204,6 +207,7 @@ export const Report = () => {
     }
   };
 
+  // Save which issues that have favorite status
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
     let logout = false;
     const saved = await fetch(
@@ -233,6 +237,7 @@ export const Report = () => {
     return saved;
   };
 
+  // Toggle favorite status for an issue-activity pair
   const handleToggleFav = async (topic: IssueActivityPair) => {
     const existingFav = favorites.find(
       (fav) =>
@@ -263,6 +268,7 @@ export const Report = () => {
     }
   };
 
+  // Enable hiding an issue-activity pair from the list of recent issues
   const handleHide = async (topic: IssueActivityPair) => {
     topic.is_hidden = true;
     topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
@@ -277,6 +283,7 @@ export const Report = () => {
     }
   };
 
+  // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
@@ -306,6 +313,7 @@ export const Report = () => {
     return saved;
   };
 
+  // Check for ...
   const handleSave = async () => {
     if (newTimeEntries.length === 0) {
       alert(

@@ -8,6 +8,18 @@ import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
 import { useNavigate, useParams } from "react-router-dom";
 
+/*
+TimeTravel
+Provide a date picker with navigation buttons on each side for switching weeks.
+
+Parameters & properties:
+- weekTravelDay    = the last day of the displayed week
+- onWeekTravel     = any day in the week to be displayed?
+- currentWeekArray = a list of the dates in the displayed week
+- currentWeek      = the number of the current/displayed week
+
+Rendering is triggered by changing currentWeek (using setCurrentWeek()).
+*/
 export const TimeTravel = ({
   weekTravelDay,
   onWeekTravel,
@@ -17,6 +29,7 @@ export const TimeTravel = ({
   onWeekTravel: (newDay: Date) => void;
   currentWeekArray: Date[];
 }) => {
+  // Week number is calculated from weekTravelDay
   const [currentWeek, setCurrentWeek] = useState<number>(
     getISOWeek(weekTravelDay)
   );
@@ -25,16 +38,18 @@ export const TimeTravel = ({
   React.useEffect(() => {
     setCurrentWeek(getISOWeek(weekTravelDay));
   }, [weekTravelDay]);
-
+  // For navigation according to week number
   const navigate = useNavigate();
-  const urlparams = useParams();
 
+  // Date changed using the date picker
   const handleDateChange = (dates: Date[]) => {
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
     navigate(`/report/${dates[0].getFullYear()}/${getISOWeek(dates[0])}`);
   };
 
+  // Click on previous week button.
+  // Calculate new date for end-of-week and set new week number based on that.
   const previousWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() - 7)
@@ -44,6 +59,7 @@ export const TimeTravel = ({
     navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
   };
 
+  // Click on next week button
   const nextWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() + 7)
@@ -53,6 +69,7 @@ export const TimeTravel = ({
     navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
   };
 
+  // Date picker
   const CustomDatePickerInput = forwardRef(({ onClick }, ref) => (
     <button onClick={onClick} className="week-button" ref={ref}>
       <svg
@@ -69,11 +86,13 @@ export const TimeTravel = ({
     </button>
   ));
 
+  // Filter for weekdays. Return only Monday through Friday.
   const isWeekday = (dt: Date) => {
     const day = dt.getDay();
     return day !== 0 && day !== 6;
   };
 
+  // The calculated time-travel section
   return (
     <div className="time-travel">
       <button onClick={previousWeeksClickHandle} className="week-arrow-button">
