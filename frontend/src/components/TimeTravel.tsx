@@ -6,7 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
 import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 /*
 TimeTravel
@@ -38,25 +38,29 @@ export const TimeTravel = ({
   React.useEffect(() => {
     setCurrentWeek(getISOWeek(weekTravelDay));
   }, [weekTravelDay]);
+
   // For navigation according to week number
   const navigate = useNavigate();
 
   // Date changed using the date picker
+  // Year for the url must be calculated w getISOWeekYear to handle year transitions.
   const handleDateChange = (dates: Date[]) => {
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
     navigate(`/report/${dates[0].getFullYear()}/${getISOWeek(dates[0])}`);
+    navigate(`/report/${getISOWeekYear(dates[0])}/${getISOWeek(dates[0])}`);
   };
 
   // Click on previous week button.
   // Calculate new date for end-of-week and set new week number based on that.
+  // Year for the url must be calculated w getISOWeekYear to handle year transitions.
   const previousWeeksClickHandle = () => {
     const nextDate = new Date(
       weekTravelDay.setDate(weekTravelDay.getDate() - 7)
     );
     onWeekTravel(nextDate);
     setCurrentWeek(getISOWeek(nextDate));
-    navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
+    navigate(`/report/${getISOWeekYear(nextDate)}/${getISOWeek(nextDate)}`);
   };
 
   // Click on next week button
@@ -66,7 +70,7 @@ export const TimeTravel = ({
     );
     onWeekTravel(nextDate);
     setCurrentWeek(getISOWeek(nextDate));
-    navigate(`/report/${nextDate.getFullYear()}/${getISOWeek(nextDate)}`);
+    navigate(`/report/${getISOWeekYear(nextDate)}/${getISOWeek(nextDate)}`);
   };
 
   // Date picker

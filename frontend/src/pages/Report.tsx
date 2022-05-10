@@ -15,7 +15,7 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -25,7 +25,6 @@ const beforeUnloadHandler = (event) => {
 // The report page
 export const Report = () => {
   const urlparams = useParams();
-  let navigate = useNavigate();
 
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
@@ -504,7 +503,7 @@ export const Report = () => {
     <>
       <header>
         <div className="report-header">
-          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+          <h1 className="header-year">{yearnum.toString()}</h1>
           <TimeTravel
             weekTravelDay={weekTravelDay}
             onWeekTravel={handleWeekTravel}
