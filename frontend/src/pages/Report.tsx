@@ -39,10 +39,10 @@ export const Report = () => {
   const [showToast, setShowToast] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
-  const [showSpinner, setShowSpinner] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleLoadingPage = (state: boolean) => {
-    setShowSpinner(state);
+    setIsLoading(state);
   };
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
@@ -483,11 +483,12 @@ export const Report = () => {
   return (
     <>
       <LoadingOverlay
-        active={showSpinner}
+        active={isLoading}
+        className="loading-overlay"
         spinner={
           <ClimbingBoxLoader
             color="hsl(76deg 55% 53%)"
-            loading={showSpinner}
+            loading={isLoading}
             size={15}
             width={4}
             height={6}
