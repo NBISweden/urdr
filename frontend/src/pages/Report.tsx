@@ -17,7 +17,7 @@ import {
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
-import { css } from "@emotion/react";
+import LoadingOverlay from "react-loading-overlay-ts";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -40,11 +40,6 @@ export const Report = () => {
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
   const [showSpinner, setShowSpinner] = useState(false);
-
-  const override = css`
-    display: block;
-    margin: 0 auto;
-  `;
 
   const toggleLoadingPage = (state: boolean) => {
     setShowSpinner(state);
@@ -622,7 +617,7 @@ export const Report = () => {
       </section>
       <ClimbingBoxLoader
         color="hsl(76deg 55% 53%)"
-        css={override}
+        className="loading"
         loading={showSpinner}
         size={10}
         width={3}
