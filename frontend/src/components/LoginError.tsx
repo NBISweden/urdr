@@ -5,7 +5,7 @@ export const LoginError = ({ code }: { code: number }) => {
   const message =
     code === 401
       ? "Wrong combination of username and password."
-      : "We are having technical problems. Please try again later.";
+      : "Something went wrong. Please try again later.";
   return (
     <>
       <div className="login-error-container">
