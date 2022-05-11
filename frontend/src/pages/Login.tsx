@@ -17,6 +17,8 @@ export const Login = () => {
     event?.preventDefault();
     const loginResponse = await onLogin(username, password);
 
+    // If everything goes right, onLogin will return a User object.
+    // Otherwise it returns a number that is an error code
     if (typeof loginResponse === "number") {
       setErrorCode(loginResponse);
       return;
