@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { format as formatDate, getISOWeek, setISOWeek } from "date-fns";
+import {
+  format as formatDate,
+  getISOWeek,
+  getISOWeekYear,
+  setISOWeek,
+} from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -26,7 +31,7 @@ const beforeUnloadHandler = (event) => {
 // The report page
 export const Report = () => {
   const urlparams = useParams();
-
+  let yearweekWarningMessage = "";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -38,13 +43,14 @@ export const Report = () => {
 
   // Get year/week either from URL parameters or current time.
   // Use today as date if nor year or week are valid numbers.
+  // Use flag "yearweekWarning" for indication of error in week/year parameters.
+  // When flag is true, display a warning message below the header with year/week.
+  let yearweekWarning: boolean = false;
   const thisYear: number = new Date().getFullYear();
-  let yearnum: number = thisYear;
-  if (urlparams.year.match(/^\d+$/)) {
-    yearnum = Number(urlparams.year);
-    if (isNaN(yearnum)) {
-      yearnum = thisYear;
-    }
+  let yearnum: number = Number(urlparams.year);
+  if (isNaN(yearnum)) {
+    yearnum = thisYear;
+    yearweekWarning = true;
   }
 
   // Assume current week/date
@@ -52,12 +58,29 @@ export const Report = () => {
   const thisWeek: number = getISOWeek(new Date());
   let weeknum = thisWeek;
 
-  // If week parameter is a valid number between 1-53, change the "today" value.
+  // If week parameter is a valid number between 1-53, change the "today" value based on year/week.
+  // If the year parameter was wrong, ignore the week parameter and use thisWeek.
   weeknum = Number(urlparams.week);
-  if (isNaN(weeknum)) {
+  if (isNaN(weeknum) || yearweekWarning) {
     weeknum = thisWeek;
+    yearweekWarning = true;
   } else if (weeknum >= 1 && weeknum <= 53) {
     today = setISOWeek(new Date(yearnum, 7, 7), weeknum);
+  } else {
+    yearweekWarning = true;
+  }
+  // Make sure that displayed year matches the year of the "today" variable
+  let ycheck = getISOWeekYear(today);
+  if (ycheck != yearnum) {
+    yearnum = ycheck;
+    yearweekWarning = true;
+  }
+
+  if (yearweekWarning) {
+    yearweekWarningMessage =
+      "Invalid year/week in url. Reverting to current year/week.";
+  } else {
+    yearweekWarningMessage = "";
   }
 
   // Set weeks for timetravel when weeknum has changed
@@ -531,6 +554,7 @@ export const Report = () => {
           <HeaderUser username={context.user ? context.user.login : ""} />
         </div>
       </header>
+      <p className="header-warning">{yearweekWarningMessage}</p>
       <main>
         {favorites && favorites.length > 0 && (
           <DragDropContext onDragEnd={onDragEnd}>

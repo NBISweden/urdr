@@ -76,6 +76,12 @@ input[type="number"] {
   width: 100vw;
 }
 
+.header-warning {
+  text-align: center;
+  color: hsl(0deg 0% 15%);
+  background-color: #a7c947;
+}
+
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
 .react-datepicker__week .react-datepicker__day--selected {
