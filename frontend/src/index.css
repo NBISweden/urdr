@@ -461,3 +461,8 @@ input[type="number"] {
 .toast-button img {
   width: 1.5rem;
 }
+
+.loading-overlay {
+  height: 100%;
+  position: fixed;
+}
