@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { format as formatDate } from "date-fns";
+import {
+  format as formatDate,
+  getISOWeek,
+  getISOWeekYear,
+  setISOWeek,
+} from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
@@ -16,6 +21,7 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import { useParams } from "react-router-dom";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import LoadingOverlay from "react-loading-overlay-ts";
 
@@ -24,7 +30,10 @@ const beforeUnloadHandler = (event) => {
   event.returnValue = "";
 };
 
+// The report page
 export const Report = () => {
+  const urlparams = useParams();
+  let yearweekWarningMessage = "";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -33,7 +42,56 @@ export const Report = () => {
   const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
-  const today = new Date();
+
+  // Get year/week either from URL parameters or current time.
+  // Use today as date if nor year or week are valid numbers.
+  // Use flag "yearweekWarning" for indication of error in week/year parameters.
+  // When flag is true, display a warning message below the header with year/week.
+  let yearweekWarning: boolean = false;
+  const thisYear: number = new Date().getFullYear();
+  let yearnum: number = Number(urlparams.year);
+  if (isNaN(yearnum)) {
+    yearnum = thisYear;
+    yearweekWarning = true;
+  }
+
+  // Assume current week/date
+  let today = new Date();
+  const thisWeek: number = getISOWeek(new Date());
+  let weeknum = thisWeek;
+
+  // If week parameter is a valid number between 1-53, change the "today" value based on year/week.
+  // If the year parameter was wrong, ignore the week parameter and use thisWeek.
+  weeknum = Number(urlparams.week);
+  if (isNaN(weeknum) || yearweekWarning) {
+    weeknum = thisWeek;
+    yearweekWarning = true;
+  } else if (weeknum >= 1 && weeknum <= 53) {
+    today = setISOWeek(new Date(yearnum, 7, 7), weeknum);
+  } else {
+    yearweekWarning = true;
+  }
+  // Make sure that displayed year matches the year of the "today" variable
+  let ycheck = getISOWeekYear(today);
+  if (ycheck != yearnum) {
+    yearnum = ycheck;
+    yearweekWarning = true;
+  }
+
+  if (yearweekWarning) {
+    yearweekWarningMessage =
+      "Invalid year/week in url. Reverting to current year/week.";
+  } else {
+    yearweekWarningMessage = "";
+  }
+
+  // Set weeks for timetravel when weeknum has changed
+  React.useEffect(() => {
+    setWeekTravelDay(today);
+    setCurrentWeekArray(getFullWeek(today));
+  }, [weeknum]);
+
+  // Change displayed "Timetravel content" based on found year/week
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
   const [showToast, setShowToast] = useState(false);
@@ -45,21 +103,23 @@ export const Report = () => {
     setIsLoading(state);
   };
 
+  // Retrieve time entries via api
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    let params = new URLSearchParams({
+    let queryparams = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
       from: formatDate(days[0], dateFormat),
       to: formatDate(days[4], dateFormat),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`,
+      `/api/time_entries?${queryparams}`,
       context
     );
     if (entries) return entries.time_entries;
     return null;
   };
 
+  // Retrieve time entries and recent entries
   const getAllEntries = async (
     favs: IssueActivityPair[],
     recents: IssueActivityPair[]
@@ -76,6 +136,7 @@ export const Report = () => {
     setTimeEntries(allEntries);
   };
 
+  // If weekTravelDay changes, do this...
   React.useEffect(() => {
     let didCancel = false;
     const setRecentIssuesWithinRange = async () => {
@@ -94,6 +155,7 @@ export const Report = () => {
     };
   }, [weekTravelDay]);
 
+  // If recentIssues has changed, do this...
   React.useEffect(() => {
     let didCancel = false;
 
@@ -134,6 +196,7 @@ export const Report = () => {
     };
   }, [recentIssues]);
 
+  // If the newTimeEntries have changed...
   React.useEffect(() => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
     if (newTimeEntries.length > 0) {
@@ -183,6 +246,7 @@ export const Report = () => {
     }
   };
 
+  // Save which issues that have favorite status
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
     let logout = false;
     const saved = await fetch(
@@ -212,6 +276,7 @@ export const Report = () => {
     return saved;
   };
 
+  // Toggle favorite status for an issue-activity pair
   const handleToggleFav = async (topic: IssueActivityPair) => {
     const existingFav = favorites.find(
       (fav) =>
@@ -242,6 +307,7 @@ export const Report = () => {
     }
   };
 
+  // Enable hiding an issue-activity pair from the list of recent issues
   const handleHide = async (topic: IssueActivityPair) => {
     topic.is_hidden = true;
     topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
@@ -256,6 +322,7 @@ export const Report = () => {
     }
   };
 
+  // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
@@ -285,6 +352,7 @@ export const Report = () => {
     return saved;
   };
 
+  // Check for ...
   const handleSave = async () => {
     setShowToast(false);
     setShowUnsavedWarning(false);
@@ -480,6 +548,8 @@ export const Report = () => {
   };
 
   if (context.user === null) return <></>;
+
+  // Main content
   return (
     <>
       <LoadingOverlay
@@ -499,7 +569,7 @@ export const Report = () => {
       >
         <header>
           <div className="report-header">
-            <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+            <h1 className="header-year">{yearnum.toString()}</h1>
             <TimeTravel
               weekTravelDay={weekTravelDay}
               onWeekTravel={handleWeekTravel}
@@ -511,6 +581,7 @@ export const Report = () => {
         <div className="wrapper">
           <div className="main">
             <main>
+              <p className="header-warning">{yearweekWarningMessage}</p>
               {favorites && favorites.length > 0 && (
                 <DragDropContext onDragEnd={onDragEnd}>
                   <section className="favorites-container">
