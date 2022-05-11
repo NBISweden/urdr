@@ -355,7 +355,6 @@ input[type="number"] {
 }
 
 .area-container {
-  width: 6%;
   position: fixed;
   z-index: 1;
   margin-bottom: 0.5rem;
@@ -400,7 +399,6 @@ input[type="number"] {
   width: 100%;
   border: 1px solid hsl(0deg 0% 83%);
   padding: 0.2rem;
-  resize: none;
 }
 
 .toast-box {
