@@ -16,6 +16,8 @@ import {
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import LoadingOverlay from "react-loading-overlay-ts";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -37,6 +39,11 @@ export const Report = () => {
   const [showToast, setShowToast] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const toggleLoadingPage = (state: boolean) => {
+    setIsLoading(state);
+  };
 
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
     let params = new URLSearchParams({
@@ -287,6 +294,7 @@ export const Report = () => {
       );
       return;
     }
+    toggleLoadingPage(true);
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
@@ -294,13 +302,14 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
+    await getAllEntries(favorites, filteredRecents);
+    setNewTimeEntries(unsavedEntries);
+    toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
       setShowToast(true);
     } else if (unsavedEntries.length > 0) {
       setShowUnsavedWarning(true);
     }
-    await getAllEntries(favorites, filteredRecents);
-    setNewTimeEntries(unsavedEntries);
   };
 
   const handleCloseToast = () => {
@@ -473,136 +482,167 @@ export const Report = () => {
   if (context.user === null) return <></>;
   return (
     <>
-      <header>
-        <div className="report-header">
-          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
-          <TimeTravel
-            weekTravelDay={weekTravelDay}
-            onWeekTravel={handleWeekTravel}
-            currentWeekArray={currentWeekArray}
-          />
-          <HeaderUser username={context.user ? context.user.login : ""} />
-        </div>
-      </header>
-      <main>
-        {favorites && favorites.length > 0 && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <section className="favorites-container">
-              <HeaderRow days={currentWeekArray} />
-              <Droppable droppableId="favorites">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {favorites &&
-                      favorites.map((fav, index) => {
-                        const rowEntries = findRowEntries(
-                          fav,
-                          currentWeekArray
-                        );
-                        return (
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={findRowHours(fav)}
-                                  rowEntries={rowEntries}
-                                  getRowSum={getRowSum}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                    {provided.placeholder}
-                  </div>
+      <LoadingOverlay
+        active={isLoading}
+        className="loading-overlay"
+        spinner={
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={isLoading}
+            size={15}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          ></ClimbingBoxLoader>
+        }
+      >
+        <header>
+          <div className="report-header">
+            <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+            <TimeTravel
+              weekTravelDay={weekTravelDay}
+              onWeekTravel={handleWeekTravel}
+              currentWeekArray={currentWeekArray}
+            />
+            <HeaderUser username={context.user ? context.user.login : ""} />
+          </div>
+        </header>
+        <div className="wrapper">
+          <div className="main">
+            <main>
+              {favorites && favorites.length > 0 && (
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <section className="favorites-container">
+                    <HeaderRow days={currentWeekArray} />
+                    <Droppable droppableId="favorites">
+                      {(provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          {favorites &&
+                            favorites.map((fav, index) => {
+                              const rowEntries = findRowEntries(
+                                fav,
+                                currentWeekArray
+                              );
+                              return (
+                                <Draggable
+                                  draggableId={`${fav.issue.id}${fav.activity.id}`}
+                                  index={index}
+                                  key={`${fav.issue.id}${fav.activity.id}-drag`}
+                                >
+                                  {(provided) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                    >
+                                      <Row
+                                        key={`${fav.issue.id}${fav.activity.id}`}
+                                        topic={fav}
+                                        onCellUpdate={handleCellUpdate}
+                                        onToggleFav={handleToggleFav}
+                                        days={currentWeekArray}
+                                        rowHours={findRowHours(fav)}
+                                        rowEntries={rowEntries}
+                                        getRowSum={getRowSum}
+                                        isFav={true}
+                                      />
+                                    </div>
+                                  )}
+                                </Draggable>
+                              );
+                            })}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </section>
+                </DragDropContext>
+              )}
+              <section className="recent-container">
+                {favorites.length == 0 && (
+                  <HeaderRow days={currentWeekArray}></HeaderRow>
                 )}
-              </Droppable>
-            </section>
-          </DragDropContext>
-        )}
-        <section className="recent-container">
-          {favorites.length == 0 && (
-            <HeaderRow days={currentWeekArray}></HeaderRow>
-          )}
-          {filteredRecents &&
-            filteredRecents.map((recentIssue) => {
-              const rowEntries = findRowEntries(recentIssue, currentWeekArray);
-              return (
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  onHide={handleHide}
-                  days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue)}
-                  rowEntries={rowEntries}
-                  getRowSum={getRowSum}
-                  isFav={false}
-                />
-              );
-            })}
-        </section>
-        <section className="recent-container ">
-          <div className="row">
-            <div className="col-6">
-              <h2>Total</h2>
-            </div>
-            {currentWeekArray &&
-              currentWeekArray.map((date) => {
-                const dateStr = formatDate(date, dateFormat);
-                return (
-                  <div key={dateStr} className="col-1 cell-container">
+                {filteredRecents &&
+                  filteredRecents.map((recentIssue) => {
+                    const rowEntries = findRowEntries(
+                      recentIssue,
+                      currentWeekArray
+                    );
+                    return (
+                      <Row
+                        key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                        topic={recentIssue}
+                        onCellUpdate={handleCellUpdate}
+                        onToggleFav={handleToggleFav}
+                        onHide={handleHide}
+                        days={currentWeekArray}
+                        rowHours={findRowHours(recentIssue)}
+                        rowEntries={rowEntries}
+                        getRowSum={getRowSum}
+                        isFav={false}
+                      />
+                    );
+                  })}
+              </section>
+              <section className="recent-container ">
+                <div className="row">
+                  <div className="col-6">
+                    <h2>Total</h2>
+                  </div>
+                  {currentWeekArray &&
+                    currentWeekArray.map((date) => {
+                      const dateStr = formatDate(date, dateFormat);
+                      return (
+                        <div key={dateStr} className="col-1 cell-container">
+                          <input
+                            aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                            type="text"
+                            id={dateStr}
+                            className="cell not-outline"
+                            value={getTotalHours(dateStr)}
+                            readOnly
+                          />
+                        </div>
+                      );
+                    })}
+                  <div className="col-1 cell-container">
                     <input
-                      aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                      aria-labelledby="total of hours spent during the week"
                       type="text"
-                      id={dateStr}
                       className="cell not-outline"
-                      value={getTotalHours(dateStr)}
+                      value={getTotalHoursWeek()}
                       readOnly
                     />
                   </div>
-                );
-              })}
-            <div className="col-1 cell-container">
-              <input
-                aria-labelledby="total of hours spent during the week"
-                type="text"
-                className="cell not-outline"
-                value={getTotalHoursWeek()}
-                readOnly
-              />
-            </div>
+                </div>
+              </section>
+              <section className="save-button-container">
+                {showUnsavedWarning && (
+                  <div className="unsaved-alert-p">
+                    <p role="status">⚠ You have unsaved changes</p>
+                  </div>
+                )}
+                <button
+                  className="basic-button save-button"
+                  onClick={handleSave}
+                >
+                  Save changes
+                </button>
+                {showToast && <Toast onCloseToast={handleCloseToast} />}
+              </section>
+            </main>
           </div>
-        </section>
-        <section className="save-button-container">
-          {showUnsavedWarning && (
-            <div className="unsaved-alert-p">
-              <p role="status">⚠ You have unsaved changes</p>
-            </div>
-          )}
-          <button className="basic-button save-button" onClick={handleSave}>
-            Save changes
-          </button>
-          {showToast && <Toast onCloseToast={handleCloseToast} />}
-        </section>
-        <section className="recent-container">
-          <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
-        </section>
-      </main>
+        </div>
+        <div className="footer">
+          <section className="recent-container">
+            <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+          </section>
+        </div>
+      </LoadingOverlay>
     </>
   );
 };
