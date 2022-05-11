@@ -65,7 +65,7 @@ export const Cell = ({
         Time spent on {`${topic.issue.subject} ${topic.activity.name}`}
         on {`${date}`}
       </label>
-      <div class="comment-container">
+      <div className="comment-container">
         <input
           type="text"
           id={`${topic.issue.id}${topic.activity.id}${formatDate(
@@ -85,7 +85,7 @@ export const Cell = ({
           ></button>
         )}
         {showCommentArea && (
-          <div className="area-container">
+          <div className="area-container col-2">
             <label htmlFor="comments" hidden={true}></label>
             <textarea
               autoFocus
@@ -93,7 +93,7 @@ export const Cell = ({
               onChange={onCommentUpdate}
               placeholder="Comments"
               name="comments"
-              rows={1}
+              rows={2}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
