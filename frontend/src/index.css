@@ -463,6 +463,26 @@ input[type="number"] {
   width: 1.5rem;
 }
 
+.login-error-container {
+  width: 25rem;
+  border: 2px solid hsl(10deg 91% 22%);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem 0.6rem;
+  border-radius: 4px;
+}
+
+.login-error-text {
+  margin: 0;
+  color: hsl(10deg 91% 22%);
+}
+
+.login-error-img {
+  height: 1.8rem;
+  margin-right: 1rem;
+}
+
 .loading-overlay {
   height: 100%;
   position: fixed;
