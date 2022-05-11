@@ -569,7 +569,7 @@ export const Report = () => {
       >
         <header>
           <div className="report-header">
-          <h1 className="header-year">{yearnum.toString()}</h1>
+            <h1 className="header-year">{yearnum.toString()}</h1>
             <TimeTravel
               weekTravelDay={weekTravelDay}
               onWeekTravel={handleWeekTravel}
@@ -578,10 +578,10 @@ export const Report = () => {
             <HeaderUser username={context.user ? context.user.login : ""} />
           </div>
         </header>
-      <p className="header-warning">{yearweekWarningMessage}</p>
         <div className="wrapper">
           <div className="main">
             <main>
+              <p className="header-warning">{yearweekWarningMessage}</p>
               {favorites && favorites.length > 0 && (
                 <DragDropContext onDragEnd={onDragEnd}>
                   <section className="favorites-container">

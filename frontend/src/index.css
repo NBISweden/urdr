@@ -85,6 +85,7 @@ input[type="number"] {
   text-align: center;
   color: hsl(0deg 0% 15%);
   background-color: #a7c947;
+  margin-top: 0%;
 }
 
 /* The following classes overwrite styling of the datepicker library */
