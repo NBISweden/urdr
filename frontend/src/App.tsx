@@ -11,22 +11,20 @@ export const App = () => {
       <React.StrictMode>
         <BrowserRouter>
           <AuthProvider>
-            <div className="wrapper">
-              <Routes>
-                {["/report", "/"].map((path) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={
-                      <ProtectedRoute>
-                        <Report />
-                      </ProtectedRoute>
-                    }
-                  />
-                ))}
-                <Route path="/login" element={<Login />} />
-              </Routes>
-            </div>
+            <Routes>
+              {["/report", "/"].map((path) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={
+                    <ProtectedRoute>
+                      <Report />
+                    </ProtectedRoute>
+                  }
+                />
+              ))}
+              <Route path="/login" element={<Login />} />
+            </Routes>
           </AuthProvider>
         </BrowserRouter>
       </React.StrictMode>
