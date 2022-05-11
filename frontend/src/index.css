@@ -388,7 +388,7 @@ input[type="number"] {
 .area-container {
   position: absolute;
   z-index: 1;
-  width: 100%;
+  width: 90%;
 }
 
 .comment {
@@ -411,7 +411,7 @@ input[type="number"] {
   position: absolute;
   top: 0;
   right: 0;
-  left: 23.5rem;
+  left: 20.5rem;
   background-color: transparent;
 }
 
@@ -428,7 +428,7 @@ input[type="number"] {
 }
 
 .comment-area {
-  width: 25rem;
+  width: 22rem;
   border: 1px solid hsl(0deg 0% 83%);
   padding: 0.2rem;
 }
