@@ -104,6 +104,7 @@ export const Cell = ({
               placeholder="Comments"
               name="comments"
               rows={2}
+              maxLength={1000}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
