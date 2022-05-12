@@ -253,7 +253,6 @@ input[type="number"] {
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 0.5rem 1.5rem 2.5rem;
-  margin-bottom: 0.2rem;
 }
 
 .footer-container {
@@ -495,4 +494,6 @@ input[type="number"] {
 .loading-overlay {
   height: 100%;
   position: fixed;
+  z-index: 101;
+  overflow: hidden;
 }
