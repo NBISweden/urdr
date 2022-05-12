@@ -35,6 +35,15 @@ export const Cell = ({
       spent_on: formatDate(date, dateFormat),
     });
   };
+  const onDeleteCellEntry = (e: any) => {
+    {
+      if (e.key === "Backspace") {
+        onCellChange(e);
+      } else if (e.key === "Delete") {
+        onCellChange(e);
+      }
+    }
+  };
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
     //with an unlimited number of decimals behind the delimiter
@@ -73,6 +82,7 @@ export const Cell = ({
             "yyyy-MM-dd"
           )}`}
           onChange={onCellChange}
+          onKeyUp={onDeleteCellEntry}
           className="cell"
           defaultValue={hours === 0 ? "" : hours}
         />
