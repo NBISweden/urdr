@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       "Authorization",
       "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
     );
-
+    let errorCode: number;
     const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
       method: "POST",
       credentials: "include",
@@ -43,13 +43,16 @@ export const AuthProvider = ({ children }) => {
         if (response.ok) {
           return response.json();
         } else {
-          console.log("Error: login failed");
+          errorCode = response.status;
         }
       })
       .catch((error) => console.log("An error occured.", error));
-
-    setUser(user);
-    return user;
+    if (user) {
+      setUser(user);
+      return user;
+    } else {
+      return errorCode;
+    }
   };
   // This will only listen to changes on value
 

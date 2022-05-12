@@ -1,11 +1,11 @@
--- A proposed relational database schema for Urdr, storing the data that
--- is not kept by Redmine by default but that we need to be persistent
--- between sessions.
+-- The relational database schema for Urdr, storing the data that is not
+-- kept by Redmine by default but that we need to be persistent between
+-- sessions.
 --
 -- We assume that this file is used to initialize a SQLite database.
--- From the command line, this could be done using the following command
--- (which creates the database file "database.db" if it does not already
--- exist):
+-- The Go code does thes automatically, but you may also do so from the
+-- command line, using the following command (which creates the database
+-- file "database.db" if it does not already exist):
 --
 --	sqlite3 database.db <sql/schema.sql
 --
@@ -16,11 +16,6 @@
 -- The "sqlite3" command line utility is part of the "sqlite3" package
 -- on Ubuntu.  The utility is part of the macOS base system and does not
 -- need to be installed separately.
-
--- FIXME:
--- The datatype for the fields whose names start with "redmine_" are
--- currently unknown, so we assume that they are INTEGER in the schema
--- below.
 
 PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
@@ -60,7 +55,7 @@ CREATE TABLE user_setting (
 		ON DELETE CASCADE
 );
 
--- Priority entries
+-- Priority entries.
 -- https://github.com/NBISweden/urdr/issues/11
 -- https://github.com/NBISweden/urdr/issues/19
 --
@@ -80,5 +75,27 @@ CREATE TABLE priority_entry (
 	priority INTEGER NOT NULL,
 
 	UNIQUE (redmine_user_id, redmine_issue_id, redmine_activity_id)
+		ON CONFLICT REPLACE
+);
+
+-- Invalid entries.
+-- https://github.com/NBISweden/urdr/issues/338
+--
+-- Not all activities can be used together with every issue.  Some
+-- activities are not "active" for certain projects.  This is
+-- configurable for projects in Redmine, not issues.
+--
+-- This table stores the combinations of issue IDs and activity IDs that
+-- are explicitly inactivated.  Any combination not listed is active by
+-- default.  An activity listed with a zero project ID is deactivated
+-- for all projects (zero is used rather than NULL to avoid issues with
+-- the UNIQUE constraint).
+
+DROP TABLE IF EXISTS invalid_entry;
+CREATE TABLE invalid_entry (
+	redmine_issue_id INTEGER NOT NULL,
+	redmine_activity_id INTEGER NOT NULL,
+
+	UNIQUE (redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
 );

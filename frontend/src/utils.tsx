@@ -38,6 +38,8 @@ const addDays = (date: Date, days: number) => {
   result.setDate(result.getDate() + days);
   return result;
 };
+
+// Return array of all days in the same week as supplied date
 export const getFullWeek = (today: Date): Date[] => {
   let fullWeek = [];
   const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6
@@ -96,21 +98,6 @@ export const getLongCustomDateString = (day: Date) => {
 
 export const getShortCustomDateString = (day: Date) => {
   return `${day.getDate()}/${day.getMonth() + 1}`;
-};
-
-// Removes an IssueActivityPair object from an array of these objects.
-// Returns the shortened array.
-export const removeIssueActivityPair = (
-  pairs: IssueActivityPair[],
-  item: IssueActivityPair
-): IssueActivityPair[] => {
-  const removed = pairs.find(
-    (pair) =>
-      pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
-  );
-  const index = pairs.indexOf(removed);
-  pairs.splice(index, 1);
-  return pairs;
 };
 
 export const useDebounce = (value, delay) => {

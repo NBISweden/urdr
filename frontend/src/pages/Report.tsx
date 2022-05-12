@@ -1,9 +1,15 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { format as formatDate } from "date-fns";
+import {
+  format as formatDate,
+  getISOWeek,
+  getISOWeekYear,
+  setISOWeek,
+} from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
+import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
 import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
 import {
@@ -11,18 +17,23 @@ import {
   getApiEndpoint,
   headers,
   getFullWeek,
-  removeIssueActivityPair,
   dateFormat,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
+import { useParams } from "react-router-dom";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import LoadingOverlay from "react-loading-overlay-ts";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
   event.returnValue = "";
 };
 
+// The report page
 export const Report = () => {
+  const urlparams = useParams();
+  let yearweekWarningMessage = "";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -31,26 +42,84 @@ export const Report = () => {
   const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
-  const today = new Date();
+
+  // Get year/week either from URL parameters or current time.
+  // Use today as date if nor year or week are valid numbers.
+  // Use flag "yearweekWarning" for indication of error in week/year parameters.
+  // When flag is true, display a warning message below the header with year/week.
+  let yearweekWarning: boolean = false;
+  const thisYear: number = new Date().getFullYear();
+  let yearnum: number = Number(urlparams.year);
+  if (isNaN(yearnum)) {
+    yearnum = thisYear;
+    yearweekWarning = true;
+  }
+
+  // Assume current week/date
+  let today = new Date();
+  const thisWeek: number = getISOWeek(new Date());
+  let weeknum = thisWeek;
+
+  // If week parameter is a valid number between 1-53, change the "today" value based on year/week.
+  // If the year parameter was wrong, ignore the week parameter and use thisWeek.
+  weeknum = Number(urlparams.week);
+  if (isNaN(weeknum) || yearweekWarning) {
+    weeknum = thisWeek;
+    yearweekWarning = true;
+  } else if (weeknum >= 1 && weeknum <= 53) {
+    today = setISOWeek(new Date(yearnum, 7, 7), weeknum);
+  } else {
+    yearweekWarning = true;
+  }
+  // Make sure that displayed year matches the year of the "today" variable
+  let ycheck = getISOWeekYear(today);
+  if (ycheck != yearnum) {
+    yearnum = ycheck;
+    yearweekWarning = true;
+  }
+
+  if (yearweekWarning) {
+    yearweekWarningMessage =
+      "Invalid year/week in url. Reverting to current year/week.";
+  } else {
+    yearweekWarningMessage = "";
+  }
+
+  // Set weeks for timetravel when weeknum has changed
+  React.useEffect(() => {
+    setWeekTravelDay(today);
+    setCurrentWeekArray(getFullWeek(today));
+  }, [weeknum]);
+
+  // Change displayed "Timetravel content" based on found year/week
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
+  const [showToast, setShowToast] = useState(false);
+  const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState(false);
 
+  const toggleLoadingPage = (state: boolean) => {
+    setIsLoading(state);
+  };
+
+  // Retrieve time entries via api
   const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    let params = new URLSearchParams({
+    let queryparams = new URLSearchParams({
       issue_id: `${rowTopic.issue.id}`,
       activity_id: `${rowTopic.activity.id}`,
       from: formatDate(days[0], dateFormat),
       to: formatDate(days[4], dateFormat),
     });
     let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${params}`,
+      `/api/time_entries?${queryparams}`,
       context
     );
     if (entries) return entries.time_entries;
     return null;
   };
 
+  // Retrieve time entries and recent entries
   const getAllEntries = async (
     favs: IssueActivityPair[],
     recents: IssueActivityPair[]
@@ -67,6 +136,7 @@ export const Report = () => {
     setTimeEntries(allEntries);
   };
 
+  // If weekTravelDay changes, do this...
   React.useEffect(() => {
     let didCancel = false;
     const setRecentIssuesWithinRange = async () => {
@@ -85,6 +155,7 @@ export const Report = () => {
     };
   }, [weekTravelDay]);
 
+  // If recentIssues has changed, do this...
   React.useEffect(() => {
     let didCancel = false;
 
@@ -125,10 +196,19 @@ export const Report = () => {
     };
   }, [recentIssues]);
 
+  // If the newTimeEntries have changed...
   React.useEffect(() => {
     window.removeEventListener("beforeunload", beforeUnloadHandler, true);
     if (newTimeEntries.length > 0) {
       window.addEventListener("beforeunload", beforeUnloadHandler, true);
+    }
+  }, [newTimeEntries]);
+
+  React.useEffect(() => {
+    if (newTimeEntries.length > 0) {
+      setShowUnsavedWarning(true);
+    } else {
+      setShowUnsavedWarning(false);
     }
   }, [newTimeEntries]);
 
@@ -150,7 +230,8 @@ export const Report = () => {
       (entry) =>
         entry.issue.id === timeEntry.issue_id &&
         entry.activity.id === timeEntry.activity_id &&
-        entry.spent_on === timeEntry.spent_on
+        entry.spent_on === timeEntry.spent_on &&
+        entry.comments === timeEntry.comments
     );
     // If there is one, check if it has the same hours.
     // If there is none, check if the incoming entry's hours are 0.
@@ -165,6 +246,7 @@ export const Report = () => {
     }
   };
 
+  // Save which issues that have favorite status
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
     let logout = false;
     const saved = await fetch(
@@ -194,6 +276,7 @@ export const Report = () => {
     return saved;
   };
 
+  // Toggle favorite status for an issue-activity pair
   const handleToggleFav = async (topic: IssueActivityPair) => {
     const existingFav = favorites.find(
       (fav) =>
@@ -224,6 +307,7 @@ export const Report = () => {
     }
   };
 
+  // Enable hiding an issue-activity pair from the list of recent issues
   const handleHide = async (topic: IssueActivityPair) => {
     topic.is_hidden = true;
     topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
@@ -238,6 +322,7 @@ export const Report = () => {
     }
   };
 
+  // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
     const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
@@ -267,13 +352,17 @@ export const Report = () => {
     return saved;
   };
 
+  // Check for ...
   const handleSave = async () => {
+    setShowToast(false);
+    setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
       alert(
         "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
       );
       return;
     }
+    toggleLoadingPage(true);
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
@@ -281,11 +370,19 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    if (unsavedEntries.length === 0) {
-      alert("All changes were saved!");
-    }
     await getAllEntries(favorites, filteredRecents);
     setNewTimeEntries(unsavedEntries);
+    toggleLoadingPage(false);
+    if (unsavedEntries.length === 0) {
+      setShowToast(true);
+    } else if (unsavedEntries.length > 0) {
+      setShowUnsavedWarning(true);
+    }
+  };
+
+  const handleCloseToast = () => {
+    setShowToast(false);
+    return;
   };
 
   const handleWeekTravel = (newDay: Date) => {
@@ -350,9 +447,9 @@ export const Report = () => {
   Checks first for new time entries, i.e. unsaved changes,
   and, if there are none, for entries from the database for the respective cell.
   */
-  const findRowHours = (rowTopic: IssueActivityPair, days: Date[]) => {
+  const findRowHours = (rowTopic: IssueActivityPair) => {
     let rowHours = [];
-    days.map((day) => {
+    currentWeekArray.map((day) => {
       let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
         (entry) =>
@@ -378,26 +475,22 @@ export const Report = () => {
   };
 
   /*
-  Returns an array of five numbers representing Redmine's entry ids of 
-  entries displayed in a row. 
+  Returns an object with Redmine's entry ids and comments of
+  entries displayed in a row.
   If there is no entry in the database, id is 0.
   */
-  const findRowEntryIds = (rowTopic: IssueActivityPair, days: Date[]) => {
-    let rowEntryIds = [];
+  const findRowEntries = (rowTopic: IssueActivityPair, days: Date[]) => {
+    let entries = [];
     days.map((day) => {
-      let id = 0;
       let entry = timeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue.id === rowTopic.issue.id &&
           entry.activity.id === rowTopic.activity.id
-      );
-      if (entry) {
-        id = entry.id;
-      }
-      rowEntryIds.push(id);
+      )!;
+      entries.push(entry);
     });
-    return rowEntryIds;
+    return entries;
   };
 
   const getTotalHoursWeek = () => {
@@ -432,159 +525,195 @@ export const Report = () => {
   };
 
   const getRowSum = (pair: IssueActivityPair) => {
-    let count = 0;
-    const rowEntries = timeEntries.filter(
-      (entry) =>
-        pair.activity.id === entry.activity.id &&
-        pair.issue.id === entry.issue.id &&
-        newTimeEntries.filter(
-          (newEntry) =>
-            newEntry.spent_on === entry.spent_on &&
-            newEntry.activity_id === pair.activity.id &&
-            newEntry.issue_id === pair.issue.id
-        ).length == 0
+    const sum = findRowHours(pair).reduce(
+      (previousValue, currentValue) => previousValue + currentValue,
+      0
     );
-    rowEntries.map((entry) => {
-      count += entry.hours;
-    });
-    newTimeEntries.map((entry) => {
-      if (
-        pair.activity.id === entry.activity_id &&
-        pair.issue.id === entry.issue_id
-      )
-        count += entry.hours;
-    });
-    return count;
+    return sum;
+  };
+
+  // Removes an IssueActivityPair object from an array of these objects.
+  // Returns the shortened array.
+  const removeIssueActivityPair = (
+    pairs: IssueActivityPair[],
+    item: IssueActivityPair
+  ): IssueActivityPair[] => {
+    const removed = pairs.find(
+      (pair) =>
+        pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
+    );
+    const index = pairs.indexOf(removed);
+    pairs.splice(index, 1);
+    return pairs;
   };
 
   if (context.user === null) return <></>;
+
+  // Main content
   return (
     <>
-      <header>
-        <div className="report-header">
-          <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
-          <TimeTravel
-            weekTravelDay={weekTravelDay}
-            onWeekTravel={handleWeekTravel}
-            currentWeekArray={currentWeekArray}
-          />
-          <HeaderUser username={context.user ? context.user.login : ""} />
-        </div>
-      </header>
-      <main>
-        {favorites && favorites.length > 0 && (
-          <DragDropContext onDragEnd={onDragEnd}>
-            <section className="favorites-container">
-              <HeaderRow days={currentWeekArray} />
-              <Droppable droppableId="favorites">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {favorites &&
-                      favorites.map((fav, index) => {
-                        return (
-                          <Draggable
-                            draggableId={`${fav.issue.id}${fav.activity.id}`}
-                            index={index}
-                            key={`${fav.issue.id}${fav.activity.id}-drag`}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <Row
-                                  key={`${fav.issue.id}${fav.activity.id}`}
-                                  topic={fav}
-                                  onCellUpdate={handleCellUpdate}
-                                  onToggleFav={handleToggleFav}
-                                  days={currentWeekArray}
-                                  rowHours={findRowHours(fav, currentWeekArray)}
-                                  rowEntryIds={findRowEntryIds(
-                                    fav,
-                                    currentWeekArray
+      <LoadingOverlay
+        active={isLoading}
+        className="loading-overlay"
+        spinner={
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={isLoading}
+            size={15}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          ></ClimbingBoxLoader>
+        }
+      >
+        <header>
+          <div className="report-header">
+            <h1 className="header-year">{yearnum.toString()}</h1>
+            <TimeTravel
+              weekTravelDay={weekTravelDay}
+              onWeekTravel={handleWeekTravel}
+              currentWeekArray={currentWeekArray}
+            />
+            <HeaderUser username={context.user ? context.user.login : ""} />
+          </div>
+        </header>
+        <div className="wrapper">
+          <div className="main">
+            <main>
+              <p className="header-warning">{yearweekWarningMessage}</p>
+              {favorites && favorites.length > 0 && (
+                <DragDropContext onDragEnd={onDragEnd}>
+                  <section className="favorites-container">
+                    <HeaderRow days={currentWeekArray} />
+                    <Droppable droppableId="favorites">
+                      {(provided) => (
+                        <div
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          {favorites &&
+                            favorites.map((fav, index) => {
+                              const rowEntries = findRowEntries(
+                                fav,
+                                currentWeekArray
+                              );
+                              return (
+                                <Draggable
+                                  draggableId={`${fav.issue.id}${fav.activity.id}`}
+                                  index={index}
+                                  key={`${fav.issue.id}${fav.activity.id}-drag`}
+                                >
+                                  {(provided) => (
+                                    <div
+                                      ref={provided.innerRef}
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                    >
+                                      <Row
+                                        key={`${fav.issue.id}${fav.activity.id}`}
+                                        topic={fav}
+                                        onCellUpdate={handleCellUpdate}
+                                        onToggleFav={handleToggleFav}
+                                        days={currentWeekArray}
+                                        rowHours={findRowHours(fav)}
+                                        rowEntries={rowEntries}
+                                        getRowSum={getRowSum}
+                                        isFav={true}
+                                      />
+                                    </div>
                                   )}
-                                  getRowSum={getRowSum}
-                                  isFav={true}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        );
-                      })}
-                    {provided.placeholder}
-                  </div>
+                                </Draggable>
+                              );
+                            })}
+                          {provided.placeholder}
+                        </div>
+                      )}
+                    </Droppable>
+                  </section>
+                </DragDropContext>
+              )}
+              <section className="recent-container">
+                {favorites.length == 0 && (
+                  <HeaderRow days={currentWeekArray}></HeaderRow>
                 )}
-              </Droppable>
-            </section>
-          </DragDropContext>
-        )}
-        <section className="recent-container">
-          {favorites.length == 0 && (
-            <HeaderRow days={currentWeekArray}></HeaderRow>
-          )}
-          {filteredRecents &&
-            filteredRecents.map((recentIssue) => {
-              return (
-                <Row
-                  key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                  topic={recentIssue}
-                  onCellUpdate={handleCellUpdate}
-                  onToggleFav={handleToggleFav}
-                  onHide={handleHide}
-                  days={currentWeekArray}
-                  rowHours={findRowHours(recentIssue, currentWeekArray)}
-                  rowEntryIds={findRowEntryIds(recentIssue, currentWeekArray)}
-                  getRowSum={getRowSum}
-                  isFav={false}
-                />
-              );
-            })}
-        </section>
-        <section className="recent-container ">
-          <div className="row">
-            <div className="col-6">
-              <h2>Total</h2>
-            </div>
-            {currentWeekArray &&
-              currentWeekArray.map((date) => {
-                const dateStr = formatDate(date, dateFormat);
-                return (
-                  <div key={dateStr} className="col-1 cell-container">
+                {filteredRecents &&
+                  filteredRecents.map((recentIssue) => {
+                    const rowEntries = findRowEntries(
+                      recentIssue,
+                      currentWeekArray
+                    );
+                    return (
+                      <Row
+                        key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                        topic={recentIssue}
+                        onCellUpdate={handleCellUpdate}
+                        onToggleFav={handleToggleFav}
+                        onHide={handleHide}
+                        days={currentWeekArray}
+                        rowHours={findRowHours(recentIssue)}
+                        rowEntries={rowEntries}
+                        getRowSum={getRowSum}
+                        isFav={false}
+                      />
+                    );
+                  })}
+              </section>
+              <section className="recent-container ">
+                <div className="row">
+                  <div className="col-6">
+                    <h2>Total</h2>
+                  </div>
+                  {currentWeekArray &&
+                    currentWeekArray.map((date) => {
+                      const dateStr = formatDate(date, dateFormat);
+                      return (
+                        <div key={dateStr} className="col-1 cell-container">
+                          <input
+                            aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                            type="text"
+                            id={dateStr}
+                            className="cell not-outline"
+                            value={getTotalHours(dateStr)}
+                            readOnly
+                          />
+                        </div>
+                      );
+                    })}
+                  <div className="col-1 cell-container">
                     <input
+                      aria-labelledby="total of hours spent during the week"
                       type="text"
-                      id={dateStr}
                       className="cell not-outline"
-                      value={getTotalHours(dateStr)}
+                      value={getTotalHoursWeek()}
                       readOnly
                     />
                   </div>
-                );
-              })}
-            <div className="col-1 cell-container">
-              <input
-                type="text"
-                className="cell not-outline"
-                value={getTotalHoursWeek()}
-                readOnly
-              />
-            </div>
+                </div>
+              </section>
+              <section className="save-button-container">
+                {showUnsavedWarning && (
+                  <div className="unsaved-alert-p">
+                    <p role="status">⚠ You have unsaved changes</p>
+                  </div>
+                )}
+                <button
+                  className="basic-button save-button"
+                  onClick={handleSave}
+                >
+                  Save changes
+                </button>
+                {showToast && <Toast onCloseToast={handleCloseToast} />}
+              </section>
+            </main>
           </div>
-        </section>
-        <section className="save-button-container">
-          {newTimeEntries.length > 0 && (
-            <div className="unsaved-alert-p">
-              <p role="status">⚠ You have unsaved changes</p>
-            </div>
-          )}
-          <button className="basic-button save-button" onClick={handleSave}>
-            Save changes
-          </button>
-        </section>
-      </main>
-      <section className="recent-container">
-        <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
-      </section>
+        </div>
+        <div className="footer">
+          <section className="recent-container">
+            <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+          </section>
+        </div>
+      </LoadingOverlay>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { IssueActivityPair, TimeEntry } from "../model";
+import { FetchedTimeEntry, IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 
 import { Cell } from "./Cell";
@@ -14,7 +14,7 @@ export const Row = ({
   topic,
   days,
   rowHours,
-  rowEntryIds,
+  rowEntries,
   onCellUpdate,
   onToggleFav,
   onHide,
@@ -24,7 +24,7 @@ export const Row = ({
   topic: IssueActivityPair;
   days: Date[];
   rowHours: number[];
-  rowEntryIds: number[];
+  rowEntries: FetchedTimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   getRowSum: (pair: IssueActivityPair) => number;
@@ -99,13 +99,15 @@ export const Row = ({
               date={day}
               onCellUpdate={onCellUpdate}
               hours={rowHours[i]}
-              entryId={rowEntryIds[i]}
+              comments={rowEntries[i] ? rowEntries[i].comments : ""}
+              entryId={rowEntries[i] ? rowEntries[i].id : 0}
             />
           );
         })}
         <div className="col-1 cell-container">
           <input
             type="text"
+            aria-labelledby={`total of hours spent on the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
             id={`${topic.issue.id}${topic.activity.id}-total`}
             className="cell not-outline"
             value={getRowSum(topic)}
