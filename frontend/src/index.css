@@ -66,14 +66,17 @@ input[type="number"] {
 
 .header-wrapper {
   width: 100vw;
-  text-align: center;
   height: 10rem;
   line-height: 10rem;
   margin-bottom: 3rem;
-  background-color: #a7c947;
+  background-color: hsl(76deg 55% 53%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .header-heading {
+  color: hsl(186deg 92% 11%);
   font-size: 3rem;
   margin: 0;
 }
@@ -285,7 +288,6 @@ input[type="number"] {
   border: none;
   border-radius: 4px;
   transition-duration: 0.2s;
-  margin-left: 1rem;
 }
 
 .dropdown-button {
@@ -316,12 +318,13 @@ input[type="number"] {
 }
 
 .basic-button:hover {
-  background-color: hsl(90deg 55% 23%);
+  background-color: hsl(107deg 55% 15%);
 }
 
 .plus-button {
   width: 4.5rem;
   background-color: hsl(288deg 46% 22%);
+  margin-left: 1rem;
 }
 
 .plus-button:hover {

@@ -48,7 +48,11 @@ export const Login = () => {
             placeholder="Enter your password"
             onChange={(event) => setPassword(event.target.value)}
           />
-          <input type="submit" value="Login" className="login-button" />
+          <input
+            type="submit"
+            value="Login"
+            className="basic-button login-button"
+          />
         </form>
         {errorCode && <LoginError code={errorCode} />}
       </div>
