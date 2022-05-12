@@ -35,7 +35,7 @@ body {
   font-family: Lato, sans-serif;
   color: hsl(0deg 0% 15%);
   margin: 0;
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 120px);
   width: 100%;
   height: 100%;
   display: flex;
@@ -123,17 +123,16 @@ input[type="number"] {
 
 .main {
   position: relative;
-  margin: 50px 0;
+  margin: 50px 0 100px 0;
   padding: 10px;
-  min-height: calc(60vh);
 }
 
 .footer {
   z-index: 100;
   width: 100%;
-  top: calc(100vh - 100px);
+  top: calc(100vh - 120px);
   position: fixed;
-  height: 100px;
+  height: 120px;
   background-color: white;
 }
 
@@ -257,7 +256,7 @@ input[type="number"] {
 
 .footer-container {
   margin-top: 0.2rem;
-  padding: 0.2rem;
+  padding: 0.5rem 1rem;
   background-color: hsl(0deg 0% 97%);
   display: flex;
 }
