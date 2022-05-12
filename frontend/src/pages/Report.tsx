@@ -576,10 +576,11 @@ export const Report = () => {
             />
             <HeaderUser username={context.user ? context.user.login : ""} />
           </div>
+          <p className="header-warning">{yearweekWarningMessage}</p>
         </header>
+
         <div className="main">
           <main>
-            <p className="header-warning">{yearweekWarningMessage}</p>
             {favorites && favorites.length > 0 && (
               <DragDropContext onDragEnd={onDragEnd}>
                 <section className="favorites-container">
