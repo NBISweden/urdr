@@ -134,6 +134,7 @@ export const QuickAdd = ({
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
+        style={{ width: "60%" }}
       >
         {activities &&
           activities.map((activity) => {

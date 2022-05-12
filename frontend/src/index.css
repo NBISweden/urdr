@@ -118,7 +118,7 @@ input[type="number"] {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100px;
+  height: 80px;
 }
 
 .main {
@@ -128,17 +128,11 @@ input[type="number"] {
   min-height: calc(60vh);
 }
 
-.wrapper {
-  position: relative;
-  border-top: 1px solid white;
-  flex: 1 0 auto;
-  min-height: calc(100vh - 100px);
-}
-
 .footer {
-  z-index: -4;
+  z-index: 100;
   width: 100%;
-  flex-shrink: 0;
+  top: calc(100vh - 100px);
+  position: fixed;
   height: 100px;
 }
 
@@ -261,6 +255,11 @@ input[type="number"] {
   margin-bottom: 0.2rem;
 }
 
+.footer-container {
+  background-color: hsl(0deg 0% 97%);
+  display: flex;
+}
+
 .favorites-container {
   background-color: hsl(0deg 0% 97%);
   padding: 2.5rem 1.5rem 0.5rem;
@@ -309,13 +308,13 @@ input[type="number"] {
   padding: 1rem 1.5rem;
 }
 
-.basic-button:hover {
-  background-color: hsl(90deg 55% 23%);
+.save-changes {
+  justify-content: end;
+  text-align: end;
 }
 
-.save-button-container {
-  display: flex;
-  justify-content: end;
+.basic-button:hover {
+  background-color: hsl(90deg 55% 23%);
 }
 
 .plus-button {
@@ -386,6 +385,7 @@ input[type="number"] {
 .unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
   margin: 3rem 1rem 2rem;
+  text-align: right;
 }
 
 .comment-container {
@@ -444,8 +444,8 @@ input[type="number"] {
   width: 20rem;
   height: 5rem;
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: 10px;
+  right: 200px;
   background: hsl(76deg 55% 65%);
   box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
   border-radius: 4px;
