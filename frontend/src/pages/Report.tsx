@@ -690,10 +690,10 @@ export const Report = () => {
         </div>
         <div className="footer">
           <section className="footer-container">
-            <div className="col-6">
+            <div className="col-7">
               <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
             </div>
-            <div className="col-4 ">
+            <div className="col-3 ">
               {showUnsavedWarning && (
                 <div className="unsaved-alert-p">
                   <p role="status">⚠ You have unsaved changes</p>

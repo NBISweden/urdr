@@ -257,6 +257,8 @@ input[type="number"] {
 
 .footer-container {
   margin-top: 0.2rem;
+  padding: 0.2rem;
+
   background-color: hsl(0deg 0% 97%);
   display: flex;
 }
