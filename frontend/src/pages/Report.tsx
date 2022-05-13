@@ -669,7 +669,7 @@ export const Report = () => {
                       return (
                         <div key={dateStr} className="col-1 cell-container">
                           <input
-                            aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                            aria-label={`total of hours spent during the day ${dateStr}`}
                             type="text"
                             id={dateStr}
                             className="cell not-outline"
@@ -681,7 +681,7 @@ export const Report = () => {
                     })}
                   <div className="col-1 cell-container">
                     <input
-                      aria-labelledby="total of hours spent during the week"
+                      aria-label="total of hours spent during the week"
                       type="text"
                       className="cell not-outline"
                       value={getTotalHoursWeek()}
