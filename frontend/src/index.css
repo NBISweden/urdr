@@ -445,8 +445,8 @@ input[type="number"] {
   width: 20rem;
   height: 5rem;
   position: fixed;
-  bottom: 10px;
-  right: 200px;
+  bottom: 20px;
+  left: 20px;
   background: hsl(76deg 55% 65%);
   box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
   border-radius: 4px;
@@ -492,7 +492,7 @@ input[type="number"] {
 }
 
 .loading-overlay {
-  height: 100%;
+  height: 100vh;
   position: fixed;
   z-index: 101;
   overflow: hidden;
