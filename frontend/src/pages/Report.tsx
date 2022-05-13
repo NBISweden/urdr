@@ -553,7 +553,7 @@ export const Report = () => {
     <>
       <LoadingOverlay
         active={isLoading}
-        className="loading-overlay"
+        className={isLoading ? "loading-overlay" : ""}
         spinner={
           <ClimbingBoxLoader
             color="hsl(76deg 55% 53%)"

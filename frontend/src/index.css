@@ -34,7 +34,8 @@
 body {
   font-family: Lato, sans-serif;
   color: hsl(0deg 0% 15%);
-  margin: 0;
+  margin-bottom: 120px;
+  justify-content: center;
   min-height: calc(100vh - 120px);
   width: 100%;
   height: 100%;
@@ -123,8 +124,7 @@ input[type="number"] {
 
 .main {
   position: relative;
-  margin: 50px 0 100px;
-  padding: 10px;
+  margin: 50px 0;
 }
 
 .footer {
@@ -306,6 +306,7 @@ input[type="number"] {
 
 .save-button {
   margin: 2rem;
+  min-width: 10rem;
   padding: 1rem 1.5rem;
 }
 
