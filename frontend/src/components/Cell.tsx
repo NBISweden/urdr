@@ -22,7 +22,7 @@ export const Cell = ({
   const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
   const [areaComments, setAreaComments] = useState<string>(null);
   const onCommentButtonClick = () => {
-    setShowCommentArea(!showCommentArea);
+    setShowCommentArea(true);
   };
   const onCommentUpdate = (e: any) => {
     setAreaComments(e.target.value);
