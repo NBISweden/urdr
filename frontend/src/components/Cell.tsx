@@ -22,7 +22,7 @@ export const Cell = ({
   const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
   const [areaComments, setAreaComments] = useState<string>(null);
   const onCommentButtonClick = () => {
-    setShowCommentArea(!showCommentArea);
+    setShowCommentArea(true);
   };
   const onCommentUpdate = (e: any) => {
     setAreaComments(e.target.value);
@@ -41,6 +41,13 @@ export const Cell = ({
         onCellChange(e);
       } else if (e.key === "Delete") {
         onCellChange(e);
+      }
+    }
+  };
+  const onEscapeArea = (e: any) => {
+    {
+      if (e.key === "Escape") {
+        setShowCommentArea(false);
       }
     }
   };
@@ -105,6 +112,8 @@ export const Cell = ({
               name="comments"
               rows={2}
               maxLength={1000}
+              onKeyUp={onEscapeArea}
+              onBlur={() => setShowCommentArea(false)}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
