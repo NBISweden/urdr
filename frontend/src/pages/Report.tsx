@@ -332,7 +332,6 @@ export const Report = () => {
     })
       .then((response) => {
         if (response.ok) {
-          console.log("Time reported");
           return true;
         } else if (response.status === 401) {
           logout = true;
