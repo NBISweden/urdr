@@ -351,11 +351,6 @@ Other button classes are defined further down together with other classes for th
   text-align: end;
 }
 
-.save-button-container {
-  display: flex;
-  justify-content: end;
-}
-
 .plus-button {
   width: 4.5rem;
   background-color: hsl(288deg 46% 22%);
