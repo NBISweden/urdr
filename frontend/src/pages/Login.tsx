@@ -32,30 +32,31 @@ export const Login = () => {
         <LoginHeader />
         <form onSubmit={authenticateRedmine} className="login-form">
           <p className="login-info">
-            This time logging interface is connected to Redmine. <br></br>Use
-            your Redmine credentials to log in.
+            This time logging application is connected to{" "}
+            <a href="https://projects.nbis.se"> Redmine</a>. <br></br>Use your
+            Redmine credentials to log in.
           </p>
           <label htmlFor="username" className="login-label">
-            Username
+            Redmine username
           </label>
           <input
             className="login-field"
             type="text"
             id="username"
             value={username}
-            placeholder="Enter your username"
+            placeholder="e.g. lisas"
             autoFocus
             onChange={(event) => setUsername(event.target.value)}
           />
           <label htmlFor="Password" className="login-label">
-            Password
+            Redmine password
           </label>
           <input
             className="login-field"
             type="password"
             id="password"
             value={password}
-            placeholder="Enter your password"
+            placeholder="e.g. usePasswordManagers<3"
             onChange={(event) => setPassword(event.target.value)}
           />
           {errorCode && <LoginError code={errorCode} />}

@@ -247,6 +247,16 @@ Other button classes are defined further down together with other classes for th
   margin: 2rem 0 3rem;
 }
 
+.login-info a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+}
+
+.login-info a:hover {
+  color: hsl(185deg 92% 16%);
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
