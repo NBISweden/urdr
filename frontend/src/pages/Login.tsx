@@ -35,8 +35,11 @@ export const Login = () => {
             This time logging interface is connected to Redmine. <br></br>Use
             your Redmine credentials to log in.
           </p>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username" className="login-label">
+            Username
+          </label>
           <input
+            className="login-field"
             type="text"
             id="username"
             value={username}
@@ -44,8 +47,11 @@ export const Login = () => {
             autoFocus
             onChange={(event) => setUsername(event.target.value)}
           />
-          <label htmlFor="Password">Password</label>
+          <label htmlFor="Password" className="login-label">
+            Password
+          </label>
           <input
+            className="login-field"
             type="password"
             id="password"
             value={password}
