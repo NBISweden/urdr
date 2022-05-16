@@ -24,5 +24,10 @@
     "react-datepicker": "^4.7.0",
     "react-spinners": "^0.11.0",
     "react-loading-overlay-ts": "^2.0.0"
+  },
+  "stylelint": {
+    "rules": {
+      "color-function-notation": null
+    }
   }
 }
