@@ -31,26 +31,41 @@ export const Login = () => {
       <div className="login-wrapper">
         <LoginHeader />
         <form onSubmit={authenticateRedmine} className="login-form">
-          <label htmlFor="username">Username</label>
+          <p className="login-info">
+            This time logging application is connected to{" "}
+            <a href="https://projects.nbis.se"> Redmine</a>. <br></br>Use your
+            Redmine credentials to log in.
+          </p>
+          <label htmlFor="username" className="login-label">
+            Redmine username
+          </label>
           <input
+            className="login-field"
             type="text"
             id="username"
             value={username}
-            placeholder="Enter your username"
+            placeholder="e.g. lisas"
             autoFocus
             onChange={(event) => setUsername(event.target.value)}
           />
-          <label htmlFor="Password">Password</label>
+          <label htmlFor="Password" className="login-label">
+            Redmine password
+          </label>
           <input
+            className="login-field"
             type="password"
             id="password"
             value={password}
-            placeholder="Enter your password"
+            placeholder="e.g. usePasswordManagers<3"
             onChange={(event) => setPassword(event.target.value)}
           />
-          <input type="submit" value="Login" className="login-button" />
+          {errorCode && <LoginError code={errorCode} />}
+          <input
+            type="submit"
+            value="Login"
+            className="basic-button login-button"
+          />
         </form>
-        {errorCode && <LoginError code={errorCode} />}
       </div>
     </main>
   );

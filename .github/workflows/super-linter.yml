@@ -3,9 +3,9 @@ name: Super Linter
 on:
   pull_request:
     paths-ignore:
-      - backend/docs/docs.go       # Auto-generated
-      - backend/docs/swagger.json  # Auto-generated
-      - backend/docs/swagger.yaml  # Auto-generated
+      - backend/docs/docs.go # Auto-generated
+      - backend/docs/swagger.json # Auto-generated
+      - backend/docs/swagger.yaml # Auto-generated
 jobs:
   build:
     name: Lint Code Base
@@ -24,3 +24,5 @@ jobs:
           DEFAULT_BRANCH: develop
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: bootstrap\.min\.css(\.map)?|backend/docs/(docs\.go|swagger\.(json|yaml))$
+          CSS_FILE_NAME: .stylelintrc.json
+          LINTER_RULES_PATH: .github/linters
