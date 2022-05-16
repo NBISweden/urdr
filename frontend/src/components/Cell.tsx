@@ -44,6 +44,13 @@ export const Cell = ({
       }
     }
   };
+  const onEscapeArea = (e: any) => {
+    {
+      if (e.key === "Escape") {
+        setShowCommentArea(false);
+      }
+    }
+  };
   const onCellChange = (event: any) => {
     //makes sure that users can only input positive numbers up to 999.99999999...
     //with an unlimited number of decimals behind the delimiter
@@ -105,6 +112,8 @@ export const Cell = ({
               name="comments"
               rows={2}
               maxLength={1000}
+              onKeyUp={onEscapeArea}
+              onBlur={() => setShowCommentArea(false)}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
