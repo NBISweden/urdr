@@ -351,10 +351,6 @@ Other button classes are defined further down together with other classes for th
   text-align: end;
 }
 
-.basic-button:hover {
-  background-color: hsl(107deg 55% 15%);
-}
-
 .save-button-container {
   display: flex;
   justify-content: end;
