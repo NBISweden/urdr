@@ -224,10 +224,19 @@ input[type="number"] {
   align-items: center;
 }
 
+.login-info {
+  margin: 3rem 0;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
-  width: 25rem;
+  width: 30rem;
+  background-color: white;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
 }
 
 .login-form input {

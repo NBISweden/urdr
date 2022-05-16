@@ -31,6 +31,10 @@ export const Login = () => {
       <div className="login-wrapper">
         <LoginHeader />
         <form onSubmit={authenticateRedmine} className="login-form">
+          <p className="login-info">
+            This time logging interface is connected to Redmine. <br></br>Use
+            your Redmine credentials to log in.
+          </p>
           <label htmlFor="username">Username</label>
           <input
             type="text"
