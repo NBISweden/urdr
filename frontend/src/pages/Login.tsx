@@ -58,13 +58,13 @@ export const Login = () => {
             placeholder="Enter your password"
             onChange={(event) => setPassword(event.target.value)}
           />
+          {errorCode && <LoginError code={errorCode} />}
           <input
             type="submit"
             value="Login"
             className="basic-button login-button"
           />
         </form>
-        {errorCode && <LoginError code={errorCode} />}
       </div>
     </main>
   );

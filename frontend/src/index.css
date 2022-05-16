@@ -506,7 +506,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .login-error-container {
-  width: 25rem;
+  width: 100%;
   border: 2px solid hsl(10deg 91% 22%);
   display: flex;
   justify-content: space-around;
