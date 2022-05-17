@@ -5,12 +5,15 @@ services:
 
   urdr:
     user: urdr
+    image: ghcr.io/nbisweden/urdr:${TAG:?TAG-not-set}
+    container_name: urdr
     build:
       dockerfile: ../production/Dockerfile
       context: ../backend
+      labels:
+        - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
     volumes:
       - ../backend/:/app
-    container_name: urdr
     expose:
       - "8080"
     ports:
@@ -19,10 +22,13 @@ services:
     env_file:
       - ./urdr.env
   nginx:
-    container_name: urdr-frontend
+    image: ghcr.io/nbisweden/urdr-web:${TAG:?TAG-not-set}
+    container_name: urdr-web
     build:
       dockerfile: ../production/Dockerfile.nginx
       context: ../frontend
+      labels:
+        - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
       args:
         - SNOWPACK_PUBLIC_API_URL=${SNOWPACK_PUBLIC_API_URL}
         - SNOWPACK_PUBLIC_REDMINE_URL=${SNOWPACK_PUBLIC_REDMINE_URL}
