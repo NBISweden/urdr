@@ -491,7 +491,6 @@ Other button classes are defined further down together with other classes for th
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: hsl(76deg 55% 65%);
   box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
   border-radius: 4px;
   padding: 0.2rem;
@@ -501,14 +500,20 @@ Other button classes are defined further down together with other classes for th
   align-items: start;
 }
 
+.toast-success {
+  background: hsl(76deg 55% 65%);
+  color: hsl(107deg 55% 15%);
+}
+
 .toast-message {
   margin: auto;
-  color: hsl(107deg 55% 15%);
+  color: inherit;
 }
 
 .toast-button {
   background-color: transparent;
   border: none;
+  color: inherit;
 }
 
 .toast-button img {
