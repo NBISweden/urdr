@@ -42,8 +42,6 @@ jobs:
              TAG="$branch" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1
 
              for image in urdr urdr-web; do
-               docker tag "$image:latest" "ghcr.io/nbisweden/$image:$branch"
                docker push "ghcr.io/nbisweden/$image:$branch"
-               docker tag "$image:latest" "ghcr.io/nbisweden/$image:latest"
                docker push "ghcr.io/nbisweden/$image:latest"
              done
