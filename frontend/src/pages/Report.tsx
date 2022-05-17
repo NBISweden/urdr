@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   format as formatDate,
@@ -37,8 +37,6 @@ const beforeUnloadHandler = (event) => {
 
 // The report page
 export const Report = () => {
-  const urlparams = useParams();
-  let yearweekWarningMessage = "";
   const [recentIssues, setRecentIssues] = useState<IssueActivityPair[]>([]);
   const [filteredRecents, setFilteredRecents] = useState<IssueActivityPair[]>(
     []
@@ -48,61 +46,43 @@ export const Report = () => {
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-
-  // Get year/week either from URL parameters or current time.
-  // Use today as date if nor year or week are valid numbers.
-  // Use flag "yearweekWarning" for indication of error in week/year parameters.
-  // When flag is true, display a warning message below the header with year/week.
-  let yearweekWarning: boolean = false;
-  const thisYear: number = new Date().getFullYear();
-  let yearnum: number = Number(urlparams.year);
-  if (isNaN(yearnum)) {
-    yearnum = thisYear;
-    yearweekWarning = true;
-  }
-
-  // Assume current week/date
-  let today = new Date();
-  const thisWeek: number = getISOWeek(new Date());
-  let weeknum = thisWeek;
-
-  // If week parameter is a valid number between 1-53, change the "today" value based on year/week.
-  // If the year parameter was wrong, ignore the week parameter and use thisWeek.
-  weeknum = Number(urlparams.week);
-  if (isNaN(weeknum) || yearweekWarning) {
-    weeknum = thisWeek;
-    yearweekWarning = true;
-  } else if (weeknum >= 1 && weeknum <= 53) {
-    today = setISOWeek(new Date(yearnum, 7, 7), weeknum);
-  } else {
-    yearweekWarning = true;
-  }
-  // Make sure that displayed year matches the year of the "today" variable
-  let ycheck = getISOWeekYear(today);
-  if (ycheck != yearnum) {
-    yearnum = ycheck;
-    yearweekWarning = true;
-  }
-
-  if (yearweekWarning) {
-    yearweekWarningMessage =
-      "Invalid year/week in url. Reverting to current year/week.";
-  } else {
-    yearweekWarningMessage = "";
-  }
-
-  // Set weeks for timetravel when weeknum has changed
-  React.useEffect(() => {
-    setWeekTravelDay(today);
-    setCurrentWeekArray(getFullWeek(today));
-  }, [weeknum]);
-
-  // Change displayed "Timetravel content" based on found year/week
-  const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
-  const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
+  const [weekTravelDay, setWeekTravelDay] = useState<Date>(new Date());
+  const [currentWeekArray, setCurrentWeekArray] = useState(
+    getFullWeek(new Date())
+  );
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-  const context = React.useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
+  const context = React.useContext(AuthContext);
+  const urlparams = useParams();
+
+  // Effect only run on first render to check if the user has entered
+  // a valid year and week in URL.
+  useEffect(() => {
+    // Take today's date as default.
+    let day = new Date();
+
+    // Check if the URL contains a valid year and week number
+    // If yes, use that for the date.
+    // If not, display a warning message.
+    const yearnum = Number(urlparams.year);
+    const weeknum = Number(urlparams.week);
+    if (!isNaN(yearnum) && !isNaN(weeknum) && weeknum >= 1 && weeknum <= 53) {
+      day = setISOWeek(new Date(yearnum, 7, 7), weeknum);
+    } else {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "Invalid year or week in URL. Reverting to today.",
+        },
+      ]);
+    }
+
+    // Update "time travel variables" with the resulting date.
+    setWeekTravelDay(day);
+    setCurrentWeekArray(getFullWeek(day));
+  }, []);
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -581,7 +561,7 @@ export const Report = () => {
       >
         <header>
           <div className="report-header">
-            <h1 className="header-year">{yearnum.toString()}</h1>
+            <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
             <TimeTravel
               weekTravelDay={weekTravelDay}
               onWeekTravel={handleWeekTravel}
@@ -589,7 +569,6 @@ export const Report = () => {
             />
             <HeaderUser username={context.user ? context.user.login : ""} />
           </div>
-          <p className="header-warning">{yearweekWarningMessage}</p>
         </header>
 
         <div className="main">
