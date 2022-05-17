@@ -491,7 +491,7 @@ Other button classes are defined further down together with other classes for th
   position: fixed;
   bottom: 20px;
   left: 20px;
-  box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
   border-radius: 4px;
   padding: 0.2rem;
   padding-left: 1rem;
@@ -501,8 +501,18 @@ Other button classes are defined further down together with other classes for th
 }
 
 .toast-success {
-  background: hsl(76deg 55% 65%);
+  background-color: hsl(76deg 55% 65%);
   color: hsl(107deg 55% 15%);
+}
+
+.toast-warning {
+  background-color: hsl(26deg 91% 65%);
+  color: hsl(6deg 91% 15%);
+}
+
+.toast-info {
+  background-color: hsl(186deg 30% 73%);
+  color: hsl(185deg 92% 11%);
 }
 
 .toast-message {
