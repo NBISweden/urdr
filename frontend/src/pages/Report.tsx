@@ -11,7 +11,12 @@ import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
-import { IssueActivityPair, TimeEntry, FetchedTimeEntry } from "../model";
+import {
+  IssueActivityPair,
+  TimeEntry,
+  FetchedTimeEntry,
+  ToastMsg,
+} from "../model";
 import {
   SNOWPACK_PUBLIC_API_URL,
   getApiEndpoint,
@@ -42,6 +47,7 @@ export const Report = () => {
   const [hidden, setHidden] = useState<IssueActivityPair[]>([]);
   const [timeEntries, setTimeEntries] = useState<FetchedTimeEntry[]>([]);
   const [newTimeEntries, setNewTimeEntries] = useState<TimeEntry[]>([]);
+  const [toastList, setToastList] = useState<ToastMsg[]>([]);
 
   // Get year/week either from URL parameters or current time.
   // Use today as date if nor year or week are valid numbers.
@@ -94,7 +100,6 @@ export const Report = () => {
   // Change displayed "Timetravel content" based on found year/week
   const [weekTravelDay, setWeekTravelDay] = useState<Date>(today);
   const [currentWeekArray, setCurrentWeekArray] = useState(getFullWeek(today));
-  const [showToast, setShowToast] = useState(false);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const context = React.useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -353,7 +358,6 @@ export const Report = () => {
 
   // Check for ...
   const handleSave = async () => {
-    setShowToast(false);
     setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
       alert(
@@ -373,14 +377,23 @@ export const Report = () => {
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
-      setShowToast(true);
+      setToastList([
+        ...toastList,
+        {
+          type: "success",
+          timeout: 3000,
+          message: "All changes saved!",
+        },
+      ]);
     } else if (unsavedEntries.length > 0) {
       setShowUnsavedWarning(true);
     }
   };
 
-  const handleCloseToast = () => {
-    setShowToast(false);
+  const handleCloseToast = (index: number) => {
+    const toasts = [...toastList];
+    toasts.splice(index, 1);
+    setToastList(toasts);
     return;
   };
 
@@ -700,7 +713,9 @@ export const Report = () => {
                   <p role="status">⚠ You have unsaved changes</p>
                 </div>
               )}
-              {showToast && <Toast onCloseToast={handleCloseToast} />}
+              {toastList.length > 0 && (
+                <Toast onCloseToast={handleCloseToast} toastList={toastList} />
+              )}
             </div>
             <div className="col-2 save-changes">
               <button className="basic-button save-button" onClick={handleSave}>
