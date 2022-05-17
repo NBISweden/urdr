@@ -103,13 +103,6 @@ Other button classes are defined further down together with other classes for th
   width: 100vw;
 }
 
-.header-warning {
-  text-align: center;
-  color: hsl(0deg 0% 15%);
-  background-color: #a7c947;
-  margin-top: 5.5em;
-}
-
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
 .react-datepicker__week .react-datepicker__day--selected {
