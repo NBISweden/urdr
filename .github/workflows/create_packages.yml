@@ -39,7 +39,7 @@ jobs:
              SNOWPACK_PUBLIC_REDMINE_URL="https://projects.nbis.se"
              END
 
-             docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1
+             TAG="$branch" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1
 
              for image in urdr urdr-web; do
                docker tag "$image:latest" "ghcr.io/nbisweden/$image:$branch"
