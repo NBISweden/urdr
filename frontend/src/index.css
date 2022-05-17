@@ -34,8 +34,9 @@
 body {
   font-family: Lato, sans-serif;
   color: hsl(0deg 0% 15%);
-  margin: 0;
-  min-height: calc(100vh - 100px);
+  margin-bottom: 120px;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
   width: 100%;
   height: 100%;
   display: flex;
@@ -61,18 +62,39 @@ input[type="number"] {
   appearance: textfield;
 }
 
+/*
+Classes that are defined later in the stylesheet will override those defined early in the stylesheet.
+Therefore we have the basic button class up here.
+Other button classes are defined further down together with other classes for their respective sections.
+*/
+
+.basic-button {
+  background-color: hsl(90deg 55% 23%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  transition-duration: 0.2s;
+}
+
+.basic-button:hover {
+  background-color: hsl(107deg 55% 15%);
+}
+
 /* HEADER */
 
 .header-wrapper {
   width: 100vw;
-  text-align: center;
   height: 10rem;
   line-height: 10rem;
   margin-bottom: 3rem;
-  background-color: #a7c947;
+  background-color: hsl(76deg 55% 53%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .header-heading {
+  color: hsl(186deg 92% 11%);
   font-size: 3rem;
   margin: 0;
 }
@@ -85,7 +107,7 @@ input[type="number"] {
   text-align: center;
   color: hsl(0deg 0% 15%);
   background-color: #a7c947;
-  margin-top: 0%;
+  margin-top: 5.5em;
 }
 
 /* The following classes overwrite styling of the datepicker library */
@@ -118,28 +140,21 @@ input[type="number"] {
   left: 0;
   top: 0;
   width: 100%;
-  height: 100px;
+  height: 80px;
 }
 
 .main {
   position: relative;
-  margin: calc(10vh) 0 50px 0;
-  padding: 10px;
-  min-height: calc(60vh);
-}
-
-.wrapper {
-  position: relative;
-  border-top: 1px solid white;
-  flex: 1 0 auto;
-  min-height: calc(100vh - 100px);
+  margin: 50px 0;
 }
 
 .footer {
-  z-index: -4;
+  z-index: 100;
   width: 100%;
-  flex-shrink: 0;
-  height: 100px;
+  top: calc(100vh - 120px);
+  position: fixed;
+  height: 120px;
+  background-color: white;
 }
 
 .header-year {
@@ -225,21 +240,55 @@ input[type="number"] {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: hsl(70deg 55% 98%);
+}
+
+.login-info {
+  margin: 2rem 0 3rem;
+}
+
+.login-info a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+}
+
+.login-info a:hover {
+  color: hsl(185deg 92% 16%);
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  width: 25rem;
+  width: 30rem;
+  background-color: white;
+  padding: 2rem;
+  margin-top: 2rem;
+  border-radius: 4px;
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+  color: hsl(185deg 92% 11%);
 }
 
-.login-form input {
+.login-label {
+  margin: 0 0 0.25rem;
+}
+
+.login-field {
   margin-bottom: 1.5rem;
+  background: hsl(70deg 55% 95%);
+  border: 1px solid hsl(76deg 55% 77%);
+  border-radius: 4px;
+  padding: 0.5rem;
 }
 
 .login-button {
   padding: 1rem 2rem;
-  margin: 0 auto;
+  margin: 2rem auto 0;
+  background-color: hsl(185deg 92% 16%);
+}
+
+.login-button:hover {
+  background-color: hsl(185deg 92% 11%);
 }
 
 /* TIME REPORTING */
@@ -258,7 +307,13 @@ input[type="number"] {
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 0.5rem 1.5rem 2.5rem;
-  margin-bottom: 0.2rem;
+}
+
+.footer-container {
+  margin-top: 0.2rem;
+  padding: 0.5rem 1rem;
+  background-color: hsl(0deg 0% 97%);
+  display: flex;
 }
 
 .favorites-container {
@@ -279,15 +334,6 @@ input[type="number"] {
   min-width: 4rem;
 }
 
-.basic-button {
-  background-color: hsl(90deg 55% 23%);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  transition-duration: 0.2s;
-  margin-left: 1rem;
-}
-
 .dropdown-button {
   margin-right: 1rem;
   background-color: hsl(186deg 30% 94%);
@@ -306,21 +352,19 @@ input[type="number"] {
 
 .save-button {
   margin: 2rem;
+  min-width: 10rem;
   padding: 1rem 1.5rem;
 }
 
-.basic-button:hover {
-  background-color: hsl(90deg 55% 23%);
-}
-
-.save-button-container {
-  display: flex;
+.save-changes {
   justify-content: end;
+  text-align: end;
 }
 
 .plus-button {
   width: 4.5rem;
   background-color: hsl(288deg 46% 22%);
+  margin-left: 1rem;
 }
 
 .plus-button:hover {
@@ -386,6 +430,7 @@ input[type="number"] {
 .unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
   margin: 3rem 1rem 2rem;
+  text-align: right;
 }
 
 .comment-container {
@@ -471,7 +516,7 @@ input[type="number"] {
 }
 
 .login-error-container {
-  width: 25rem;
+  width: 100%;
   border: 2px solid hsl(10deg 91% 22%);
   display: flex;
   justify-content: space-around;
@@ -491,6 +536,8 @@ input[type="number"] {
 }
 
 .loading-overlay {
-  height: 100%;
+  height: 100vh;
   position: fixed;
+  z-index: 101;
+  overflow: hidden;
 }

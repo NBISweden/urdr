@@ -5,10 +5,10 @@ go 1.17
 require (
 	github.com/gofiber/fiber/v2 v2.33.0
 	github.com/gofiber/storage/sqlite3 v0.0.0-20220331080057-83339bc1564f
-	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/mattn/go-sqlite3 v1.14.13
 	github.com/sirupsen/logrus v1.8.1
 	github.com/swaggo/fiber-swagger v1.2.1
-	github.com/swaggo/swag v1.8.1
+	github.com/swaggo/swag v1.8.2
 )
 
 require (
@@ -27,9 +27,9 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.36.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.10 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

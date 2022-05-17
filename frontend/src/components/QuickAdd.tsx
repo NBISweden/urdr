@@ -108,7 +108,7 @@ export const QuickAdd = ({
 
   return (
     <div className="row">
-      <h2>Quick add:</h2>
+      <h2> Add a new issue</h2>
       <input
         aria-labelledby="input-issue"
         id="input-issue"
@@ -134,6 +134,7 @@ export const QuickAdd = ({
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
+        style={{ width: "50%" }}
       >
         {activities &&
           activities.map((activity) => {
