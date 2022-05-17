@@ -109,6 +109,7 @@ export const QuickAdd = ({
   return (
     <div className="row">
       <h2> Add a new issue</h2>
+      <label>Type issue number e.g. 3499</label>
       <input
         aria-labelledby="input-issue"
         id="input-issue"
@@ -119,7 +120,6 @@ export const QuickAdd = ({
           setSearch(e.target.value);
           setIssue(null);
         }}
-        placeholder="Type issue number..."
         title={(issue && issue.subject) || ""}
       />
       <img
