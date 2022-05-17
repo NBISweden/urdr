@@ -5,6 +5,7 @@ services:
 
   urdr:
     user: urdr
+    image: ghcr.io/nbisweden/urdr:${TAG:?TAG-not-set}
     build:
       dockerfile: ../production/Dockerfile
       context: ../backend
@@ -21,6 +22,7 @@ services:
     env_file:
       - ./urdr.env
   nginx:
+    image: ghcr.io/nbisweden/urdr-web:${TAG:?TAG-not-set}
     container_name: urdr-frontend
     build:
       dockerfile: ../production/Dockerfile.nginx
