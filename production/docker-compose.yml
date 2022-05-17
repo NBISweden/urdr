@@ -10,7 +10,7 @@ services:
       dockerfile: ../production/Dockerfile
       context: ../backend
       labels:
-        - org.opencontainers.image.source = "https://github.com/NBISweden/urdr"
+        - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
     volumes:
       - ../backend/:/app
     container_name: urdr
@@ -28,7 +28,7 @@ services:
       dockerfile: ../production/Dockerfile.nginx
       context: ../frontend
       labels:
-        - org.opencontainers.image.source = "https://github.com/NBISweden/urdr"
+        - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
       args:
         - SNOWPACK_PUBLIC_API_URL=${SNOWPACK_PUBLIC_API_URL}
         - SNOWPACK_PUBLIC_REDMINE_URL=${SNOWPACK_PUBLIC_REDMINE_URL}
