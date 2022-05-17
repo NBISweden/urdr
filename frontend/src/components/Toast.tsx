@@ -35,6 +35,7 @@ export const Toast = ({
                 ? "status"
                 : "alert"
             }
+            key={i}
           >
             <p className="toast-message">{toast.message}</p>
             <button
