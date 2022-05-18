@@ -484,6 +484,16 @@ Other button classes are defined further down together with other classes for th
   left: 20px;
 }
 
+@keyframes slidein {
+  from {
+    margin-left: -22rem;
+  }
+
+  to {
+    margin-left: 0;
+  }
+}
+
 .toast-box {
   width: 20rem;
   height: 5rem;
@@ -495,6 +505,8 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   justify-content: space-between;
   align-items: start;
+  animation-duration: 1s;
+  animation-name: slidein;
 }
 
 .toast-success {
