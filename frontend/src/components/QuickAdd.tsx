@@ -95,7 +95,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-2 quick-add-input ";
+    let classes = "col-2 mx-3 ";
     if (search != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
@@ -107,9 +107,20 @@ export const QuickAdd = ({
   };
 
   return (
-    <div className="row">
-      <h2> Add a new issue</h2>
-      <label htmlFor="input-issue">Type issue number e.g. 3499</label>
+    <div>
+      <h2 className="mx-1"> Add a new issue</h2>
+      <div className="row">
+      <label htmlFor="input-issue"
+      className="col-2 mx-1"
+      >Type issue e.g. 3499
+      </label>
+       <label 
+      htmlFor="select-activity"
+      className="col-3 mx-4" 
+      >Select activity
+      </label>
+      </div>
+      <div className="row">
       <input
         id="input-issue"
         className={getSearchClasses()}
@@ -129,7 +140,7 @@ export const QuickAdd = ({
         aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
-        className="col-3"
+        className="col-3 mx-3"
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
@@ -144,9 +155,11 @@ export const QuickAdd = ({
             );
           })}
       </select>
-      <button className=" basic-button plus-button" onClick={handleAdd}>
+      <button className="col-2 basic-button plus-button" onClick={handleAdd}>
         <img src={plus} alt="Add line" />
       </button>
+      </div>
+     
     </div>
   );
 };

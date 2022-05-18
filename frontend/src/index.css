@@ -399,12 +399,6 @@ Other button classes are defined further down together with other classes for th
   height: 2rem;
 }
 
-.quick-add-input {
-  padding: 0.5rem 0.75rem;
-  margin: 0 0 0 2rem;
-  outline: none;
-}
-
 .not-outline {
   outline: none;
 }
@@ -419,7 +413,7 @@ Other button classes are defined further down together with other classes for th
 
 .validation-icon {
   width: 3.5rem;
-  margin-left: -2.8rem;
+  margin-left: -3.8rem;
 }
 
 .hiden {
