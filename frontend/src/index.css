@@ -568,7 +568,7 @@ Other button classes are defined further down together with other classes for th
 
 .help-wrapper {
   background-color: hsl(0deg 0% 97%);
-  padding: 0 3rem 3rem 3rem;
+  padding: 0 3rem 3rem;
   position: relative;
   margin: 100px 0;
 }
