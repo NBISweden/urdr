@@ -47,3 +47,11 @@ export interface FetchedTimeEntry {
   created_on: string;
   updated_on: string;
 }
+
+type ToastType = "success" | "warning" | "info";
+
+export interface ToastMsg {
+  type: ToastType;
+  timeout: number;
+  message: string;
+}

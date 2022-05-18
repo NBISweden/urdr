@@ -103,13 +103,6 @@ Other button classes are defined further down together with other classes for th
   width: 100vw;
 }
 
-.header-warning {
-  text-align: center;
-  color: hsl(0deg 0% 15%);
-  background-color: #a7c947;
-  margin-top: 5.5em;
-}
-
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
 .react-datepicker__week .react-datepicker__day--selected {
@@ -485,30 +478,61 @@ Other button classes are defined further down together with other classes for th
   padding: 0.2rem;
 }
 
-.toast-box {
-  width: 20rem;
-  height: 5rem;
+.toast-wrapper {
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: hsl(76deg 55% 65%);
-  box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
+}
+
+@keyframes slidein {
+  from {
+    margin-left: -22rem;
+  }
+
+  to {
+    margin-left: 0;
+  }
+}
+
+.toast-box {
+  width: 20rem;
+  height: 5rem;
+  margin-top: 0.75rem;
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
   border-radius: 4px;
   padding: 0.2rem;
   padding-left: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: start;
+  animation-duration: 1s;
+  animation-name: slidein;
+}
+
+.toast-success {
+  background-color: hsl(76deg 55% 65%);
+  color: hsl(107deg 55% 15%);
+}
+
+.toast-warning {
+  background-color: hsl(26deg 91% 65%);
+  color: hsl(6deg 91% 15%);
+}
+
+.toast-info {
+  background-color: hsl(186deg 30% 73%);
+  color: hsl(185deg 92% 11%);
 }
 
 .toast-message {
   margin: auto;
-  color: hsl(107deg 55% 15%);
+  color: inherit;
 }
 
 .toast-button {
   background-color: transparent;
   border: none;
+  color: inherit;
 }
 
 .toast-button img {
