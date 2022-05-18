@@ -63,7 +63,7 @@ export const Report = () => {
 
     // Check if the URL contains a valid year and week number
     // If yes, use that for the date.
-    // If not, display a warning message.
+    // If not, display a warning message and revert to current year/week.
     const yearnum = Number(urlparams.year);
     const weeknum = Number(urlparams.week);
     if (!isNaN(yearnum) && !isNaN(weeknum) && weeknum >= 1 && weeknum <= 53) {
