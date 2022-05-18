@@ -541,3 +541,61 @@ Other button classes are defined further down together with other classes for th
   z-index: 101;
   overflow: hidden;
 }
+
+.help-wrapper {
+  background-color: hsl(0deg 0% 97%);
+  padding: 0 3rem 3rem 3rem;
+  position: relative;
+  margin: 100px 0;
+}
+
+.help-title {
+  font-size: 2rem;
+  margin-top: 1.5rem;
+  margin-left: 2rem;
+  color: hsl(186deg 92% 11%);
+}
+
+.help-subtitle {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  color: hsl(186deg 92% 11%);
+}
+
+.help-info {
+  font-size: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: hsl(76deg 55% 53%);
+  margin-bottom: 0.4rem;
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 80px;
+}
+
+.overview-img {
+  height: 30rem;
+  width: 65rem;
+  margin-right: 1rem;
+  margin-top: 2rem;
+}
+
+.weektravel-img {
+  height: 25rem;
+  width: 27rem;
+  margin-right: 1rem;
+  margin-top: 2rem;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+}
