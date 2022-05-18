@@ -561,7 +561,9 @@ export const Report = () => {
       >
         <header>
           <div className="report-header">
-            <h1 className="header-year">{weekTravelDay.getFullYear()}</h1>
+            <h1 className="header-year">
+              {getISOWeekYear(weekTravelDay).toString()}
+            </h1>
             <TimeTravel
               weekTravelDay={weekTravelDay}
               onWeekTravel={handleWeekTravel}
