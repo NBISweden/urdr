@@ -109,9 +109,8 @@ export const QuickAdd = ({
   return (
     <div className="row">
       <h2> Add a new issue</h2>
-      <label>Type issue number e.g. 3499</label>
+      <label htmlFor="input-issue">Type issue number e.g. 3499</label>
       <input
-        aria-labelledby="input-issue"
         id="input-issue"
         className={getSearchClasses()}
         type="number"
@@ -120,6 +119,7 @@ export const QuickAdd = ({
           setSearch(e.target.value);
           setIssue(null);
         }}
+        placeholder="e.g. 3499"
         title={(issue && issue.subject) || ""}
       />
       <img
@@ -129,7 +129,6 @@ export const QuickAdd = ({
         aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
-        aria-label="Activity"
         className="col-3"
         name="activity"
         id="select-activity"
