@@ -48,7 +48,7 @@ export const Help = () => {
   };
   return (
     <main>
-      <div className="help-header">
+      <div className="usr-header">
         <h1 className="help-title">How do I use the urdr service?</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
       </div>

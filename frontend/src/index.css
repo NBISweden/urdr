@@ -129,7 +129,7 @@ Other button classes are defined further down together with other classes for th
 }
 /* stylelint-enable selector-class-pattern */
 
-.report-header {
+.usr-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -565,20 +565,6 @@ Other button classes are defined further down together with other classes for th
 .help-info {
   font-size: 1.2rem;
   margin-top: 1.5rem;
-}
-
-.help-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: hsl(76deg 55% 53%);
-  margin-bottom: 0.4rem;
-  position: fixed;
-  z-index: 100;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 80px;
 }
 
 .overview-img {

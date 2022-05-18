@@ -567,7 +567,7 @@ export const Report = () => {
         }
       >
         <header>
-          <div className="report-header">
+          <div className="usr-header">
             <h1 className="header-year">{yearnum.toString()}</h1>
             <TimeTravel
               weekTravelDay={weekTravelDay}
