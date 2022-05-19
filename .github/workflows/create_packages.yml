@@ -30,7 +30,6 @@ jobs:
         run: |
              echo "${GH_TOKEN}" | docker login ghcr.io -u "${GH_ACTOR}" --password-stdin
              branch="${GH_HEAD_REF}"
-             echo $branch
 
              for image in urdr urdr-web; do
                docker pull "ghcr.io/nbisweden/$image:latest" || true
