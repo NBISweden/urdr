@@ -26,9 +26,10 @@ jobs:
           COMPOSE_DOCKER_CLI_BUILD: 1
           GH_ACTOR: ${{ github.actor }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_HEAD_REF: ${{ github.head_ref }}
         run: |
              echo "${GH_TOKEN}" | docker login ghcr.io -u "${GH_ACTOR}" --password-stdin
-             branch=${GITHUB_REF##*/}
+             branch="${GH_HEAD_REF}"
              echo $branch
 
              for image in urdr urdr-web; do
