@@ -368,14 +368,13 @@ Other button classes are defined further down together with other classes for th
   width: 1.8rem;
 }
 
-.star-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.star-icon {
+  width: 1.7rem;
 }
 
-.star {
-  width: 1.7rem;
+.hide-icon {
+  width: 2rem;
+  margin-top: 0.5rem;
 }
 
 .star-button {
@@ -385,7 +384,12 @@ Other button classes are defined further down together with other classes for th
 }
 
 .grip-container {
-  justify-content: end;
+  justify-content: space-evenly;
+  padding: 0;
+}
+
+.grip-container > * {
+  margin: 0 0 0 0.75rem;
   padding: 0;
 }
 
