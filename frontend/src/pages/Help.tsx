@@ -61,12 +61,11 @@ export const Help = () => {
           usual procedure for logging time with Redmine involves selecting an
           issue and an activity for reporting your time. In urdr, issues are
           strictly linked to valid activities, thus making it simpler to do time
-          reporting accurately. In order to improve the user experience, the
-          time reporting page offers a spreadsheet-like grid for time entry
-          reporting, together with an intuitive way of navigating over different
+          reporting accurately. The time reporting page offers a spreadsheet-like grid for time entry
+          reporting, together with the possibility to navigate over different
           weeks. The report view is primarily made up of a header containing a
-          week navigation handler and a user dropdown menu, the time entries
-          grid, and the bottom bar including the feature for adding new rows and
+          date picker and arrow buttons to navigate between weeks, as well as a user dropdown menu.
+          Below, you find the time entries grid, and the bottom bar including the feature for adding new rows and
           saving your changes.
         </p>
         <div className="centered">
