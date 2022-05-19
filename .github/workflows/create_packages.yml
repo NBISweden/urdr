@@ -1,12 +1,15 @@
 name: Create packages
 on:
-  push:
+  pull_request:
     branches:
-      - main
+      - dev/fix-act
+    types:
+      - closed
 
 
 jobs:
   main:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,6 +29,7 @@ jobs:
         run: |
              echo "${GH_TOKEN}" | docker login ghcr.io -u "${GH_ACTOR}" --password-stdin
              branch=${GITHUB_REF##*/}
+             echo $branch
 
              for image in urdr urdr-web; do
                docker pull "ghcr.io/nbisweden/$image:latest" || true
