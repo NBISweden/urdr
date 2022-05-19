@@ -1,0 +1,45 @@
+name: Create packages
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build and push images
+        working-directory: production
+        env:
+          DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          GH_ACTOR: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+             echo "${GH_TOKEN}" | docker login ghcr.io -u "${GH_ACTOR}" --password-stdin
+             branch=${GITHUB_REF##*/}
+
+             for image in urdr urdr-web; do
+               docker pull "ghcr.io/nbisweden/$image:latest" || true
+               docker pull "ghcr.io/nbisweden/$image:$branch" || true
+             done
+
+             cat > urdr.env <<END
+             SNOWPACK_PUBLIC_API_URL="https://urdr.nbis.se"
+             SNOWPACK_PUBLIC_REDMINE_URL="https://projects.nbis.se"
+             END
+
+             TAG="$branch" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1
+
+             for image in urdr urdr-web; do
+               docker push "ghcr.io/nbisweden/$image:$branch"
+               docker push "ghcr.io/nbisweden/$image:latest"
+             done
