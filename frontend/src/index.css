@@ -387,6 +387,7 @@ Other button classes are defined further down together with other classes for th
   padding: 0;
 }
 
+/*targeting all child elements of grip-container*/
 .grip-container > * {
   margin: 0 0 0 0.75rem;
   padding: 0;
