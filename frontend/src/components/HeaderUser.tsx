@@ -22,6 +22,12 @@ export const HeaderUser = ({ username }: { username: string }) => {
     return (
       <ul className="settings-box" aria-labelledby="dropdownMenuLink">
         <li className="settings-list-item">
+          <a className="dropdown-item settings-list-link" href="/report">
+            Report time
+          </a>
+          <a className="dropdown-item settings-list-link" href="/help">
+            Help
+          </a>
           <a className="dropdown-item settings-list-link" onClick={logout}>
             Logout
           </a>

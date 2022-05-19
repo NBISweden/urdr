@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
+import { Help } from "./pages/Help";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek } from "date-fns";
@@ -37,6 +38,14 @@ export const App = () => {
                     replace
                     to={`/report/${currentYear}/${currentWeek}`}
                   />
+                }
+              />
+              <Route
+                path="/help"
+                element={
+                  <ProtectedRoute>
+                    <Help />
+                  </ProtectedRoute>
                 }
               />
             </Routes>

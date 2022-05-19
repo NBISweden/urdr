@@ -108,7 +108,7 @@ export const QuickAdd = ({
 
   return (
     <div className="row">
-      <h2> Add a new issue</h2>
+      <h2> Add a new row</h2>
       <input
         aria-labelledby="input-issue"
         id="input-issue"
