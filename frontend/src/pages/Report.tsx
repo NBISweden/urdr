@@ -560,7 +560,7 @@ export const Report = () => {
         }
       >
         <header>
-          <div className="report-header">
+          <div className="usr-header">
             <h1 className="header-year">
               {getISOWeekYear(weekTravelDay).toString()}
             </h1>
