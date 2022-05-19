@@ -87,7 +87,7 @@ In order to run the node-urdr server in a Docker container, you don't need to in
 - Move to the `/frontend` directory
 - Run `npm ci`.
 
-### Installing and updating packages
+### Installing and updating packagesaaa
 
 In order to avoid dependency differences between local environments we create our `package-lock.json` file in a separate Docker container.
 
