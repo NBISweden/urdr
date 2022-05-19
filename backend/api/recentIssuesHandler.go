@@ -71,7 +71,7 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			},
 			Activity: Activity{
 				Id:   19,
-				Name: "Absence (Vacation/VAB/Other",
+				Name: "Absence (Vacation/VAB/Other)",
 			},
 		}
 		entries = append(entries, vacationEntry)
