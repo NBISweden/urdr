@@ -371,6 +371,7 @@ Other button classes are defined further down together with other classes for th
 .star-container {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .star {
