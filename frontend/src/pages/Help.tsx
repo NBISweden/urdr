@@ -100,10 +100,7 @@ export const Help = () => {
           onCellUpdate={() => {}}
         ></Row>
         <p className="help-info">
-          The next one is a recent row. If desired, these type of rows can be
-          hidden and/or after clicking on the eye button. It's worth noting that
-          recent rows change as you navigate across different weeks or as you
-          add new time entries.
+          The next one is a recent row. The issues shown here are the ones you have most recently logged time on, based on the week you are currently looking at. Thus, recent rows change as you navigate across different weeks or as you add new time entries. If desired, these type of rows can be hidden after clicking on the eye button. 
         </p>
         <Row
           topic={exampleIAP}
