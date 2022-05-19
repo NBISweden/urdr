@@ -122,6 +122,8 @@ If you only want to update dependencies, follow the same steps but skip adding a
 
 [Urdr API](http://localhost:8080/issues)
 
+Hej!
+
 ---
 
 [![GitHub Super-Linter](https://github.com/NBISweden/urdr/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
