@@ -559,7 +559,7 @@ export const Report = () => {
           ></ClimbingBoxLoader>
         }
       >
-        <header className="report-header">
+        <header className="usr-header">
           <h1 className="header-year">
             {getISOWeekYear(weekTravelDay).toString()}
           </h1>
