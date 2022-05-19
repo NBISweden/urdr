@@ -2,7 +2,7 @@ name: Create packages
 on:
   pull_request:
     branches:
-      - dev/fix-act
+      - main
     types:
       - closed
 
