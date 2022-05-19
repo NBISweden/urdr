@@ -61,12 +61,13 @@ export const Help = () => {
           usual procedure for logging time with Redmine involves selecting an
           issue and an activity for reporting your time. In urdr, issues are
           strictly linked to valid activities, thus making it simpler to do time
-          reporting accurately. The time reporting page offers a spreadsheet-like grid for time entry
-          reporting, together with the possibility to navigate over different
-          weeks. The report view is primarily made up of a header containing a
-          date picker and arrow buttons to navigate between weeks, as well as a user dropdown menu.
-          Below, you find the time entries grid, and the bottom bar including the feature for adding new rows and
-          saving your changes.
+          reporting accurately. The time reporting page offers a
+          spreadsheet-like grid for time entry reporting, together with the
+          possibility to navigate over different weeks. The report view is
+          primarily made up of a header containing a date picker and arrow
+          buttons to navigate between weeks, as well as a user dropdown menu.
+          Below, you find the time entries grid, and the bottom bar including
+          the feature for adding new rows and saving your changes.
         </p>
         <div className="centered">
           <img src={overview} alt="overview of urdr" className="overview-img" />
@@ -100,7 +101,11 @@ export const Help = () => {
           onCellUpdate={() => {}}
         ></Row>
         <p className="help-info">
-          The next one is a recent row. The issues shown here are the ones you have most recently logged time on, based on the week you are currently looking at. Thus, recent rows change as you navigate across different weeks or as you add new time entries. If desired, these type of rows can be hidden after clicking on the eye button. 
+          The next one is a recent row. The issues shown here are the ones you
+          have most recently logged time on, based on the week you are currently
+          looking at. Thus, recent rows change as you navigate across different
+          weeks or as you add new time entries. If desired, these type of rows
+          can be hidden after clicking on the eye button.
         </p>
         <Row
           topic={exampleIAP}
@@ -120,11 +125,16 @@ export const Help = () => {
           issue. After clicking on the plus button, a new row will be appended
           to the bottom of the list of recent rows.
         </p>
-        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <p className="help-info">
-          If you have accidentally hidden a row, you can always bring it back by
-          using this feature.
+          A cell in the sum row shows the sum of all time entries logged on
+          different rows on the corresponding day. It is worth noting that the
+          sum also contains entries that have been hidden from list of recent
+          rows. In case the number displayed in a sum field doesn't seem to fit
+          to the time entries displayed above, you have probably hidden a row
+          that contained a time entry for that day. You can easily make it
+          visible again by using the <b>"Add new row"</b> feature.
         </p>
+        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">Adding or updating time entries</h2>
         <p className="help-info">
           One may log time by simply clicking on the cell corresponding to the
@@ -168,7 +178,13 @@ export const Help = () => {
           arrow or using the week picker. The week picker is displayed after
           clicking on the button containing a calendar icon and the current week
           number. It's worth noting that users can also go back to previously
-          visited weeks by using the browsers back button.
+          visited weeks by using the browser's back button.
+        </p>
+        <p className="help-info">
+          The URL displayed in your browser will show which year and week you
+          are currently looking at. That makes it possible to note down a link
+          to a certain week in urdr, in case you know you want to revisit that
+          week at a later point.
         </p>
         <div className="centered">
           <img
