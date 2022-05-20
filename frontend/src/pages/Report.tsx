@@ -5,6 +5,8 @@ import {
   getISOWeek,
   getISOWeekYear,
   setISOWeek,
+  isPast,
+  addDays,
 } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
@@ -668,8 +670,7 @@ export const Report = () => {
                         />
                         {/* Only show warnings for weeks that have passed. 
                           It must be at least Saturday. */}
-                        {new Date().getTime() - currentWeekArray[4].getTime() >
-                        1000 * 3600 * 24 ? (
+                        {isPast(addDays(currentWeekArray[4], 1)) && (
                           <img
                             src={getTotalHours(dateStr) === 8 ? check : warning}
                             alt={
@@ -689,8 +690,6 @@ export const Report = () => {
                                 : "less or more than 8 hours logged"
                             }
                           />
-                        ) : (
-                          <></>
                         )}
                       </div>
                     </div>
@@ -707,8 +706,7 @@ export const Report = () => {
                   />
                   {/* Only show warnings for weeks that have passed. 
                     It must be at least Saturday. */}
-                  {new Date().getTime() - currentWeekArray[4].getTime() >
-                  1000 * 3600 * 24 ? (
+                  {isPast(addDays(currentWeekArray[4], 1)) && (
                     <img
                       src={getTotalHoursWeek() === 40 ? check : warning}
                       alt={
@@ -727,8 +725,6 @@ export const Report = () => {
                           : "less or more than 40 hours logged"
                       }
                     />
-                  ) : (
-                    <></>
                   )}
                 </div>
               </div>
