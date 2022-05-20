@@ -66,7 +66,13 @@ export const Report = () => {
     // If not, display a warning message and revert to current year/week.
     const yearnum = Number(urlparams.year);
     const weeknum = Number(urlparams.week);
-    if (!isNaN(yearnum) && !isNaN(weeknum) && weeknum >= 1 && weeknum <= 53) {
+    if (
+      !isNaN(yearnum) &&
+      yearnum > 0 &&
+      !isNaN(weeknum) &&
+      weeknum >= 1 &&
+      weeknum <= 53
+    ) {
       day = setISOWeek(new Date(yearnum, 7, 7), weeknum);
     } else {
       setToastList([
