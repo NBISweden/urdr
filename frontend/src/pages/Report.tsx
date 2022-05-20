@@ -672,13 +672,19 @@ export const Report = () => {
                             src={getTotalHours(dateStr) === 8 ? check : warning}
                             alt={
                               getTotalHours(dateStr) === 8
-                                ? "check: 8 hours logged"
-                                : "warning: less or more than 8 hours logged"
+                                ? "check: 8 hours logged on " + dateStr
+                                : "warning: less or more than 8 hours logged on " +
+                                  dateStr
                             }
                             className={
                               getTotalHours(dateStr) === 8
                                 ? "feedback-check"
                                 : "feedback-warning"
+                            }
+                            title={
+                              getTotalHours(dateStr) === 8
+                                ? "8 hours logged"
+                                : "less or more than 8 hours logged"
                             }
                           />
                         ) : (
@@ -710,6 +716,11 @@ export const Report = () => {
                         getTotalHoursWeek() === 40
                           ? "feedback-check"
                           : "feedback-warning"
+                      }
+                      title={
+                        getTotalHoursWeek() === 40
+                          ? "40 hours logged"
+                          : "less or more than 40 hours logged"
                       }
                     />
                   ) : (
