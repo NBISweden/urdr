@@ -29,6 +29,8 @@ import { AuthContext } from "../components/AuthProvider";
 import { useParams } from "react-router-dom";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import LoadingOverlay from "react-loading-overlay-ts";
+import warning from "../icons/exclamation-triangle.svg";
+import check from "../icons/check.svg";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -655,14 +657,34 @@ export const Report = () => {
                   const dateStr = formatDate(date, dateFormat);
                   return (
                     <div key={dateStr} className="col-1 cell-container">
-                      <input
-                        aria-labelledby={`total of hours spent during the day ${dateStr}`}
-                        type="text"
-                        id={dateStr}
-                        className="cell not-outline"
-                        value={getTotalHours(dateStr)}
-                        readOnly
-                      />
+                      <div className="comment-container">
+                        <input
+                          aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                          type="text"
+                          id={dateStr}
+                          className="cell not-outline"
+                          value={getTotalHours(dateStr)}
+                          readOnly
+                        />
+                        {new Date().getTime() - currentWeekArray[4].getTime() >
+                        1000 * 3600 * 24 ? (
+                          <img
+                            src={getTotalHours(dateStr) === 8 ? check : warning}
+                            alt={
+                              getTotalHours(dateStr) === 8
+                                ? "check: 8 hours logged"
+                                : "warning: less or more than 8 hours logged"
+                            }
+                            className={
+                              getTotalHours(dateStr) === 8
+                                ? "feedback-check"
+                                : "feedback-warning"
+                            }
+                          />
+                        ) : (
+                          <></>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
