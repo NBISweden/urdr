@@ -659,39 +659,14 @@ export const Report = () => {
                   const dateStr = formatDate(date, dateFormat);
                   return (
                     <div key={dateStr} className="col-1 cell-container">
-                      <div className="comment-container">
-                        <input
-                          aria-labelledby={`total of hours spent during the day ${dateStr}`}
-                          type="text"
-                          id={dateStr}
-                          className="cell not-outline"
-                          value={getTotalHours(dateStr)}
-                          readOnly
-                        />
-                        {/* Only show warnings for weeks that have passed. 
-                          It must be at least Saturday. */}
-                        {isPast(addDays(currentWeekArray[4], 1)) && (
-                          <img
-                            src={getTotalHours(dateStr) === 8 ? check : warning}
-                            alt={
-                              getTotalHours(dateStr) === 8
-                                ? "check: 8 hours logged on " + dateStr
-                                : "warning: less or more than 8 hours logged on " +
-                                  dateStr
-                            }
-                            className={
-                              getTotalHours(dateStr) === 8
-                                ? "feedback-check"
-                                : "feedback-warning"
-                            }
-                            title={
-                              getTotalHours(dateStr) === 8
-                                ? "8 hours logged"
-                                : "less or more than 8 hours logged"
-                            }
-                          />
-                        )}
-                      </div>
+                      <input
+                        aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                        type="text"
+                        id={dateStr}
+                        className="cell not-outline"
+                        value={getTotalHours(dateStr)}
+                        readOnly
+                      />
                     </div>
                   );
                 })}
