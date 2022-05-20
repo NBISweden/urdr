@@ -143,9 +143,8 @@ Other button classes are defined further down together with other classes for th
 .footer {
   z-index: 100;
   width: 100%;
-  top: calc(100vh - 120px);
+  bottom:0;
   position: fixed;
-  height: 120px;
   background-color: white;
 }
 
@@ -343,7 +342,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .save-button {
-  margin: 2rem;
+  margin: 1rem 2rem 2rem; 
   min-width: 10rem;
   padding: 1rem 1.5rem;
 }
@@ -421,8 +420,9 @@ Other button classes are defined further down together with other classes for th
 /* The unsaved changes alert message box */
 .unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
-  margin: 3rem 1rem 2rem;
+  /* margin: 3rem 1rem 2rem; */
   text-align: right;
+  min-height: 2rem;
 }
 
 .comment-container {
@@ -607,4 +607,10 @@ Other button classes are defined further down together with other classes for th
 .centered {
   display: flex;
   justify-content: center;
+}
+
+@media (max-width: 992px) {
+  .hidden{
+    visibility: hidden;
+  }
 }

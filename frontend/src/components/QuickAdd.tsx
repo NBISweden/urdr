@@ -95,7 +95,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-2 mx-3 ";
+    let classes = "col-3 mx-3 ";
     if (search != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
@@ -111,12 +111,12 @@ export const QuickAdd = ({
       <h2 className="mx-1"> Add a new row</h2>
       <div className="row">
       <label htmlFor="input-issue"
-      className="col-2 mx-1"
-      >Type issue e.g. 3499
+      className="col-3 mx-1 hidden">
+        Issue e.g. 3499
       </label>
        <label 
       htmlFor="select-activity"
-      className="col-3 mx-4" 
+      className="col-3 mx-4 hidden" 
       >Select activity
       </label>
       </div>
@@ -155,7 +155,7 @@ export const QuickAdd = ({
             );
           })}
       </select>
-      <button className="col-2 basic-button plus-button" onClick={handleAdd}>
+      <button className="col-3 basic-button plus-button" onClick={handleAdd}>
         <img src={plus} alt="Add line" />
       </button>
       </div>
