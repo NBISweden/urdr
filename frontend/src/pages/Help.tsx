@@ -6,8 +6,8 @@ import { Row } from "../components/Row";
 import { Cell } from "../components/Cell";
 import { IssueActivityPair, FetchedTimeEntry } from "../model";
 import { QuickAdd } from "../components/QuickAdd";
-import weektravel from "../icons/weektravel.png";
-import overview from "../icons/overview.png";
+import weektravel from "../images/weektravel.png";
+import overview from "../images/overview.png";
 
 export const Help = () => {
   const context = React.useContext(AuthContext);
