@@ -666,6 +666,8 @@ export const Report = () => {
                           value={getTotalHours(dateStr)}
                           readOnly
                         />
+                        {/* Only show warnings for weeks that have passed. 
+                          It must be at least Saturday. */}
                         {new Date().getTime() - currentWeekArray[4].getTime() >
                         1000 * 3600 * 24 ? (
                           <img
@@ -703,6 +705,8 @@ export const Report = () => {
                     value={getTotalHoursWeek()}
                     readOnly
                   />
+                  {/* Only show warnings for weeks that have passed. 
+                    It must be at least Saturday. */}
                   {new Date().getTime() - currentWeekArray[4].getTime() >
                   1000 * 3600 * 24 ? (
                     <img
