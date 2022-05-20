@@ -105,7 +105,7 @@ export const Help = () => {
           have most recently logged time on, based on the week you are currently
           looking at. Thus, recent rows change as you navigate across different
           weeks or as you add new time entries. If desired, these type of rows
-          can be hidden after clicking on the eye button.
+          can be hidden after clicking on the red cross button to the far left.
         </p>
         <Row
           topic={exampleIAP}
