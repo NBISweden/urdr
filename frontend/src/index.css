@@ -575,7 +575,6 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(0deg 0% 97%);
   padding: 0 3rem 3rem;
   position: relative;
-  margin: 100px 0;
 }
 
 .help-title {
@@ -587,7 +586,7 @@ Other button classes are defined further down together with other classes for th
 
 .help-subtitle {
   font-size: 1.5rem;
-  margin-top: 1.5rem;
+  padding-top: 1.5rem;
   color: hsl(186deg 92% 11%);
 }
 

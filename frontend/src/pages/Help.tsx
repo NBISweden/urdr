@@ -47,12 +47,12 @@ export const Help = () => {
     updated_on: "2020-01-01",
   };
   return (
-    <main>
-      <div className="usr-header">
+    <>
+      <header className="usr-header">
         <h1 className="help-title">How do I use the urdr service?</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
-      </div>
-      <div className="help-wrapper">
+      </header>
+      <main className="help-wrapper">
         <h2 className="help-subtitle">Introduction</h2>
         <p className="help-info">
           The purpose of this website is to ease the process of logging time on
@@ -193,7 +193,7 @@ export const Help = () => {
             className="weektravel-img"
           />
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 };
