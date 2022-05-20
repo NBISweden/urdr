@@ -7,7 +7,6 @@ import { Cell } from "../components/Cell";
 import { IssueActivityPair, FetchedTimeEntry } from "../model";
 import { QuickAdd } from "../components/QuickAdd";
 import weektravel from "../images/weektravel.png";
-import overview from "../images/overview.png";
 
 export const Help = () => {
   const context = React.useContext(AuthContext);
@@ -69,9 +68,6 @@ export const Help = () => {
           Below, you find the time entries grid, and the bottom bar including
           the feature for adding new rows and saving your changes.
         </p>
-        <div className="centered">
-          <img src={overview} alt="overview of urdr" className="overview-img" />
-        </div>
         <h2 className="help-subtitle">What is a row?</h2>
         <p className="help-info">
           Within the context of the urdr system, we refer to a row as to the
