@@ -631,7 +631,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 @media (max-width: 992px) {
-  .hidden{
-   visibility: hidden;
+  .hidden {
+    visibility: hidden;
   }
 }
