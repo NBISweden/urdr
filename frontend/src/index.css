@@ -206,30 +206,30 @@ Other button classes are defined further down together with other classes for th
   align-items: center;
   padding: 0.3rem 0.8rem;
   border: none;
-  border-radius: 6px;
-  color: hsl(0deg 0% 15%);
+  border-radius: 4px;
+  color: hsl(185deg 92% 11%);
   background-color: hsl(76deg 55% 77%);
 }
 
 .nav-bar {
   padding: 0.3rem 0.8rem;
   border: none;
-  color: hsl(0deg 0% 15%);
+  color: hsl(185deg 92% 11%);
   background-color: transparent;
 }
 
 .nav-item {
   padding: 0.3rem 0.8rem;
   border: none;
-  border-radius: 6px;
-  color: hsl(0deg 0% 15%);
+  border-radius: 4px;
+  color: hsl(185deg 92% 11%);
   background-color: transparent;
   text-decoration: none;
 }
 
 .nav-item:hover {
   background-color: hsl(76deg 55% 77%);
-  color: hsl(0deg 0% 15%);
+  color: hsl(185deg 92% 11%);
 }
 
 /* LOGIN */
@@ -608,11 +608,6 @@ Other button classes are defined further down together with other classes for th
 .help-info {
   font-size: 1.2rem;
   margin-top: 1rem;
-}
-
-.overview-img {
-  height: 30rem;
-  margin-top: 2rem;
 }
 
 .weektravel-img {
