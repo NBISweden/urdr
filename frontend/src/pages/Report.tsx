@@ -689,13 +689,33 @@ export const Report = () => {
                   );
                 })}
               <div className="col-1 cell-container">
-                <input
-                  aria-label="total of hours spent during the week"
-                  type="text"
-                  className="cell not-outline"
-                  value={getTotalHoursWeek()}
-                  readOnly
-                />
+                <div className="comment-container">
+                  <input
+                    aria-label="total of hours spent during the week"
+                    type="text"
+                    className="cell not-outline"
+                    value={getTotalHoursWeek()}
+                    readOnly
+                  />
+                  {new Date().getTime() - currentWeekArray[4].getTime() >
+                  1000 * 3600 * 24 ? (
+                    <img
+                      src={getTotalHoursWeek() === 40 ? check : warning}
+                      alt={
+                        getTotalHoursWeek() === 40
+                          ? "check: 40 hours logged this week"
+                          : "warning: less or more than 40 hours logged this week"
+                      }
+                      className={
+                        getTotalHoursWeek() === 40
+                          ? "feedback-check"
+                          : "feedback-warning"
+                      }
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </div>
               </div>
             </div>
           </section>
