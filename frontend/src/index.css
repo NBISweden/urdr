@@ -621,3 +621,17 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   justify-content: center;
 }
+
+.feedback-check {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.5rem;
+}
+
+.feedback-warning {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 0.7rem;
+}
