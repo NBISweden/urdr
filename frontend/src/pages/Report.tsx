@@ -559,130 +559,125 @@ export const Report = () => {
           ></ClimbingBoxLoader>
         }
       >
-        <header>
-          <div className="usr-header">
-            <h1 className="header-year">
-              {getISOWeekYear(weekTravelDay).toString()}
-            </h1>
-            <TimeTravel
-              weekTravelDay={weekTravelDay}
-              onWeekTravel={handleWeekTravel}
-              currentWeekArray={currentWeekArray}
-            />
-            <HeaderUser username={context.user ? context.user.login : ""} />
-          </div>
+        <header className="usr-header">
+          <h1 className="header-year">
+            {getISOWeekYear(weekTravelDay).toString()}
+          </h1>
+          <TimeTravel
+            weekTravelDay={weekTravelDay}
+            onWeekTravel={handleWeekTravel}
+            currentWeekArray={currentWeekArray}
+          />
+          <HeaderUser username={context.user ? context.user.login : ""} />
         </header>
-
-        <div className="main">
-          <main>
-            {favorites && favorites.length > 0 && (
-              <DragDropContext onDragEnd={onDragEnd}>
-                <section className="favorites-container">
-                  <HeaderRow days={currentWeekArray} />
-                  <Droppable droppableId="favorites">
-                    {(provided) => (
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {favorites &&
-                          favorites.map((fav, index) => {
-                            const rowEntries = findRowEntries(
-                              fav,
-                              currentWeekArray
-                            );
-                            return (
-                              <Draggable
-                                draggableId={`${fav.issue.id}${fav.activity.id}`}
-                                index={index}
-                                key={`${fav.issue.id}${fav.activity.id}-drag`}
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    <Row
-                                      key={`${fav.issue.id}${fav.activity.id}`}
-                                      topic={fav}
-                                      onCellUpdate={handleCellUpdate}
-                                      onToggleFav={handleToggleFav}
-                                      days={currentWeekArray}
-                                      rowHours={findRowHours(fav)}
-                                      rowEntries={rowEntries}
-                                      getRowSum={getRowSum}
-                                      isFav={true}
-                                    />
-                                  </div>
-                                )}
-                              </Draggable>
-                            );
-                          })}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </section>
-              </DragDropContext>
+        <main className="spreadsheet">
+          {favorites && favorites.length > 0 && (
+            <DragDropContext onDragEnd={onDragEnd}>
+              <section className="favorites-container">
+                <HeaderRow days={currentWeekArray} />
+                <Droppable droppableId="favorites">
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {favorites &&
+                        favorites.map((fav, index) => {
+                          const rowEntries = findRowEntries(
+                            fav,
+                            currentWeekArray
+                          );
+                          return (
+                            <Draggable
+                              draggableId={`${fav.issue.id}${fav.activity.id}`}
+                              index={index}
+                              key={`${fav.issue.id}${fav.activity.id}-drag`}
+                            >
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <Row
+                                    key={`${fav.issue.id}${fav.activity.id}`}
+                                    topic={fav}
+                                    onCellUpdate={handleCellUpdate}
+                                    onToggleFav={handleToggleFav}
+                                    days={currentWeekArray}
+                                    rowHours={findRowHours(fav)}
+                                    rowEntries={rowEntries}
+                                    getRowSum={getRowSum}
+                                    isFav={true}
+                                  />
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </section>
+            </DragDropContext>
+          )}
+          <section className="recent-container">
+            {favorites.length == 0 && (
+              <HeaderRow days={currentWeekArray}></HeaderRow>
             )}
-            <section className="recent-container">
-              {favorites.length == 0 && (
-                <HeaderRow days={currentWeekArray}></HeaderRow>
-              )}
-              {filteredRecents &&
-                filteredRecents.map((recentIssue) => {
-                  const rowEntries = findRowEntries(
-                    recentIssue,
-                    currentWeekArray
-                  );
+            {filteredRecents &&
+              filteredRecents.map((recentIssue) => {
+                const rowEntries = findRowEntries(
+                  recentIssue,
+                  currentWeekArray
+                );
+                return (
+                  <Row
+                    key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                    topic={recentIssue}
+                    onCellUpdate={handleCellUpdate}
+                    onToggleFav={handleToggleFav}
+                    onHide={handleHide}
+                    days={currentWeekArray}
+                    rowHours={findRowHours(recentIssue)}
+                    rowEntries={rowEntries}
+                    getRowSum={getRowSum}
+                    isFav={false}
+                  />
+                );
+              })}
+          </section>
+          <section className="recent-container ">
+            <div className="row">
+              <div className="col-6">
+                <h2>Total</h2>
+              </div>
+              {currentWeekArray &&
+                currentWeekArray.map((date) => {
+                  const dateStr = formatDate(date, dateFormat);
                   return (
-                    <Row
-                      key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                      topic={recentIssue}
-                      onCellUpdate={handleCellUpdate}
-                      onToggleFav={handleToggleFav}
-                      onHide={handleHide}
-                      days={currentWeekArray}
-                      rowHours={findRowHours(recentIssue)}
-                      rowEntries={rowEntries}
-                      getRowSum={getRowSum}
-                      isFav={false}
-                    />
+                    <div key={dateStr} className="col-1 cell-container">
+                      <input
+                        aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                        type="text"
+                        id={dateStr}
+                        className="cell not-outline"
+                        value={getTotalHours(dateStr)}
+                        readOnly
+                      />
+                    </div>
                   );
                 })}
-            </section>
-            <section className="recent-container ">
-              <div className="row">
-                <div className="col-6">
-                  <h2>Total</h2>
-                </div>
-                {currentWeekArray &&
-                  currentWeekArray.map((date) => {
-                    const dateStr = formatDate(date, dateFormat);
-                    return (
-                      <div key={dateStr} className="col-1 cell-container">
-                        <input
-                          aria-labelledby={`total of hours spent during the day ${dateStr}`}
-                          type="text"
-                          id={dateStr}
-                          className="cell not-outline"
-                          value={getTotalHours(dateStr)}
-                          readOnly
-                        />
-                      </div>
-                    );
-                  })}
-                <div className="col-1 cell-container">
-                  <input
-                    aria-label="total of hours spent during the week"
-                    type="text"
-                    className="cell not-outline"
-                    value={getTotalHoursWeek()}
-                    readOnly
-                  />
-                </div>
+              <div className="col-1 cell-container">
+                <input
+                  aria-label="total of hours spent during the week"
+                  type="text"
+                  className="cell not-outline"
+                  value={getTotalHoursWeek()}
+                  readOnly
+                />
               </div>
-            </section>
-          </main>
-        </div>
+            </div>
+          </section>
+        </main>
         <div className="footer">
           <section className="footer-container">
             <div className="col-7">

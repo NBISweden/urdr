@@ -127,8 +127,8 @@ Other button classes are defined further down together with other classes for th
   justify-content: space-between;
   align-items: center;
   background-color: hsl(76deg 55% 53%);
-  margin-bottom: 0.4rem;
-  position: fixed;
+  margin-bottom: 0.2rem;
+  position: sticky;
   z-index: 100;
   left: 0;
   top: 0;
@@ -136,9 +136,8 @@ Other button classes are defined further down together with other classes for th
   height: 80px;
 }
 
-.main {
-  position: relative;
-  margin: 50px 0;
+.spreadsheet {
+  min-height: 100vh;
 }
 
 .footer {
@@ -368,13 +367,13 @@ Other button classes are defined further down together with other classes for th
   width: 1.8rem;
 }
 
-.star-container {
-  display: flex;
-  align-items: center;
+.star-icon {
+  width: 1.7rem;
 }
 
-.star {
-  width: 1.7rem;
+.hide-icon {
+  width: 2rem;
+  margin-top: 0.5rem;
 }
 
 .star-button {
@@ -384,7 +383,13 @@ Other button classes are defined further down together with other classes for th
 }
 
 .grip-container {
-  justify-content: end;
+  justify-content: space-evenly;
+  padding: 0;
+}
+
+/* targeting all child elements of grip-container */
+.grip-container > * {
+  margin: 0 0 0 0.75rem;
   padding: 0;
 }
 
