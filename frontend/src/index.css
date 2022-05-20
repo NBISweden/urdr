@@ -195,33 +195,41 @@ Other button classes are defined further down together with other classes for th
   height: 2rem;
 }
 
-.settings-wrapper {
-  position: relative;
+.nav-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 2rem;
 }
 
-.settings-box {
-  position: absolute;
-  right: 1rem;
-  top: 3.3rem;
-  background-color: hsl(186deg 30% 94%);
-  padding: 0.8rem;
-  border-radius: 5px;
-  box-shadow: 0 5px 15px 0 hsla(0deg 0% 0% 15%);
-}
-
-.settings-list-item {
-  list-style-type: none;
-  cursor: pointer;
-}
-
-.settings-list-link {
-  padding: 0.3rem 2.5rem 0.3rem 0.8rem;
+.nav-user {
+  align-items: center;
+  padding: 0.3rem 0.8rem 0.3rem 0.8rem;
   border: none;
-  border-radius: 3px;
+  border-radius: 6px;
+  color: hsl(0deg 0% 15%);
+  background-color: hsl(76deg 55% 77%);
 }
 
-.settings-list-link:hover {
-  background-color: hsl(186deg 30% 86%);
+.nav-bar {
+  padding: 0.3rem 0.8rem 0.3rem 0.8rem;
+  border: none;
+  color: hsl(0deg 0% 15%);
+  background-color: transparent;
+}
+
+.nav-item {
+  padding: 0.3rem 0.8rem 0.3rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  color: hsl(0deg 0% 15%);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background-color: hsl(76deg 55% 77%);
+  color: hsl(0deg 0% 15%);
 }
 
 /* LOGIN */
