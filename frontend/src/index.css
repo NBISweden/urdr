@@ -420,7 +420,7 @@ Other button classes are defined further down together with other classes for th
 /* The unsaved changes alert message box */
 .unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
-  /* margin: 3rem 1rem 2rem; */
+  margin-right: 2rem;
   text-align: right;
   min-height: 2rem;
 }
