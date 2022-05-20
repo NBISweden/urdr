@@ -5,6 +5,8 @@ import {
   getISOWeek,
   getISOWeekYear,
   setISOWeek,
+  isPast,
+  addDays,
 } from "date-fns";
 import { Row } from "../components/Row";
 import { HeaderRow } from "../components/HeaderRow";
@@ -29,6 +31,8 @@ import { AuthContext } from "../components/AuthProvider";
 import { useParams } from "react-router-dom";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import LoadingOverlay from "react-loading-overlay-ts";
+import warning from "../icons/exclamation-triangle.svg";
+import check from "../icons/check.svg";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -66,7 +70,13 @@ export const Report = () => {
     // If not, display a warning message and revert to current year/week.
     const yearnum = Number(urlparams.year);
     const weeknum = Number(urlparams.week);
-    if (!isNaN(yearnum) && !isNaN(weeknum) && weeknum >= 1 && weeknum <= 53) {
+    if (
+      !isNaN(yearnum) &&
+      yearnum > 0 &&
+      !isNaN(weeknum) &&
+      weeknum >= 1 &&
+      weeknum <= 53
+    ) {
       day = setISOWeek(new Date(yearnum, 7, 7), weeknum);
     } else {
       setToastList([
@@ -667,13 +677,37 @@ export const Report = () => {
                   );
                 })}
               <div className="col-1 cell-container">
-                <input
-                  aria-label="total of hours spent during the week"
-                  type="text"
-                  className="cell not-outline"
-                  value={getTotalHoursWeek()}
-                  readOnly
-                />
+                <div className="comment-container">
+                  <input
+                    aria-label="total of hours spent during the week"
+                    type="text"
+                    className="cell not-outline"
+                    value={getTotalHoursWeek()}
+                    readOnly
+                  />
+                  {/* Only show warnings for weeks that have passed. 
+                    It must be at least Saturday. */}
+                  {isPast(addDays(currentWeekArray[4], 1)) && (
+                    <img
+                      src={getTotalHoursWeek() === 40 ? check : warning}
+                      alt={
+                        getTotalHoursWeek() === 40
+                          ? "check: 40 hours logged this week"
+                          : "warning: less or more than 40 hours logged this week"
+                      }
+                      className={
+                        getTotalHoursWeek() === 40
+                          ? "feedback-check"
+                          : "feedback-warning"
+                      }
+                      title={
+                        getTotalHoursWeek() === 40
+                          ? "40 hours logged"
+                          : "less or more than 40 hours logged"
+                      }
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </section>
