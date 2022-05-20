@@ -590,9 +590,16 @@ Other button classes are defined further down together with other classes for th
   color: hsl(186deg 92% 11%);
 }
 
+.help-h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding-top: 1.5rem;
+  color: hsl(186deg 92% 11%);
+}
+
 .help-info {
   font-size: 1.2rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
 }
 
 .overview-img {

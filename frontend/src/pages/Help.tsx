@@ -130,9 +130,10 @@ export const Help = () => {
           different rows on the corresponding day. It is worth noting that the
           sum also contains entries that have been hidden from list of recent
           rows. In case the number displayed in a sum field doesn't seem to fit
-          to the time entries displayed above, you have probably hidden a row
-          that contained a time entry for that day. You can easily make it
-          visible again by using the <b>"Add new row"</b> feature.
+          to the time entries displayed above, you might have hidden a row that
+          contained a time entry for that day (see "Known limitations"). You can
+          easily make it visible again by using the <b>"Add new row"</b>{" "}
+          feature.
         </p>
         <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">Adding or updating time entries</h2>
@@ -193,6 +194,32 @@ export const Help = () => {
             className="weektravel-img"
           />
         </div>
+        <h2 className="help-subtitle">Known limitations</h2>
+        <h3 className="help-h3">Double time entries</h3>
+        <p className="help-info">
+          In Redmine it's possible to create two time entries for the same
+          issue-activity pair per day. You might have done that in the past, and
+          for example had two different comments on the different time entries.
+          As urdr only has one cell per day and row (i.e. issue-activity pair),
+          you will only see one of these entries displayed in the interface. The
+          sum row and column however will contain both entries.{" "}
+          <b>
+            In this case, the number of hours displayed as sum will not match
+            what you actually see on the page.
+          </b>
+        </p>
+        <h3 className="help-h3">Hidden rows with time entries</h3>
+        <p className="help-info">
+          If you hide a row in urdr, it will be permanently hidden unless you
+          add it again manually. It stays hidden even when you time travel. If
+          you move to a week in which the hidden row has time entries, the row
+          will still not be displayed. The time entries however will be included
+          in the sum row in the bottom of the spreadsheet.{" "}
+          <b>
+            In this case, the number of hours displayed as sum will not match
+            what you actually see on the page.
+          </b>
+        </p>
       </main>
     </>
   );
