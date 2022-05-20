@@ -3,8 +3,9 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"sort"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // recentIssuesHandler godoc
@@ -59,6 +60,22 @@ func recentIssuesHandler(c *fiber.Ctx) error {
 			seenEntries[entry] = true
 			entries = append(entries, entry)
 		}
+	}
+
+	// Make sure that when there is not any time entry, we send the vacation entry by default
+	if len(entries) == 0 {
+		vacationEntry := Entry{
+			Issue: Issue{
+				Id:      3499,
+				Subject: "NBIS General",
+			},
+			Activity: Activity{
+				Id:   19,
+				Name: "Absence (Vacation/VAB/Other)",
+			},
+		}
+		entries = append(entries, vacationEntry)
+		return c.JSON(entries)
 	}
 
 	// Populate the issue subjects.
