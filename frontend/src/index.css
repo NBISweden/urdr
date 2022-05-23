@@ -650,6 +650,7 @@ Other button classes are defined further down together with other classes for th
     visibility: hidden;
   }
 }
+
 .row-focused {
   background-color: hsl(186deg 30% 94%);
 }
