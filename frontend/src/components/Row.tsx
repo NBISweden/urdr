@@ -117,11 +117,12 @@ export const Row = ({
             type="text"
             aria-label={`total of hours spent on the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
             id={`${topic.issue.id}${topic.activity.id}-total`}
-            className="cell not-outline"
+            className="cell"
             value={getRowSum(topic)}
             readOnly
             onFocus={onFocusRow}
             onBlur={onBlurRow}
+            tabIndex={-1}
           />
         </div>
       </div>
