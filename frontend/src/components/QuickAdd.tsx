@@ -95,7 +95,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-3 mx-3 ";
+    let classes = "col-3 footer-field";
     if (search != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
@@ -108,15 +108,15 @@ export const QuickAdd = ({
 
   return (
     <div>
-      <h2 className="mx-1 mb-2"> Add a new row</h2>
+      <h2> Add a new row</h2>
       <div className="row">
       <label htmlFor="input-issue"
-      className="col-3 mx-1 hidden">
+      className="col-3 input-label hidden">
         Issue e.g. 3499
       </label>
        <label 
       htmlFor="select-activity"
-      className="col-3 mx-4 hidden" 
+      className="col-3 select-label hidden" 
       >Select activity
       </label>
       </div>
@@ -140,7 +140,7 @@ export const QuickAdd = ({
         aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
-        className="col-3 mx-3"
+        className="col-3 footer-field"
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}

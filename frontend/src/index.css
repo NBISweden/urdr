@@ -138,6 +138,7 @@ Other button classes are defined further down together with other classes for th
 
 .spreadsheet {
   min-height: 100vh;
+  margin-bottom: 5rem;
 }
 
 .footer {
@@ -146,6 +147,20 @@ Other button classes are defined further down together with other classes for th
   bottom: 0;
   position: fixed;
   background-color: white;
+}
+
+.input-label {
+  margin-left: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.select-label {
+  margin-left: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer-field {
+  margin-left: 1rem;
 }
 
 .header-year {
