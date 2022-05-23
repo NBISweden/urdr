@@ -635,3 +635,7 @@ Other button classes are defined further down together with other classes for th
   right: 3px;
   width: 0.7rem;
 }
+
+.row-focused {
+  background-color: hsl(186deg 30% 94%);
+}
