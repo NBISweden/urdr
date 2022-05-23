@@ -411,10 +411,6 @@ Other button classes are defined further down together with other classes for th
   outline: none;
 }
 
-.not-outline {
-  outline: none;
-}
-
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }
