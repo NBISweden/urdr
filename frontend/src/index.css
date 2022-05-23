@@ -385,7 +385,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .star-button {
-  background-color: hsl(0deg 0% 97%);
+  background-color: transparent;
   border: none;
   display: flex;
 }
