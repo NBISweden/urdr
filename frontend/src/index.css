@@ -399,7 +399,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .star-button {
-  background-color: hsl(0deg 0% 97%);
+  background-color: transparent;
   border: none;
   display: flex;
 }
@@ -649,4 +649,7 @@ Other button classes are defined further down together with other classes for th
   .hidden {
     visibility: hidden;
   }
+}
+.row-focused {
+  background-color: hsl(186deg 30% 94%);
 }

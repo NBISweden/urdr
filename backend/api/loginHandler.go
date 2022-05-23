@@ -37,6 +37,8 @@ func loginHandler(c *fiber.Ctx) error {
 	if err := proxy.Do(c, redmineURL); err != nil {
 		return err
 	} else if c.Response().StatusCode() != fiber.StatusOK {
+		// This prevents the browser from displaying the auth popup
+		c.Response().Header.Del("Www-Authenticate")
 		return nil
 	}
 
