@@ -108,7 +108,7 @@ export const QuickAdd = ({
 
   return (
     <div>
-      <h2 className="mx-1"> Add a new row</h2>
+      <h2 className="mx-1 mb-2"> Add a new row</h2>
       <div className="row">
       <label htmlFor="input-issue"
       className="col-3 mx-1 hidden">
