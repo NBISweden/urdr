@@ -7,6 +7,7 @@ import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
 import x from "../icons/x.svg";
+import doubleUp from "../icons/chevron-double-up.svg";
 import { dateFormat } from "../utils";
 import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
 
@@ -17,7 +18,7 @@ export const Row = ({
   rowEntries,
   onCellUpdate,
   onToggleFav,
-  onHide,
+  onToggleHide,
   getRowSum,
   isFav,
   isHidden,
@@ -29,10 +30,9 @@ export const Row = ({
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   getRowSum: (pair: IssueActivityPair) => number;
-  onHide?: (topic: IssueActivityPair) => void;
-
-  isFav: boolean;
-  isHidden: boolean;
+  onToggleHide?: (topic: IssueActivityPair) => void;
+  isFav?: boolean;
+  isHidden?: boolean;
 }) => {
   // State var for setting the className of the row depending on focus
   const [rowClass, setRowClass] = React.useState("row");
@@ -52,12 +52,24 @@ export const Row = ({
           {isFav ? (
             <img src={grip} className="grip" alt="grip to change row sorting" />
           ) : isHidden ? (
-            <div className="hide-icon"></div>
+            <button
+              type="button"
+              className="star-button"
+              onClick={() => onToggleHide(topic)}
+            >
+              <img
+                src={doubleUp}
+                className="unhide-icon"
+                role="button"
+                alt={"Stop hiding"}
+                title={"Stop hiding"}
+              />
+            </button>
           ) : (
             <button
               type="button"
               className="star-button"
-              onClick={() => onHide(topic)}
+              onClick={() => onToggleHide(topic)}
             >
               <img
                 src={x}

@@ -384,6 +384,11 @@ Other button classes are defined further down together with other classes for th
   margin-top: 0.5rem;
 }
 
+.unhide-icon {
+  width: 1.5rem;
+  margin-top: 0.2rem;
+}
+
 .star-button {
   background-color: transparent;
   border: none;
