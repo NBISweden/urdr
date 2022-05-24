@@ -55,6 +55,7 @@ export const Report = () => {
     getFullWeek(new Date())
   );
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
@@ -678,31 +679,36 @@ export const Report = () => {
                   />
                 );
               })}
+            <button onClick={() => setShowHidden(!showHidden)}>
+              {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
+            </button>
           </section>
-          <section className="recent-container">
-            {hidden &&
-              hidden.map((hiddenIssue) => {
-                const rowEntries = findRowEntries(
-                  hiddenIssue,
-                  currentWeekArray
-                );
-                return (
-                  <Row
-                    key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
-                    topic={hiddenIssue}
-                    onCellUpdate={handleCellUpdate}
-                    onToggleFav={handleToggleFav}
-                    onHide={handleHide}
-                    days={currentWeekArray}
-                    rowHours={findRowHours(hiddenIssue)}
-                    rowEntries={rowEntries}
-                    getRowSum={getRowSum}
-                    isFav={false}
-                    isHidden={true}
-                  />
-                );
-              })}
-          </section>
+          {showHidden && (
+            <section className="recent-container">
+              {hidden &&
+                hidden.map((hiddenIssue) => {
+                  const rowEntries = findRowEntries(
+                    hiddenIssue,
+                    currentWeekArray
+                  );
+                  return (
+                    <Row
+                      key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
+                      topic={hiddenIssue}
+                      onCellUpdate={handleCellUpdate}
+                      onToggleFav={handleToggleFav}
+                      onHide={handleHide}
+                      days={currentWeekArray}
+                      rowHours={findRowHours(hiddenIssue)}
+                      rowEntries={rowEntries}
+                      getRowSum={getRowSum}
+                      isFav={false}
+                      isHidden={true}
+                    />
+                  );
+                })}
+            </section>
+          )}
           <section className="recent-container ">
             <div className="row">
               <div className="col-6">
