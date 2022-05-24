@@ -669,9 +669,10 @@ export const Report = () => {
                         aria-labelledby={`total of hours spent during the day ${dateStr}`}
                         type="text"
                         id={dateStr}
-                        className="cell not-outline"
+                        className="cell"
                         value={getTotalHours(dateStr)}
                         readOnly
+                        tabIndex={-1}
                       />
                     </div>
                   );
@@ -681,9 +682,10 @@ export const Report = () => {
                   <input
                     aria-label="total of hours spent during the week"
                     type="text"
-                    className="cell not-outline"
+                    className="cell"
                     value={getTotalHoursWeek()}
                     readOnly
+                    tabIndex={-1}
                   />
                   {/* Only show warnings for weeks that have passed. 
                     It must be at least Saturday. */}

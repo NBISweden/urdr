@@ -419,8 +419,9 @@ Other button classes are defined further down together with other classes for th
   height: 2rem;
 }
 
-.not-outline {
-  outline: none;
+.quick-add-input {
+  padding: 0.5rem 0.75rem;
+  margin: 0 0 0 3.75rem;
 }
 
 .invalid {
