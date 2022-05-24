@@ -73,6 +73,11 @@ export const Cell = ({
       spent_on: formatDate(date, dateFormat),
     });
   };
+  // Make sure that the the comment area is not visible and the row is no longer highlighted
+  const onBlurArea = () => {
+    setShowCommentArea(false);
+    onBlurRow();
+  };
   return (
     <div className="col-1 cell-container">
       <label
@@ -121,7 +126,7 @@ export const Cell = ({
               maxLength={1000}
               onKeyUp={onEscapeArea}
               onFocus={onFocusRow}
-              onBlur={() => setShowCommentArea(false)}
+              onBlur={onBlurArea}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button
