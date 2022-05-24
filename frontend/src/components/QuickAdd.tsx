@@ -95,7 +95,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-3 footer-field";
+    let classes = "col-3 footer-field ";
     if (search != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
