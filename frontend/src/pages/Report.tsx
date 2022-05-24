@@ -117,19 +117,12 @@ export const Report = () => {
     return null;
   };
 
-  // Retrieve time entries and recent entries
-  const getAllEntries = async (
-    favs: IssueActivityPair[],
-    recents: IssueActivityPair[]
-  ) => {
+  // Retrieve time entries for given rows
+  const getAllEntries = async (rows: IssueActivityPair[]) => {
     let allEntries = [];
-    for await (let fav of favs) {
-      const favEntries = await getTimeEntries(fav, currentWeekArray);
-      allEntries.push(...favEntries);
-    }
-    for await (let recent of recents) {
-      const recentEntries = await getTimeEntries(recent, currentWeekArray);
-      if (recentEntries) allEntries.push(...recentEntries);
+    for await (let row of rows) {
+      const entries = await getTimeEntries(row, currentWeekArray);
+      allEntries.push(...entries);
     }
     setTimeEntries(allEntries);
   };
@@ -178,13 +171,13 @@ export const Report = () => {
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
           const hidden = priorityIssues.filter((issue) => issue.is_hidden);
-          getAllEntries(favorites, nonPrioIssues);
+          getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
           setHidden(hidden);
         }
       } else if (!didCancel) {
-        getAllEntries([], issues);
+        getAllEntries(issues);
         setFilteredRecents(issues);
       }
     };
@@ -410,7 +403,7 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    await getAllEntries(favorites, filteredRecents);
+    await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
