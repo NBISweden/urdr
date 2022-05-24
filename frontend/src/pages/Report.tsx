@@ -33,6 +33,8 @@ import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import LoadingOverlay from "react-loading-overlay-ts";
 import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
+import up from "../icons/caret-up-fill.svg";
+import down from "../icons/caret-down-fill.svg";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -679,8 +681,12 @@ export const Report = () => {
                   />
                 );
               })}
-            <button onClick={() => setShowHidden(!showHidden)}>
+            <button
+              onClick={() => setShowHidden(!showHidden)}
+              className="basic-button hide-button"
+            >
               {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
+              <img src={showHidden ? up : down} alt="" />
             </button>
           </section>
           {showHidden && (
