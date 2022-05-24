@@ -273,10 +273,30 @@ export const Report = () => {
 
   // Toggle favorite status for an issue-activity pair
   const handleToggleFav = async (topic: IssueActivityPair) => {
+    // Check if topic is hidden. If yes, make it a favorite.
+    const existingHidden = hidden.find(
+      (hidden) =>
+        hidden.activity.id === topic.activity.id &&
+        hidden.issue.id === topic.issue.id
+    );
+    if (!!existingHidden) {
+      const shortenedHidden = removeIssueActivityPair([...hidden], topic);
+      topic.is_hidden = false;
+      const saved = await saveFavorites([...favorites, ...hidden, topic]);
+      if (!saved) {
+        console.log("Something went wrong with adding a favorite!");
+        return;
+      }
+      setFavorites([...favorites, topic]);
+      setHidden(shortenedHidden);
+      return;
+    }
+    // Topic was not hidden. Check if it is a favorite.
     const existingFav = favorites.find(
       (fav) =>
         fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
     );
+    // If it is not a favorite, make it one and remove it from recents.
     if (!existingFav) {
       topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
       const saved = await saveFavorites([...favorites, topic, ...hidden]);
@@ -290,7 +310,9 @@ export const Report = () => {
         topic
       );
       setFilteredRecents(shortenedRecents);
-    } else {
+    }
+    // Topic was a favorite. Remove it from favorites and make it a recent.
+    else {
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
       const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
@@ -616,6 +638,7 @@ export const Report = () => {
                                     rowEntries={rowEntries}
                                     getRowSum={getRowSum}
                                     isFav={true}
+                                    isHidden={false}
                                   />
                                 </div>
                               )}
@@ -651,6 +674,31 @@ export const Report = () => {
                     rowEntries={rowEntries}
                     getRowSum={getRowSum}
                     isFav={false}
+                    isHidden={false}
+                  />
+                );
+              })}
+          </section>
+          <section className="recent-container">
+            {hidden &&
+              hidden.map((hiddenIssue) => {
+                const rowEntries = findRowEntries(
+                  hiddenIssue,
+                  currentWeekArray
+                );
+                return (
+                  <Row
+                    key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
+                    topic={hiddenIssue}
+                    onCellUpdate={handleCellUpdate}
+                    onToggleFav={handleToggleFav}
+                    onHide={handleHide}
+                    days={currentWeekArray}
+                    rowHours={findRowHours(hiddenIssue)}
+                    rowEntries={rowEntries}
+                    getRowSum={getRowSum}
+                    isFav={false}
+                    isHidden={true}
                   />
                 );
               })}

@@ -20,6 +20,7 @@ export const Row = ({
   onHide,
   getRowSum,
   isFav,
+  isHidden,
 }: {
   topic: IssueActivityPair;
   days: Date[];
@@ -31,6 +32,7 @@ export const Row = ({
   onHide?: (topic: IssueActivityPair) => void;
 
   isFav: boolean;
+  isHidden: boolean;
 }) => {
   // State var for setting the className of the row depending on focus
   const [rowClass, setRowClass] = React.useState("row");
@@ -49,6 +51,8 @@ export const Row = ({
         <div className="col-1 cell-container grip-container">
           {isFav ? (
             <img src={grip} className="grip" alt="grip to change row sorting" />
+          ) : isHidden ? (
+            <div className="hide-icon"></div>
           ) : (
             <button
               type="button"
