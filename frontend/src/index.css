@@ -320,7 +320,8 @@ Other button classes are defined further down together with other classes for th
 
 .recent-container {
   background-color: hsl(0deg 0% 97%);
-  padding: 0.5rem 1.5rem 2.5rem;
+  padding: 1rem 1.5rem;
+  margin-top: 0.2rem;
 }
 
 .footer-container {
@@ -332,8 +333,7 @@ Other button classes are defined further down together with other classes for th
 
 .favorites-container {
   background-color: hsl(0deg 0% 97%);
-  padding: 2.5rem 1.5rem 0.5rem;
-  margin-bottom: 0.2rem;
+  padding: 2.5rem 1.5rem 1rem;
 }
 
 .issue-label {
@@ -396,6 +396,11 @@ Other button classes are defined further down together with other classes for th
 .hide-icon {
   width: 2rem;
   margin-top: 0.5rem;
+}
+
+.unhide-icon {
+  width: 1.5rem;
+  margin-top: 0.2rem;
 }
 
 .star-button {
@@ -654,4 +659,19 @@ Other button classes are defined further down together with other classes for th
 
 .row-focused {
   background-color: hsl(186deg 30% 94%);
+}
+
+.hide-button {
+  color: hsl(288deg 46% 22%);
+  background-color: hsl(291deg 13% 90%);
+  padding: 0.2rem 0.5rem;
+  margin: 1rem;
+}
+
+.hide-button:hover {
+  background-color: hsl(291deg 13% 81%);
+}
+
+.hide-button > img {
+  margin-left: 0.5rem;
 }
