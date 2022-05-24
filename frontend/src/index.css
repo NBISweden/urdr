@@ -138,15 +138,29 @@ Other button classes are defined further down together with other classes for th
 
 .spreadsheet {
   min-height: 100vh;
+  margin-bottom: 5rem;
 }
 
 .footer {
   z-index: 100;
   width: 100%;
-  top: calc(100vh - 120px);
+  bottom: 0;
   position: fixed;
-  height: 120px;
   background-color: white;
+}
+
+.input-label {
+  margin-left: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.select-label {
+  margin-left: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.footer-field {
+  margin-left: 1rem;
 }
 
 .header-year {
@@ -351,7 +365,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .save-button {
-  margin: 2rem;
+  margin: 1rem 2rem 2rem;
   min-width: 10rem;
   padding: 1rem 1.5rem;
 }
@@ -385,7 +399,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .star-button {
-  background-color: hsl(0deg 0% 97%);
+  background-color: transparent;
   border: none;
   display: flex;
 }
@@ -408,11 +422,6 @@ Other button classes are defined further down together with other classes for th
 .quick-add-input {
   padding: 0.5rem 0.75rem;
   margin: 0 0 0 3.75rem;
-  outline: none;
-}
-
-.not-outline {
-  outline: none;
 }
 
 .invalid {
@@ -425,7 +434,7 @@ Other button classes are defined further down together with other classes for th
 
 .validation-icon {
   width: 3.5rem;
-  margin-left: -2.8rem;
+  margin-left: -3.8rem;
 }
 
 .hiden {
@@ -435,8 +444,9 @@ Other button classes are defined further down together with other classes for th
 /* The unsaved changes alert message box */
 .unsaved-alert-p {
   color: hsl(26deg 91% 42%); /* Red */
-  margin: 3rem 1rem 2rem;
+  margin-right: 2rem;
   text-align: right;
+  min-height: 2rem;
 }
 
 .comment-container {
@@ -634,4 +644,14 @@ Other button classes are defined further down together with other classes for th
   top: 3px;
   right: 3px;
   width: 0.7rem;
+}
+
+@media (max-width: 992px) {
+  .hidden {
+    visibility: hidden;
+  }
+}
+
+.row-focused {
+  background-color: hsl(186deg 30% 94%);
 }

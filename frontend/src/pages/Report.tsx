@@ -669,9 +669,10 @@ export const Report = () => {
                         aria-labelledby={`total of hours spent during the day ${dateStr}`}
                         type="text"
                         id={dateStr}
-                        className="cell not-outline"
+                        className="cell"
                         value={getTotalHours(dateStr)}
                         readOnly
+                        tabIndex={-1}
                       />
                     </div>
                   );
@@ -681,9 +682,10 @@ export const Report = () => {
                   <input
                     aria-label="total of hours spent during the week"
                     type="text"
-                    className="cell not-outline"
+                    className="cell"
                     value={getTotalHoursWeek()}
                     readOnly
+                    tabIndex={-1}
                   />
                   {/* Only show warnings for weeks that have passed. 
                     It must be at least Saturday. */}
@@ -714,20 +716,20 @@ export const Report = () => {
         </main>
         <div className="footer">
           <section className="footer-container">
-            <div className="col-7">
+            <div className="col-8">
               <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
             </div>
-            <div className="col-3 ">
-              {showUnsavedWarning && (
-                <div className="unsaved-alert-p">
-                  <p role="status">⚠ You have unsaved changes</p>
-                </div>
-              )}
-              {toastList.length > 0 && (
+            {toastList.length > 0 && (
                 <Toast onCloseToast={handleCloseToast} toastList={toastList} />
               )}
-            </div>
-            <div className="col-2 save-changes">
+            <div className="col-4 save-changes">
+            <div className="unsaved-alert-p">
+              {showUnsavedWarning && (
+                
+                  <p role="status">⚠ You have unsaved changes</p>
+                
+              )}
+              </div>
               <button className="basic-button save-button" onClick={handleSave}>
                 Save changes
               </button>

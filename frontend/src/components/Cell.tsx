@@ -11,6 +11,8 @@ export const Cell = ({
   comments,
   entryId,
   onCellUpdate,
+  onFocusRow,
+  onBlurRow,
 }: {
   topic: IssueActivityPair;
   date: Date;
@@ -18,6 +20,8 @@ export const Cell = ({
   comments: string;
   entryId: number;
   onCellUpdate: (timeEntry: TimeEntry) => void;
+  onFocusRow: () => void;
+  onBlurRow: () => void;
 }) => {
   const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
   const [areaComments, setAreaComments] = useState<string>(null);
@@ -69,6 +73,11 @@ export const Cell = ({
       spent_on: formatDate(date, dateFormat),
     });
   };
+  // Make sure that the the comment area is not visible and the row is no longer highlighted
+  const onBlurArea = () => {
+    setShowCommentArea(false);
+    onBlurRow();
+  };
   return (
     <div className="col-1 cell-container">
       <label
@@ -90,6 +99,8 @@ export const Cell = ({
           )}`}
           onChange={onCellChange}
           onKeyUp={onDeleteCellEntry}
+          onFocus={onFocusRow}
+          onBlur={onBlurRow}
           className="cell"
           defaultValue={hours === 0 ? "" : hours}
         />
@@ -98,6 +109,7 @@ export const Cell = ({
             className={comments === "" ? "comment comment-unfilled" : "comment"}
             type="button"
             title="Toggle comment area"
+            onFocus={onFocusRow}
             onClick={() => onCommentButtonClick()}
           ></button>
         )}
@@ -113,7 +125,8 @@ export const Cell = ({
               rows={2}
               maxLength={1000}
               onKeyUp={onEscapeArea}
-              onBlur={() => setShowCommentArea(false)}
+              onFocus={onFocusRow}
+              onBlur={onBlurArea}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button

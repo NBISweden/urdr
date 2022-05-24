@@ -32,9 +32,20 @@ export const Row = ({
 
   isFav: boolean;
 }) => {
+  // State var for setting the className of the row depending on focus
+  const [rowClass, setRowClass] = React.useState("row");
+
+  const onFocusRow = () => {
+    setRowClass("row row-focused");
+  };
+
+  const onBlurRow = () => {
+    setRowClass("row");
+  };
+
   return (
     <>
-      <div className="row">
+      <div className={rowClass}>
         <div className="col-1 cell-container grip-container">
           {isFav ? (
             <img src={grip} className="grip" alt="grip to change row sorting" />
@@ -96,6 +107,8 @@ export const Row = ({
               hours={rowHours[i]}
               comments={rowEntries[i] ? rowEntries[i].comments : ""}
               entryId={rowEntries[i] ? rowEntries[i].id : 0}
+              onFocusRow={onFocusRow}
+              onBlurRow={onBlurRow}
             />
           );
         })}
@@ -104,9 +117,12 @@ export const Row = ({
             type="text"
             aria-label={`total of hours spent on the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
             id={`${topic.issue.id}${topic.activity.id}-total`}
-            className="cell not-outline"
+            className="cell"
             value={getRowSum(topic)}
             readOnly
+            onFocus={onFocusRow}
+            onBlur={onBlurRow}
+            tabIndex={-1}
           />
         </div>
       </div>

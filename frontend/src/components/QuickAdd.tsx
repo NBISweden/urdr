@@ -95,7 +95,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-2 quick-add-input ";
+    let classes = "col-3 footer-field ";
     if (search != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
@@ -107,10 +107,21 @@ export const QuickAdd = ({
   };
 
   return (
-    <div className="row">
+    <div>
       <h2> Add a new row</h2>
+      <div className="row">
+      <label htmlFor="input-issue"
+      className="col-3 input-label hidden">
+        Issue e.g. 3499
+      </label>
+       <label 
+      htmlFor="select-activity"
+      className="col-3 select-label hidden" 
+      >Select activity
+      </label>
+      </div>
+      <div className="row">
       <input
-        aria-labelledby="input-issue"
         id="input-issue"
         className={getSearchClasses()}
         type="number"
@@ -119,7 +130,7 @@ export const QuickAdd = ({
           setSearch(e.target.value);
           setIssue(null);
         }}
-        placeholder="Type issue number..."
+        placeholder="e.g. 3499"
         title={(issue && issue.subject) || ""}
       />
       <img
@@ -129,8 +140,7 @@ export const QuickAdd = ({
         aria-label="Indicator for validity of issue number - x for not valid, check for valid."
       />
       <select
-        aria-label="Activity"
-        className="col-3"
+        className="col-3 footer-field"
         name="activity"
         id="select-activity"
         onChange={handleSetActivity}
@@ -145,9 +155,11 @@ export const QuickAdd = ({
             );
           })}
       </select>
-      <button className=" basic-button plus-button" onClick={handleAdd}>
+      <button className="col-3 basic-button plus-button" onClick={handleAdd}>
         <img src={plus} alt="Add line" />
       </button>
+      </div>
+     
     </div>
   );
 };
