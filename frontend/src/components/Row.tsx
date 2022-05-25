@@ -70,13 +70,13 @@ export const Row = ({
               type="button"
               className="star-button"
               onClick={() => onToggleHide(topic)}
+              title={"Hide this row"}
             >
               <img
                 src={x}
                 className="hide-icon"
                 role="button"
                 alt={"Hide this row"}
-                title={"Hide this row"}
               />
             </button>
           )}
@@ -84,13 +84,13 @@ export const Row = ({
             type="button"
             className="star-button"
             onClick={() => onToggleFav(topic)}
+            title={isFav ? "Remove from favorites" : "Make favorite"}
           >
             <img
               src={isFav ? fillStar : star}
               className="star-icon"
               role="button"
               alt={isFav ? "Remove from favorites" : "Make favorite"}
-              title={isFav ? "Remove from favorites" : "Make favorite"}
             />
           </button>
         </div>
