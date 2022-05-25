@@ -114,6 +114,26 @@ export const Help = () => {
           onToggleFav={() => {}}
           onCellUpdate={() => {}}
         ></Row>
+        <h2 className="help-subtitle">Hidden rows</h2>
+        <p className="help-info">
+          Below all rows that are visible by default you find a button saying
+          "Show hidden rows". Clicking the button will open a section below that
+          lists all rows you have ever hidden. You can make a row a favorite by
+          clicking on the star, or move it up to the list of recent rows by
+          clicking on the arrow-up symbol. You can collapse the whole section
+          again by clicking on the button again.
+        </p>
+        <Row
+          topic={exampleIAP}
+          days={[new Date()]}
+          rowHours={[1]}
+          rowEntries={[exampleEntry]}
+          getRowSum={() => 1}
+          onToggleHide={() => {}}
+          isHidden={true}
+          onToggleFav={() => {}}
+          onCellUpdate={() => {}}
+        ></Row>
         <h2 className="help-subtitle">Adding new rows</h2>
         <p className="help-info">
           In order to add a new row, it is necessary to first enter a valid
