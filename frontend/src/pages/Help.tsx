@@ -120,7 +120,9 @@ export const Help = () => {
           "Show hidden rows". Clicking the button will open a section below that
           lists all rows you have ever hidden. You can make a row a favorite by
           clicking on the star, or move it up to the list of recent rows by
-          clicking on the arrow-up symbol. You can collapse the whole section
+          clicking on the arrow-up symbol. You can also move a row back from the
+          list of hidden rows to the list of recent rows by using the "Adding
+          new rows" feature (see below). You can collapse the whole section
           again by clicking on the button again.
         </p>
         <Row
@@ -141,17 +143,16 @@ export const Help = () => {
           issue. After clicking on the plus button, a new row will be appended
           to the bottom of the list of recent rows.
         </p>
+        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
+        <h2 className="help-subtitle">The sum row</h2>
         <p className="help-info">
           A cell in the sum row shows the sum of all time entries logged on
           different rows on the corresponding day. It is worth noting that the
-          sum also contains entries that have been hidden from list of recent
-          rows. In case the number displayed in a sum field doesn't seem to fit
-          to the time entries displayed above, you might have hidden a row that
-          contained a time entry for that day (see "Known limitations"). You can
-          easily make it visible again by using the <b>"Add new row"</b>{" "}
-          feature.
+          sum also contains entries that have been hidden from the list of
+          recent rows. In case the number displayed in a sum field doesn't seem
+          to fit to the time entries displayed above, check the section with
+          hidden rows.
         </p>
-        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">Adding or updating time entries</h2>
         <p className="help-info">
           One may log time by simply clicking on the cell corresponding to the
@@ -233,7 +234,8 @@ export const Help = () => {
           in the sum row in the bottom of the spreadsheet.{" "}
           <b>
             In this case, the number of hours displayed as sum will not match
-            what you actually see on the page.
+            what you actually see on the page, unless you expand the list of
+            hidden rows.
           </b>
         </p>
       </main>
