@@ -91,7 +91,7 @@ export const Help = () => {
           rowHours={[1]}
           rowEntries={[exampleEntry]}
           getRowSum={() => 1}
-          onHide={() => {}}
+          onToggleHide={() => {}}
           isFav={true}
           onToggleFav={() => {}}
           onCellUpdate={() => {}}
@@ -109,7 +109,7 @@ export const Help = () => {
           rowHours={[1]}
           rowEntries={[exampleEntry]}
           getRowSum={() => 1}
-          onHide={() => {}}
+          onToggleHide={() => {}}
           isFav={false}
           onToggleFav={() => {}}
           onCellUpdate={() => {}}
@@ -174,6 +174,8 @@ export const Help = () => {
             comments={""}
             entryId={1}
             onCellUpdate={() => {}}
+            onFocusRow={() => {}}
+            onBlurRow={() => {}}
           />
         </div>
         <p className="help-info">
@@ -188,6 +190,8 @@ export const Help = () => {
             comments={"Test comment"}
             entryId={1}
             onCellUpdate={() => {}}
+            onFocusRow={() => {}}
+            onBlurRow={() => {}}
           />
         </div>
         <h2 className="help-subtitle">Time travelling</h2>
