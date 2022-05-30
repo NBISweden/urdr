@@ -231,11 +231,12 @@ export const Help = () => {
         </p>
         <h3 className="help-h3">Hidden rows with time entries</h3>
         <p className="help-info">
-          If you hide a row in urdr, it will be permanently hidden unless you
-          add it again manually. It stays hidden even when you time travel. If
-          you move to a week in which the hidden row has time entries, the row
-          will still not be displayed. The time entries however will be included
-          in the sum row in the bottom of the spreadsheet.{" "}
+          If you hide a row in urdr, it stays hidden even when you time travel.
+          If you move to a week in which the hidden row has time entries, the
+          row will still not be displayed in the rows shown by default. You need
+          to expand the list of hidden rows to see it. However, the time entries
+          in hidden rows will be included in the sum row in the bottom of the
+          spreadsheet regardless if the hidden rows list is expanded or not.{" "}
           <b>
             In this case, the number of hours displayed as sum will not match
             what you actually see on the page, unless you expand the list of
