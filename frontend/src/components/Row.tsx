@@ -6,8 +6,8 @@ import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
-import x from "../icons/x.svg";
-import doubleUp from "../icons/chevron-double-up.svg";
+import eyeSlash from "../icons/eye-slash.svg";
+import eye from "../icons/eye.svg";
 import { dateFormat } from "../utils";
 import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
 
@@ -58,8 +58,8 @@ export const Row = ({
               onClick={() => onToggleHide(topic)}
             >
               <img
-                src={doubleUp}
-                className="unhide-icon"
+                src={eye}
+                className="eye-icon"
                 role="button"
                 alt={"Stop hiding"}
                 title={"Stop hiding"}
@@ -73,8 +73,8 @@ export const Row = ({
               title={"Hide this row"}
             >
               <img
-                src={x}
-                className="hide-icon"
+                src={eyeSlash}
+                className="eye-icon"
                 role="button"
                 alt={"Hide this row"}
               />
