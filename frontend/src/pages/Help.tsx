@@ -102,7 +102,7 @@ export const Help = () => {
           have most recently logged time on, based on the week you are currently
           looking at. Thus, recent rows change as you navigate across different
           weeks or as you add new time entries. If desired, these type of rows
-          can be hidden after clicking on the red cross button to the far left.
+          can be hidden after clicking on the hide button to the far left.
         </p>
         <Row
           key={2}
@@ -122,10 +122,10 @@ export const Help = () => {
           "Show hidden rows". Clicking the button will open a section below that
           lists all rows you have ever hidden. You can make a row a favorite by
           clicking on the star, or move it up to the list of recent rows by
-          clicking on the arrow-up symbol. You can also move a row back from the
-          list of hidden rows to the list of recent rows by using the "Adding
-          new rows" feature (see below). You can collapse the whole section
-          again by clicking on the button again.
+          clicking on the eye symbol. You can also move a row back from the list
+          of hidden rows to the list of recent rows by using the "Adding new
+          rows" feature (see below). You can collapse the whole section again by
+          clicking on the button again.
         </p>
         <Row
           key={3}
