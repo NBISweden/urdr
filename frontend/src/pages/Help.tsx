@@ -86,6 +86,7 @@ export const Help = () => {
           drag–and–drop handle icon at the left-most position of the row.
         </p>
         <Row
+          key={1}
           topic={exampleIAP}
           days={[new Date()]}
           rowHours={[1]}
@@ -104,11 +105,12 @@ export const Help = () => {
           can be hidden after clicking on the red cross button to the far left.
         </p>
         <Row
+          key={2}
           topic={exampleIAP}
           days={[new Date()]}
-          rowHours={[1]}
+          rowHours={[2]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 1}
+          getRowSum={() => 2}
           onToggleHide={() => {}}
           isFav={false}
           onToggleFav={() => {}}
@@ -126,11 +128,12 @@ export const Help = () => {
           again by clicking on the button again.
         </p>
         <Row
+          key={3}
           topic={exampleIAP}
           days={[new Date()]}
-          rowHours={[1]}
+          rowHours={[3]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 1}
+          getRowSum={() => 3}
           onToggleHide={() => {}}
           isHidden={true}
           onToggleFav={() => {}}
