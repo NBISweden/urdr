@@ -55,8 +55,7 @@ export const Help = () => {
         <h2 className="help-subtitle">Introduction</h2>
         <p className="help-info">
           The purpose of this website is to ease the process of logging time on
-          the
-          <a href="https://projects.nbis.se"> NBIS Redmine instance</a>. The
+          the <a href="https://projects.nbis.se">NBIS Redmine instance</a>. The
           usual procedure for logging time with Redmine involves selecting an
           issue and an activity for reporting your time. In urdr, issues are
           strictly linked to valid activities, thus making it simpler to do time
