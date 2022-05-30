@@ -56,13 +56,13 @@ export const Row = ({
               type="button"
               className="star-button"
               onClick={() => onToggleHide(topic)}
+              title={"Stop hiding"}
             >
               <img
                 src={eye}
                 className="eye-icon"
                 role="button"
                 alt={"Stop hiding"}
-                title={"Stop hiding"}
               />
             </button>
           ) : (
