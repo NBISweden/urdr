@@ -6,7 +6,8 @@ import { Cell } from "./Cell";
 import fillStar from "../icons/star-fill.svg";
 import star from "../icons/star.svg";
 import grip from "../icons/grip-vertical.svg";
-import x from "../icons/x.svg";
+import eyeSlash from "../icons/eye-slash.svg";
+import eye from "../icons/eye.svg";
 import { dateFormat } from "../utils";
 import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
 
@@ -17,9 +18,10 @@ export const Row = ({
   rowEntries,
   onCellUpdate,
   onToggleFav,
-  onHide,
+  onToggleHide,
   getRowSum,
   isFav,
+  isHidden,
 }: {
   topic: IssueActivityPair;
   days: Date[];
@@ -28,9 +30,9 @@ export const Row = ({
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   getRowSum: (pair: IssueActivityPair) => number;
-  onHide?: (topic: IssueActivityPair) => void;
-
-  isFav: boolean;
+  onToggleHide?: (topic: IssueActivityPair) => void;
+  isFav?: boolean;
+  isHidden?: boolean;
 }) => {
   // State var for setting the className of the row depending on focus
   const [rowClass, setRowClass] = React.useState("row");
@@ -49,18 +51,32 @@ export const Row = ({
         <div className="col-1 cell-container grip-container">
           {isFav ? (
             <img src={grip} className="grip" alt="grip to change row sorting" />
+          ) : isHidden ? (
+            <button
+              type="button"
+              className="star-button"
+              onClick={() => onToggleHide(topic)}
+              title={"Stop hiding"}
+            >
+              <img
+                src={eye}
+                className="eye-icon"
+                role="button"
+                alt={"Stop hiding"}
+              />
+            </button>
           ) : (
             <button
               type="button"
               className="star-button"
-              onClick={() => onHide(topic)}
+              onClick={() => onToggleHide(topic)}
+              title={"Hide this row"}
             >
               <img
-                src={x}
-                className="hide-icon"
+                src={eyeSlash}
+                className="eye-icon"
                 role="button"
                 alt={"Hide this row"}
-                title={"Hide this row"}
               />
             </button>
           )}
@@ -68,13 +84,13 @@ export const Row = ({
             type="button"
             className="star-button"
             onClick={() => onToggleFav(topic)}
+            title={isFav ? "Remove from favorites" : "Make favorite"}
           >
             <img
               src={isFav ? fillStar : star}
               className="star-icon"
               role="button"
               alt={isFav ? "Remove from favorites" : "Make favorite"}
-              title={isFav ? "Remove from favorites" : "Make favorite"}
             />
           </button>
         </div>

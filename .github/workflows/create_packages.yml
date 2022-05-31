@@ -45,5 +45,6 @@ jobs:
 
              for image in urdr urdr-web; do
                docker push "ghcr.io/nbisweden/$image:$branch"
+               docker tag "ghcr.io/nbisweden/$image:$branch" "ghcr.io/nbisweden/$image:latest"
                docker push "ghcr.io/nbisweden/$image:latest"
              done

@@ -33,6 +33,8 @@ import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import LoadingOverlay from "react-loading-overlay-ts";
 import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
+import up from "../icons/caret-up-fill.svg";
+import down from "../icons/caret-down-fill.svg";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -55,6 +57,7 @@ export const Report = () => {
     getFullWeek(new Date())
   );
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
@@ -114,19 +117,12 @@ export const Report = () => {
     return null;
   };
 
-  // Retrieve time entries and recent entries
-  const getAllEntries = async (
-    favs: IssueActivityPair[],
-    recents: IssueActivityPair[]
-  ) => {
+  // Retrieve time entries for given rows
+  const getAllEntries = async (rows: IssueActivityPair[]) => {
     let allEntries = [];
-    for await (let fav of favs) {
-      const favEntries = await getTimeEntries(fav, currentWeekArray);
-      allEntries.push(...favEntries);
-    }
-    for await (let recent of recents) {
-      const recentEntries = await getTimeEntries(recent, currentWeekArray);
-      if (recentEntries) allEntries.push(...recentEntries);
+    for await (let row of rows) {
+      const entries = await getTimeEntries(row, currentWeekArray);
+      allEntries.push(...entries);
     }
     setTimeEntries(allEntries);
   };
@@ -175,13 +171,13 @@ export const Report = () => {
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
           const hidden = priorityIssues.filter((issue) => issue.is_hidden);
-          getAllEntries(favorites, nonPrioIssues);
+          getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
           setHidden(hidden);
         }
       } else if (!didCancel) {
-        getAllEntries([], issues);
+        getAllEntries(issues);
         setFilteredRecents(issues);
       }
     };
@@ -273,10 +269,30 @@ export const Report = () => {
 
   // Toggle favorite status for an issue-activity pair
   const handleToggleFav = async (topic: IssueActivityPair) => {
+    // Check if topic is hidden. If yes, make it a favorite.
+    const existingHidden = hidden.find(
+      (hidden) =>
+        hidden.activity.id === topic.activity.id &&
+        hidden.issue.id === topic.issue.id
+    );
+    if (!!existingHidden) {
+      const shortenedHidden = removeIssueActivityPair([...hidden], topic);
+      topic.is_hidden = false;
+      const saved = await saveFavorites([...favorites, ...hidden, topic]);
+      if (!saved) {
+        console.log("Something went wrong with adding a favorite!");
+        return;
+      }
+      setFavorites([...favorites, topic]);
+      setHidden(shortenedHidden);
+      return;
+    }
+    // Topic was not hidden. Check if it is a favorite.
     const existingFav = favorites.find(
       (fav) =>
         fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
     );
+    // If it is not a favorite, make it one and remove it from recents.
     if (!existingFav) {
       topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
       const saved = await saveFavorites([...favorites, topic, ...hidden]);
@@ -290,7 +306,9 @@ export const Report = () => {
         topic
       );
       setFilteredRecents(shortenedRecents);
-    } else {
+    }
+    // Topic was a favorite. Remove it from favorites and make it a recent.
+    else {
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
       const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
@@ -303,17 +321,39 @@ export const Report = () => {
   };
 
   // Enable hiding an issue-activity pair from the list of recent issues
-  const handleHide = async (topic: IssueActivityPair) => {
-    topic.is_hidden = true;
-    topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
-    const saved = await saveFavorites([...favorites, ...hidden, topic]);
-    if (!saved) {
-      console.log("Something went wrong with hiding the row");
-      return;
-    } else {
-      const newRecents = removeIssueActivityPair([...filteredRecents], topic);
-      setFilteredRecents(newRecents);
-      setHidden([...hidden, topic]);
+  const toggleHide = async (topic: IssueActivityPair) => {
+    // Check if topic is hidden.
+    const existingHidden = hidden.find(
+      (hidden) =>
+        hidden.activity.id === topic.activity.id &&
+        hidden.issue.id === topic.issue.id
+    );
+    // If not, make it a hidden and remove from recent.
+    if (!existingHidden) {
+      topic.is_hidden = true;
+      topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
+      const saved = await saveFavorites([...favorites, topic, ...hidden]);
+      if (!saved) {
+        console.log("Something went wrong with hiding the row");
+        return;
+      } else {
+        const newRecents = removeIssueActivityPair([...filteredRecents], topic);
+        setFilteredRecents(newRecents);
+        setHidden([topic, ...hidden]);
+      }
+    }
+    // If yes, remove it from hidden and add to recent.
+    else {
+      const shortenedHidden = removeIssueActivityPair([...hidden], topic);
+      const saved = await saveFavorites([...favorites, ...shortenedHidden]);
+      if (!saved) {
+        console.log("Something went wrong with unhiding the row");
+        return;
+      } else {
+        topic.is_hidden = false;
+        setFilteredRecents([...filteredRecents, topic]);
+        setHidden(shortenedHidden);
+      }
     }
   };
 
@@ -363,7 +403,7 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    await getAllEntries(favorites, filteredRecents);
+    await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
@@ -645,16 +685,47 @@ export const Report = () => {
                     topic={recentIssue}
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
-                    onHide={handleHide}
+                    onToggleHide={toggleHide}
                     days={currentWeekArray}
                     rowHours={findRowHours(recentIssue)}
                     rowEntries={rowEntries}
                     getRowSum={getRowSum}
-                    isFav={false}
                   />
                 );
               })}
+            <button
+              onClick={() => setShowHidden(!showHidden)}
+              className="basic-button hide-button"
+            >
+              {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
+              <img src={showHidden ? up : down} alt="" />
+            </button>
           </section>
+          {showHidden && (
+            <section className="recent-container">
+              {hidden &&
+                hidden.map((hiddenIssue) => {
+                  const rowEntries = findRowEntries(
+                    hiddenIssue,
+                    currentWeekArray
+                  );
+                  return (
+                    <Row
+                      key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
+                      topic={hiddenIssue}
+                      onCellUpdate={handleCellUpdate}
+                      onToggleFav={handleToggleFav}
+                      onToggleHide={toggleHide}
+                      days={currentWeekArray}
+                      rowHours={findRowHours(hiddenIssue)}
+                      rowEntries={rowEntries}
+                      getRowSum={getRowSum}
+                      isHidden={true}
+                    />
+                  );
+                })}
+            </section>
+          )}
           <section className="recent-container ">
             <div className="row">
               <div className="col-6">
@@ -666,7 +737,7 @@ export const Report = () => {
                   return (
                     <div key={dateStr} className="col-1 cell-container">
                       <input
-                        aria-labelledby={`total of hours spent during the day ${dateStr}`}
+                        aria-label={`total of hours spent during the day ${dateStr}`}
                         type="text"
                         id={dateStr}
                         className="cell"

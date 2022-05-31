@@ -110,56 +110,53 @@ export const QuickAdd = ({
     <div>
       <h2> Add a new row</h2>
       <div className="row">
-      <label htmlFor="input-issue"
-      className="col-3 input-label hidden">
-        Issue e.g. 3499
-      </label>
-       <label 
-      htmlFor="select-activity"
-      className="col-3 select-label hidden" 
-      >Select activity
-      </label>
+        <label htmlFor="input-issue" className="col-3 input-label hidden">
+          Issue e.g. 3499
+        </label>
+        <label htmlFor="select-activity" className="col-3 select-label hidden">
+          Select activity
+        </label>
       </div>
       <div className="row">
-      <input
-        id="input-issue"
-        className={getSearchClasses()}
-        type="number"
-        min={0}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setIssue(null);
-        }}
-        placeholder="e.g. 3499"
-        title={(issue && issue.subject) || ""}
-      />
-      <img
-        className={search === "" ? "validation-icon hiden" : "validation-icon"}
-        src={getValidationIconSrc()}
-        alt="Validity"
-        aria-label="Indicator for validity of issue number - x for not valid, check for valid."
-      />
-      <select
-        className="col-3 footer-field"
-        name="activity"
-        id="select-activity"
-        onChange={handleSetActivity}
-        style={{ width: "50%" }}
-      >
-        {activities &&
-          activities.map((activity) => {
-            return (
-              <option value={activity.id} key={activity.id}>
-                {activity.name}
-              </option>
-            );
-          })}
-      </select>
-      <button className="col-3 basic-button plus-button" onClick={handleAdd}>
-        <img src={plus} alt="Add line" />
-      </button>
+        <input
+          id="input-issue"
+          className={getSearchClasses()}
+          type="number"
+          min={0}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setIssue(null);
+          }}
+          title={(issue && issue.subject) || ""}
+        />
+        <img
+          className={
+            search === "" ? "validation-icon hiden" : "validation-icon"
+          }
+          src={getValidationIconSrc()}
+          alt="Validity"
+          aria-label="Indicator for validity of issue number - x for not valid, check for valid."
+        />
+        <select
+          className="col-3 footer-field"
+          name="activity"
+          id="select-activity"
+          onChange={handleSetActivity}
+          style={{ width: "50%" }}
+        >
+          {activities &&
+            activities.map((activity) => {
+              return (
+                <option value={activity.id} key={activity.id}>
+                  {activity.name}
+                </option>
+              );
+            })}
+        </select>
+        <button className="col-3 basic-button plus-button" onClick={handleAdd}>
+          <img src={plus} alt="Add line" />
+        </button>
       </div>
-     
     </div>
   );
 };

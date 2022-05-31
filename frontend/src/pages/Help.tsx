@@ -55,8 +55,7 @@ export const Help = () => {
         <h2 className="help-subtitle">Introduction</h2>
         <p className="help-info">
           The purpose of this website is to ease the process of logging time on
-          the
-          <a href="https://projects.nbis.se"> NBIS Redmine instance</a>. The
+          the <a href="https://projects.nbis.se">NBIS Redmine instance</a>. The
           usual procedure for logging time with Redmine involves selecting an
           issue and an activity for reporting your time. In urdr, issues are
           strictly linked to valid activities, thus making it simpler to do time
@@ -86,12 +85,13 @@ export const Help = () => {
           drag–and–drop handle icon at the left-most position of the row.
         </p>
         <Row
+          key={1}
           topic={exampleIAP}
           days={[new Date()]}
           rowHours={[1]}
           rowEntries={[exampleEntry]}
           getRowSum={() => 1}
-          onHide={() => {}}
+          onToggleHide={() => {}}
           isFav={true}
           onToggleFav={() => {}}
           onCellUpdate={() => {}}
@@ -101,16 +101,40 @@ export const Help = () => {
           have most recently logged time on, based on the week you are currently
           looking at. Thus, recent rows change as you navigate across different
           weeks or as you add new time entries. If desired, these type of rows
-          can be hidden after clicking on the red cross button to the far left.
+          can be hidden after clicking on the hide button to the far left.
         </p>
         <Row
+          key={2}
           topic={exampleIAP}
           days={[new Date()]}
-          rowHours={[1]}
+          rowHours={[2]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 1}
-          onHide={() => {}}
+          getRowSum={() => 2}
+          onToggleHide={() => {}}
           isFav={false}
+          onToggleFav={() => {}}
+          onCellUpdate={() => {}}
+        ></Row>
+        <h2 className="help-subtitle">Hidden rows</h2>
+        <p className="help-info">
+          Below all rows that are visible by default you find a button saying
+          "Show hidden rows". Clicking the button will open a section below that
+          lists all rows you have ever hidden. You can make a row a favorite by
+          clicking on the star, or move it up to the list of recent rows by
+          clicking on the eye symbol. You can also move a row back from the list
+          of hidden rows to the list of recent rows by using the "Adding new
+          rows" feature (see below). You can collapse the whole section again by
+          clicking on the button again.
+        </p>
+        <Row
+          key={3}
+          topic={exampleIAP}
+          days={[new Date()]}
+          rowHours={[3]}
+          rowEntries={[exampleEntry]}
+          getRowSum={() => 3}
+          onToggleHide={() => {}}
+          isHidden={true}
           onToggleFav={() => {}}
           onCellUpdate={() => {}}
         ></Row>
@@ -121,17 +145,16 @@ export const Help = () => {
           issue. After clicking on the plus button, a new row will be appended
           to the bottom of the list of recent rows.
         </p>
+        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
+        <h2 className="help-subtitle">The sum row</h2>
         <p className="help-info">
           A cell in the sum row shows the sum of all time entries logged on
           different rows on the corresponding day. It is worth noting that the
-          sum also contains entries that have been hidden from list of recent
-          rows. In case the number displayed in a sum field doesn't seem to fit
-          to the time entries displayed above, you might have hidden a row that
-          contained a time entry for that day (see "Known limitations"). You can
-          easily make it visible again by using the <b>"Add new row"</b>{" "}
-          feature.
+          sum also contains entries that have been hidden from the list of
+          recent rows. In case the number displayed in a sum field doesn't seem
+          to fit to the time entries displayed above, check the section with
+          hidden rows.
         </p>
-        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">Adding or updating time entries</h2>
         <p className="help-info">
           One may log time by simply clicking on the cell corresponding to the
@@ -153,6 +176,8 @@ export const Help = () => {
             comments={""}
             entryId={1}
             onCellUpdate={() => {}}
+            onFocusRow={() => {}}
+            onBlurRow={() => {}}
           />
         </div>
         <p className="help-info">
@@ -167,6 +192,8 @@ export const Help = () => {
             comments={"Test comment"}
             entryId={1}
             onCellUpdate={() => {}}
+            onFocusRow={() => {}}
+            onBlurRow={() => {}}
           />
         </div>
         <h2 className="help-subtitle">Time travelling</h2>
@@ -206,14 +233,16 @@ export const Help = () => {
         </p>
         <h3 className="help-h3">Hidden rows with time entries</h3>
         <p className="help-info">
-          If you hide a row in urdr, it will be permanently hidden unless you
-          add it again manually. It stays hidden even when you time travel. If
-          you move to a week in which the hidden row has time entries, the row
-          will still not be displayed. The time entries however will be included
-          in the sum row in the bottom of the spreadsheet.{" "}
+          If you hide a row in urdr, it stays hidden even when you time travel.
+          If you move to a week in which the hidden row has time entries, the
+          row will still not be displayed in the rows shown by default. You need
+          to expand the list of hidden rows to see it. However, the time entries
+          in hidden rows will be included in the sum row in the bottom of the
+          spreadsheet regardless if the hidden rows list is expanded or not.{" "}
           <b>
             In this case, the number of hours displayed as sum will not match
-            what you actually see on the page.
+            what you actually see on the page, unless you expand the list of
+            hidden rows.
           </b>
         </p>
       </main>
