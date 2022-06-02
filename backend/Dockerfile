@@ -1,4 +1,4 @@
-FROM golang:1.17.10-stretch
+FROM golang:1.17.11-stretch
 
 ENV XDG_CACHE_HOME='/tmp/.cache'
 
