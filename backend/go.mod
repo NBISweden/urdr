@@ -7,7 +7,7 @@ require (
 	github.com/gofiber/storage/sqlite3 v0.0.0-20220331080057-83339bc1564f
 	github.com/mattn/go-sqlite3 v1.14.14
 	github.com/sirupsen/logrus v1.8.1
-	github.com/swaggo/fiber-swagger v1.2.1
+	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.8.3
 )
 
@@ -23,7 +23,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
+	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.37.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
