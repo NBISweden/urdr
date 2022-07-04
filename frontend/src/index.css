@@ -466,7 +466,7 @@ Other button classes are defined further down together with other classes for th
 
 .comment {
   background-color: transparent;
-  border-style: inset;
+  border-style: solid;
   width: 0;
   height: 0;
   padding: 0;
