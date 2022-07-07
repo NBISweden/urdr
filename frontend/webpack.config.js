@@ -1,4 +1,5 @@
 const path = require('path');
+var webpack = require('webpack');
 
  module.exports = {
    mode: 'development',
@@ -16,20 +17,17 @@ const path = require('path');
         },
       },
       {
-        test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+        test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|html)$/i,
         type: "asset",
       },
       {
         test: /\.(css)$/i,
         use: ["style-loader", "css-loader"],
       }
-
-      // Add your rules for custom modules here
-      // Learn more about loaders from https://webpack.js.org/loaders/
     ],
   },
    resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js", ".css", ".html", "..."],
+    extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
   },
    devtool: 'inline-source-map',
    devServer: {
@@ -40,11 +38,18 @@ const path = require('path');
     allowedHosts: "all",
     historyApiFallback: true,
     static: "./public",
+    client: {
+      webSocketURL: 'ws://localhost:4567/ws',
+    },
   },
-   plugins: [],
+   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.PUBLIC_API_URL': JSON.stringify(process.env.PUBLIC_API_URL),
+      'process.env.PUBLIC_REDMINE_URL': JSON.stringify(process.env.PUBLIC_REDMINE_URL),
+    })
+   ],
    output: {
      filename: 'bundle.js',
-     path: path.resolve(__dirname, './public'),
-     clean: true,
+     path: path.resolve(__dirname, './public')
    },
  };
