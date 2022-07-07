@@ -8,11 +8,11 @@ RUN npm ci
 
 FROM node:17.6-slim as bundler
 
-ARG SNOWPACK_PUBLIC_API_URL
-ENV SNOWPACK_PUBLIC_API_URL=${SNOWPACK_PUBLIC_API_URL}
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
 
-ARG SNOWPACK_PUBLIC_REDMINE_URL
-ENV SNOWPACK_PUBLIC_REDMINE_URL=${SNOWPACK_PUBLIC_REDMINE_URL}
+ARG PUBLIC_REDMINE_URL
+ENV PUBLIC_REDMINE_URL=${PUBLIC_REDMINE_URL}
 
 USER node
 RUN mkdir /home/node/app
@@ -24,4 +24,4 @@ RUN npm run build
 FROM nginx:1.21.6
 
 RUN mkdir -p /app/dist
-COPY --from=bundler --chown=www-data:www-data /home/node/app/build/ /app/dist
+COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist

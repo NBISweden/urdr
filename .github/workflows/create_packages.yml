@@ -37,8 +37,8 @@ jobs:
              done
 
              cat > urdr.env <<END
-             SNOWPACK_PUBLIC_API_URL="https://urdr.nbis.se"
-             SNOWPACK_PUBLIC_REDMINE_URL="https://projects.nbis.se"
+             PUBLIC_API_URL="https://urdr.nbis.se"
+             PUBLIC_REDMINE_URL="https://projects.nbis.se"
              END
 
              TAG="$branch" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1

@@ -20,7 +20,7 @@ import {
   ToastMsg,
 } from "../model";
 import {
-  SNOWPACK_PUBLIC_API_URL,
+  PUBLIC_API_URL,
   getApiEndpoint,
   headers,
   getFullWeek,
@@ -240,14 +240,11 @@ export const Report = () => {
   // Save which issues that have favorite status
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
     let logout = false;
-    const saved = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
-      {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(newFavs),
-      }
-    )
+    const saved = await fetch(`${PUBLIC_API_URL}/api/priority_entries`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(newFavs),
+    })
       .then((res) => {
         if (res.ok) {
           return true;
@@ -360,7 +357,7 @@ export const Report = () => {
   // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
-    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
+    const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
       headers: headers,
@@ -791,15 +788,13 @@ export const Report = () => {
               <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
             </div>
             {toastList.length > 0 && (
-                <Toast onCloseToast={handleCloseToast} toastList={toastList} />
-              )}
+              <Toast onCloseToast={handleCloseToast} toastList={toastList} />
+            )}
             <div className="col-4 save-changes">
-            <div className="unsaved-alert-p">
-              {showUnsavedWarning && (
-                
+              <div className="unsaved-alert-p">
+                {showUnsavedWarning && (
                   <p role="status">⚠ You have unsaved changes</p>
-                
-              )}
+                )}
               </div>
               <button className="basic-button save-button" onClick={handleSave}>
                 Save changes
