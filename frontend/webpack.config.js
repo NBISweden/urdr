@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'development',
@@ -17,12 +18,15 @@ module.exports = {
         }
       },
       {
-        test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif|html)$/i,
+        test: /\.(woff|woff2|png|svg|html)$/i,
         type: 'asset'
       },
       {
         test: /\.(css)$/i,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.hbs$/, loader: 'handlebars-loader'
       }
     ]
   },
@@ -48,10 +52,16 @@ module.exports = {
       'process.env.PUBLIC_REDMINE_URL': JSON.stringify(
         process.env.PUBLIC_REDMINE_URL
       )
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Urdr time logging',
+      filename: 'index.html',
+      publicPath: '/',
+      template: './src/template.hbs'
     })
   ],
   output: {
-    filename: 'bundle.js',
+    filename: './js/index.js',
     path: path.resolve(__dirname, './public')
   }
 }
