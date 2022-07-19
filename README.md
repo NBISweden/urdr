@@ -32,8 +32,8 @@ named `redmine_db.dump`, and it should be placed in that repository's
 In the top-most directory of the `urdr` repository, create the
 file `urdr.env`, using `urdr.env.default` as the template. If you
 are on Linux, you need to set the variables `REDMINE_URL` and
-`SNOWPACK_PUBLIC_REDMINE_URL` to the
-value `"http://172.17.0.1:3000"`. The `SNOWPACK_PUBLIC_API_URL`
+`PUBLIC_REDMINE_URL` to the
+value `"http://172.17.0.1:3000"`. The `PUBLIC_API_URL`
 variable should be set to the URL from which the service is publically
 accessible, e.g. `"http://localhost:4567"` during development.
 

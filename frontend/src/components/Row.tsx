@@ -9,7 +9,7 @@ import grip from "../icons/grip-vertical.svg";
 import eyeSlash from "../icons/eye-slash.svg";
 import eye from "../icons/eye.svg";
 import { dateFormat } from "../utils";
-import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
+import { PUBLIC_REDMINE_URL } from "../utils";
 
 export const Row = ({
   topic,
@@ -98,9 +98,7 @@ export const Row = ({
           <div className="issue-label">
             <p className="issue-label-text">
               <a
-                href={
-                  `${SNOWPACK_PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`
-                }
+                href={`${PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`}
               >{`# ${topic.issue.id}`}</a>
             </p>
             <p className="issue-label-text">
