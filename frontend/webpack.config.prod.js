@@ -34,13 +34,35 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.jsx', '.js', '...']
   },
   optimization: {
+    moduleIds: 'deterministic',
     runtimeChunk: {
       name: 'webpack-runtime'
     },
     splitChunks: {
+      name: false,
       chunks: 'all',
       maxInitialRequests: 25,
-      minSize: 20000
+      cacheGroups: {
+        commons: {
+          test (module) {
+            const moduleFileName = module
+              .identifier()
+              .split('/')
+              .reduceRight((item) => item)
+            return (
+              moduleFileName.split('.').pop() !== 'css' &&
+              module.size() > 80000)
+          },
+          name (module, chunks, cacheGroupKey) {
+            const moduleFileName = module
+              .identifier()
+              .split('/')
+              .reduceRight((item) => item)
+            const allChunksNames = chunks.map((item) => item.name).join('~')
+            return `${cacheGroupKey}-${allChunksNames}-${moduleFileName}`
+          }
+        }
+      }
     }
   },
   plugins: [
