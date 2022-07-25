@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { User } from "../model";
-import { SNOWPACK_PUBLIC_API_URL } from "../utils";
+import { PUBLIC_API_URL } from "../utils";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
 
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
       "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
     );
     let errorCode: number;
-    const user: User = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/login`, {
+    const user: User = await fetch(`${PUBLIC_API_URL}/api/login`, {
       method: "POST",
       credentials: "include",
       headers: headers,
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   // This will only listen to changes on value
 
   const handleLogout = async () => {
-    const logout = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/logout`, {
+    const logout = await fetch(`${PUBLIC_API_URL}/api/logout`, {
       method: "POST",
     })
       .then((res) => {
