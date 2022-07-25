@@ -117,12 +117,12 @@ export const Row = ({
               )}`}
               topic={topic}
               date={day}
-              onCellUpdate={onCellUpdate}
+              onCellUpdate={(ev) => onCellUpdate(ev)}
               hours={rowHours[i]}
               comments={rowEntries[i] ? rowEntries[i].comments : ""}
               entryId={rowEntries[i] ? rowEntries[i].id : 0}
-              onFocusRow={onFocusRow}
-              onBlurRow={onBlurRow}
+              onFocusRow={() => onFocusRow()}
+              onBlurRow={() => onBlurRow()}
             />
           );
         })}
@@ -134,8 +134,8 @@ export const Row = ({
             className="cell"
             value={getRowSum(topic)}
             readOnly
-            onFocus={onFocusRow}
-            onBlur={onBlurRow}
+            onFocus={() => onFocusRow()}
+            onBlur={() => onBlurRow()}
             tabIndex={-1}
           />
         </div>
