@@ -103,11 +103,41 @@ export const Row = ({
                 href={`${PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`}
               >{`# ${topic.issue.id}`}</a>
             </p>
-            <p className="issue-label-text">
-              {topic.custom_name
-                ? `${topic.custom_name}`
-                : `${topic.issue.subject} - ${topic.activity.name}`}
-            </p>
+            {isFav ? (
+              <div className="tooltip">
+                <textarea
+                  aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
+                  className="issue-textarea"
+                  defaultValue={
+                    topic.custom_name
+                      ? `${topic.custom_name}`
+                      : `${topic.issue.subject} - ${topic.activity.name}`
+                  }
+                  onFocus={onFocusRow}
+                  onBlur={() => {
+                    onBlurRow();
+                  }}
+                  onChange={(ev) => {
+                    onFavNameUpdate(topic, ev.target.value);
+                  }}
+                  maxLength={100}
+                />
+                <span className="tooltiptext">
+                  {topic.issue.subject} - {topic.activity.name}
+                </span>
+              </div>
+            ) : (
+              <div className="tooltip">
+                <p className="issue-label-text">
+                  {topic.custom_name
+                    ? `${topic.custom_name}`
+                    : `${topic.issue.subject} - ${topic.activity.name}`}
+                </p>
+                <span className="tooltiptext">
+                  {topic.issue.subject} - {topic.activity.name}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         {days.map((day, i) => {
