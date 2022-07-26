@@ -18,6 +18,7 @@ export const Row = ({
   rowEntries,
   onCellUpdate,
   onToggleFav,
+  onFavNameUpdate,
   onToggleHide,
   getRowSum,
   isFav,
@@ -29,6 +30,7 @@ export const Row = ({
   rowEntries: FetchedTimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  onFavNameUpdate: (topic: IssueActivityPair, custom_name: string) => void;
   getRowSum: (pair: IssueActivityPair) => number;
   onToggleHide?: (topic: IssueActivityPair) => void;
   isFav?: boolean;
