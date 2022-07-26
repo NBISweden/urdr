@@ -318,6 +318,25 @@ export const Report = () => {
     }
   };
 
+  // Makes sure that the custom name of the favorite is updated in the local state
+  const handleFavNameUpdate = async (
+    topic: IssueActivityPair,
+    custom_name: string
+  ) => {
+    let favs = favorites.slice();
+    const updatedFavs = favs.map((fav) => {
+      if (
+        fav.activity.id === topic.activity.id &&
+        fav.issue.id === topic.issue.id
+      ) {
+        fav.custom_name = custom_name;
+        setShowUnsavedWarning(true);
+      }
+      return fav;
+    });
+    setFavorites(updatedFavs);
+  };
+
   // Enable hiding an issue-activity pair from the list of recent issues
   const toggleHide = async (topic: IssueActivityPair) => {
     // Check if topic is hidden.
@@ -384,13 +403,28 @@ export const Report = () => {
     return saved;
   };
 
+  // Make sure that the custom issue name is saved in the database.
+  const handleCustomNamesSave = async () => {
+    const saved = await saveFavorites([...favorites, ...hidden]);
+    if (!saved) {
+      alert("Favourite rows could not be saved. Please try again later.");
+      return;
+    }
+    setToastList([
+      ...toastList,
+      {
+        type: "success",
+        timeout: 3000,
+        message: "Custom names were saved!",
+      },
+    ]);
+  };
+
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
+    handleCustomNamesSave();
     if (newTimeEntries.length === 0) {
-      alert(
-        "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
-      );
       return;
     }
     toggleLoadingPage(true);
