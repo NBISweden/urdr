@@ -306,6 +306,7 @@ export const Report = () => {
     }
     // Topic was a favorite. Remove it from favorites and make it a recent.
     else {
+      topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
       const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
