@@ -94,6 +94,7 @@ export const Help = () => {
           onToggleHide={() => {}}
           isFav={true}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <p className="help-info">
@@ -113,6 +114,7 @@ export const Help = () => {
           onToggleHide={() => {}}
           isFav={false}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Hidden rows</h2>
@@ -136,6 +138,7 @@ export const Help = () => {
           onToggleHide={() => {}}
           isHidden={true}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Adding new rows</h2>
