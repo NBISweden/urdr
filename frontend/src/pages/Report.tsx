@@ -683,6 +683,7 @@ export const Report = () => {
                                     topic={fav}
                                     onCellUpdate={handleCellUpdate}
                                     onToggleFav={handleToggleFav}
+                                    onFavNameUpdate={handleFavNameUpdate}
                                     days={currentWeekArray}
                                     rowHours={findRowHours(fav)}
                                     rowEntries={rowEntries}
