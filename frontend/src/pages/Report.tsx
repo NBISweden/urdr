@@ -319,22 +319,22 @@ export const Report = () => {
   };
 
   // Makes sure that the custom name of the favorite is updated in the local state
-  const handleFavNameUpdate = async (
+  const handleFavNameUpdate = (
     topic: IssueActivityPair,
     custom_name: string
   ) => {
     let favs = favorites.slice();
-    const updatedFavs = favs.map((fav) => {
-      if (
-        fav.activity.id === topic.activity.id &&
-        fav.issue.id === topic.issue.id
-      ) {
-        fav.custom_name = custom_name;
-        setShowUnsavedWarning(true);
-      }
-      return fav;
-    });
-    setFavorites(updatedFavs);
+    let existingFav = favs.find(
+      (fav) =>
+        fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
+    );
+
+    if (existingFav) {
+      setShowUnsavedWarning(true);
+      let newFav = { ...existingFav, custom_name };
+      favs.splice(favs.indexOf(existingFav), 1, newFav);
+      setFavorites(favs);
+    }
   };
 
   // Enable hiding an issue-activity pair from the list of recent issues
