@@ -84,6 +84,13 @@ export const Help = () => {
           rows can be changed by drag and dropping the row using the
           drag–and–drop handle icon at the left-most position of the row.
         </p>
+        <p className="help-info">
+          Favourite rows can be given a custom name by editing the text area
+          next to the issue number. The custom name is only saved after clicking
+          on the <b>"Save Changes"</b> button. The original names of the rows
+          can be seen after hovering over the text area. When unfavouriting a
+          row, the custom name is reset to the original name.
+        </p>
         <Row
           key={1}
           topic={exampleIAP}
