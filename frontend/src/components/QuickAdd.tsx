@@ -5,6 +5,8 @@ import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
+import { PUBLIC_API_URL, headers } from "../utils";
+import * as ReactDOM from "react-dom";
 
 export const QuickAdd = ({
   addIssueActivity,
@@ -14,7 +16,12 @@ export const QuickAdd = ({
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
   const [activity, setActivity] = useState<IdName>();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState({
+    text: "",
+    suggestions: [],
+  });
+  const [isAutoCompleteVisible, setIsAutoCompleteVisible] = useState(false);
+
   const debouncedSearch = useDebounce(search, 500);
   const context = React.useContext(AuthContext);
 
@@ -43,31 +50,91 @@ export const QuickAdd = ({
   React.useEffect(
     () => {
       let didCancel = false;
-      const searchIssue = async () => {
-        if (debouncedSearch) {
-          const endpoint = `/api/issues?status_id=*&issue_id=${search}`;
-          let result: { issues: Issue[] } = await getApiEndpoint(
-            endpoint,
-            context
-          );
-          if (!didCancel) {
-            if (result.issues.length > 0) {
-              const issue: Issue = {
-                id: result.issues[0].id,
-                subject: result.issues[0].subject,
-              };
-              setIssue(issue);
+      const searchSuggestions = async () => {
+        if (search.text === "") {
+          setIsAutoCompleteVisible(false);
+        }
+        if (debouncedSearch && search.text) {
+          let res: { issues: Issue[] };
+          let candidateIssues: Issue[];
+
+          if (Number.isInteger(Number(search.text))) {
+            const endpoint = `/api/issues?status_id=*&issue_id=${search.text}`;
+            res = await getApiEndpoint(endpoint, context);
+          } else {
+            res = await searchIssues(search.text);
+          }
+          if (!didCancel && res.issues) {
+            if (res.issues.length > 0) {
+              if (res.issues.length === 1) {
+                candidateIssues = [res.issues[0]];
+              } else {
+                candidateIssues = res.issues;
+              }
+              setSearch({ text: undefined, suggestions: candidateIssues });
+              setIsAutoCompleteVisible(true);
+            } else {
+              setIsAutoCompleteVisible(false);
             }
+          } else {
+            setIsAutoCompleteVisible(false);
           }
         }
       };
-      searchIssue();
+      searchSuggestions();
       return () => {
         didCancel = true;
       };
     },
     [debouncedSearch] // Only call effect if debounced search term changes
   );
+
+  const suggestionSelected = (selection: Issue) => {
+    setIssue(selection);
+    // Update input box with selected issue
+    let element = ReactDOM.findDOMNode(document.getElementById("input-issue"));
+    element.value = selection.id.toString();
+    setIsAutoCompleteVisible(false);
+  };
+
+  const searchIssues = async (searchQuery: string) => {
+    let logout = false;
+
+    let payload = {
+      open_issues: "1",
+      messages: "0",
+      wiki_pages: "0",
+      changesets: "0",
+      documents: "0",
+      issues: "1",
+      titles_only: "0",
+      all_words: "1",
+      scope: "all",
+    };
+
+    const foundIssues: { issues: Issue[] } = await fetch(
+      `${PUBLIC_API_URL}/api/search?q=${searchQuery}`,
+      {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(payload),
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } else if (res.status === 401) {
+          logout = true;
+        } else {
+          throw new Error("Could not search for issues.");
+        }
+      })
+      .catch((error) => {
+        alert(error);
+      });
+    if (logout) context.setUser(null);
+    return foundIssues;
+  };
 
   const handleAdd = (e) => {
     if (issue === null) {
@@ -96,22 +163,22 @@ export const QuickAdd = ({
 
   const getSearchClasses = () => {
     let classes = "col-3 footer-field ";
-    if (search != "") classes += issue ? "valid" : "invalid";
+    if (search.text != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
 
   const getValidationIconSrc = () => {
     let src = "";
-    if (search != "") src = issue ? check : x;
+    if (search.text != "") src = issue ? check : x;
     return src;
   };
 
   return (
-    <div>
+    <div className="advanced-search-container">
       <h2> Add a new row</h2>
       <div className="row">
         <label htmlFor="input-issue" className="col-3 input-label hidden">
-          Issue e.g. 3499
+          Issue (e.g. 3499) / free text
         </label>
         <label htmlFor="select-activity" className="col-3 select-label hidden">
           Select activity
@@ -120,18 +187,18 @@ export const QuickAdd = ({
       <div className="row">
         <input
           id="input-issue"
+          autoComplete="off"
           className={getSearchClasses()}
-          type="number"
+          type="text"
           min={0}
           onChange={(e) => {
-            setSearch(e.target.value);
-            setIssue(null);
+            setSearch({ ...search, text: e.target.value });
           }}
           title={(issue && issue.subject) || ""}
         />
         <img
           className={
-            search === "" ? "validation-icon hiden" : "validation-icon"
+            search.text === "" ? "validation-icon hiden" : "validation-icon"
           }
           src={getValidationIconSrc()}
           alt="Validity"
@@ -157,6 +224,21 @@ export const QuickAdd = ({
           <img src={plus} alt="Add line" />
         </button>
       </div>
+      {search.suggestions.length > 0 && isAutoCompleteVisible && (
+        <ul className="col-6 autocomplete-container">
+          {search.suggestions.map((item) => (
+            <li key={item.id} className="autocomplete-item">
+              <button
+                key={item.id}
+                onClick={() => suggestionSelected(item)}
+                className="autocomplete-button"
+              >
+                {item.subject}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
