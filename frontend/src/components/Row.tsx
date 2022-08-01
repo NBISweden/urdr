@@ -127,16 +127,11 @@ export const Row = ({
                 </span>
               </div>
             ) : (
-              <div className="issuetooltip">
-                <p className="issue-label-text">
-                  {topic.custom_name
-                    ? `${topic.custom_name}`
-                    : `${topic.issue.subject} - ${topic.activity.name}`}
-                </p>
-                <span className="tooltiptext">
-                  {topic.issue.subject} - {topic.activity.name}
-                </span>
-              </div>
+              <p className="issue-label-text">
+                {topic.custom_name
+                  ? `${topic.custom_name}`
+                  : `${topic.issue.subject} - ${topic.activity.name}`}
+              </p>
             )}
           </div>
         </div>
