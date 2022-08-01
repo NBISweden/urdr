@@ -104,7 +104,7 @@ export const Row = ({
               >{`# ${topic.issue.id}`}</a>
             </p>
             {isFav ? (
-              <div className="tooltip">
+              <div className="issuetooltip">
                 <textarea
                   aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
                   className="issue-textarea"
@@ -127,7 +127,7 @@ export const Row = ({
                 </span>
               </div>
             ) : (
-              <div className="tooltip">
+              <div className="issuetooltip">
                 <p className="issue-label-text">
                   {topic.custom_name
                     ? `${topic.custom_name}`

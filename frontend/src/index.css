@@ -356,7 +356,7 @@ Other button classes are defined further down together with other classes for th
   opacity: 1;
 }
 
-.tooltip {
+.issuetooltip {
   width: 100%;
   position: relative;
   display: inline-block;
