@@ -54,7 +54,6 @@ module.exports = {
       )
     }),
     new HtmlWebpackPlugin({
-      title: 'Urdr time logging',
       filename: 'index.html',
       publicPath: '/',
       template: './src/template.hbs'
