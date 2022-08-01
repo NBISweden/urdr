@@ -7,7 +7,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
-	log "github.com/sirupsen/logrus"
 )
 
 // loginHandler godoc
@@ -42,14 +41,10 @@ func issueSearchHandler(c *fiber.Ctx) error {
 		} `json:"results"`
 	}{}
 
-	log.Debug(string(c.Response().Body()))
-
 	if err := json.Unmarshal(c.Response().Body(), &searchResponse); err != nil {
 		c.Response().Reset()
 		return c.SendStatus(fiber.StatusUnprocessableEntity)
 	}
-
-	log.Debug("Search response: ", searchResponse)
 
 	var foundIssues []Issue
 
