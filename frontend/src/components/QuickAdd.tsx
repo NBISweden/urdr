@@ -173,6 +173,14 @@ export const QuickAdd = ({
     return src;
   };
 
+  const onEscapeInput = (e: any) => {
+    {
+      if (e.key === "Escape") {
+        setIsAutoCompleteVisible(false);
+      }
+    }
+  };
+
   return (
     <div className="advanced-search-container">
       <h2> Add a new row</h2>
@@ -191,6 +199,7 @@ export const QuickAdd = ({
           className={getSearchClasses()}
           type="text"
           min={0}
+          onKeyUp={(e) => onEscapeInput(e)}
           onChange={(e) => {
             setSearch({ ...search, text: e.target.value });
             setIssue(null);
