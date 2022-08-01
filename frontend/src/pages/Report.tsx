@@ -315,6 +315,10 @@ export const Report = () => {
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
+      // Make sure that the warning is gone when we un-favorite an issue
+      if (newTimeEntries.length === 0) {
+        setShowUnsavedWarning(false);
+      }
     }
   };
 
