@@ -193,6 +193,7 @@ export const QuickAdd = ({
           min={0}
           onChange={(e) => {
             setSearch({ ...search, text: e.target.value });
+            setIssue(null);
           }}
           title={(issue && issue.subject) || ""}
         />
