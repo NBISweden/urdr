@@ -364,7 +364,7 @@ Other button classes are defined further down together with other classes for th
   z-index: 1;
 }
 
-.tooltip .tooltiptext {
+.tooltiptext {
   visibility: hidden;
   width: auto;
   height: auto;
@@ -376,10 +376,9 @@ Other button classes are defined further down together with other classes for th
   bottom: 125%;
   left: 50%;
   margin-left: -60px;
-  z-index: 1;
 }
 
-.tooltip .tooltiptext::after {
+.tooltiptext::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -390,7 +389,7 @@ Other button classes are defined further down together with other classes for th
   border-color: hsl(0deg 0% 0%) transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
+.issuetooltip:hover .tooltiptext {
   visibility: visible;
 }
 
