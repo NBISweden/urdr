@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { IdName, Issue, IssueActivityPair } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
-import { PUBLIC_API_URL, headers } from "../utils";
+import { PUBLIC_API_URL, headers, useEscaper } from "../utils";
 import * as ReactDOM from "react-dom";
 
 export const QuickAdd = ({
@@ -175,13 +175,12 @@ export const QuickAdd = ({
     return src;
   };
 
-  const onEscapeInput = (e: any) => {
-    {
-      if (e.key === "Escape") {
-        setIsAutoCompleteVisible(false);
-      }
-    }
+  const handleHideAutocomplete = () => {
+    setIsAutoCompleteVisible(false);
   };
+
+  const wrapperRef = useRef(null);
+  useEscaper(wrapperRef, handleHideAutocomplete);
 
   return (
     <div>
@@ -201,7 +200,6 @@ export const QuickAdd = ({
           className={getSearchClasses()}
           type="text"
           min={0}
-          onKeyUp={(e) => onEscapeInput(e)}
           onChange={(e) => {
             setSearch({ ...search, text: e.target.value });
             setIssue(null);
@@ -237,7 +235,7 @@ export const QuickAdd = ({
         </button>
       </div>
       {search.suggestions.length > 0 && isAutoCompleteVisible && (
-        <ul className="col-8 autocomplete-container">
+        <ul className="col-8 autocomplete-container" ref={wrapperRef}>
           {search.suggestions.map((item) => (
             <li key={item.id} className="autocomplete-item">
               <button

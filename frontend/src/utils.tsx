@@ -1,5 +1,10 @@
 import.meta.hot;
-import React, { useState } from "react";
+import React, {
+  useState,
+  useEffect,
+  ElementType,
+  MouseEventHandler,
+} from "react";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
 
@@ -131,4 +136,35 @@ export const useViewport = () => {
 
   // Return the width so we can use it in our components
   return { width };
+};
+
+// Hook to escape a certain DOM element by clicking outside of it or pressing Escape
+export const useEscaper = (
+  ref: React.RefObject<HTMLElement>,
+  callback: () => void
+) => {
+  useEffect(() => {
+    // What should happen when clicked outside the element
+    const handleClickOutside = (event: any) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback();
+      }
+    };
+
+    // What should happen when pressed escape
+    const handleEscape = (event: any) => {
+      if (event.key == "Escape") {
+        callback();
+      }
+    };
+
+    // Bind the event listeners
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      // Unbind the event listeners on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [ref]);
 };
