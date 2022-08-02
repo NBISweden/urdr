@@ -19,3 +19,8 @@ updates:
     directory: "production/"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "node/"
+    schedule:
+      interval: "daily"
