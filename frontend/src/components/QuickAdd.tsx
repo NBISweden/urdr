@@ -101,15 +101,17 @@ export const QuickAdd = ({
     let logout = false;
 
     let payload = {
-      open_issues: "1",
-      messages: "0",
-      wiki_pages: "0",
-      changesets: "0",
-      documents: "0",
-      issues: "1",
-      titles_only: "0",
-      all_words: "1",
       scope: "all",
+      all_words: "1",
+      titles_only: "0",
+      issues: "1",
+      news: "0",
+      // documents: "0" produces weird results.
+      changesets: "0",
+      wiki_pages: "0",
+      messages: "0",
+      // projects: "0" produces weird results.
+      open_issues: "1",
     };
 
     const foundIssues: { issues: Issue[] } = await fetch(
@@ -145,7 +147,7 @@ export const QuickAdd = ({
       const pair: IssueActivityPair = {
         issue: issue,
         activity: activity,
-        custom_name: issue.subject + "-" + activity.name,
+        custom_name: issue.subject + " - " + activity.name,
         is_hidden: false,
       };
 
@@ -243,7 +245,7 @@ export const QuickAdd = ({
                 onClick={() => suggestionSelected(item)}
                 className="autocomplete-button"
               >
-                {item.subject}
+                #{item.id} - {item.subject}
               </button>
             </li>
           ))}
