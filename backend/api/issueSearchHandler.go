@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,6 +38,7 @@ func issueSearchHandler(c *fiber.Ctx) error {
 	searchResponse := struct {
 		Results []struct {
 			Id    int    `json:"id"`
+			Type  string `json:"type"`
 			Title string `json:"title"`
 		} `json:"results"`
 	}{}
@@ -49,10 +51,14 @@ func issueSearchHandler(c *fiber.Ctx) error {
 	var foundIssues []Issue
 
 	for _, issue := range searchResponse.Results {
-		foundIssues = append(foundIssues, Issue{
-			Id:      issue.Id,
-			Subject: issue.Title,
-		})
+		if issue.Type == "issue" && strings.Contains(issue.Title, "):") {
+			issueSubject := strings.TrimSpace(strings.Split(issue.Title, "):")[1])
+			issue := Issue{
+				Id:      issue.Id,
+				Subject: issueSubject,
+			}
+			foundIssues = append(foundIssues, issue)
+		}
 	}
 
 	return c.JSON(IssuesResponse{
