@@ -1,4 +1,4 @@
-FROM node:17.6-slim as build
+FROM node:18.7.0-slim as build
 
 USER node
 RUN mkdir /home/node/app
@@ -6,7 +6,7 @@ WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:17.6-slim as bundler
+FROM node:18.7.0-slim as bundler
 
 ARG PUBLIC_API_URL
 ENV PUBLIC_API_URL=${PUBLIC_API_URL}
