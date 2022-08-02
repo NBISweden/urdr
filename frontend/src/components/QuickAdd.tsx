@@ -182,7 +182,7 @@ export const QuickAdd = ({
   };
 
   return (
-    <div className="advanced-search-container">
+    <div>
       <h2> Add a new row</h2>
       <div className="row">
         <label htmlFor="input-issue" className="col-3 input-label hidden">
@@ -235,7 +235,7 @@ export const QuickAdd = ({
         </button>
       </div>
       {search.suggestions.length > 0 && isAutoCompleteVisible && (
-        <ul className="col-6 autocomplete-container">
+        <ul className="col-8 autocomplete-container">
           {search.suggestions.map((item) => (
             <li key={item.id} className="autocomplete-item">
               <button

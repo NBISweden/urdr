@@ -474,37 +474,31 @@ Other button classes are defined further down together with other classes for th
   margin: 0 0 0 3.75rem;
 }
 
-.advanced-search-container {
-  min-height: 270px;
-}
-
 .autocomplete-container {
+  max-height: 10rem;
   margin-left: -3.2em;
   margin-top: 0.6em;
   list-style-type: none;
-  max-height: 100px;
   overflow-y: auto;
   z-index: 1;
 }
 
 .autocomplete-item {
-  padding: 0 24px;
+  padding: 0 0 0 24px;
   width: 100%;
   box-sizing: border-box;
 }
 
-.autocomplete-item:hover {
-  background-color: #fafafa;
-}
-
 .autocomplete-button {
+  background-color: white;
   width: 100%;
-  line-height: 32px;
   text-align: left;
+  border: none;
+  padding: 0.5rem 1rem;
 }
 
 .autocomplete-button:hover {
-  background-color: #fafafa;
+  background-color: hsl(186deg 30% 94%);
   outline: none;
 }
 
