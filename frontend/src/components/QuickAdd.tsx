@@ -175,14 +175,6 @@ export const QuickAdd = ({
     return src;
   };
 
-  const onEscapeInput = (e: any) => {
-    {
-      if (e.key === "Escape") {
-        setIsAutoCompleteVisible(false);
-      }
-    }
-  };
-
   const handleHideAutocomplete = () => {
     setIsAutoCompleteVisible(false);
   };
@@ -208,7 +200,6 @@ export const QuickAdd = ({
           className={getSearchClasses()}
           type="text"
           min={0}
-          onKeyUp={(e) => onEscapeInput(e)}
           onChange={(e) => {
             setSearch({ ...search, text: e.target.value });
             setIssue(null);
