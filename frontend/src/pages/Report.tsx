@@ -306,6 +306,7 @@ export const Report = () => {
     }
     // Topic was a favorite. Remove it from favorites and make it a recent.
     else {
+      topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
       const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
@@ -314,6 +315,29 @@ export const Report = () => {
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
+      // Make sure that the warning is gone when we un-favorite an issue
+      if (newTimeEntries.length === 0) {
+        setShowUnsavedWarning(false);
+      }
+    }
+  };
+
+  // Makes sure that the custom name of the favorite is updated in the local state
+  const handleFavNameUpdate = (
+    topic: IssueActivityPair,
+    custom_name: string
+  ) => {
+    let favs = favorites.slice();
+    let existingFav = favs.find(
+      (fav) =>
+        fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
+    );
+
+    if (existingFav) {
+      setShowUnsavedWarning(true);
+      let newFav = { ...existingFav, custom_name };
+      favs.splice(favs.indexOf(existingFav), 1, newFav);
+      setFavorites(favs);
     }
   };
 
@@ -383,13 +407,28 @@ export const Report = () => {
     return saved;
   };
 
+  // Make sure that the custom issue name is saved in the database.
+  const handleCustomNamesSave = async () => {
+    const saved = await saveFavorites([...favorites, ...hidden]);
+    if (!saved) {
+      alert("Favourite rows could not be saved. Please try again later.");
+      return;
+    }
+    setToastList([
+      ...toastList,
+      {
+        type: "success",
+        timeout: 3000,
+        message: "Custom names were saved!",
+      },
+    ]);
+  };
+
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
+    handleCustomNamesSave();
     if (newTimeEntries.length === 0) {
-      alert(
-        "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
-      );
       return;
     }
     toggleLoadingPage(true);
@@ -648,6 +687,7 @@ export const Report = () => {
                                     topic={fav}
                                     onCellUpdate={handleCellUpdate}
                                     onToggleFav={handleToggleFav}
+                                    onFavNameUpdate={handleFavNameUpdate}
                                     days={currentWeekArray}
                                     rowHours={findRowHours(fav)}
                                     rowEntries={rowEntries}
