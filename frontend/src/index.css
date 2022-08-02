@@ -474,6 +474,34 @@ Other button classes are defined further down together with other classes for th
   margin: 0 0 0 3.75rem;
 }
 
+.autocomplete-container {
+  max-height: 10rem;
+  margin-left: -3.2em;
+  margin-top: 0.6em;
+  list-style-type: none;
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.autocomplete-item {
+  padding: 0 0 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.autocomplete-button {
+  background-color: white;
+  width: 100%;
+  text-align: left;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.autocomplete-button:hover {
+  background-color: hsl(186deg 30% 94%);
+  outline: none;
+}
+
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }

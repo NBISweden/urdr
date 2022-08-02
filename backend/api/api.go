@@ -74,6 +74,8 @@ func Setup() *fiber.App {
 
 	app.Post("/api/priority_entries", postPriorityEntriesHandler)
 
+	app.Post("/api/search", issueSearchHandler)
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotFound) // => 404 "Not Found"

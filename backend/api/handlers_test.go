@@ -132,11 +132,28 @@ func Test_Handlers(t *testing.T) {
 
 	issueActsResp, _ := json.Marshal(issueAct)
 
+	issueSearchResponse := api.IssueSearchResponse{
+		Results: []api.IssueWithTitle{
+			{
+				Id:    1,
+				Title: "test issue",
+			},
+		},
+	}
+
+	searchResponse, _ := json.Marshal(issueSearchResponse)
 	var err error
 
 	// Create a fake Redmine server to which redmine requests will be forwarded
 	fakeRedmine := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch endpoint := r.URL.Path; endpoint {
+		case "/search.json":
+			if r.Method == "GET" {
+				w.WriteHeader(fiber.StatusOK)
+				_, err = w.Write(searchResponse)
+			}
+			w.WriteHeader(fiber.StatusMethodNotAllowed)
+			_, err = w.Write(nil)
 		case "/my/account.json":
 			_, err = w.Write(userResponse)
 		case "/time_entries.json":
@@ -361,6 +378,30 @@ func Test_Handlers(t *testing.T) {
 			testRedmine:      fakeRedmine,
 			useSessionHeader: false,
 			statusCode:       fiber.StatusUnauthorized,
+		},
+		{
+			name:             "search POST",
+			method:           "POST",
+			endpoint:         "/api/search",
+			testRedmine:      fakeRedmine,
+			useSessionHeader: true,
+			statusCode:       fiber.StatusOK,
+		},
+		{
+			name:             "search POST 401",
+			method:           "POST",
+			endpoint:         "/api/search",
+			testRedmine:      fakeRedmine,
+			useSessionHeader: false,
+			statusCode:       fiber.StatusUnauthorized,
+		},
+		{
+			name:             "search GET",
+			method:           "GET",
+			endpoint:         "/api/search",
+			testRedmine:      fakeRedmine,
+			useSessionHeader: true,
+			statusCode:       fiber.StatusNotFound,
 		},
 		{
 			name:             "Logout",
