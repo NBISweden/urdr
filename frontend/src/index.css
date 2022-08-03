@@ -498,7 +498,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .autocomplete-button:focus {
-  background-color: hsl(186deg 30% 94%);
+  background-color: hsl(186deg 30% 86%);
   outline: none;
 }
 
