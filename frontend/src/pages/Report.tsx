@@ -158,7 +158,7 @@ export const Report = () => {
       );
       const issues = [...recentIssues];
       if (!!priorityIssues) {
-        let nonPrioIssues = [];
+        let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
           let match = priorityIssues.find(
             (fav) =>
@@ -528,7 +528,7 @@ export const Report = () => {
   and, if there are none, for entries from the database for the respective cell.
   */
   const findRowHours = (rowTopic: IssueActivityPair) => {
-    let rowHours = [];
+    let rowHours: number[] = [];
     currentWeekArray.map((day) => {
       let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
@@ -560,7 +560,7 @@ export const Report = () => {
   If there is no entry in the database, id is 0.
   */
   const findRowEntries = (rowTopic: IssueActivityPair, days: Date[]) => {
-    let entries = [];
+    let entries: FetchedTimeEntry[] = [];
     days.map((day) => {
       let entry = timeEntries?.find(
         (entry) =>
@@ -724,6 +724,7 @@ export const Report = () => {
                     topic={recentIssue}
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
+                    onFavNameUpdate={handleFavNameUpdate}
                     onToggleHide={toggleHide}
                     days={currentWeekArray}
                     rowHours={findRowHours(recentIssue)}
@@ -754,6 +755,7 @@ export const Report = () => {
                       topic={hiddenIssue}
                       onCellUpdate={handleCellUpdate}
                       onToggleFav={handleToggleFav}
+                      onFavNameUpdate={handleFavNameUpdate}
                       onToggleHide={toggleHide}
                       days={currentWeekArray}
                       rowHours={findRowHours(hiddenIssue)}
