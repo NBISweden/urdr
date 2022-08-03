@@ -6,7 +6,6 @@ import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
 import { PUBLIC_API_URL, headers, useEscaper } from "../utils";
-import * as ReactDOM from "react-dom";
 
 export const QuickAdd = ({
   addIssueActivity,
@@ -101,7 +100,7 @@ export const QuickAdd = ({
   const suggestionSelected = (selection: Issue) => {
     setIssue(selection);
     // Update input box with selected issue
-    let element = ReactDOM.findDOMNode(document.getElementById("input-issue"));
+    let element = issueInputRef.current;
     element.value = selection.id.toString();
     setIsAutoCompleteVisible(false);
   };
@@ -188,29 +187,22 @@ export const QuickAdd = ({
     setIsAutoCompleteVisible(false);
   };
 
-  const wrapperRef = useRef(null);
-  useEscaper(wrapperRef, handleHideAutocomplete);
+  const suggestionsRef = useRef(null);
+  useEscaper(suggestionsRef, handleHideAutocomplete);
+  const issueInputRef = useRef(null);
 
   const handleInputToAutocompleteFocus = (event: any) => {
     event.preventDefault();
     if (event.key == "ArrowUp" || event.key == "ArrowDown") {
-      const suggestionsList = ReactDOM.findDOMNode(
-        document.getElementById("suggestions-ul")
-      );
+      const suggestionsList = suggestionsRef.current;
       let lengthOfSuggestions = suggestionsList.childNodes.length;
       if (lengthOfSuggestions > 0) {
         let suggestionIndex = 0;
-        if (event.key == "ArrowUp") {
-          suggestionIndex = lengthOfSuggestions - 1;
-        } else if (event.key == "ArrowDown") {
-          suggestionIndex = 0;
-        }
-        const suggestion = ReactDOM.findDOMNode(
-          document.getElementById(
-            "suggestion-btn-" + suggestionIndex.toString()
-          )
-        );
-        suggestion.focus();
+        event.key == "ArrowUp" ? lengthOfSuggestions - 1 : 0;
+
+        suggestionsRef.current.childNodes[
+          suggestionIndex
+        ].childNodes[0].focus();
       }
     }
   };
@@ -218,19 +210,14 @@ export const QuickAdd = ({
   const handleAutocompleteNavigation = (event: any) => {
     event.preventDefault();
     if (event.key == "ArrowUp" || event.key == "ArrowDown") {
-      const suggestionsList = ReactDOM.findDOMNode(
-        document.getElementById("suggestions-ul")
-      );
+      const suggestionsList = suggestionsRef.current;
       let lengthOfSuggestions = suggestionsList.childNodes.length;
       if (lengthOfSuggestions > 0) {
         let sourceIndex: number = Number(event.target.id.split("-")[2]);
         let targetIndex: number =
           event.key == "ArrowUp" ? sourceIndex - 1 : sourceIndex + 1;
         if (targetIndex >= 0 && targetIndex < lengthOfSuggestions) {
-          const suggestion = ReactDOM.findDOMNode(
-            document.getElementById("suggestion-btn-" + targetIndex.toString())
-          );
-          suggestion.focus();
+          suggestionsRef.current.childNodes[targetIndex].childNodes[0].focus();
         }
       }
     }
@@ -250,6 +237,7 @@ export const QuickAdd = ({
       <div className="row">
         <input
           id="input-issue"
+          ref={issueInputRef}
           autoComplete="off"
           className={getSearchClasses()}
           type="text"
@@ -295,7 +283,7 @@ export const QuickAdd = ({
         <ul
           id="suggestions-ul"
           className="col-8 autocomplete-container"
-          ref={wrapperRef}
+          ref={suggestionsRef}
         >
           {search.suggestions.map((item, index) => (
             <li key={item.id} className="autocomplete-item">
