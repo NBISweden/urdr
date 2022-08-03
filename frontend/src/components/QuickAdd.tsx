@@ -191,6 +191,51 @@ export const QuickAdd = ({
   const wrapperRef = useRef(null);
   useEscaper(wrapperRef, handleHideAutocomplete);
 
+  const handleInputToAutocompleteFocus = (event: any) => {
+    event.preventDefault();
+    if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+      const suggestionsList = ReactDOM.findDOMNode(
+        document.getElementById("suggestions-ul")
+      );
+      let lengthOfSuggestions = suggestionsList.childNodes.length;
+      if (lengthOfSuggestions > 0) {
+        let suggestionIndex = 0;
+        if (event.key == "ArrowUp") {
+          suggestionIndex = lengthOfSuggestions - 1;
+        } else if (event.key == "ArrowDown") {
+          suggestionIndex = 0;
+        }
+        const suggestion = ReactDOM.findDOMNode(
+          document.getElementById(
+            "suggestion-btn-" + suggestionIndex.toString()
+          )
+        );
+        suggestion.focus();
+      }
+    }
+  };
+
+  const handleAutocompleteNavigation = (event: any) => {
+    event.preventDefault();
+    if (event.key == "ArrowUp" || event.key == "ArrowDown") {
+      const suggestionsList = ReactDOM.findDOMNode(
+        document.getElementById("suggestions-ul")
+      );
+      let lengthOfSuggestions = suggestionsList.childNodes.length;
+      if (lengthOfSuggestions > 0) {
+        let sourceIndex: number = Number(event.target.id.split("-")[2]);
+        let targetIndex: number =
+          event.key == "ArrowUp" ? sourceIndex - 1 : sourceIndex + 1;
+        if (targetIndex >= 0 && targetIndex < lengthOfSuggestions) {
+          const suggestion = ReactDOM.findDOMNode(
+            document.getElementById("suggestion-btn-" + targetIndex.toString())
+          );
+          suggestion.focus();
+        }
+      }
+    }
+  };
+
   return (
     <div>
       <h2> Add a new row</h2>
@@ -208,6 +253,9 @@ export const QuickAdd = ({
           autoComplete="off"
           className={getSearchClasses()}
           type="text"
+          onKeyUp={(ev) => {
+            handleInputToAutocompleteFocus(ev);
+          }}
           min={0}
           onChange={(e) => {
             setSearch({ ...search, text: e.target.value });
@@ -244,10 +292,18 @@ export const QuickAdd = ({
         </button>
       </div>
       {search.suggestions.length > 0 && isAutoCompleteVisible && (
-        <ul className="col-8 autocomplete-container" ref={wrapperRef}>
-          {search.suggestions.map((item) => (
+        <ul
+          id="suggestions-ul"
+          className="col-8 autocomplete-container"
+          ref={wrapperRef}
+        >
+          {search.suggestions.map((item, index) => (
             <li key={item.id} className="autocomplete-item">
               <button
+                id={"suggestion-btn-" + index.toString()}
+                onKeyUp={(ev) => {
+                  handleAutocompleteNavigation(ev);
+                }}
                 key={item.id}
                 onClick={() => suggestionSelected(item)}
                 className="autocomplete-button"
