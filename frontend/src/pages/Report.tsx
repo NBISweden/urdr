@@ -59,6 +59,7 @@ export const Report = () => {
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFavNameUpdated, setIsFavNameUpdated] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
 
@@ -338,6 +339,7 @@ export const Report = () => {
       let newFav = { ...existingFav, custom_name };
       favs.splice(favs.indexOf(existingFav), 1, newFav);
       setFavorites(favs);
+      setIsFavNameUpdated(true);
     }
   };
 
@@ -407,42 +409,34 @@ export const Report = () => {
     return saved;
   };
 
-  // Make sure that the custom issue name is saved in the database.
-  const handleCustomNamesSave = async () => {
-    const saved = await saveFavorites([...favorites, ...hidden]);
-    if (!saved) {
-      alert("Favourite rows could not be saved. Please try again later.");
-      return;
-    }
-    setToastList([
-      ...toastList,
-      {
-        type: "success",
-        timeout: 3000,
-        message: "Custom names were saved!",
-      },
-    ]);
-  };
-
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
-    handleCustomNamesSave();
-    if (newTimeEntries.length === 0) {
+    if (newTimeEntries.length === 0 && !isFavNameUpdated) {
       return;
     }
     toggleLoadingPage(true);
-    const unsavedEntries = [];
-    for await (let entry of newTimeEntries) {
-      const saved = await reportTime(entry);
-      if (!saved) {
-        unsavedEntries.push(entry);
+    let saveFailed = false;
+    if (newTimeEntries.length !== 0) {
+      const unsavedEntries = [];
+      for await (let entry of newTimeEntries) {
+        const saved = await reportTime(entry);
+        if (!saved) {
+          unsavedEntries.push(entry);
+          saveFailed = true;
+        }
+      }
+      await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
+      setNewTimeEntries(unsavedEntries);
+    }
+    if (isFavNameUpdated) {
+      const namesSaved = await saveFavorites([...favorites, ...hidden]);
+      if (!namesSaved) {
+        saveFailed = true;
       }
     }
-    await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
-    setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
-    if (unsavedEntries.length === 0) {
+    if (!saveFailed) {
       setToastList([
         ...toastList,
         {
@@ -451,8 +445,16 @@ export const Report = () => {
           message: "All changes saved!",
         },
       ]);
-    } else if (unsavedEntries.length > 0) {
+    } else if (saveFailed) {
       setShowUnsavedWarning(true);
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 3000,
+          message: "Not all changes could be saved. Please try again later.",
+        },
+      ]);
     }
   };
 
