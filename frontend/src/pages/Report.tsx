@@ -59,7 +59,7 @@ export const Report = () => {
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isFavNameUpdated, setIsFavNameUpdated] = useState(false);
+  const [changedFavNames, setChangedFavNames] = useState<number[]>([]);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
 
@@ -197,12 +197,12 @@ export const Report = () => {
   }, [newTimeEntries]);
 
   React.useEffect(() => {
-    if (newTimeEntries.length > 0) {
+    if (newTimeEntries.length > 0 || changedFavNames.length > 0) {
       setShowUnsavedWarning(true);
     } else {
       setShowUnsavedWarning(false);
     }
-  }, [newTimeEntries]);
+  }, [changedFavNames, newTimeEntries]);
 
   const handleCellUpdate = (timeEntry: TimeEntry): void => {
     const entries = [...newTimeEntries];
@@ -316,9 +316,11 @@ export const Report = () => {
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
-      // Make sure that the warning is gone when we un-favorite an issue
-      if (newTimeEntries.length === 0) {
-        setShowUnsavedWarning(false);
+      // Remove the un-favorited issue from list of changed favs
+      if (changedFavNames.includes(existingFav.issue.id)) {
+        let changedFavs = [...changedFavNames];
+        changedFavs.splice(changedFavs.indexOf(existingFav.issue.id), 1);
+        setChangedFavNames([...changedFavs]);
       }
     }
   };
@@ -335,11 +337,16 @@ export const Report = () => {
     );
 
     if (existingFav) {
-      setShowUnsavedWarning(true);
       let newFav = { ...existingFav, custom_name };
       favs.splice(favs.indexOf(existingFav), 1, newFav);
       setFavorites(favs);
-      setIsFavNameUpdated(true);
+
+      // If the favorite has't been updated since the last save,
+      // add it to the list of changed favs for tracking
+      if (!changedFavNames.includes(existingFav.issue.id)) {
+        let changedFavs = [...changedFavNames, existingFav.issue.id];
+        setChangedFavNames(changedFavs);
+      }
     }
   };
 
@@ -412,7 +419,7 @@ export const Report = () => {
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
-    if (newTimeEntries.length === 0 && !isFavNameUpdated) {
+    if (newTimeEntries.length === 0 && changedFavNames.length === 0) {
       return;
     }
     toggleLoadingPage(true);
@@ -429,7 +436,7 @@ export const Report = () => {
       await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
       setNewTimeEntries(unsavedEntries);
     }
-    if (isFavNameUpdated) {
+    if (changedFavNames.length > 0) {
       const namesSaved = await saveFavorites([...favorites, ...hidden]);
       if (!namesSaved) {
         saveFailed = true;
