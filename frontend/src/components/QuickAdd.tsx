@@ -25,6 +25,10 @@ export const QuickAdd = ({
   const debouncedSearch = useDebounce(search, 500);
   const context = React.useContext(AuthContext);
 
+  const isNumber = (s: string) => {
+    return Number.isInteger(Number(s));
+  };
+
   React.useEffect(() => {
     let endpoint = "/api/activities";
     if (issue) endpoint += "?issue_id=" + issue.id;
@@ -58,7 +62,7 @@ export const QuickAdd = ({
           let res: { issues: Issue[] };
           let candidateIssues: Issue[];
 
-          if (Number.isInteger(Number(search.text))) {
+          if (isNumber(search.text)) {
             const endpoint = `/api/issues?status_id=*&issue_id=${search.text}`;
             res = await getApiEndpoint(endpoint, context);
           } else {
@@ -67,7 +71,12 @@ export const QuickAdd = ({
           if (!didCancel && res.issues) {
             if (res.issues.length > 0) {
               if (res.issues.length === 1) {
-                candidateIssues = [res.issues[0]];
+                let foundIssue = res.issues[0];
+                candidateIssues = [foundIssue];
+                //allow for valid issue id autoselection
+                if (isNumber(search.text)) {
+                  setIssue(foundIssue);
+                }
               } else {
                 candidateIssues = res.issues;
               }
