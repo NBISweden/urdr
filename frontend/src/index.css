@@ -497,6 +497,11 @@ Other button classes are defined further down together with other classes for th
   padding: 0.5rem 1rem;
 }
 
+.autocomplete-button:focus {
+  background-color: hsl(186deg 30% 94%);
+  outline: none;
+}
+
 .autocomplete-button:hover {
   background-color: hsl(186deg 30% 94%);
   outline: none;
