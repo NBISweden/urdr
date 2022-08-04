@@ -117,7 +117,12 @@ export const Row = ({
                   }
                   onFocus={onFocusRow}
                   onBlur={() => {
-                    onFavNameSave();
+                    if (
+                      topic.custom_name !==
+                      topic.issue.subject + " - " + topic.activity.name
+                    ) {
+                      onFavNameSave();
+                    }
                     onBlurRow();
                   }}
                   onChange={(ev) => {
