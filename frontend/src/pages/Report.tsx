@@ -255,7 +255,14 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         const favs = [...favorites];
         setFavorites(favs);
         return false;
@@ -400,11 +407,42 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         return false;
       });
     if (logout) context.setUser(null);
     return saved;
+  };
+
+  // Make sure that the custom issue name is saved in the database.
+  const handleCustomNamesSave = async () => {
+    const saved = await saveFavorites([...favorites, ...hidden]);
+    if (!saved) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 5000,
+          message: "Favourite rows could not be saved. Please try again later.",
+        },
+      ]);
+      return;
+    }
+    setToastList([
+      ...toastList,
+      {
+        type: "success",
+        timeout: 3000,
+        message: "Custom names were saved!",
+      },
+    ]);
   };
 
   // Check for ...
@@ -462,7 +500,14 @@ export const Report = () => {
       });
     }
     if (recentIssue) {
-      alert("This issue/activity pair is already added");
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 5000,
+          message: "This issue/activity pair is already added.",
+        },
+      ]);
       return;
     }
     const newRecentIssues = [...filteredRecents, pair];
