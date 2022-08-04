@@ -231,6 +231,10 @@ export const QuickAdd = ({
           event.key == "ArrowUp" ? sourceIndex - 1 : sourceIndex + 1;
         if (targetIndex >= 0 && targetIndex < sugLen) {
           suggestionsRef.current.childNodes[targetIndex].childNodes[0].focus();
+        } else if (targetIndex < 0) {
+          issueInputRef.current.focus();
+        } else if (targetIndex >= sugLen) {
+          suggestionsRef.current.childNodes[0].childNodes[0].focus();
         }
       }
     }
@@ -304,6 +308,12 @@ export const QuickAdd = ({
                 id={"suggestion-btn-" + index.toString()}
                 onKeyUp={(ev) => {
                   handleAutocompleteNavigation(ev);
+                }}
+                // Make sure scroll does not disturb kbd nav
+                onKeyDown={(ev) => {
+                  if (ev.key == "ArrowUp" || ev.key == "ArrowDown") {
+                    ev.preventDefault();
+                  }
                 }}
                 key={item.id}
                 onClick={() => suggestionSelected(item)}
