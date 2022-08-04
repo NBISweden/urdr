@@ -388,6 +388,7 @@ export const Report = () => {
   // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
+    toggleLoadingPage(true);
     const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
@@ -407,6 +408,7 @@ export const Report = () => {
         }
       })
       .catch((error) => {
+        toggleLoadingPage(false);
         setToastList([
           ...toastList,
           {
@@ -435,7 +437,6 @@ export const Report = () => {
       ]);
       return;
     }
-    toggleLoadingPage(true);
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
