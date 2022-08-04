@@ -607,6 +607,18 @@ export const Report = () => {
     return pairs;
   };
 
+  // Forwards the option to update the toast list to child components
+  const handleToastListUpdate = (newToast: ToastMsg) => {
+    setToastList([
+      ...toastList,
+      {
+        type: newToast.type,
+        timeout: newToast.timeout,
+        message: newToast.message,
+      },
+    ]);
+  };
+
   if (context.user === null) return <></>;
 
   // Main content
@@ -812,7 +824,11 @@ export const Report = () => {
         <div className="footer">
           <section className="footer-container">
             <div className="col-8">
-              <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+              <QuickAdd
+                addIssueActivity={addIssueActivityHandler}
+                toastList={toastList}
+                onToastListUpdate={handleToastListUpdate}
+              ></QuickAdd>
             </div>
             {toastList.length > 0 && (
               <Toast onCloseToast={handleCloseToast} toastList={toastList} />
