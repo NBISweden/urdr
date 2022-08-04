@@ -425,6 +425,14 @@ export const Report = () => {
   const handleSave = async () => {
     setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
+      setToastList([
+        ...toastList,
+        {
+          type: "info",
+          timeout: 3000,
+          message: "Your time entries are already up-to-date.",
+        },
+      ]);
       return;
     }
     toggleLoadingPage(true);
