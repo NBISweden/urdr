@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { IdName, Issue, IssueActivityPair } from "../model";
+import { IdName, Issue, IssueActivityPair, ToastMsg } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
@@ -9,8 +9,12 @@ import { PUBLIC_API_URL, headers, useEscaper } from "../utils";
 
 export const QuickAdd = ({
   addIssueActivity,
+  toastList,
+  onToastListUpdate,
 }: {
   addIssueActivity: (pair: IssueActivityPair) => void;
+  toastList: ToastMsg[];
+  onToastListUpdate: (newToast: ToastMsg) => void;
 }) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
@@ -140,7 +144,11 @@ export const QuickAdd = ({
         }
       })
       .catch((error) => {
-        alert(error);
+        onToastListUpdate({
+          type: "warning",
+          timeout: 5000,
+          message: error.message,
+        });
       });
     if (logout) context.setUser(null);
     return foundIssues;
@@ -148,9 +156,12 @@ export const QuickAdd = ({
 
   const handleAdd = (e) => {
     if (issue === null) {
-      alert(
-        "We couldn't add anything. Make sure to type a valid issue number and choose an activity."
-      );
+      onToastListUpdate({
+        type: "warning",
+        timeout: 5000,
+        message:
+          "We couldn't add anything. Make sure to type a valid issue number and choose an activity.",
+      });
     } else {
       const pair: IssueActivityPair = {
         issue: issue,

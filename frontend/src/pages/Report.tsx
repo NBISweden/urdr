@@ -255,7 +255,14 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         const favs = [...favorites];
         setFavorites(favs);
         return false;
@@ -400,7 +407,14 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         return false;
       });
     if (logout) context.setUser(null);
@@ -462,7 +476,14 @@ export const Report = () => {
       });
     }
     if (recentIssue) {
-      alert("This issue/activity pair is already added");
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 5000,
+          message: "This issue/activity pair is already added.",
+        },
+      ]);
       return;
     }
     const newRecentIssues = [...filteredRecents, pair];
@@ -605,6 +626,18 @@ export const Report = () => {
     const index = pairs.indexOf(removed);
     pairs.splice(index, 1);
     return pairs;
+  };
+
+  // Forwards the option to update the toast list to child components
+  const handleToastListUpdate = (newToast: ToastMsg) => {
+    setToastList([
+      ...toastList,
+      {
+        type: newToast.type,
+        timeout: newToast.timeout,
+        message: newToast.message,
+      },
+    ]);
   };
 
   if (context.user === null) return <></>;
@@ -812,7 +845,11 @@ export const Report = () => {
         <div className="footer">
           <section className="footer-container">
             <div className="col-8">
-              <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+              <QuickAdd
+                addIssueActivity={addIssueActivityHandler}
+                toastList={toastList}
+                onToastListUpdate={handleToastListUpdate}
+              ></QuickAdd>
             </div>
             {toastList.length > 0 && (
               <Toast onCloseToast={handleCloseToast} toastList={toastList} />
