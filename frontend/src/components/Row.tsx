@@ -19,6 +19,7 @@ export const Row = ({
   onCellUpdate,
   onToggleFav,
   onFavNameUpdate,
+  onFavNameSave,
   onToggleHide,
   getRowSum,
   isFav,
@@ -31,6 +32,7 @@ export const Row = ({
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
   onFavNameUpdate: (topic: IssueActivityPair, custom_name: string) => void;
+  onFavNameSave: () => void;
   getRowSum: (pair: IssueActivityPair) => number;
   onToggleHide?: (topic: IssueActivityPair) => void;
   isFav?: boolean;
@@ -115,6 +117,12 @@ export const Row = ({
                   }
                   onFocus={onFocusRow}
                   onBlur={() => {
+                    if (
+                      topic.custom_name !==
+                      topic.issue.subject + " - " + topic.activity.name
+                    ) {
+                      onFavNameSave();
+                    }
                     onBlurRow();
                   }}
                   onChange={(ev) => {

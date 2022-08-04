@@ -157,7 +157,7 @@ export const Report = () => {
       );
       const issues = [...recentIssues];
       if (!!priorityIssues) {
-        let nonPrioIssues = [];
+        let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
           let match = priorityIssues.find(
             (fav) =>
@@ -315,10 +315,6 @@ export const Report = () => {
       }
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
-      // Make sure that the warning is gone when we un-favorite an issue
-      if (newTimeEntries.length === 0) {
-        setShowUnsavedWarning(false);
-      }
     }
   };
 
@@ -334,11 +330,15 @@ export const Report = () => {
     );
 
     if (existingFav) {
-      setShowUnsavedWarning(true);
       let newFav = { ...existingFav, custom_name };
       favs.splice(favs.indexOf(existingFav), 1, newFav);
       setFavorites(favs);
     }
+  };
+
+  //Save the fav name
+  const handleFavNameSave = () => {
+    saveFavorites([...favorites, ...hidden]);
   };
 
   // Enable hiding an issue-activity pair from the list of recent issues
@@ -407,27 +407,9 @@ export const Report = () => {
     return saved;
   };
 
-  // Make sure that the custom issue name is saved in the database.
-  const handleCustomNamesSave = async () => {
-    const saved = await saveFavorites([...favorites, ...hidden]);
-    if (!saved) {
-      alert("Favourite rows could not be saved. Please try again later.");
-      return;
-    }
-    setToastList([
-      ...toastList,
-      {
-        type: "success",
-        timeout: 3000,
-        message: "Custom names were saved!",
-      },
-    ]);
-  };
-
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
-    handleCustomNamesSave();
     if (newTimeEntries.length === 0) {
       return;
     }
@@ -526,7 +508,7 @@ export const Report = () => {
   and, if there are none, for entries from the database for the respective cell.
   */
   const findRowHours = (rowTopic: IssueActivityPair) => {
-    let rowHours = [];
+    let rowHours: number[] = [];
     currentWeekArray.map((day) => {
       let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
@@ -558,7 +540,7 @@ export const Report = () => {
   If there is no entry in the database, id is 0.
   */
   const findRowEntries = (rowTopic: IssueActivityPair, days: Date[]) => {
-    let entries = [];
+    let entries: FetchedTimeEntry[] = [];
     days.map((day) => {
       let entry = timeEntries?.find(
         (entry) =>
@@ -688,6 +670,7 @@ export const Report = () => {
                                     onCellUpdate={handleCellUpdate}
                                     onToggleFav={handleToggleFav}
                                     onFavNameUpdate={handleFavNameUpdate}
+                                    onFavNameSave={handleFavNameSave}
                                     days={currentWeekArray}
                                     rowHours={findRowHours(fav)}
                                     rowEntries={rowEntries}
@@ -722,6 +705,8 @@ export const Report = () => {
                     topic={recentIssue}
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
+                    onFavNameUpdate={handleFavNameUpdate}
+                    onFavNameSave={handleFavNameSave}
                     onToggleHide={toggleHide}
                     days={currentWeekArray}
                     rowHours={findRowHours(recentIssue)}
@@ -752,6 +737,8 @@ export const Report = () => {
                       topic={hiddenIssue}
                       onCellUpdate={handleCellUpdate}
                       onToggleFav={handleToggleFav}
+                      onFavNameUpdate={handleFavNameUpdate}
+                      onFavNameSave={handleFavNameSave}
                       onToggleHide={toggleHide}
                       days={currentWeekArray}
                       rowHours={findRowHours(hiddenIssue)}
