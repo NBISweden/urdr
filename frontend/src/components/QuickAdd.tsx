@@ -187,6 +187,10 @@ export const QuickAdd = ({
     setIsAutoCompleteVisible(false);
   };
 
+  const getSuggestionsLength = () => {
+    return suggestionsRef.current.childNodes.length;
+  };
+
   const suggestionsRef = useRef(null);
   useEscaper(suggestionsRef, handleHideAutocomplete);
   const issueInputRef = useRef(null);
@@ -194,11 +198,10 @@ export const QuickAdd = ({
   const handleInputToAutocompleteFocus = (event: any) => {
     event.preventDefault();
     if (event.key == "ArrowUp" || event.key == "ArrowDown") {
-      const suggestionsList = suggestionsRef.current;
-      let lengthOfSuggestions = suggestionsList.childNodes.length;
-      if (lengthOfSuggestions > 0) {
+      let sugLen = getSuggestionsLength();
+      if (sugLen > 0) {
         let suggestionIndex = 0;
-        event.key == "ArrowUp" ? lengthOfSuggestions - 1 : 0;
+        event.key == "ArrowUp" ? sugLen - 1 : 0;
 
         suggestionsRef.current.childNodes[
           suggestionIndex
@@ -210,13 +213,12 @@ export const QuickAdd = ({
   const handleAutocompleteNavigation = (event: any) => {
     event.preventDefault();
     if (event.key == "ArrowUp" || event.key == "ArrowDown") {
-      const suggestionsList = suggestionsRef.current;
-      let lengthOfSuggestions = suggestionsList.childNodes.length;
-      if (lengthOfSuggestions > 0) {
+      let sugLen = getSuggestionsLength();
+      if (sugLen > 0) {
         let sourceIndex: number = Number(event.target.id.split("-")[2]);
         let targetIndex: number =
           event.key == "ArrowUp" ? sourceIndex - 1 : sourceIndex + 1;
-        if (targetIndex >= 0 && targetIndex < lengthOfSuggestions) {
+        if (targetIndex >= 0 && targetIndex < sugLen) {
           suggestionsRef.current.childNodes[targetIndex].childNodes[0].focus();
         }
       }
