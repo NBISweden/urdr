@@ -305,6 +305,12 @@ export const QuickAdd = ({
                 onKeyUp={(ev) => {
                   handleAutocompleteNavigation(ev);
                 }}
+                // Make sure scroll does not disturb kbd nav
+                onKeyDown={(ev) => {
+                  if (ev.key == "ArrowUp" || ev.key == "ArrowDown") {
+                    ev.preventDefault();
+                  }
+                }}
                 key={item.id}
                 onClick={() => suggestionSelected(item)}
                 className="autocomplete-button"
