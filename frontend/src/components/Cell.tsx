@@ -107,6 +107,7 @@ export const Cell = ({
         {hours > 0 && (
           <button
             className={comments === "" ? "comment comment-unfilled" : "comment"}
+            onBlur={() => onBlurRow()}
             type="button"
             title="Toggle comment area"
             onFocus={() => onFocusRow()}
