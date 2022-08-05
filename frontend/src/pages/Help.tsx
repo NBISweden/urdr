@@ -86,10 +86,10 @@ export const Help = () => {
         </p>
         <p className="help-info">
           Favourite rows can be given a custom name by editing the text area
-          next to the issue number. The custom name is only saved after clicking
-          on the <b>"Save Changes"</b> button. The original names of the rows
-          can be seen after hovering over the text area. When unfavouriting a
-          row, the custom name is reset to the original name.
+          next to the issue number. The custom name is saved after switching the
+          focus to another element on the page, or clicking away. The original
+          names of the rows can be seen after hovering over the text area. When
+          unfavouriting a row, the custom name is reset to the original name.
         </p>
         <Row
           key={1}
@@ -228,6 +228,19 @@ export const Help = () => {
             className="weektravel-img"
           />
         </div>
+        <h2 className="help-subtitle">Keyboard shortcuts</h2>
+        <p className="help-info">
+          The following keyboard shortcuts are currently available when
+          navigating on the spreadsheet:
+        </p>
+        <ul className="help-info">
+          <li>
+            <b>Ctrl + S</b> - Save changes
+          </li>
+          <li>
+            <b>Ctrl + A</b> - Switch the focus to the issue search component
+          </li>
+        </ul>
         <h2 className="help-subtitle">Known limitations</h2>
         <h3 className="help-h3">Double time entries</h3>
         <p className="help-info">

@@ -11,10 +11,12 @@ export const QuickAdd = ({
   addIssueActivity,
   toastList,
   onToastListUpdate,
+  issueInputRef,
 }: {
   addIssueActivity: (pair: IssueActivityPair) => void;
   toastList: ToastMsg[];
   onToastListUpdate: (newToast: ToastMsg) => void;
+  issueInutRef: React.RefObject<HTMLInputElement>;
 }) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
@@ -204,7 +206,6 @@ export const QuickAdd = ({
 
   const suggestionsRef = useRef(null);
   useEscaper(suggestionsRef, handleHideAutocomplete);
-  const issueInputRef = useRef(null);
 
   const handleInputToAutocompleteFocus = (event: any) => {
     event.preventDefault();
@@ -254,6 +255,7 @@ export const QuickAdd = ({
       <div className="row">
         <input
           id="input-issue"
+          aria-keyshortcuts="ctrl+a"
           ref={issueInputRef}
           autoComplete="off"
           className={getSearchClasses()}
