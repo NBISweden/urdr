@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   format as formatDate,
@@ -651,6 +651,8 @@ export const Report = () => {
 
   if (context.user === null) return <></>;
 
+  const issueInputRef = useRef(null);
+
   // Main content
   return (
     <>
@@ -680,7 +682,18 @@ export const Report = () => {
           />
           <HeaderUser username={context.user ? context.user.login : ""} />
         </header>
-        <main className="spreadsheet">
+        <main
+          className="spreadsheet"
+          onKeyDown={(e) => {
+            if (e.key.toLowerCase() === "s" && e.ctrlKey) {
+              e.preventDefault();
+              handleSave();
+            } else if (e.key.toLowerCase() === "a" && e.ctrlKey) {
+              e.preventDefault();
+              issueInputRef.current.focus();
+            }
+          }}
+        >
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="favorites-container">
@@ -858,6 +871,7 @@ export const Report = () => {
                 addIssueActivity={addIssueActivityHandler}
                 toastList={toastList}
                 onToastListUpdate={handleToastListUpdate}
+                issueInputRef={issueInputRef}
               ></QuickAdd>
             </div>
             {toastList.length > 0 && (
@@ -869,7 +883,11 @@ export const Report = () => {
                   <p role="status">⚠ You have unsaved changes</p>
                 )}
               </div>
-              <button className="basic-button save-button" onClick={handleSave}>
+              <button
+                className="basic-button save-button"
+                aria-keyshortcuts="ctrl+s"
+                onClick={handleSave}
+              >
                 Save changes
               </button>
             </div>
