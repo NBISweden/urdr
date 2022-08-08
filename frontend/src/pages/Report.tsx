@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   format as formatDate,
@@ -20,7 +20,7 @@ import {
   ToastMsg,
 } from "../model";
 import {
-  SNOWPACK_PUBLIC_API_URL,
+  PUBLIC_API_URL,
   getApiEndpoint,
   headers,
   getFullWeek,
@@ -157,7 +157,7 @@ export const Report = () => {
       );
       const issues = [...recentIssues];
       if (!!priorityIssues) {
-        let nonPrioIssues = [];
+        let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
           let match = priorityIssues.find(
             (fav) =>
@@ -240,14 +240,11 @@ export const Report = () => {
   // Save which issues that have favorite status
   const saveFavorites = async (newFavs: IssueActivityPair[]) => {
     let logout = false;
-    const saved = await fetch(
-      `${SNOWPACK_PUBLIC_API_URL}/api/priority_entries`,
-      {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(newFavs),
-      }
-    )
+    const saved = await fetch(`${PUBLIC_API_URL}/api/priority_entries`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(newFavs),
+    })
       .then((res) => {
         if (res.ok) {
           return true;
@@ -258,7 +255,14 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         const favs = [...favorites];
         setFavorites(favs);
         return false;
@@ -309,6 +313,7 @@ export const Report = () => {
     }
     // Topic was a favorite. Remove it from favorites and make it a recent.
     else {
+      topic.custom_name = `${topic.issue.subject} - ${topic.activity.name}`;
       const shortenedFavs = removeIssueActivityPair([...favorites], topic);
       const saved = await saveFavorites([...shortenedFavs, ...hidden]);
       if (!saved) {
@@ -318,6 +323,29 @@ export const Report = () => {
       setFavorites(shortenedFavs);
       setFilteredRecents([topic, ...filteredRecents]);
     }
+  };
+
+  // Makes sure that the custom name of the favorite is updated in the local state
+  const handleFavNameUpdate = (
+    topic: IssueActivityPair,
+    custom_name: string
+  ) => {
+    let favs = favorites.slice();
+    let existingFav = favs.find(
+      (fav) =>
+        fav.activity.id === topic.activity.id && fav.issue.id === topic.issue.id
+    );
+
+    if (existingFav) {
+      let newFav = { ...existingFav, custom_name };
+      favs.splice(favs.indexOf(existingFav), 1, newFav);
+      setFavorites(favs);
+    }
+  };
+
+  //Save the fav name
+  const handleFavNameSave = () => {
+    saveFavorites([...favorites, ...hidden]);
   };
 
   // Enable hiding an issue-activity pair from the list of recent issues
@@ -360,7 +388,8 @@ export const Report = () => {
   // Try to ...
   const reportTime = async (timeEntry: TimeEntry) => {
     let logout = false;
-    const saved = await fetch(`${SNOWPACK_PUBLIC_API_URL}/api/time_entries`, {
+    toggleLoadingPage(true);
+    const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
       body: JSON.stringify({ time_entry: timeEntry }),
       method: "POST",
       headers: headers,
@@ -379,7 +408,15 @@ export const Report = () => {
         }
       })
       .catch((error) => {
-        alert(error);
+        toggleLoadingPage(false);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message: error.message,
+          },
+        ]);
         return false;
       });
     if (logout) context.setUser(null);
@@ -390,12 +427,16 @@ export const Report = () => {
   const handleSave = async () => {
     setShowUnsavedWarning(false);
     if (newTimeEntries.length === 0) {
-      alert(
-        "You haven't added, edited or deleted any time entries yet, so nothing could be saved."
-      );
+      setToastList([
+        ...toastList,
+        {
+          type: "info",
+          timeout: 3000,
+          message: "Your time entries are already up-to-date.",
+        },
+      ]);
       return;
     }
-    toggleLoadingPage(true);
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
       const saved = await reportTime(entry);
@@ -444,7 +485,14 @@ export const Report = () => {
       });
     }
     if (recentIssue) {
-      alert("This issue/activity pair is already added");
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 5000,
+          message: "This issue/activity pair is already added.",
+        },
+      ]);
       return;
     }
     const newRecentIssues = [...filteredRecents, pair];
@@ -490,7 +538,7 @@ export const Report = () => {
   and, if there are none, for entries from the database for the respective cell.
   */
   const findRowHours = (rowTopic: IssueActivityPair) => {
-    let rowHours = [];
+    let rowHours: number[] = [];
     currentWeekArray.map((day) => {
       let hours: number = null;
       let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
@@ -522,7 +570,7 @@ export const Report = () => {
   If there is no entry in the database, id is 0.
   */
   const findRowEntries = (rowTopic: IssueActivityPair, days: Date[]) => {
-    let entries = [];
+    let entries: FetchedTimeEntry[] = [];
     days.map((day) => {
       let entry = timeEntries?.find(
         (entry) =>
@@ -589,7 +637,21 @@ export const Report = () => {
     return pairs;
   };
 
+  // Forwards the option to update the toast list to child components
+  const handleToastListUpdate = (newToast: ToastMsg) => {
+    setToastList([
+      ...toastList,
+      {
+        type: newToast.type,
+        timeout: newToast.timeout,
+        message: newToast.message,
+      },
+    ]);
+  };
+
   if (context.user === null) return <></>;
+
+  const issueInputRef = useRef(null);
 
   // Main content
   return (
@@ -620,7 +682,18 @@ export const Report = () => {
           />
           <HeaderUser username={context.user ? context.user.login : ""} />
         </header>
-        <main className="spreadsheet">
+        <main
+          className="spreadsheet"
+          onKeyDown={(e) => {
+            if (e.key.toLowerCase() === "s" && e.ctrlKey) {
+              e.preventDefault();
+              handleSave();
+            } else if (e.key.toLowerCase() === "a" && e.ctrlKey) {
+              e.preventDefault();
+              issueInputRef.current.focus();
+            }
+          }}
+        >
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="favorites-container">
@@ -651,6 +724,8 @@ export const Report = () => {
                                     topic={fav}
                                     onCellUpdate={handleCellUpdate}
                                     onToggleFav={handleToggleFav}
+                                    onFavNameUpdate={handleFavNameUpdate}
+                                    onFavNameSave={handleFavNameSave}
                                     days={currentWeekArray}
                                     rowHours={findRowHours(fav)}
                                     rowEntries={rowEntries}
@@ -685,6 +760,8 @@ export const Report = () => {
                     topic={recentIssue}
                     onCellUpdate={handleCellUpdate}
                     onToggleFav={handleToggleFav}
+                    onFavNameUpdate={handleFavNameUpdate}
+                    onFavNameSave={handleFavNameSave}
                     onToggleHide={toggleHide}
                     days={currentWeekArray}
                     rowHours={findRowHours(recentIssue)}
@@ -715,6 +792,8 @@ export const Report = () => {
                       topic={hiddenIssue}
                       onCellUpdate={handleCellUpdate}
                       onToggleFav={handleToggleFav}
+                      onFavNameUpdate={handleFavNameUpdate}
+                      onFavNameSave={handleFavNameSave}
                       onToggleHide={toggleHide}
                       days={currentWeekArray}
                       rowHours={findRowHours(hiddenIssue)}
@@ -788,20 +867,27 @@ export const Report = () => {
         <div className="footer">
           <section className="footer-container">
             <div className="col-8">
-              <QuickAdd addIssueActivity={addIssueActivityHandler}></QuickAdd>
+              <QuickAdd
+                addIssueActivity={addIssueActivityHandler}
+                toastList={toastList}
+                onToastListUpdate={handleToastListUpdate}
+                issueInputRef={issueInputRef}
+              ></QuickAdd>
             </div>
             {toastList.length > 0 && (
-                <Toast onCloseToast={handleCloseToast} toastList={toastList} />
-              )}
+              <Toast onCloseToast={handleCloseToast} toastList={toastList} />
+            )}
             <div className="col-4 save-changes">
-            <div className="unsaved-alert-p">
-              {showUnsavedWarning && (
-                
+              <div className="unsaved-alert-p">
+                {showUnsavedWarning && (
                   <p role="status">⚠ You have unsaved changes</p>
-                
-              )}
+                )}
               </div>
-              <button className="basic-button save-button" onClick={handleSave}>
+              <button
+                className="basic-button save-button"
+                aria-keyshortcuts="ctrl+s"
+                onClick={handleSave}
+              >
                 Save changes
               </button>
             </div>

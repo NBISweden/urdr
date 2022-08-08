@@ -84,6 +84,13 @@ export const Help = () => {
           rows can be changed by drag and dropping the row using the
           drag–and–drop handle icon at the left-most position of the row.
         </p>
+        <p className="help-info">
+          Favourite rows can be given a custom name by editing the text area
+          next to the issue number. The custom name is saved after switching the
+          focus to another element on the page, or clicking away. The original
+          names of the rows can be seen after hovering over the text area. When
+          unfavouriting a row, the custom name is reset to the original name.
+        </p>
         <Row
           key={1}
           topic={exampleIAP}
@@ -94,6 +101,7 @@ export const Help = () => {
           onToggleHide={() => {}}
           isFav={true}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <p className="help-info">
@@ -113,6 +121,7 @@ export const Help = () => {
           onToggleHide={() => {}}
           isFav={false}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Hidden rows</h2>
@@ -136,14 +145,16 @@ export const Help = () => {
           onToggleHide={() => {}}
           isHidden={true}
           onToggleFav={() => {}}
+          onFavNameUpdate={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Adding new rows</h2>
         <p className="help-info">
-          In order to add a new row, it is necessary to first enter a valid
-          issue number and then select an activity, which will be linked to the
-          issue. After clicking on the plus button, a new row will be appended
-          to the bottom of the list of recent rows.
+          In order to add a new row, you first find an issue by using its id or
+          it's subject, and then select an activity, which will be linked to the
+          issue. After selecting your desired issue and clicking on the plus
+          button, a new row will be appended to the bottom of the list of recent
+          rows.
         </p>
         <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">The sum row</h2>
@@ -217,6 +228,19 @@ export const Help = () => {
             className="weektravel-img"
           />
         </div>
+        <h2 className="help-subtitle">Keyboard shortcuts</h2>
+        <p className="help-info">
+          The following keyboard shortcuts are currently available when
+          navigating on the spreadsheet:
+        </p>
+        <ul className="help-info">
+          <li>
+            <b>Ctrl + S</b> - Save changes
+          </li>
+          <li>
+            <b>Ctrl + A</b> - Switch the focus to the issue search component
+          </li>
+        </ul>
         <h2 className="help-subtitle">Known limitations</h2>
         <h3 className="help-h3">Double time entries</h3>
         <p className="help-info">

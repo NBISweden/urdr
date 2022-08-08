@@ -51,7 +51,7 @@ export const Cell = ({
   const onEscapeArea = (e: any) => {
     {
       if (e.key === "Escape") {
-        setShowCommentArea(false);
+        onBlurArea();
       }
     }
   };
@@ -97,19 +97,20 @@ export const Cell = ({
             date,
             "yyyy-MM-dd"
           )}`}
-          onChange={onCellChange}
-          onKeyUp={onDeleteCellEntry}
-          onFocus={onFocusRow}
-          onBlur={onBlurRow}
+          onChange={(ev) => onCellChange(ev)}
+          onKeyUp={(ev) => onDeleteCellEntry(ev)}
+          onFocus={() => onFocusRow()}
+          onBlur={() => onBlurRow()}
           className="cell"
           defaultValue={hours === 0 ? "" : hours}
         />
         {hours > 0 && (
           <button
             className={comments === "" ? "comment comment-unfilled" : "comment"}
+            onBlur={() => onBlurRow()}
             type="button"
             title="Toggle comment area"
-            onFocus={onFocusRow}
+            onFocus={() => onFocusRow()}
             onClick={() => onCommentButtonClick()}
           ></button>
         )}
@@ -119,14 +120,14 @@ export const Cell = ({
             <textarea
               autoFocus
               className="comment-area"
-              onChange={onCommentUpdate}
+              onChange={(ev) => onCommentUpdate(ev)}
               placeholder="Comments"
               name="comments"
               rows={2}
               maxLength={1000}
-              onKeyUp={onEscapeArea}
-              onFocus={onFocusRow}
-              onBlur={onBlurArea}
+              onKeyUp={(ev) => onEscapeArea(ev)}
+              onFocus={() => onFocusRow()}
+              onBlur={() => onBlurArea()}
               defaultValue={areaComments !== null ? areaComments : comments}
             />
             <button

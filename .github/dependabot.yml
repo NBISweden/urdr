@@ -14,3 +14,13 @@ updates:
     directory: "backend/"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "production/"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "docker"
+    directory: "node/"
+    schedule:
+      interval: "daily"

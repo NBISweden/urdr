@@ -1,8 +1,12 @@
 import.meta.hot;
-import React, { useState } from "react";
-import { IssueActivityPair } from "./model";
-export const { SNOWPACK_PUBLIC_API_URL } = __SNOWPACK_ENV__;
-export const { SNOWPACK_PUBLIC_REDMINE_URL } = __SNOWPACK_ENV__;
+import React, {
+  useState,
+  useEffect,
+  ElementType,
+  MouseEventHandler,
+} from "react";
+export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
+export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
@@ -13,7 +17,7 @@ export const dateFormat = "yyyy-MM-dd";
 export const getApiEndpoint = async (endpoint, context) => {
   if (context.user === null) return null;
   let logout = false;
-  let result = await fetch(`${SNOWPACK_PUBLIC_API_URL}${endpoint}`, {
+  let result = await fetch(`${PUBLIC_API_URL}${endpoint}`, {
     method: "GET",
     headers: headers,
   })
@@ -132,4 +136,35 @@ export const useViewport = () => {
 
   // Return the width so we can use it in our components
   return { width };
+};
+
+// Hook to escape a certain DOM element by clicking outside of it or pressing Escape
+export const useEscaper = (
+  ref: React.RefObject<HTMLElement>,
+  callback: () => void
+) => {
+  useEffect(() => {
+    // What should happen when clicked outside the element
+    const handleClickOutside = (event: any) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback();
+      }
+    };
+
+    // What should happen when pressed escape
+    const handleEscape = (event: any) => {
+      if (event.key == "Escape") {
+        callback();
+      }
+    };
+
+    // Bind the event listeners
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      // Unbind the event listeners on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [ref]);
 };

@@ -9,6 +9,15 @@ type Issue struct {
 	Subject string `json:"subject"`
 }
 
+type IssueWithTitle struct {
+	Id    int    `json:"id"`
+	Title string `json:"title"`
+}
+
+type IssuesResponse struct {
+	Issues []Issue `json:"issues"`
+}
+
 type Activity struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
@@ -24,4 +33,8 @@ type PriorityEntry struct {
 	Activity   Activity `json:"activity"`
 	CustomName string   `json:"custom_name"`
 	IsHidden   bool     `json:"is_hidden"`
+}
+
+type IssueSearchResponse struct {
+	Results []IssueWithTitle `json:"results"`
 }

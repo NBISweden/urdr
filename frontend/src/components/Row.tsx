@@ -9,7 +9,7 @@ import grip from "../icons/grip-vertical.svg";
 import eyeSlash from "../icons/eye-slash.svg";
 import eye from "../icons/eye.svg";
 import { dateFormat } from "../utils";
-import { SNOWPACK_PUBLIC_REDMINE_URL } from "../utils";
+import { PUBLIC_REDMINE_URL } from "../utils";
 
 export const Row = ({
   topic,
@@ -18,6 +18,8 @@ export const Row = ({
   rowEntries,
   onCellUpdate,
   onToggleFav,
+  onFavNameUpdate,
+  onFavNameSave,
   onToggleHide,
   getRowSum,
   isFav,
@@ -29,6 +31,8 @@ export const Row = ({
   rowEntries: FetchedTimeEntry[];
   onCellUpdate: (timeEntry: TimeEntry) => void;
   onToggleFav: (topic: IssueActivityPair) => void;
+  onFavNameUpdate: (topic: IssueActivityPair, custom_name: string) => void;
+  onFavNameSave: () => void;
   getRowSum: (pair: IssueActivityPair) => number;
   onToggleHide?: (topic: IssueActivityPair) => void;
   isFav?: boolean;
@@ -98,16 +102,45 @@ export const Row = ({
           <div className="issue-label">
             <p className="issue-label-text">
               <a
-                href={
-                  `${SNOWPACK_PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`
-                }
+                href={`${PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`}
               >{`# ${topic.issue.id}`}</a>
             </p>
-            <p className="issue-label-text">
-              {topic.custom_name
-                ? `${topic.custom_name}`
-                : `${topic.issue.subject} - ${topic.activity.name}`}
-            </p>
+            {isFav ? (
+              <div className="issuetooltip">
+                <textarea
+                  aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
+                  className="issue-textarea"
+                  defaultValue={
+                    topic.custom_name
+                      ? `${topic.custom_name}`
+                      : `${topic.issue.subject} - ${topic.activity.name}`
+                  }
+                  onFocus={onFocusRow}
+                  onBlur={() => {
+                    if (
+                      topic.custom_name !==
+                      topic.issue.subject + " - " + topic.activity.name
+                    ) {
+                      onFavNameSave();
+                    }
+                    onBlurRow();
+                  }}
+                  onChange={(ev) => {
+                    onFavNameUpdate(topic, ev.target.value);
+                  }}
+                  maxLength={100}
+                />
+                <span className="tooltiptext">
+                  {topic.issue.subject} - {topic.activity.name}
+                </span>
+              </div>
+            ) : (
+              <p className="issue-label-text">
+                {topic.custom_name
+                  ? `${topic.custom_name}`
+                  : `${topic.issue.subject} - ${topic.activity.name}`}
+              </p>
+            )}
           </div>
         </div>
         {days.map((day, i) => {
@@ -119,12 +152,12 @@ export const Row = ({
               )}`}
               topic={topic}
               date={day}
-              onCellUpdate={onCellUpdate}
+              onCellUpdate={(ev) => onCellUpdate(ev)}
               hours={rowHours[i]}
               comments={rowEntries[i] ? rowEntries[i].comments : ""}
               entryId={rowEntries[i] ? rowEntries[i].id : 0}
-              onFocusRow={onFocusRow}
-              onBlurRow={onBlurRow}
+              onFocusRow={() => onFocusRow()}
+              onBlurRow={() => onBlurRow()}
             />
           );
         })}
@@ -136,8 +169,8 @@ export const Row = ({
             className="cell"
             value={getRowSum(topic)}
             readOnly
-            onFocus={onFocusRow}
-            onBlur={onBlurRow}
+            onFocus={() => onFocusRow()}
+            onBlur={() => onBlurRow()}
             tabIndex={-1}
           />
         </div>

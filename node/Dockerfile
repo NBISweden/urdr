@@ -1,4 +1,4 @@
-FROM node:17.6-slim as build
+FROM node:18.7.0-slim as build
 
 USER node
 RUN mkdir /home/node/app

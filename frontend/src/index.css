@@ -7,8 +7,8 @@
 /* Lato Light */
 @font-face {
   font-family: Lato;
-  src: url("/dist/fonts/Lato-Light.woff") format("woff");
-  src: url("/dist/fonts/Lato-Light.woff2") format("woff2");
+  src: url("./fonts/Lato-Light.woff") format("woff");
+  src: url("./fonts/Lato-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
 }
@@ -16,8 +16,8 @@
 /* Lato Regular */
 @font-face {
   font-family: Lato;
-  src: url("/dist/fonts/Lato-Regular.woff") format("woff");
-  src: url("/dist/fonts/Lato-Regular.woff2") format("woff2");
+  src: url("./fonts/Lato-Regular.woff") format("woff");
+  src: url("./fonts/Lato-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
 }
@@ -25,8 +25,8 @@
 /* Lato Bold */
 @font-face {
   font-family: Lato;
-  src: url("/dist/fonts/Lato-Bold.woff") format("woff");
-  src: url("/dist/fonts/Lato-Bold.woff2") format("woff2");
+  src: url("./fonts/Lato-Bold.woff") format("woff");
+  src: url("./fonts/Lato-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
 }
@@ -348,6 +348,51 @@ Other button classes are defined further down together with other classes for th
   min-width: 4rem;
 }
 
+.issue-textarea {
+  width: 100%;
+  height: 2em;
+  border: 1px solid hsl(0deg 0% 83%);
+  border-radius: 3px;
+  opacity: 1;
+}
+
+.issuetooltip {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+  opacity: 1;
+  z-index: 1;
+}
+
+.tooltiptext {
+  visibility: hidden;
+  width: auto;
+  height: auto;
+  background-color: hsl(0deg 0% 90%);
+  text-align: center;
+  border-radius: 6px;
+  padding: 0.5em;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: hsl(0deg 0% 0%) transparent transparent transparent;
+}
+
+.issuetooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
 .dropdown-button {
   margin-right: 1rem;
   background-color: hsl(186deg 30% 94%);
@@ -429,6 +474,39 @@ Other button classes are defined further down together with other classes for th
   margin: 0 0 0 3.75rem;
 }
 
+.autocomplete-container {
+  max-height: 10rem;
+  margin-left: -3.2em;
+  margin-top: 0.6em;
+  list-style-type: none;
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.autocomplete-item {
+  padding: 0 0 0 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.autocomplete-button {
+  background-color: white;
+  width: 100%;
+  text-align: left;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
+.autocomplete-button:focus {
+  background-color: hsl(186deg 30% 86%);
+  outline: none;
+}
+
+.autocomplete-button:hover {
+  background-color: hsl(186deg 30% 94%);
+  outline: none;
+}
+
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }
@@ -466,7 +544,7 @@ Other button classes are defined further down together with other classes for th
 
 .comment {
   background-color: transparent;
-  border-style: inset;
+  border-style: solid;
   width: 0;
   height: 0;
   padding: 0;

@@ -1,4 +1,4 @@
-FROM node:17.6-slim as build
+FROM node:18.7.0-slim as build
 
 USER node
 RUN mkdir /home/node/app
@@ -6,13 +6,13 @@ WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:17.6-slim as bundler
+FROM node:18.7.0-slim as bundler
 
-ARG SNOWPACK_PUBLIC_API_URL
-ENV SNOWPACK_PUBLIC_API_URL=${SNOWPACK_PUBLIC_API_URL}
+ARG PUBLIC_API_URL
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
 
-ARG SNOWPACK_PUBLIC_REDMINE_URL
-ENV SNOWPACK_PUBLIC_REDMINE_URL=${SNOWPACK_PUBLIC_REDMINE_URL}
+ARG PUBLIC_REDMINE_URL
+ENV PUBLIC_REDMINE_URL=${PUBLIC_REDMINE_URL}
 
 USER node
 RUN mkdir /home/node/app
@@ -21,7 +21,7 @@ COPY --chown=node:node /. /home/node/app/
 COPY --from=build --chown=node:node /home/node/node_modules/ /home/node/app/node_modules/
 RUN npm run build
 
-FROM nginx:1.21.6
+FROM nginx:1.23.1
 
 RUN mkdir -p /app/dist
-COPY --from=bundler --chown=www-data:www-data /home/node/app/build/ /app/dist
+COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist
