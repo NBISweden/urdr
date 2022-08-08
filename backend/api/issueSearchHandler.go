@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"urdr-api/internal/config"
 
 	"github.com/gofiber/fiber/v2"
@@ -51,11 +50,29 @@ func issueSearchHandler(c *fiber.Ctx) error {
 	var foundIssues []Issue
 
 	for _, issue := range searchResponse.Results {
-		if issue.Type == "issue" && strings.Contains(issue.Title, "):") {
-			issueSubject := strings.TrimSpace(strings.Split(issue.Title, "):")[1])
+		if issue.Type == "issue" {
+
+			c.Request().URI().SetQueryString(
+				fmt.Sprintf("issue_id=%d", issue.Id))
+
+			if err := getIssuesHandler(c); err != nil {
+			} else if c.Response().StatusCode() != fiber.StatusOK {
+				return nil
+			}
+
+			// Parse the response and fill out the subjects.
+			issuesResponse := struct {
+				Issues []Issue `json:"issues"`
+			}{}
+
+			if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
+				c.Response().Reset()
+				return c.SendStatus(fiber.StatusUnprocessableEntity)
+			}
+
 			issue := Issue{
 				Id:      issue.Id,
-				Subject: issueSubject,
+				Subject: issuesResponse.Issues[0].Subject,
 			}
 			foundIssues = append(foundIssues, issue)
 		}
