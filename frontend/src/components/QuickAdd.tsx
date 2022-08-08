@@ -129,7 +129,7 @@ export const QuickAdd = ({
     };
 
     const foundIssues: { issues: Issue[] } = await fetch(
-      `${PUBLIC_API_URL}/api/search?q=${searchQuery}`,
+      `${PUBLIC_API_URL}/api/search?q=${searchQuery}&limit=5`,
       {
         method: "POST",
         headers: headers,
