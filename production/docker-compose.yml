@@ -13,7 +13,7 @@ services:
       labels:
         - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
     volumes:
-      - ../backend/:/app
+      - "../backend/:/app:rw"
     expose:
       - "8080"
     ports:
