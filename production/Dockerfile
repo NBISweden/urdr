@@ -13,7 +13,7 @@ RUN apk --update add gcc=10.3.1_git20211027-r0 \
 RUN go build -o ./urdr ./cmd && \
     echo "urdr:x:1001:1001:urdr:/:/sbin/nologin" > passwd
 
-FROM alpine:3.16.1
+FROM alpine:3.16.2
 
 WORKDIR /app
 
