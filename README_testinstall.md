@@ -1,7 +1,8 @@
 # Urdr - Setting up a test machine on SNIC SSC using pre-built images
 
 ## Create a VM on SNIC SSC
-Create a VM on Snic (https://cloud.snic.se) using (https://github.com/NBISweden/os-pulumi), after installing Pulumi from (https://www.pulumi.com/).
+
+Create a VM on Snic <https://cloud.snic.se> using <https://github.com/NBISweden/os-pulumi>, after installing Pulumi from <https://www.pulumi.com/>.
 
 To use os-pulumi, you need to have an account on cloud.snic.se and have generated/setup an API account password. Then you can, from your profile menu, save a file "Openstack RC File v3" for "OS Credentials" to source when running pulumi. (See README.md for os-pulumi.) When running Pulumi commands, you do not need to set another password inside pulumi if you do not want to.
 
@@ -117,8 +118,9 @@ sudo chown -R urdr:urdr ../backend/
 cp ../urdr.env.default urdr.env
 ```
 
-Then update urdr.env so that REDMINE_URL points to http://172.17.0.1:3000. The file should look like this on Linux:
+Then update urdr.env so that REDMINE_URL points to <http://172.17.0.1:3000>. The file should look like this on Linux:
 
+```command
 BACKEND_DB_PATH="./database.db"
 BACKEND_HOST=0.0.0.0
 BACKEND_PORT=8080
@@ -126,6 +128,7 @@ REDMINE_URL="http://172.17.0.1:3000"
 PUBLIC_REDMINE_URL="http://172.17.0.1:3000"
 SESSION_DB_PATH="./session.db"
 PUBLIC_API_URL="http://localhost:4567"
+```
 
 Start the urdr containers with:
 
@@ -134,6 +137,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 
 ## Setup nginx proxy and SSL certificates
+
 To proxy calls and be able to use SSL/HTTPS, we need to install nginx and certbot:
 
 ```command
@@ -216,4 +220,4 @@ sudo systemctl restart nginx
 
 Close port 80 again, using the Snic web interface.
 
-Redmine should now be available via (https://urdr-test-redmine.nbis.se/) and Urdr via (https://urdr-test.nbis.se/).
+Redmine should now be available via <https://urdr-test-redmine.nbis.se/> and Urdr via <https://urdr-test.nbis.se/>.
