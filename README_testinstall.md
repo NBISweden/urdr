@@ -3,7 +3,7 @@
 ## Create a VM on SNIC SSC
 Create a VM on Snic (https://cloud.snic.se) using (https://github.com/NBISweden/os-pulumi), after installing Pulumi from (https://www.pulumi.com/).
 
-To use os-pulumi, you need to have an account on cloud.snic.se and have generated/setup an api account password. Then you can, from your profile menu, save a file "Openstack RC File v3" for "OS Credentials" to source when running pulumi. (See README.md for os-pulumi.) When running Pulumi commands, you do not need to set another password inside pulumi if you do not want to.
+To use os-pulumi, you need to have an account on cloud.snic.se and have generated/setup an API account password. Then you can, from your profile menu, save a file "Openstack RC File v3" for "OS Credentials" to source when running pulumi. (See README.md for os-pulumi.) When running Pulumi commands, you do not need to set another password inside pulumi if you do not want to.
 
 You also need a public SSH key to be able to login to a snic VM created with os-pulumi. The main.go script creates a minimum-size machine with ports 22 and 443 opened.
 
@@ -11,7 +11,7 @@ You also need a public SSH key to be able to login to a snic VM created with os-
 
 A snic VM is not capable of building a docker container for Urdr in a reasonable amount of time, so containers must be pre-built and pulled to the VM.
 
-This means that especially the urdr-web container for the frontend must be built with variables PUBLIC_API_URL and PUBLIC_REDMINE_URL set to point to a url or an address where the Urdr backend and Redmine site can be located. If both of these are to be hosted on the snic VM, setup two separate DNS names for the IP address to the VM so that calls can be proxied based on the DNS name.
+This means that especially the urdr-web container for the frontend must be built with variables PUBLIC_API_URL and PUBLIC_REDMINE_URL set to point to a URL or an address where the Urdr backend and Redmine site can be located. If both of these are to be hosted on the snic VM, setup two separate DNS names for the IP address to the VM so that calls can be proxied based on the DNS name.
 
 Suggestions for DNS names: urdr-test.nbis.se and urdr-test-redmine.nbis.se
 
