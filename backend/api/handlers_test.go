@@ -2,7 +2,7 @@ package api_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -158,7 +158,7 @@ func Test_Handlers(t *testing.T) {
 			_, err = w.Write(userResponse)
 		case "/time_entries.json":
 			if r.Method == "POST" {
-				bodyBytes, err := ioutil.ReadAll(r.Body)
+				bodyBytes, err := io.ReadAll(r.Body)
 				if err != nil {
 					w.WriteHeader(fiber.StatusUnprocessableEntity)
 				}

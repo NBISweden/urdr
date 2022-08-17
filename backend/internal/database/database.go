@@ -6,7 +6,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	// go-sqlite3 is the module for the SQLite3 database driver.
@@ -63,11 +62,11 @@ func New(databasePath string) (*Database, error) {
 		}
 
 		for i := range files {
-			query, err := ioutil.ReadFile(files[i])
+			query, err := os.ReadFile(files[i])
 			if err != nil {
 				_ = tx.Rollback()
 				return nil,
-					fmt.Errorf("ioutil.ReadFile() failed: %w", err)
+					fmt.Errorf("os.ReadFile() failed: %w", err)
 			}
 			if _, err := tx.Exec(string(query)); err != nil {
 				_ = tx.Rollback()
