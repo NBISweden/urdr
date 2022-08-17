@@ -733,12 +733,6 @@ Other button classes are defined further down together with other classes for th
   }
 }
 
-@media (max-width: 700px) and (orientation: portrait) {
-  .help-component {
-    transform: scale(2);
-  }
-}
-
 .help-subtitle {
   font-size: 1.5rem;
   padding-top: 1.5rem;
