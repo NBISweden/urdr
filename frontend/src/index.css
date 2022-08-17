@@ -93,6 +93,12 @@ Other button classes are defined further down together with other classes for th
   align-items: center;
 }
 
+@media (max-width: 700px) and (orientation: portrait) {
+  .header-wrapper {
+    width: 80vh;
+  }
+}
+
 .header-heading {
   color: hsl(186deg 92% 11%);
   font-size: 3rem;
@@ -122,7 +128,8 @@ Other button classes are defined further down together with other classes for th
 }
 /* stylelint-enable selector-class-pattern */
 
-.usr-header {
+.usr-header,
+.help-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -136,9 +143,24 @@ Other button classes are defined further down together with other classes for th
   height: 80px;
 }
 
+@media (max-width: 700px) and (orientation: portrait) {
+  .usr-header {
+    width: 150vh;
+  }
+  .help-header {
+    width: 100vh;
+  }
+}
+
 .spreadsheet {
   min-height: 100vh;
   margin-bottom: 5rem;
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .spreadsheet {
+    width: 150vh;
+  }
 }
 
 .footer {
@@ -147,6 +169,12 @@ Other button classes are defined further down together with other classes for th
   bottom: 0;
   position: fixed;
   background-color: white;
+}
+@media (max-height: 700px) and (orientation: landscape) {
+  .footer {
+    position: relative;
+    z-index: 0;
+  }
 }
 
 .input-label {
@@ -255,6 +283,12 @@ Other button classes are defined further down together with other classes for th
   flex-direction: column;
   align-items: center;
   background-color: hsl(70deg 55% 98%);
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .login-wrapper {
+    width: 80vh;
+  }
 }
 
 .login-info {
@@ -678,11 +712,31 @@ Other button classes are defined further down together with other classes for th
   position: relative;
 }
 
+@media (max-width: 700px) and (orientation: portrait) {
+  .help-wrapper {
+    position: flex;
+    flex-direction: column;
+    width: 100vh;
+  }
+}
+
 .help-title {
   font-size: 2rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   margin-left: 2rem;
   color: hsl(186deg 92% 11%);
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .help-title {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .help-component {
+    transform: scale(2);
+  }
 }
 
 .help-subtitle {
