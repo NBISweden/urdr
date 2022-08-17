@@ -147,6 +147,7 @@ Other button classes are defined further down together with other classes for th
   .usr-header {
     width: 150vh;
   }
+
   .help-header {
     width: 100vh;
   }
@@ -170,6 +171,7 @@ Other button classes are defined further down together with other classes for th
   position: fixed;
   background-color: white;
 }
+
 @media (max-height: 700px) and (orientation: landscape) {
   .footer {
     position: relative;
