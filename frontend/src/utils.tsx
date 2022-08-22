@@ -7,6 +7,9 @@ import React, {
 } from "react";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
+import { IssueActivityPair, FetchedTimeEntry } from "./model";
+
+import { format as formatDate } from "date-fns";
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
@@ -167,4 +170,42 @@ export const useEscaper = (
       document.removeEventListener("keydown", handleEscape);
     };
   }, [ref]);
+};
+
+// Retrieve time entries via api
+export const getTimeEntries = async (
+  issueActivityc: IssueActivityPair,
+  days: Date[],
+  context: any
+) => {
+  // The ofset param is used to get all time_entries
+  // from the api, as the limit per batch is 100
+  let offset = 0;
+  let gotTotal = false;
+  let queryparams = new URLSearchParams({
+    issue_id: issueActivityc ? `${issueActivityc.issue.id}` : "",
+    activity_id: issueActivityc ? `${issueActivityc.activity.id}` : "",
+    from: formatDate(days[0], dateFormat),
+    to: formatDate(days[4] ? days[4] : days[1], dateFormat),
+    offset: `${offset}`,
+    limit: "100",
+  });
+
+  let allEntries: FetchedTimeEntry[] = [];
+
+  while (gotTotal === false) {
+    let entries: { total_count: number; time_entries: FetchedTimeEntry[] };
+
+    entries = await getApiEndpoint(`/api/time_entries?${queryparams}`, context);
+    if (entries) {
+      if (entries.total_count > 100 && entries.time_entries.length == 100) {
+        offset += 100;
+      } else {
+        gotTotal = true;
+      }
+      allEntries.push(...entries.time_entries);
+    }
+    if (allEntries) return allEntries;
+  }
+  return null;
 };
