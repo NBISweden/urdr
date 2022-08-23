@@ -25,6 +25,7 @@ import {
   headers,
   getFullWeek,
   dateFormat,
+  getTimeEntries,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
@@ -101,27 +102,16 @@ export const Report = () => {
     setIsLoading(state);
   };
 
-  // Retrieve time entries via api
-  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    let queryparams = new URLSearchParams({
-      issue_id: `${rowTopic.issue.id}`,
-      activity_id: `${rowTopic.activity.id}`,
-      from: formatDate(days[0], dateFormat),
-      to: formatDate(days[4], dateFormat),
-    });
-    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${queryparams}`,
-      context
-    );
-    if (entries) return entries.time_entries;
-    return null;
-  };
-
   // Retrieve time entries for given rows
   const getAllEntries = async (rows: IssueActivityPair[]) => {
     let allEntries = [];
     for await (let row of rows) {
-      const entries = await getTimeEntries(row, currentWeekArray);
+      const entries = await getTimeEntries(
+        row,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context
+      );
       allEntries.push(...entries);
     }
     setTimeEntries(allEntries);
