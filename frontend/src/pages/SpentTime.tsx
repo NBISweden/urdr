@@ -14,7 +14,8 @@ export const SpentTime = () => {
   const getHoursPerActivity = async () => {
     const timeEntries = await getTimeEntries(
       undefined,
-      [new Date(2019, 6, 5, 10, 33, 30), new Date()],
+      new Date(2019, 6, 5, 10, 33, 30),
+      new Date(),
       context
     );
     let activityHours = {};

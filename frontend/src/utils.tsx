@@ -175,7 +175,8 @@ export const useEscaper = (
 // Retrieve time entries via api
 export const getTimeEntries = async (
   issueActivityc: IssueActivityPair,
-  days: Date[],
+  from_date: Date,
+  to_date: Date,
   context: any
 ) => {
   // The ofset param is used to get all time_entries
@@ -185,8 +186,8 @@ export const getTimeEntries = async (
   let queryparams = new URLSearchParams({
     issue_id: issueActivityc ? `${issueActivityc.issue.id}` : "",
     activity_id: issueActivityc ? `${issueActivityc.activity.id}` : "",
-    from: formatDate(days[0], dateFormat),
-    to: formatDate(days[4] ? days[4] : days[1], dateFormat),
+    from: formatDate(from_date, dateFormat),
+    to: formatDate(to_date, dateFormat),
     offset: `${offset}`,
     limit: "100",
   });

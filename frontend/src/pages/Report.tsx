@@ -106,7 +106,12 @@ export const Report = () => {
   const getAllEntries = async (rows: IssueActivityPair[]) => {
     let allEntries = [];
     for await (let row of rows) {
-      const entries = await getTimeEntries(row, currentWeekArray, context);
+      const entries = await getTimeEntries(
+        row,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context
+      );
       allEntries.push(...entries);
     }
     setTimeEntries(allEntries);
