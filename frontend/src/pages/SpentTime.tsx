@@ -20,12 +20,10 @@ export const SpentTime = () => {
     );
     let activityHours = {};
     timeEntries.map((entry: FetchedTimeEntry) => {
-      activityHours[entry.activity.name]
-        ? (activityHours[entry.activity.name] += entry.hours)
-        : (activityHours[entry.activity.name] = 0);
-      if (activityHours[entry.activity.name] === 0) {
-        activityHours[entry.activity.name] += entry.hours;
+      if (!activityHours[entry.activity.name]) {
+        activityHours[entry.activity.name] = 0;
       }
+      activityHours[entry.activity.name] += entry.hours;
     });
     setSpentTime(activityHours);
   };
