@@ -26,6 +26,7 @@ import {
   getFullWeek,
   dateFormat,
   getTimeEntries,
+  reportTime,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
@@ -375,44 +376,18 @@ export const Report = () => {
     }
   };
 
-  // Try to ...
-  const reportTime = async (timeEntry: TimeEntry) => {
-    let logout = false;
-    toggleLoadingPage(true);
-    const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
-      body: JSON.stringify({ time_entry: timeEntry }),
-      method: "POST",
-      headers: headers,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return true;
-        } else if (response.status === 401) {
-          logout = true;
-        } else if (response.status === 422) {
-          throw new Error(
-            `Invalid issue-activity combination for (${timeEntry.issue_id}) or invalid amount of time entered`
-          );
-        } else {
-          throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
-        }
-      })
-      .catch((error) => {
-        toggleLoadingPage(false);
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 5000,
-            message: error.message,
-          },
-        ]);
-        return false;
-      });
-    if (logout) context.setUser(null);
-    return saved;
+  const onErrorSavingEntries = (error: any) => {
+    toggleLoadingPage(false);
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: error.message,
+      },
+    ]);
+    return false;
   };
-
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
@@ -429,7 +404,8 @@ export const Report = () => {
     }
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
-      const saved = await reportTime(entry);
+      toggleLoadingPage(true);
+      const saved = await reportTime(entry, onErrorSavingEntries, context);
       if (!saved) {
         unsavedEntries.push(entry);
       }
