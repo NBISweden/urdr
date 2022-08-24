@@ -803,3 +803,60 @@ Other button classes are defined further down together with other classes for th
 .hide-button > img {
   margin-left: 0.5rem;
 }
+
+/* The sidebar menu */
+.sidebar {
+  height: 100%; /* 100% Full-height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Stay on top */
+  top: 0;
+  right: 0;
+  background-color: hsl(0deg 0% 97%);
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidebar a:hover {
+  color: hsl(0, 0%, 51%);
+}
+
+/* Position and style the close button (top right corner) */
+.sidebar .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  color: hsl(0, 0%, 15%);
+  text-decoration: none;
+}
+
+/* The button used to open the sidebar */
+.openbtn {
+  font-size: 20px;
+  cursor: pointer;
+  background-color: hsl(90deg 55% 23%);
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  margin-right: 0.5rem;
+}
+
+.openbtn:hover {
+  background-color: hsl(107deg 55% 15%);
+}
+
+/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
+#spreadsheet {
+  transition: margin-left .5s; /* If you want a transition effect */
+  padding: 20px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidebar {padding-top: 15px;}
+  .sidebar a {font-size: 18px;}
+}

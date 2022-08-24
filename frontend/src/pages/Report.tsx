@@ -643,6 +643,22 @@ export const Report = () => {
 
   const issueInputRef = useRef(null);
 
+  /* Set the width of the sidebar to 250px and the right margin of the page content to 250px */
+  function openNav() {
+    document.getElementById("mySidebar").style.width = "250px";
+    document.getElementById("spreadsheet").style.marginRight = "250px";
+    document.getElementById("hamburger").style.marginRight = "250px";
+    document.getElementById("footer-container").style.marginRight = "250px";
+  }
+
+  /* Set the width of the sidebar to 0 and the right margin of the page content to 0 */
+  function closeNav() {
+    document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("spreadsheet").style.marginRight = "0";
+    document.getElementById("hamburger").style.marginRight = "0";
+    document.getElementById("footer-container").style.marginRight = "0";
+  }
+
   // Main content
   return (
     <>
@@ -671,9 +687,18 @@ export const Report = () => {
             currentWeekArray={currentWeekArray}
           />
           <HeaderUser username={context.user ? context.user.login : ""} />
+          <div id="mySidebar" className="sidebar">
+            <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>×</a>
+
+          </div>
+          <div id="hamburger">
+          <button className="openbtn" onClick={openNav}>&#9776; Overview</button>
+          </div>
         </header>
+
         <main
           className="spreadsheet"
+          id="spreadsheet"
           onKeyDown={(e) => {
             if (e.key.toLowerCase() === "s" && e.ctrlKey) {
               e.preventDefault();
@@ -855,7 +880,7 @@ export const Report = () => {
           </section>
         </main>
         <div className="footer">
-          <section className="footer-container">
+          <section className="footer-container" id="footer-container">
             <div className="col-8">
               <QuickAdd
                 addIssueActivity={addIssueActivityHandler}
