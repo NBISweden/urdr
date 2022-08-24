@@ -836,17 +836,9 @@ Other button classes are defined further down together with other classes for th
 
 /* The button used to open the sidebar */
 .openbtn {
-  font-size: 20px;
   cursor: pointer;
-  background-color: hsl(90deg 55% 23%);
-  color: white;
   padding: 10px 15px;
-  border: none;
   margin-right: 0.5rem;
-}
-
-.openbtn:hover {
-  background-color: hsl(107deg 55% 15%);
 }
 
 /* Style page content - use this if you want to push the page content to the right when you open the side navigation */

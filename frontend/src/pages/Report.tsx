@@ -692,7 +692,7 @@ export const Report = () => {
 
           </div>
           <div id="hamburger">
-          <button className="openbtn" onClick={openNav}>&#9776; Overview</button>
+          <button className="openbtn basic-button" onClick={openNav}>&#9776; Overview</button>
           </div>
         </header>
 
