@@ -805,3 +805,17 @@ Other button classes are defined further down together with other classes for th
 }
 
 /* OVERVIEW SECTION */
+.overview-wrapper {
+  padding: 1rem;
+  background-color: hsl(0deg 0% 97%);
+  margin-bottom: 0.2rem;
+}
+
+.overview-bar {
+  width: 100%;
+  height: 2rem;
+}
+
+.overview-heading {
+  font-size: 1rem;
+}
