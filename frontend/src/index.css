@@ -819,3 +819,17 @@ Other button classes are defined further down together with other classes for th
 .overview-heading {
   font-size: 1rem;
 }
+
+.bar-chart-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.bar-chart-section {
+  overflow: hidden;
+  height: 100%;
+}
+
+.bar-chart-section > p {
+  display: block ruby;
+}
