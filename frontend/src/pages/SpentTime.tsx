@@ -35,6 +35,7 @@ export const SpentTime = () => {
 
   };
 
+  // Example inspiration: https://medium.com/@tgknapp11/render-a-chart-with-react-minimal-pie-chart-e30420c9276c
   let keys= Object.keys(spentTime)
   keys.map((key) => {
     let randomColor = "#000000".replace(/0/g, function () {
@@ -56,13 +57,14 @@ export const SpentTime = () => {
       <main>
         <PieChart
             data={ data }
-            style={{ height: '300px' }}
+            style={{ height: '320px' }}
             label={(data) => data.dataEntry.value}
             labelStyle={{
               fontSize: "0.40rem",
               fontColor: "FFFFFA",
               fontWeight: "800",
             }}
+            radius={42}
             labelPosition={112}
         />;
         <header>
