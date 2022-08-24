@@ -36,7 +36,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
-import { OverviewBar } from "../components/OverviewBar";
+import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -685,7 +685,7 @@ export const Report = () => {
             }
           }}
         >
-          <OverviewBar></OverviewBar>
+          <BarChart></BarChart>
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="favorites-container">
