@@ -5,6 +5,7 @@ import React, {
   ElementType,
   MouseEventHandler,
 } from "react";
+import { TimeEntry } from "./model";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
 import { IssueActivityPair, FetchedTimeEntry } from "./model";
@@ -218,4 +219,35 @@ export const getTimeEntries = async (
   if (allEntries) return allEntries;
 
   return null;
+};
+
+export const reportTime = async (
+  timeEntry: TimeEntry,
+  onError: (error: any) => {},
+  context: any
+) => {
+  let logout = false;
+  const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
+    body: JSON.stringify({ time_entry: timeEntry }),
+    method: "POST",
+    headers: headers,
+  })
+    .then((response) => {
+      if (response.ok) {
+        return true;
+      } else if (response.status === 401) {
+        logout = true;
+      } else if (response.status === 422) {
+        throw new Error(
+          `Invalid issue-activity combination for (${timeEntry.issue_id}) or invalid amount of time entered`
+        );
+      } else {
+        throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
+      }
+    })
+    .catch((error) => {
+      onError(error);
+    });
+  if (logout) context.setUser(null);
+  return saved;
 };
