@@ -174,7 +174,7 @@ export const useEscaper = (
 
 // Retrieve time entries via api
 export const getTimeEntries = async (
-  issueActivityc: IssueActivityPair,
+  issueActivity: IssueActivityPair,
   from_date: Date,
   to_date: Date,
   context: any
@@ -183,14 +183,20 @@ export const getTimeEntries = async (
   // from the api, as the limit per batch is 100
   let offset = 0;
   let gotTotal = false;
+
   let queryparams = new URLSearchParams({
-    issue_id: issueActivityc ? `${issueActivityc.issue.id}` : "",
-    activity_id: issueActivityc ? `${issueActivityc.activity.id}` : "",
+    issue_id: issueActivity ? `${issueActivity.issue.id}` : "",
+    activity_id: issueActivity ? `${issueActivity.activity.id}` : "",
     from: formatDate(from_date, dateFormat),
     to: formatDate(to_date, dateFormat),
     offset: `${offset}`,
     limit: "100",
   });
+
+  if (!issueActivity) {
+    queryparams.delete("issue_id");
+    queryparams.delete("activity_id");
+  }
 
   let allEntries: FetchedTimeEntry[] = [];
 
