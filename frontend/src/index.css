@@ -806,11 +806,11 @@ Other button classes are defined further down together with other classes for th
 
 /* The sidebar menu */
 .sidebar {
-  height: 100%; /* 100% Full-height */
+  height: 80%; /* 100% Full-height */
   width: 0; /* 0 width - change this with JavaScript */
   position: fixed; /* Stay in place */
   z-index: 1; /* Stay on top */
-  top: 0;
+  top: 80px;
   right: 0;
   background-color: hsl(0deg 0% 97%);
   overflow-x: hidden; /* Disable horizontal scroll */
