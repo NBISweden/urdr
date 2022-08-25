@@ -7,6 +7,9 @@ import { PieChart } from 'react-minimal-pie-chart';
 
 export const SpentTime = () => {
   const [spentTime, setSpentTime] = useState<{}>({});
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
   React.useEffect(() => {
     getHoursPerActivity();
@@ -17,8 +20,8 @@ export const SpentTime = () => {
   const getHoursPerActivity = async () => {
     const timeEntries = await getTimeEntries(
       undefined,
-      new Date(2019, 6, 5, 10, 33, 30),
-      new Date(),
+      oneYearAgo,
+      today,
       context
     );
     let activityHours = {};
