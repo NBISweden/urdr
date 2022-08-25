@@ -814,7 +814,7 @@ Other button classes are defined further down together with other classes for th
   right: 0;
   background-color: hsl(0deg 0% 97%);
   overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
+  padding-top: 3rem;
   transition: 0.5s; /* 0.5 second transition effect to slide in the sidebar */
 }
 
@@ -834,6 +834,9 @@ Other button classes are defined further down together with other classes for th
   text-decoration: none;
 }
 
+.side-content {
+  padding: 0.5rem 1rem;
+}
 /* The button used to open the sidebar */
 .openbtn {
   cursor: pointer;

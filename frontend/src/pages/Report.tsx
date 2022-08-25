@@ -36,6 +36,8 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import weektravel from "../images/weektravel.png";
+import piemock from "../images/piemock.png";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -643,17 +645,19 @@ export const Report = () => {
 
   const issueInputRef = useRef(null);
 
+  let sidebarWidth = "360px"
   /* Set the width of the sidebar to 250px and the right margin of the page content to 250px */
   function openNav() {
-    document.getElementById("mySidebar").style.width = "250px";
-    document.getElementById("spreadsheet").style.marginRight = "250px";
-    document.getElementById("hamburger").style.marginRight = "250px";
-    document.getElementById("footer-container").style.marginRight = "250px";
+    document.getElementById("mySidebar").style.width = sidebarWidth;
+    document.getElementById("spreadsheet").style.marginRight = sidebarWidth;
+    document.getElementById("hamburger").style.marginRight = sidebarWidth;
+    document.getElementById("footer-container").style.marginRight = sidebarWidth;
   }
 
   /* Set the width of the sidebar to 0 and the right margin of the page content to 0 */
   function closeNav() {
     document.getElementById("mySidebar").style.width = "0";
+    document.getElementById("mySidebar").style.paddingLeft = "0";
     document.getElementById("spreadsheet").style.marginRight = "0";
     document.getElementById("hamburger").style.marginRight = "0";
     document.getElementById("footer-container").style.marginRight = "0";
@@ -689,7 +693,14 @@ export const Report = () => {
           <HeaderUser username={context.user ? context.user.login : ""} />
           <div id="mySidebar" className="sidebar">
             <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>×</a>
-
+            <div className="side-content">
+            <h1>Time Overview</h1>
+            <img
+                src={piemock}
+                alt="mock of chart"
+                className="piemock-img"
+            />
+            </div>
           </div>
           <div id="hamburger">
           <button className="openbtn basic-button" onClick={openNav}>&#9776; Overview</button>
