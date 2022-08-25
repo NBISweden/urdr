@@ -10,8 +10,8 @@ import { reportTime, dateFormat, isWeekday } from "../utils";
 import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 
 export const VacationPlanner = () => {
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const [startDate, setStartDate] = useState<Date>(undefined);
+  const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
 
   const handleCloseToast = (index: number) => {
@@ -123,7 +123,7 @@ export const VacationPlanner = () => {
     <div>
       <DatePicker
         isClearable={true}
-        selected={startDate}
+        selected={startDate ? startDate : undefined}
         onChange={(date: Date) => setStartDate(date)}
         showWeekNumbers
         minDate={new Date()}
@@ -142,7 +142,7 @@ export const VacationPlanner = () => {
     <div>
       <DatePicker
         isClearable={true}
-        selected={endDate}
+        selected={endDate ? endDate : undefined}
         onChange={(date: Date) => setEndDate(date)}
         showWeekNumbers
         minDate={startDate}
