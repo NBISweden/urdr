@@ -129,6 +129,9 @@ export const VacationPlanner = () => {
         locale={sv}
         showYearDropdown
         todayButton="Idag"
+        selectsStart
+        startDate={startDate}
+        endDate={endDate}
       />
     </div>
   );
@@ -145,6 +148,9 @@ export const VacationPlanner = () => {
         locale={sv}
         showYearDropdown
         todayButton="Idag"
+        selectsEnd
+        startDate={startDate}
+        endDate={endDate}
       />
     </div>
   );
