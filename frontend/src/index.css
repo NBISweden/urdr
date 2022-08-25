@@ -806,9 +806,9 @@ Other button classes are defined further down together with other classes for th
 
 /* OVERVIEW SECTION */
 .overview-wrapper {
-  padding: 1rem;
+  padding: 1rem 1.5rem;
   background-color: hsl(0deg 0% 97%);
-  margin-bottom: 0.2rem;
+  margin-top: 0.2rem;
 }
 
 .overview-bar {

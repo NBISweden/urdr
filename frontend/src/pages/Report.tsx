@@ -685,7 +685,6 @@ export const Report = () => {
             }
           }}
         >
-          <BarChart></BarChart>
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="favorites-container">
@@ -855,6 +854,7 @@ export const Report = () => {
               </div>
             </div>
           </section>
+          <BarChart></BarChart>
         </main>
         <div className="footer">
           <section className="footer-container">
