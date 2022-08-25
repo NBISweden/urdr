@@ -1,14 +1,22 @@
 import React from "react";
 import chart from "../images/barchart_mock_notext.png";
-import { BarChartSection } from "./BarChartSection";
 
 export const BarChart = () => {
   const mockData = {
-    Support: 40,
-    Training: 30,
-    Admin: 10,
-    Consultation: 15,
-    "Professional Development": 5,
+    Support: 126,
+    Training: 59,
+    Admin: 23,
+    Consultation: 21,
+    "Professional Development": 34,
+  };
+
+  const total = Object.values(mockData).reduce(
+    (previousValue, currentValue) => previousValue + currentValue,
+    0
+  );
+
+  const getPercent = (value: number) => {
+    return Math.round((value / total) * 100);
   };
 
   const mockColors = [
@@ -30,13 +38,13 @@ export const BarChart = () => {
           return (
             <div
               style={{
-                width: `${mockData[key]}%`,
+                width: `${getPercent(mockData[key])}%`,
                 backgroundColor: `${mockColors[index]}`,
               }}
               className="bar-chart-section"
             >
               <p>
-                {key} {mockData[key]}%
+                {key} {getPercent(mockData[key])}%
               </p>
             </div>
           );
