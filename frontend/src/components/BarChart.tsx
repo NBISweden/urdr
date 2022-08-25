@@ -28,11 +28,17 @@ export const BarChart = () => {
       <div className="bar-chart-wrapper">
         {Object.keys(mockData).map((key, index) => {
           return (
-            <BarChartSection
-              label={key}
-              percentage={mockData[key]}
-              color={mockColors[index]}
-            ></BarChartSection>
+            <div
+              style={{
+                width: `${mockData[key]}%`,
+                backgroundColor: `${mockColors[index]}`,
+              }}
+              className="bar-chart-section"
+            >
+              <p>
+                {key} {mockData[key]}%
+              </p>
+            </div>
           );
         })}
       </div>
