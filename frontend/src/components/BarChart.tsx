@@ -43,8 +43,9 @@ export const BarChart = () => {
               }}
               className="bar-chart-section"
             >
+              <p>{key}</p>
               <p>
-                {key} {getPercent(mockData[key])}%
+                {mockData[key]}h, {getPercent(mockData[key])}%
               </p>
             </div>
           );

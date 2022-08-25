@@ -832,4 +832,6 @@ Other button classes are defined further down together with other classes for th
 
 .bar-chart-section > p {
   display: block ruby;
+  margin: 0;
+  font-size: 0.8rem;
 }
