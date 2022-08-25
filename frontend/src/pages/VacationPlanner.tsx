@@ -68,7 +68,21 @@ export const VacationPlanner = () => {
   };
 
   const validateDates = async () => {
-    if (startDate.getTime() && endDate.getTime() && endDate > startDate) {
+    if (!startDate || !endDate) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message:
+            "Please fill in both the starting and end date of your absence",
+        },
+      ]);
+    } else if (
+      startDate.getTime() &&
+      endDate.getTime() &&
+      endDate > startDate
+    ) {
       await reportVacationTime();
       setToastList([
         ...toastList,
@@ -95,6 +109,7 @@ export const VacationPlanner = () => {
   const FromDatePicker = () => (
     <div>
       <DatePicker
+        isClearable={true}
         selected={startDate}
         onChange={(date: Date) => setStartDate(date)}
         showWeekNumbers
@@ -110,6 +125,7 @@ export const VacationPlanner = () => {
   const ToDatePicker = () => (
     <div>
       <DatePicker
+        isClearable={true}
         selected={endDate}
         onChange={(date: Date) => setEndDate(date)}
         showWeekNumbers
