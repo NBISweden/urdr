@@ -33,24 +33,7 @@ export const VacationPlanner = () => {
     return false;
   };
 
-  const reportVacationTime = async () => {
-    const dates_interval: Interval = { start: startDate, end: endDate };
-    const all_days = eachDayOfInterval(dates_interval);
-    let reportable_days = all_days.slice();
-    reportable_days = reportable_days.filter((date) => isWeekday(date));
-
-    if (reportable_days.length > 100) {
-      setToastList([
-        ...toastList,
-        {
-          type: "warning",
-          timeout: 5000,
-          message:
-            "You may only report a maximum of 100 absence days at a time",
-        },
-      ]);
-    }
-
+  const reportVacationTime = async (reportable_days: Date[]) => {
     for await (let vacation_day of reportable_days) {
       const time_entry: TimeEntry = {
         issue_id: 3499,
@@ -95,15 +78,31 @@ export const VacationPlanner = () => {
       endDate.getTime() &&
       endDate > startDate
     ) {
-      await reportVacationTime();
-      setToastList([
-        ...toastList,
-        {
-          type: "info",
-          timeout: 10000,
-          message: "Vacation plan submitted!",
-        },
-      ]);
+      const dates_interval: Interval = { start: startDate, end: endDate };
+      const all_days = eachDayOfInterval(dates_interval);
+      let reportable_days = all_days.slice();
+      reportable_days = reportable_days.filter((date) => isWeekday(date));
+      if (reportable_days.length > 100) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 5000,
+            message:
+              "You may only report a maximum of 100 absence days at a time",
+          },
+        ]);
+      } else {
+        await reportVacationTime(reportable_days);
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 10000,
+            message: "Vacation plan submitted!",
+          },
+        ]);
+      }
     } else {
       setToastList([
         ...toastList,
