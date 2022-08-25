@@ -94,6 +94,8 @@ export const VacationPlanner = () => {
         ]);
       } else {
         await reportVacationTime(reportable_days);
+        setStartDate(undefined);
+        setEndDate(undefined);
         setToastList([
           ...toastList,
           {
