@@ -251,3 +251,9 @@ export const reportTime = async (
   if (logout) context.setUser(null);
   return saved;
 };
+
+// Filter for weekdays. Return only Monday through Friday.
+export const isWeekday = (dt: Date) => {
+  const day = dt.getDay();
+  return day !== 0 && day !== 6;
+};

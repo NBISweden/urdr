@@ -6,7 +6,7 @@ import { ToastMsg, TimeEntry } from "../model";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
-import { reportTime, dateFormat } from "../utils";
+import { reportTime, dateFormat, isWeekday } from "../utils";
 import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 
 export const VacationPlanner = () => {
@@ -37,9 +37,7 @@ export const VacationPlanner = () => {
     const dates_interval: Interval = { start: startDate, end: endDate };
     const all_days = eachDayOfInterval(dates_interval);
     let reportable_days = all_days.slice();
-    reportable_days = reportable_days.filter(
-      (date) => date.getDay() !== 0 && date.getDay() !== 6
-    );
+    reportable_days = reportable_days.filter((date) => isWeekday(date));
 
     for await (let vacation_day of reportable_days) {
       const time_entry: TimeEntry = {

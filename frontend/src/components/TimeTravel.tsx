@@ -7,6 +7,7 @@ import sv from "date-fns/locale/sv";
 import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
 import { useNavigate } from "react-router-dom";
+import { isWeekday } from "../utils";
 
 /*
 TimeTravel
@@ -88,12 +89,6 @@ export const TimeTravel = ({
       Week {`${currentWeek}`}
     </button>
   ));
-
-  // Filter for weekdays. Return only Monday through Friday.
-  const isWeekday = (dt: Date) => {
-    const day = dt.getDay();
-    return day !== 0 && day !== 6;
-  };
 
   // The calculated time-travel section
   return (
