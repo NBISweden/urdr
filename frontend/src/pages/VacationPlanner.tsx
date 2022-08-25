@@ -39,6 +39,18 @@ export const VacationPlanner = () => {
     let reportable_days = all_days.slice();
     reportable_days = reportable_days.filter((date) => isWeekday(date));
 
+    if (reportable_days.length > 100) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 5000,
+          message:
+            "You may only report a maximum of 100 absence days at a time",
+        },
+      ]);
+    }
+
     for await (let vacation_day of reportable_days) {
       const time_entry: TimeEntry = {
         issue_id: 3499,
