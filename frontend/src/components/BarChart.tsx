@@ -1,19 +1,45 @@
-import React from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../components/AuthProvider";
+import { getTimeEntries } from "../utils";
+import { FetchedTimeEntry } from "../model";
 import chart from "../images/barchart_mock_notext.png";
 
 export const BarChart = () => {
-  const mockData = {
-    Support: 126,
-    Training: 59,
-    Admin: 23,
-    Consultation: 21,
-    "Professional Development": 34,
+  const [spentTime, setSpentTime] = useState<{ [key: string]: number }>({});
+  const [total, setTotal] = useState<number>(0);
+  const today = new Date();
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const context = useContext(AuthContext);
+
+  useEffect(() => {
+    getHoursPerActivity();
+  }, []);
+
+  const getHoursPerActivity = async () => {
+    const timeEntries = await getTimeEntries(
+      undefined,
+      oneYearAgo,
+      today,
+      context
+    );
+    let activityHours: { [key: string]: number } = {};
+    timeEntries.map((entry: FetchedTimeEntry) => {
+      if (!activityHours[entry.activity.name]) {
+        activityHours[entry.activity.name] = 0;
+      }
+      activityHours[entry.activity.name] += entry.hours;
+    });
+    setSpentTime(activityHours);
   };
 
-  const total = Object.values(mockData).reduce(
-    (previousValue, currentValue) => previousValue + currentValue,
-    0
-  );
+  useEffect(() => {
+    const total = Object.values(spentTime).reduce(
+      (previousValue, currentValue) => previousValue + currentValue,
+      0
+    );
+    setTotal(total);
+  }, [spentTime]);
 
   const getPercent = (value: number) => {
     return Math.round((value / total) * 100);
@@ -32,20 +58,19 @@ export const BarChart = () => {
   return (
     <section className="overview-wrapper">
       <h2 className="overview-heading">This year's work</h2>
-      {/* <img src={chart} className="overview-bar" /> */}
       <div className="bar-chart-wrapper">
-        {Object.keys(mockData).map((key, index) => {
+        {Object.keys(spentTime).map((key, index) => {
           return (
             <div
               style={{
-                width: `${getPercent(mockData[key])}%`,
+                width: `${getPercent(spentTime[key])}%`,
                 backgroundColor: `${mockColors[index]}`,
               }}
               className="bar-chart-section"
             >
               <p>{key}</p>
               <p>
-                {mockData[key]}h, {getPercent(mockData[key])}%
+                {spentTime[key]}h, {getPercent(spentTime[key])}%
               </p>
             </div>
           );
