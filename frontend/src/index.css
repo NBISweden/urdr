@@ -811,7 +811,6 @@ Other button classes are defined further down together with other classes for th
 .vacation-plan-dates-wrapper {
   display: flex;
   margin-right: 2em;
-  place-content: end;
 }
 
 .vacation-plan-container {

@@ -2,17 +2,36 @@ import "../index.css";
 import React, { useState, useRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
-import { ToastMsg, TimeEntry } from "../model";
+import {
+  ToastMsg,
+  TimeEntry,
+  IssueActivityPair,
+  FetchedTimeEntry,
+  Issue,
+  IdName,
+} from "../model";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
-import { reportTime, dateFormat, isWeekday } from "../utils";
-import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
+import {
+  reportTime,
+  dateFormat,
+  isWeekday,
+  getTimeEntries,
+  getFullWeek,
+} from "../utils";
+import {
+  eachDayOfInterval,
+  getISOWeek,
+  Interval,
+  format as formatDate,
+} from "date-fns";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
+  const [vacationWeeklyHours, setVacationWeeklyHours] = useState<{}>({});
 
   const handleCloseToast = (index: number) => {
     const toasts = [...toastList];
@@ -31,6 +50,48 @@ export const VacationPlanner = () => {
       },
     ]);
     return false;
+  };
+
+  React.useEffect(() => {
+    getVacationTimeEntries(new Date());
+  }, []);
+
+  const getVacationTimeEntries = async (fromday: Date) => {
+    const issue: Issue = {
+      id: 3499,
+      subject: "NBIS General - Absence (Vacation/VAB/Other)",
+    };
+    const id_name: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
+    const vacation_pair: IssueActivityPair = {
+      issue: issue,
+      activity: id_name,
+      custom_name: "",
+      is_hidden: false,
+    };
+    let vacationHours = {};
+
+    const currentWeekArray: Date[] = getFullWeek(fromday);
+    const oneYearAgo: Date = new Date(
+      new Date().setFullYear(new Date().getFullYear() - 1)
+    );
+    const vacationTimeEntries = await getTimeEntries(
+      vacation_pair,
+      oneYearAgo,
+      currentWeekArray[0],
+      context
+    );
+
+    vacationTimeEntries.map((entry: FetchedTimeEntry) => {
+      const currentWeek: string = getISOWeek(
+        new Date(entry.spent_on)
+      ).toString();
+
+      if (!vacationHours[currentWeek]) {
+        vacationHours[currentWeek] = 0;
+      }
+      vacationHours[currentWeek] += entry.hours;
+    });
+    setVacationWeeklyHours(vacationHours);
   };
 
   const reportVacationTime = async (reportable_days: Date[]) => {
@@ -193,6 +254,8 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
+        <h3>Reported weekly vacation in the last year</h3>
+        <div>{JSON.stringify(vacationWeeklyHours)}</div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
