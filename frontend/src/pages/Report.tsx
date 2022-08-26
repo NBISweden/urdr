@@ -36,10 +36,8 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
-import piemock from "../images/piemock.png";
 import chart from "../icons/chart.svg";
-import plus from "../icons/plus.svg";
-
+import {Sidebar} from "../components/Sidebar";
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
   event.returnValue = "";
@@ -714,14 +712,7 @@ export const Report = () => {
           }}
         ><div id="mySidebar" className="sidebar">
           <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>×</a>
-          <div className="side-content">
-            <h1>Time Overview</h1>
-            <img
-                src={piemock}
-                alt="mock of chart"
-                className="piemock-img"
-            />
-          </div>
+         <Sidebar></Sidebar>
         </div>
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
