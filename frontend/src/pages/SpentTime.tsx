@@ -7,7 +7,7 @@ import { PieChart } from "react-minimal-pie-chart";
 import { Data } from "react-minimal-pie-chart/types/commonTypes";
 
 export const SpentTime = () => {
-  const [spentTime, setSpentTime] = useState<{}>({});
+  const [spentTime, setSpentTime] = useState<{ [key: string]: number }>({});
   const today = new Date();
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
