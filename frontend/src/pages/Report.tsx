@@ -644,7 +644,7 @@ export const Report = () => {
 
   const issueInputRef = useRef(null);
 
-  let sidebarWidth = "360px";
+  let sidebarWidth = "400px";
   /* Set the width of the sidebar to 250px and the right margin of the page content to 250px */
   function openNav() {
     document.getElementById("mySidebar").style.width = sidebarWidth;
