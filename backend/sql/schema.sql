@@ -99,3 +99,25 @@ CREATE TABLE invalid_entry (
 	UNIQUE (redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
 );
+
+DROP TABLE IF EXISTS group;
+CREATE TABLE group (
+	group_id INTEGER PRIMARY KEY,
+	name TEXT NOT NULL,
+
+	UNIQUE (name)
+		ON CONFLICT ROLLBACK
+);
+
+DROP TABLE IF EXISTS user_group;
+CREATE TABLE user_group (
+	user_id INTEGER NOT NULL,
+	group_id INTEGER NOT NULL,
+
+	UNIQUE (user_id, group_id)
+		ON CONFLICT REPLACE,
+
+	FOREIGN KEY (group_id)
+		REFERENCES group (group_id)
+		ON DELETE CASCADE
+);
