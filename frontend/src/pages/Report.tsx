@@ -37,7 +37,7 @@ import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
 import chart from "../icons/chart.svg";
-import {Sidebar} from "../components/Sidebar";
+import { Sidebar } from "../components/Sidebar";
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
   event.returnValue = "";
@@ -644,13 +644,13 @@ export const Report = () => {
 
   const issueInputRef = useRef(null);
 
-  let sidebarWidth = "360px"
+  let sidebarWidth = "360px";
   /* Set the width of the sidebar to 250px and the right margin of the page content to 250px */
   function openNav() {
     document.getElementById("mySidebar").style.width = sidebarWidth;
     document.getElementById("spreadsheet").style.marginRight = sidebarWidth;
-    //document.getElementById("hamburger").style.marginRight = sidebarWidth;
-    document.getElementById("footer-container").style.marginRight = sidebarWidth;
+    document.getElementById("footer-container").style.marginRight =
+      sidebarWidth;
   }
 
   /* Set the width of the sidebar to 0 and the right margin of the page content to 0 */
@@ -658,7 +658,7 @@ export const Report = () => {
     document.getElementById("mySidebar").style.width = "0";
     document.getElementById("mySidebar").style.paddingLeft = "0";
     document.getElementById("spreadsheet").style.marginRight = "0";
-    document.getElementById("hamburger").style.marginRight = "0";
+    document.getElementById("chart-btn").style.marginRight = "0";
     document.getElementById("footer-container").style.marginRight = "0";
   }
 
@@ -690,14 +690,12 @@ export const Report = () => {
             currentWeekArray={currentWeekArray}
           />
           <HeaderUser username={context.user ? context.user.login : ""} />
-
-          <div id="hamburger">
-          <button className="openbtn basic-button" onClick={openNav}>
-            <img src={chart} alt="Chart icon" />
-          </button>
+          <div id="chart-btn">
+            <button className="openbtn basic-button" onClick={openNav}>
+              <img src={chart} alt="Chart icon" />
+            </button>
           </div>
         </header>
-
         <main
           className="spreadsheet"
           id="spreadsheet"
@@ -710,10 +708,17 @@ export const Report = () => {
               issueInputRef.current.focus();
             }
           }}
-        ><div id="mySidebar" className="sidebar">
-          <a href="javascript:void(0)" className="closebtn" onClick={closeNav}>×</a>
-         <Sidebar></Sidebar>
-        </div>
+        >
+          <div id="mySidebar" className="sidebar">
+            <a
+              href="javascript:void(0)"
+              className="closebtn"
+              onClick={closeNav}
+            >
+              ×
+            </a>
+            <Sidebar></Sidebar>
+          </div>
           {favorites && favorites.length > 0 && (
             <DragDropContext onDragEnd={onDragEnd}>
               <section className="favorites-container">
