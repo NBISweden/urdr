@@ -2,15 +2,14 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { getTimeEntries } from "../utils";
 import { FetchedTimeEntry } from "../model";
-import chart from "../images/barchart_mock_notext.png";
 
 export const BarChart = () => {
   const [spentTime, setSpentTime] = useState<{ [key: string]: number }>({});
   const [total, setTotal] = useState<number>(0);
+  const context = useContext(AuthContext);
   const today = new Date();
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  const context = useContext(AuthContext);
 
   useEffect(() => {
     getHoursPerActivity();
@@ -45,14 +44,17 @@ export const BarChart = () => {
     return Math.round((value / total) * 100);
   };
 
-  const mockColors = [
-    "hotpink",
-    "peachpuff",
-    "lightgrey",
-    "cornflowerblue",
-    "coral",
-    "yellow",
-    "green",
+  const colors = [
+    "hsl(76deg 55% 53%)",
+    "hsl(288deg 13% 61%)",
+    "hsl(185deg 24% 80%)",
+    "hsl(26deg 91% 65%)",
+    "hsl(0deg 0% 75%)",
+    "hsl(186deg 30% 60%)",
+    "hsl(76deg 55% 77%)",
+    "hsl(291deg 13% 81%)",
+    "hsl(27deg 91% 77%)",
+    "hsl(76deg 55% 65%)",
   ];
 
   return (
@@ -60,11 +62,18 @@ export const BarChart = () => {
       <h2 className="overview-heading">This year's work</h2>
       <div className="bar-chart-wrapper">
         {Object.keys(spentTime).map((key, index) => {
+          // If the number of hours is so low that the width would be rounded down to 0%,
+          // make it a thin slice anyway to show that it's there
+          const width =
+            getPercent(spentTime[key]) > 0
+              ? `${getPercent(spentTime[key])}%`
+              : "4px";
           return (
             <div
+              key={spentTime[key]}
               style={{
-                width: `${getPercent(spentTime[key])}%`,
-                backgroundColor: `${mockColors[index]}`,
+                width: width,
+                backgroundColor: `${colors[index]}`,
               }}
               className="bar-chart-section"
             >
