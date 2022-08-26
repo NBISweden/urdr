@@ -33,7 +33,6 @@ export const SpentTime = () => {
       }
       activityHours[entry.activity.name] += entry.hours;
     });
-    console.log(activityHours);
     setSpentTime(activityHours);
   };
 
