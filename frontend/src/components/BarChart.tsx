@@ -55,6 +55,12 @@ export const BarChart = () => {
     "hsl(291deg 13% 81%)",
     "hsl(27deg 91% 77%)",
     "hsl(76deg 55% 65%)",
+    "hsl(186deg 30% 86%)",
+    "hsl(0deg 0% 83%)",
+    "hsl(76deg 55% 42%)",
+    "hsl(26deg 91% 54%)",
+    "hsl(291deg 13% 90%)",
+    "hsl(185deg 24% 60%) ",
   ];
 
   return (
@@ -68,6 +74,7 @@ export const BarChart = () => {
             getPercent(spentTime[key]) > 0
               ? `${getPercent(spentTime[key])}%`
               : "4px";
+
           return (
             <div
               key={spentTime[key]}
