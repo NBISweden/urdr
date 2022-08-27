@@ -107,7 +107,7 @@ CREATE TABLE invalid_entry (
 
 DROP TABLE IF EXISTS group;
 CREATE TABLE group (
-	group_id INTEGER PRIMARY KEY,
+	redmine_group_id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
 
 	UNIQUE (name)
@@ -121,13 +121,13 @@ CREATE TABLE group (
 
 DROP TABLE IF EXISTS user_group;
 CREATE TABLE user_group (
-	user_id INTEGER NOT NULL,
-	group_id INTEGER NOT NULL,
+	redmine_user_id INTEGER NOT NULL,
+	redmine_group_id INTEGER NOT NULL,
 
-	UNIQUE (user_id, group_id)
+	UNIQUE (redmine_user_id, redmine_group_id)
 		ON CONFLICT REPLACE,
 
-	FOREIGN KEY (group_id)
-		REFERENCES group (group_id)
+	FOREIGN KEY (redmine_group_id)
+		REFERENCES group (redmine_group_id)
 		ON DELETE CASCADE
 );
