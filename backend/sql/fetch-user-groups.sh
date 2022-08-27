@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# This script fetches data about the available redmine groups and pushes
-# the user and user_groups to the urdr local db
+# This script fetches data about the available Redmine groups and
+# updates the local Urdr database with the group information and the
+# users' group memberships.  Data is fetched using the Redmine REST API.
 
 # Arguments:
 #
@@ -9,32 +10,55 @@
 # 2:    The redmine api endpoint
 # 3:    The database.db file path
 
-unset -v err
+tmp_groups=$(mktemp)
+trap 'rm -rf -- "$tmp_groups"' EXIT
 
-curl --silent --header "X-Redmine-API-Key: $1" "$2/groups.json" | jq .groups | jq -c '.[]' |
+api_key=$1
+redmine_url=$2
+database_path=$3
 
-while IFS= read -r obj; do
-g_id=$(echo "$obj" | jq '.id')
-g_name=$(echo "$obj" | jq '.name')
-echo $g_name $g_id
+if [ ! -f "$database_path" ] || [ "${database_path%.db}" = "$database_path" ]
+then
+	cat >&2 <<-'END_ERROR'
+	ERROR: The third argument is supposed to be the pathname to the
+	       Urdr backend SQLite3 database file.
+	END_ERROR
+	err=1
+fi
 
-## Insert groups in database
-##sqlite3 "$3" "insert into group values ($g_id, $g_name)"
-##
+[ "${err+set}" = set ] && exit 1
 
-group=$(curl --silent --header "X-Redmine-API-Key: $1" "$2/groups/$g_id.json?include=users" | jq .group | jq -c '.')
+# Fetch basic group info.
 
-g_id=$(echo "$group" | jq '.id')
-users=$(echo "$group" | jq '.users' | jq -c '.[]')
+curl --silent --header "X-Redmine-API-Key: $api_key" \
+	"$redmine_url/groups.json" >"$tmp_groups"
 
-echo $users | while IFS= read -r obj; do
-u_id=$(echo $obj | jq -c .id)
+# Import group IDs and their names into our "group" table.
 
-## Insert user_groups in database
-##sqlite3 "$3" "insert into user_group values ($u_id, $g_id)"
-##
+jq -r '.groups[] | [.id, .name] | @csv' "$tmp_groups" |
+sqlite3 "$database_path" \
+	'DELETE FROM "group"' \
+	'.separator ","' \
+	'.import /dev/stdin "group"' \
+	'VACUUM'
 
-done
-done
+# Get users for each group.
+
+set --
+
+jq -r '.groups[].id' "$tmp_groups" |
+{
+	while IFS= read -r group_id; do
+		set -- "$@" "$redmine_url/groups/$group_id.json?include=users"
+	done
+
+	curl --silent --header "X-Redmine-API-Key: $api_key" "$@" |
+	jq -r '.group | .id as $gid | .users[] | [ .id, $gid ] | @csv' |
+	sqlite3 "$database_path" \
+		'DELETE FROM user_group' \
+		'.separator ","' \
+		'.import /dev/stdin user_group' \
+		'VACUUM'
+}
 
 echo 'Done.'
