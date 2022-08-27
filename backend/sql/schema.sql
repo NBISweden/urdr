@@ -87,9 +87,9 @@ CREATE TABLE priority_entry (
 --
 -- This table stores the combinations of issue IDs and activity IDs that
 -- are explicitly inactivated.  Any combination not listed is active by
--- default.  An activity listed with a zero project ID is deactivated
--- for all projects (zero is used rather than NULL to avoid issues with
--- the UNIQUE constraint).
+-- default.  An activity listed with a zero issue ID is deactivated for
+-- all projects (zero is used rather than NULL to avoid issues with the
+-- UNIQUE constraint).
 
 DROP TABLE IF EXISTS invalid_entry;
 CREATE TABLE invalid_entry (
