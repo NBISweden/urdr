@@ -23,10 +23,8 @@ then
 	ERROR: The third argument is supposed to be the pathname to the
 	       Urdr backend SQLite3 database file.
 	END_ERROR
-	err=1
+	exit 1
 fi
-
-[ "${err+set}" = set ] && exit 1
 
 # Fetch basic group info.
 
