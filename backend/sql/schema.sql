@@ -100,6 +100,11 @@ CREATE TABLE invalid_entry (
 		ON CONFLICT REPLACE
 );
 
+-- Groups.
+--
+-- A table to store Redmine group data.  A group in this sense is a
+-- Redmine group ID and the group's name.
+
 DROP TABLE IF EXISTS group;
 CREATE TABLE group (
 	group_id INTEGER PRIMARY KEY,
@@ -108,6 +113,11 @@ CREATE TABLE group (
 	UNIQUE (name)
 		ON CONFLICT ROLLBACK
 );
+
+-- User group mapping.
+--
+-- The table maps a user to a group.  A user belonging to several groups
+-- will have multiple entries in this table.
 
 DROP TABLE IF EXISTS user_group;
 CREATE TABLE user_group (
