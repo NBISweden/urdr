@@ -108,9 +108,9 @@ CREATE TABLE invalid_entry (
 DROP TABLE IF EXISTS group;
 CREATE TABLE group (
 	redmine_group_id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL,
+	redmine_group_name TEXT NOT NULL,
 
-	UNIQUE (name)
+	UNIQUE (redmine_group_name)
 		ON CONFLICT ROLLBACK
 );
 
