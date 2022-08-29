@@ -4,6 +4,7 @@ import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
 import { Help } from "./pages/Help";
 import { SpentTime } from "./pages/SpentTime";
+import { VacationPlanner } from "./pages/VacationPlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek } from "date-fns";
@@ -54,6 +55,14 @@ export const App = () => {
                 element={
                   <ProtectedRoute>
                     <SpentTime />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/vacation"
+                element={
+                  <ProtectedRoute>
+                    <VacationPlanner />
                   </ProtectedRoute>
                 }
               />
