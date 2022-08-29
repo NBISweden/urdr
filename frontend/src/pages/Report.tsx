@@ -37,6 +37,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -829,6 +830,7 @@ export const Report = () => {
               </div>
             </div>
           </section>
+          <BarChart loading={isLoading}></BarChart>
         </main>
         <div className="footer">
           <section className="footer-container">

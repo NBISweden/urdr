@@ -804,6 +804,41 @@ Other button classes are defined further down together with other classes for th
   margin-left: 0.5rem;
 }
 
+/* OVERVIEW SECTION */
+.overview-wrapper {
+  padding: 1rem 1.5rem;
+  background-color: hsl(0deg 0% 97%);
+  margin-top: 0.2rem;
+}
+
+.overview-bar {
+  width: 100%;
+  height: 2rem;
+}
+
+.overview-heading {
+  font-size: 1rem;
+}
+
+.bar-chart-wrapper {
+  display: flex;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-chart-section {
+  overflow: hidden;
+  height: 100%;
+  padding-left: 0.3rem;
+}
+
+.bar-chart-section > p {
+  display: block ruby;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
 .vacation-plan-picker-label {
   margin: 0 0 0.1rem;
 }
