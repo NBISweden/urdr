@@ -41,13 +41,11 @@ func getUserGroupsHandler(c *fiber.Ctx) error {
 		users, err := db.GetUsersInGroup(gid)
 
 		if err != nil {
-			log.Errorf("Failed to get users in group", err)
+			log.Errorf("Failed to get users in group: %v", err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		for _, user := range users {
-			groupUserIds = append(groupUserIds, user)
-		}
+		groupUserIds = append(groupUserIds, users...)
 	}
 
 	return c.JSON(groupUserIds)
