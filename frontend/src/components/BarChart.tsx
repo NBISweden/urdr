@@ -29,7 +29,16 @@ export const BarChart = () => {
       }
       activityHours[entry.activity.name] += entry.hours;
     });
-    setSpentTime(activityHours);
+    const sortedActivityHours = Object.keys(activityHours)
+      .sort()
+      .reduce(
+        (previousKey, currentKey) => ({
+          ...previousKey,
+          [currentKey]: activityHours[currentKey],
+        }),
+        {}
+      );
+    setSpentTime(sortedActivityHours);
   };
 
   useEffect(() => {
