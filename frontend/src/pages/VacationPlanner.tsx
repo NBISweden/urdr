@@ -183,6 +183,7 @@ export const VacationPlanner = () => {
   const FromDatePicker = () => (
     <div>
       <DatePicker
+        dateFormat={dateFormat}
         isClearable={true}
         selected={startDate ? startDate : undefined}
         onChange={(date: Date) => setStartDate(date)}
@@ -195,6 +196,7 @@ export const VacationPlanner = () => {
         selectsStart
         startDate={startDate}
         endDate={endDate}
+        monthsShown={2}
       />
     </div>
   );
@@ -202,6 +204,7 @@ export const VacationPlanner = () => {
   const ToDatePicker = () => (
     <div>
       <DatePicker
+        dateFormat={dateFormat}
         isClearable={true}
         selected={endDate ? endDate : undefined}
         onChange={(date: Date) => setEndDate(date)}
@@ -214,6 +217,7 @@ export const VacationPlanner = () => {
         selectsEnd
         startDate={startDate}
         endDate={endDate}
+        monthsShown={2}
       />
     </div>
   );
