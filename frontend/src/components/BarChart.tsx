@@ -3,7 +3,7 @@ import { AuthContext } from "../components/AuthProvider";
 import { getTimeEntries } from "../utils";
 import { FetchedTimeEntry } from "../model";
 
-export const BarChart = () => {
+export const BarChart = ({ loading }: { loading: boolean }) => {
   const [spentTime, setSpentTime] = useState<{ [key: string]: number }>({});
   const [total, setTotal] = useState<number>(0);
   const context = useContext(AuthContext);
@@ -12,8 +12,14 @@ export const BarChart = () => {
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
   useEffect(() => {
-    getHoursPerActivity();
-  }, []);
+    // Whenever the user has saved changes we want to fetch the year's time entries
+    // to immediately show changes in the chart.
+    // That is, we fetch everytime loading turns back to false.
+    // It's false when the page renders the first time, so we also fetch then.
+    if (!loading) {
+      getHoursPerActivity();
+    }
+  }, [loading]);
 
   const getHoursPerActivity = async () => {
     const timeEntries = await getTimeEntries(

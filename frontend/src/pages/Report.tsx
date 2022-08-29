@@ -830,7 +830,7 @@ export const Report = () => {
               </div>
             </div>
           </section>
-          <BarChart></BarChart>
+          <BarChart loading={isLoading}></BarChart>
         </main>
         <div className="footer">
           <section className="footer-container">
