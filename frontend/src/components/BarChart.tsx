@@ -82,30 +82,36 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     <section className="overview-wrapper">
       <h2 className="overview-heading">This year's work</h2>
       <div className="bar-chart-wrapper">
-        {Object.keys(spentTime).map((key, index) => {
-          // If the number of hours is so low that the width would be rounded down to 0%,
-          // make it a thin slice anyway to show that it's there
-          const width =
-            getPercent(spentTime[key]) > 0
-              ? `${getPercent(spentTime[key])}%`
-              : "4px";
+        {Object.keys(spentTime).length > 0 ? (
+          Object.keys(spentTime).map((key, index) => {
+            // If the number of hours is so low that the width would be rounded down to 0%,
+            // make it a thin slice anyway to show that it's there
+            const width =
+              getPercent(spentTime[key]) > 0
+                ? `${getPercent(spentTime[key])}%`
+                : "4px";
 
-          return (
-            <div
-              key={spentTime[key]}
-              style={{
-                width: width,
-                backgroundColor: `${colors[index]}`,
-              }}
-              className="bar-chart-section"
-            >
-              <p>{key}</p>
-              <p>
-                {spentTime[key]}h, {getPercent(spentTime[key])}%
-              </p>
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={spentTime[key]}
+                style={{
+                  width: width,
+                  backgroundColor: `${colors[index]}`,
+                }}
+                className="bar-chart-section"
+              >
+                <p>{key}</p>
+                <p>
+                  {spentTime[key]}h, {getPercent(spentTime[key])}%
+                </p>
+              </div>
+            );
+          })
+        ) : (
+          <div className="bar-chart-section">
+            Nothing to display - you haven't logged any time yet.
+          </div>
+        )}
       </div>
     </section>
   );
