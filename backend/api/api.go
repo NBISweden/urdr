@@ -78,6 +78,8 @@ func Setup() *fiber.App {
 
 	app.Get("/api/users_in_group", getUserGroupsHandler)
 
+	app.Get("/api/groups", getGroupsHandler)
+
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotFound) // => 404 "Not Found"

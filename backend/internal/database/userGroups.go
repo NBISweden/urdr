@@ -2,16 +2,18 @@ package database
 
 import (
 	"fmt"
+	"urdr-api/internal/redmine"
 )
 
-func (db *Database) GetUserGroups(redmine_user_id int) ([]int, error) {
+func (db *Database) GetUserGroups(redmine_user_id int) ([]redmine.Group, error) {
 	if err := db.handle().Ping(); err != nil {
 		return nil, fmt.Errorf("sql.Ping() failed: %w", err)
 	}
 
 	selectStmt := `
-		SELECT	redmine_group_id
+		SELECT	user_group.redmine_group_id, "group".redmine_group_name
 		FROM	user_group
+		JOIN "group" ON "group".redmine_group_id=user_group.redmine_group_id
 		WHERE	redmine_user_id = ?`
 
 	stmt, err := db.handle().Prepare(selectStmt)
@@ -26,22 +28,22 @@ func (db *Database) GetUserGroups(redmine_user_id int) ([]int, error) {
 	}
 	defer rows.Close()
 
-	var userGroupIds []int
+	var userGroups []redmine.Group
 
 	for rows.Next() {
-		var groupId int
+		var group redmine.Group
 
-		if err := rows.Scan(&groupId); err != nil {
+		if err := rows.Scan(&group.Id, &group.Name); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
 		}
-		userGroupIds = append(userGroupIds, groupId)
+		userGroups = append(userGroups, group)
 
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("sql.Next() failed: %w", err)
 	}
 
-	return userGroupIds, nil
+	return userGroups, nil
 }
 
 func (db *Database) GetUsersInGroup(redmine_group_id int) ([]int, error) {

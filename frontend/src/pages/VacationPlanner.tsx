@@ -19,6 +19,8 @@ import {
   isWeekday,
   getTimeEntries,
   getFullWeek,
+  getUsersInGroups,
+  getGroups,
 } from "../utils";
 import {
   eachDayOfInterval,
@@ -26,12 +28,20 @@ import {
   Interval,
   format as formatDate,
 } from "date-fns";
+import LoadingOverlay from "react-loading-overlay-ts";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [vacationWeeklyHours, setVacationWeeklyHours] = useState<{}>({});
+  const [vacationWeeklyHours, setVacationWeeklyHours] = useState<[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [redmineGroups, setRedmineGroups] = useState({});
+
+  const toggleLoadingPage = (state: boolean) => {
+    setIsLoading(state);
+  };
 
   const handleCloseToast = (index: number) => {
     const toasts = [...toastList];
@@ -53,10 +63,38 @@ export const VacationPlanner = () => {
   };
 
   React.useEffect(() => {
-    getVacationTimeEntries(new Date());
+    toggleLoadingPage(true);
+    const fetchTimeEntriesFromGroups = async () => {
+      const users: number[] = await getUsersInGroups(context);
+      const redmine_groups: [{ id: number; name: string }] = await getGroups(
+        context
+      );
+      const obj_groups = {};
+      redmine_groups.map((gr) => {
+        obj_groups[gr.id] = gr.name;
+      });
+
+      setRedmineGroups(obj_groups);
+      let uniqueUsers: number[] = [...new Set(users)];
+
+      // So that loading times are shorter, we only take six groups
+      let sliced_users = uniqueUsers.slice(-6);
+      const vacation_entries: {}[] = [];
+      for await (let group of sliced_users) {
+        let vacationHours = await getVacationTimeEntries(
+          new Date(),
+          group.toString()
+        );
+        vacation_entries.push(vacationHours);
+      }
+      toggleLoadingPage(false);
+
+      setVacationWeeklyHours([...vacationWeeklyHours, vacation_entries]);
+    };
+    fetchTimeEntriesFromGroups();
   }, []);
 
-  const getVacationTimeEntries = async (fromday: Date) => {
+  const getVacationTimeEntries = async (fromday: Date, user_id: string) => {
     const issue: Issue = {
       id: 3499,
       subject: "NBIS General - Absence (Vacation/VAB/Other)",
@@ -71,14 +109,14 @@ export const VacationPlanner = () => {
     let vacationHours = {};
 
     const currentWeekArray: Date[] = getFullWeek(fromday);
-    const oneYearAgo: Date = new Date(
-      new Date().setFullYear(new Date().getFullYear() - 1)
-    );
+    const currentYear: number = new Date().getFullYear();
+    const januaryThisYear: Date = new Date(currentYear);
     const vacationTimeEntries = await getTimeEntries(
       vacation_pair,
-      oneYearAgo,
+      januaryThisYear,
       currentWeekArray[0],
-      context
+      context,
+      user_id
     );
 
     vacationTimeEntries.map((entry: FetchedTimeEntry) => {
@@ -91,7 +129,7 @@ export const VacationPlanner = () => {
       }
       vacationHours[currentWeek] += entry.hours;
     });
-    setVacationWeeklyHours(vacationHours);
+    return vacationHours;
   };
 
   const reportVacationTime = async (reportable_days: Date[]) => {
@@ -224,6 +262,21 @@ export const VacationPlanner = () => {
 
   return (
     <>
+      <LoadingOverlay
+        active={isLoading}
+        className={isLoading ? "loading-overlay" : ""}
+        spinner={
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={isLoading}
+            size={15}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          ></ClimbingBoxLoader>
+        }
+      ></LoadingOverlay>
       <header>
         <h3>Vacation reporting </h3>
       </header>
@@ -259,6 +312,7 @@ export const VacationPlanner = () => {
           </div>
         </div>
         <h3>Reported weekly vacation in the last year</h3>
+        <div>{JSON.stringify(Object.values(redmineGroups))}</div>
         <div>{JSON.stringify(vacationWeeklyHours)}</div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
