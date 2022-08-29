@@ -8,8 +8,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   const [total, setTotal] = useState<number>(0);
   const context = useContext(AuthContext);
   const today = new Date();
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const startDate = new Date(`January 1, ${today.getFullYear()}`);
 
   useEffect(() => {
     // Whenever the user has saved changes we want to fetch the year's time entries
@@ -24,7 +23,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   const getHoursPerActivity = async () => {
     const timeEntries = await getTimeEntries(
       undefined,
-      oneYearAgo,
+      startDate,
       today,
       context
     );
