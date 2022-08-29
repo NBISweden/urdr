@@ -838,3 +838,20 @@ Other button classes are defined further down together with other classes for th
   margin: 0;
   font-size: 0.8rem;
 }
+
+.vacation-plan-picker-label {
+  margin: 0 0 0.1rem;
+}
+.vacation-plan-dates-wrapper {
+  display: flex;
+  margin-right: 2em;
+}
+
+.vacation-plan-container {
+  margin: 3em;
+}
+
+.apply-dates-button {
+  height: 3em;
+  width: 8em;
+}
