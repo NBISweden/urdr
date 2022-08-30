@@ -401,7 +401,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .tooltiptext {
-  visibility: hidden;
+  /* visibility: hidden; */
   width: auto;
   height: auto;
   background-color: hsl(0deg 0% 90%);
@@ -425,9 +425,9 @@ Other button classes are defined further down together with other classes for th
   border-color: hsl(0deg 0% 0%) transparent transparent transparent;
 }
 
-.issuetooltip:hover .tooltiptext {
+/* .issuetooltip:hover .tooltiptext {
   visibility: visible;
-}
+} */
 
 .dropdown-button {
   margin-right: 1rem;
