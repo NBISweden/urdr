@@ -29,6 +29,9 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     );
     let activityHours: { [key: string]: number } = {};
     timeEntries.map((entry: FetchedTimeEntry) => {
+      if (entry.activity.name === "Absence (Vacation/VAB/Other)") {
+        return;
+      }
       if (!activityHours[entry.activity.name]) {
         activityHours[entry.activity.name] = 0;
       }
@@ -58,31 +61,30 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     return Math.round((value / total) * 100);
   };
 
-  const colors = [
-    "hsl(76deg 55% 53%)",
-    "hsl(288deg 13% 61%)",
-    "hsl(185deg 24% 80%)",
-    "hsl(26deg 91% 65%)",
-    "hsl(0deg 0% 75%)",
-    "hsl(186deg 30% 60%)",
-    "hsl(76deg 55% 77%)",
-    "hsl(291deg 13% 81%)",
-    "hsl(27deg 91% 77%)",
-    "hsl(76deg 55% 65%)",
-    "hsl(186deg 30% 86%)",
-    "hsl(0deg 0% 83%)",
-    "hsl(76deg 55% 42%)",
-    "hsl(26deg 91% 54%)",
-    "hsl(291deg 13% 90%)",
-    "hsl(185deg 24% 60%) ",
-  ];
+  const colorScheme: { [key: string]: string } = {
+    Administration: "hsl(0deg 0% 75%)",
+    Consultation: "hsl(185deg 24% 80%)",
+    "Consultation (DM)": "hsl(76deg 55% 65%)",
+    "Core Facility Support": "hsl(185deg 24% 60%) ",
+    Design: "hsl(186deg 30% 86%)",
+    Development: "hsl(26deg 91% 65%)",
+    Implementation: "hsl(291deg 13% 81%)",
+    "Internal consultation": "hsl(0deg 0% 83%)",
+    "Internal NBIS": "hsl(76deg 55% 77%)",
+    "NBIS management": "hsl(26deg 91% 54%)",
+    "Presenting (outreach)": "hsl(27deg 91% 77%)",
+    "Professional Development": "hsl(288deg 13% 61%)",
+    Teaching: "hsl(186deg 30% 60%)",
+    Support: "hsl(76deg 55% 53%)",
+    "Support (DM)": "hsl(291deg 13% 90%)",
+  };
 
   return (
     <section className="overview-wrapper">
       <h2 className="overview-heading">This year's work</h2>
       <div className="bar-chart-wrapper">
         {Object.keys(spentTime).length > 0 ? (
-          Object.keys(spentTime).map((key, index) => {
+          Object.keys(spentTime).map((key) => {
             // If the number of hours is so low that the width would be rounded down to 0%,
             // make it a thin slice anyway to show that it's there
             const width =
@@ -95,7 +97,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                 key={spentTime[key]}
                 style={{
                   width: width,
-                  backgroundColor: `${colors[index]}`,
+                  backgroundColor: `${colorScheme[key]}`,
                 }}
                 className="bar-chart-section"
               >
