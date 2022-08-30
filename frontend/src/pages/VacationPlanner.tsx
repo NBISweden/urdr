@@ -84,21 +84,20 @@ export const VacationPlanner = () => {
       let group_users = users[parseInt(first_group)];
       // Make users unique TODO
 
-      // So that loading times are shorter, we only take five groups
-      let sliced_users = group_users.slice(-5);
-      console.log(sliced_users);
+      // So that loading times are shorter, we only take one
+      let sliced_users = group_users.slice(-1);
 
-      const vacation_entries_col: FetchedTimeEntry[] = [];
+      const vacation_entries: FetchedTimeEntry[] = [];
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
           new Date(),
           group.toString()
         );
-        vacation_entries_col.push(...entries);
+        vacation_entries.push(...entries);
       }
       toggleLoadingPage(false);
 
-      setVacationEntries([...vacationEntries, vacation_entries_col]);
+      setVacationEntries([...vacationEntries, ...vacation_entries.slice(-1)]);
     };
     fetchTimeEntriesFromGroups();
   }, []);
