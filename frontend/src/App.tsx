@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
 import { Help } from "./pages/Help";
-import { SpentTime } from "./pages/SpentTime";
 import { VacationPlanner } from "./pages/VacationPlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -47,14 +46,6 @@ export const App = () => {
                 element={
                   <ProtectedRoute>
                     <Help />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/spent_time"
-                element={
-                  <ProtectedRoute>
-                    <SpentTime />
                   </ProtectedRoute>
                 }
               />
