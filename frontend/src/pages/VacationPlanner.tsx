@@ -170,7 +170,9 @@ export const VacationPlanner = () => {
       const all_days = eachDayOfInterval(dates_interval);
       let reportable_days = all_days.slice();
       reportable_days = reportable_days.filter((date) => isWeekday(date));
+      toggleLoadingPage(true);
       await reportVacationTime(reportable_days);
+      toggleLoadingPage(false);
       setStartDate(undefined);
       setEndDate(undefined);
       setToastList([
