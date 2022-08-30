@@ -59,17 +59,16 @@ export const VacationPlanner = () => {
     return false;
   };
 
-  const hasAlreadyReportedVacation = async (
-    start_date: Date,
-    end_date: Date
-  ) => {
-    let myReportedVacation: FetchedTimeEntry[];
-    myReportedVacation = await getVacationTimeEntries(
+  const hasAlreadyReported = async (start_date: Date, end_date: Date) => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
       start_date,
       end_date,
+      context,
       "me"
     );
-    return myReportedVacation.length;
+    return myReportedEntries.length;
   };
 
   React.useEffect(() => {
@@ -197,11 +196,11 @@ export const VacationPlanner = () => {
       endDate.getTime() &&
       endDate >= startDate
     ) {
-      let numberOfAbsenceReported: number = await hasAlreadyReportedVacation(
+      let reportedEntries: number = await hasAlreadyReported(
         startDate,
         endDate
       );
-      if (numberOfAbsenceReported > 0) {
+      if (reportedEntries > 0) {
         setToastList([
           ...toastList,
           {
