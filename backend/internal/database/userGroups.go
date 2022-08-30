@@ -11,9 +11,9 @@ func (db *Database) GetUserGroups(redmine_user_id int) ([]redmine.Group, error) 
 	}
 
 	selectStmt := `
-		SELECT	user_group.redmine_group_id, "group".redmine_group_name
+		SELECT	user_group.redmine_group_id, group_info.redmine_group_name
 		FROM	user_group
-		JOIN "group" ON "group".redmine_group_id=user_group.redmine_group_id
+		JOIN group_info ON group_info.redmine_group_id=user_group.redmine_group_id
 		WHERE	redmine_user_id = ?`
 
 	stmt, err := db.handle().Prepare(selectStmt)

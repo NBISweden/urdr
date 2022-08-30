@@ -105,8 +105,8 @@ CREATE TABLE invalid_entry (
 -- A table to store Redmine group data.  A group in this sense is a
 -- Redmine group ID and the group's name.
 
-DROP TABLE IF EXISTS "group";
-CREATE TABLE "group" (
+DROP TABLE IF EXISTS group_info;
+CREATE TABLE group_info (
 	redmine_group_id INTEGER PRIMARY KEY,
 	redmine_group_name TEXT NOT NULL,
 
@@ -128,6 +128,6 @@ CREATE TABLE user_group (
 		ON CONFLICT REPLACE,
 
 	FOREIGN KEY (redmine_group_id)
-		REFERENCES "group" (redmine_group_id)
+		REFERENCES group_info (redmine_group_id)
 		ON DELETE CASCADE
 );

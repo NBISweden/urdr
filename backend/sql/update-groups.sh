@@ -35,9 +35,9 @@ curl --silent --header "X-Redmine-API-Key: $api_key" \
 
 jq -r '.groups[] | [.id, .name] | @csv' "$tmp_groups" |
 sqlite3 "$database_path" \
-	'DELETE FROM "group"' \
+	"DELETE FROM group_info" \
 	'.separator ","' \
-	'.import /dev/stdin "group"' \
+	".import /dev/stdin group_info" \
 	'VACUUM'
 
 # Get users for each group.
