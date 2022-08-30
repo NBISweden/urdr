@@ -30,12 +30,15 @@ import {
 } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { FetchedTimeEntry } from "../model";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [vacationWeeklyHours, setVacationWeeklyHours] = useState<[]>([]);
+  const [vacationEntries, setVacationEntries] = useState<FetchedTimeEntry[]>(
+    []
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [redmineGroups, setRedmineGroups] = useState({});
 
@@ -65,31 +68,37 @@ export const VacationPlanner = () => {
   React.useEffect(() => {
     toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
-      const users: number[] = await getUsersInGroups(context);
+      const users: { group_id: number; users: number[] } =
+        await getUsersInGroups(context);
       const redmine_groups: [{ id: number; name: string }] = await getGroups(
         context
       );
-      const obj_groups = {};
-      redmine_groups.map((gr) => {
-        obj_groups[gr.id] = gr.name;
-      });
+      const obj_groups = Object.fromEntries(
+        redmine_groups.map((item) => [item["id"], item["name"]])
+      );
 
       setRedmineGroups(obj_groups);
-      let uniqueUsers: number[] = [...new Set(users)];
 
-      // So that loading times are shorter, we only take six groups
-      let sliced_users = uniqueUsers.slice(-6);
-      const vacation_entries: {}[] = [];
+      // Take the first group
+      let first_group: string = Object.keys(users)[0];
+      let group_users = users[parseInt(first_group)];
+      // Make users unique TODO
+
+      // So that loading times are shorter, we only take five groups
+      let sliced_users = group_users.slice(-5);
+      console.log(sliced_users);
+
+      const vacation_entries_col: FetchedTimeEntry[] = [];
       for await (let group of sliced_users) {
-        let vacationHours = await getVacationTimeEntries(
+        let entries = await getVacationTimeEntries(
           new Date(),
           group.toString()
         );
-        vacation_entries.push(vacationHours);
+        vacation_entries_col.push(...entries);
       }
       toggleLoadingPage(false);
 
-      setVacationWeeklyHours([...vacationWeeklyHours, vacation_entries]);
+      setVacationEntries([...vacationEntries, vacation_entries_col]);
     };
     fetchTimeEntriesFromGroups();
   }, []);
@@ -106,30 +115,17 @@ export const VacationPlanner = () => {
       custom_name: "",
       is_hidden: false,
     };
-    let vacationHours = {};
 
     const currentWeekArray: Date[] = getFullWeek(fromday);
-    const currentYear: number = new Date().getFullYear();
-    const januaryThisYear: Date = new Date(currentYear);
     const vacationTimeEntries = await getTimeEntries(
       vacation_pair,
-      januaryThisYear,
+      currentWeekArray[0],
       currentWeekArray[0],
       context,
       user_id
     );
 
-    vacationTimeEntries.map((entry: FetchedTimeEntry) => {
-      const currentWeek: string = getISOWeek(
-        new Date(entry.spent_on)
-      ).toString();
-
-      if (!vacationHours[currentWeek]) {
-        vacationHours[currentWeek] = 0;
-      }
-      vacationHours[currentWeek] += entry.hours;
-    });
-    return vacationHours;
+    return vacationTimeEntries;
   };
 
   const reportVacationTime = async (reportable_days: Date[]) => {
@@ -313,7 +309,7 @@ export const VacationPlanner = () => {
         </div>
         <h3>Reported weekly vacation in the last year</h3>
         <div>{JSON.stringify(Object.values(redmineGroups))}</div>
-        <div>{JSON.stringify(vacationWeeklyHours)}</div>
+        <div>{JSON.stringify(vacationEntries)}</div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}

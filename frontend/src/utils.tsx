@@ -255,7 +255,10 @@ export const reportTime = async (
 };
 
 export const getUsersInGroups = async (context: any) => {
-  let users: number[] = await getApiEndpoint("/api/users_in_group", context);
+  let users: { group_id: number; users: number[] } = await getApiEndpoint(
+    "/api/users_in_group",
+    context
+  );
   return users;
 };
 

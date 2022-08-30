@@ -35,7 +35,7 @@ func getUserGroupsHandler(c *fiber.Ctx) error {
 		return c.JSON([]struct{}{})
 	}
 
-	var groupUserIds []int
+	groupUsers := make(map[int][]int)
 
 	for _, group := range dbGroupIds {
 		users, err := db.GetUsersInGroup(group.Id)
@@ -44,9 +44,9 @@ func getUserGroupsHandler(c *fiber.Ctx) error {
 			log.Errorf("Failed to get users in group: %v", err)
 			return c.SendStatus(fiber.StatusInternalServerError)
 		}
+		groupUsers[group.Id] = users
 
-		groupUserIds = append(groupUserIds, users...)
 	}
 
-	return c.JSON(groupUserIds)
+	return c.JSON(groupUsers)
 }
