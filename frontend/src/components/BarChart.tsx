@@ -97,7 +97,9 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                 key={spentTime[key]}
                 style={{
                   width: width,
-                  backgroundColor: `${colorScheme[key]}`,
+                  backgroundColor: `${
+                    colorScheme[key] ? colorScheme[key] : "hsl(291deg 13% 90%)"
+                  }`,
                 }}
                 className="bar-chart-section"
               >
