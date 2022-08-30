@@ -78,6 +78,20 @@ export const VacationPlanner = () => {
       let group_users = users[parseInt(first_group)];
       // Make users unique TODO
 
+      if (!group_users) {
+        toggleLoadingPage(false);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Your user does not belong to any group. Please contact our administrators",
+          },
+        ]);
+        return;
+      }
+
       // So that loading times are shorter, we only take one
       let sliced_users = group_users.slice(-1);
 
