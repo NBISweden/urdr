@@ -22,15 +22,9 @@ import {
   getUsersInGroups,
   getGroups,
 } from "../utils";
-import {
-  eachDayOfInterval,
-  getISOWeek,
-  Interval,
-  format as formatDate,
-} from "date-fns";
+import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
-import { FetchedTimeEntry } from "../model";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -176,29 +170,17 @@ export const VacationPlanner = () => {
       const all_days = eachDayOfInterval(dates_interval);
       let reportable_days = all_days.slice();
       reportable_days = reportable_days.filter((date) => isWeekday(date));
-      if (reportable_days.length > 100) {
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 5000,
-            message:
-              "You may only report a maximum of 100 absence days at a time",
-          },
-        ]);
-      } else {
-        await reportVacationTime(reportable_days);
-        setStartDate(undefined);
-        setEndDate(undefined);
-        setToastList([
-          ...toastList,
-          {
-            type: "info",
-            timeout: 10000,
-            message: "Vacation plan submitted!",
-          },
-        ]);
-      }
+      await reportVacationTime(reportable_days);
+      setStartDate(undefined);
+      setEndDate(undefined);
+      setToastList([
+        ...toastList,
+        {
+          type: "info",
+          timeout: 10000,
+          message: "Vacation plan submitted!",
+        },
+      ]);
     } else {
       setToastList([
         ...toastList,
@@ -306,7 +288,7 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
-        <h3>Reported weekly vacation in the last year</h3>
+        <h3>Time entries</h3>
         <div>{JSON.stringify(Object.values(redmineGroups))}</div>
         <div>{JSON.stringify(vacationEntries)}</div>
         {toastList.length > 0 && (
