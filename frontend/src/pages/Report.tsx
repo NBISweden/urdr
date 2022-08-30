@@ -112,7 +112,8 @@ export const Report = () => {
         row,
         currentWeekArray[0],
         currentWeekArray[4],
-        context
+        context,
+        "me"
       );
       allEntries.push(...entries);
     }

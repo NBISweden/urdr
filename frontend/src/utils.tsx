@@ -178,7 +178,8 @@ export const getTimeEntries = async (
   issueActivity: IssueActivityPair,
   from_date: Date,
   to_date: Date,
-  context: any
+  context: any,
+  user_id: string
 ) => {
   // The ofset param is used to get all time_entries
   // from the api, as the limit per batch is 100
@@ -192,6 +193,7 @@ export const getTimeEntries = async (
     to: formatDate(to_date, dateFormat),
     offset: `${offset}`,
     limit: "100",
+    user_id: user_id ? user_id : "me",
   });
 
   if (!issueActivity) {
@@ -250,6 +252,22 @@ export const reportTime = async (
     });
   if (logout) context.setUser(null);
   return saved;
+};
+
+export const getUsersInGroups = async (context: any) => {
+  let users: { group_id: number; users: number[] } = await getApiEndpoint(
+    "/api/users_in_group",
+    context
+  );
+  return users;
+};
+
+export const getGroups = async (context: any) => {
+  let groups: [{ id: number; name: string }] = await getApiEndpoint(
+    "/api/groups",
+    context
+  );
+  return groups;
 };
 
 // Filter for weekdays. Return only Monday through Friday.

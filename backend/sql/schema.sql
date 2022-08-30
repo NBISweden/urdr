@@ -87,9 +87,9 @@ CREATE TABLE priority_entry (
 --
 -- This table stores the combinations of issue IDs and activity IDs that
 -- are explicitly inactivated.  Any combination not listed is active by
--- default.  An activity listed with a zero project ID is deactivated
--- for all projects (zero is used rather than NULL to avoid issues with
--- the UNIQUE constraint).
+-- default.  An activity listed with a zero issue ID is deactivated for
+-- all projects (zero is used rather than NULL to avoid issues with the
+-- UNIQUE constraint).
 
 DROP TABLE IF EXISTS invalid_entry;
 CREATE TABLE invalid_entry (
@@ -98,4 +98,36 @@ CREATE TABLE invalid_entry (
 
 	UNIQUE (redmine_issue_id, redmine_activity_id)
 		ON CONFLICT REPLACE
+);
+
+-- Groups.
+--
+-- A table to store Redmine group data.  A group in this sense is a
+-- Redmine group ID and the group's name.
+
+DROP TABLE IF EXISTS group_info;
+CREATE TABLE group_info (
+	redmine_group_id INTEGER PRIMARY KEY,
+	redmine_group_name TEXT NOT NULL,
+
+	UNIQUE (redmine_group_name)
+		ON CONFLICT ROLLBACK
+);
+
+-- User group mapping.
+--
+-- The table maps a user to a group.  A user belonging to several groups
+-- will have multiple entries in this table.
+
+DROP TABLE IF EXISTS user_group;
+CREATE TABLE user_group (
+	redmine_user_id INTEGER NOT NULL,
+	redmine_group_id INTEGER NOT NULL,
+
+	UNIQUE (redmine_user_id, redmine_group_id)
+		ON CONFLICT REPLACE,
+
+	FOREIGN KEY (redmine_group_id)
+		REFERENCES group_info (redmine_group_id)
+		ON DELETE CASCADE
 );
