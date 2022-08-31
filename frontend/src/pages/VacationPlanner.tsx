@@ -18,13 +18,16 @@ import {
   dateFormat,
   isWeekday,
   getTimeEntries,
-  getFullWeek,
   getUsersInGroups,
   getGroups,
 } from "../utils";
 import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import Timeline from "react-calendar-timeline";
+// make sure you include the timeline stylesheet or the timeline will not be styled
+import "react-calendar-timeline/lib/Timeline.css";
+import moment from "moment";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -35,6 +38,7 @@ export const VacationPlanner = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [redmineGroups, setRedmineGroups] = useState({});
+  const [allRedmineGroups, setAllRedmineGroups] = useState([]);
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -79,6 +83,12 @@ export const VacationPlanner = () => {
       const redmine_groups: [{ id: number; name: string }] = await getGroups(
         context
       );
+      let custom_groups = redmine_groups.slice();
+      custom_groups.map((group) => {
+        group["title"] = group.name;
+      });
+
+      setAllRedmineGroups(custom_groups);
       const obj_groups = Object.fromEntries(
         redmine_groups.map((item) => [item["id"], item["name"]])
       );
@@ -284,6 +294,30 @@ export const VacationPlanner = () => {
     </div>
   );
 
+  const items = [
+    {
+      id: 4,
+      group: 4,
+      title: "item 1",
+      start_time: moment(),
+      end_time: moment().add(1, "hour"),
+    },
+    {
+      id: 106,
+      group: 106,
+      title: "item 2",
+      start_time: moment().add(-0.5, "hour"),
+      end_time: moment().add(0.5, "hour"),
+    },
+    {
+      id: 157,
+      group: 157,
+      title: "item 3",
+      start_time: moment().add(2, "hour"),
+      end_time: moment().add(3, "hour"),
+    },
+  ];
+
   return (
     <>
       <LoadingOverlay
@@ -341,6 +375,14 @@ export const VacationPlanner = () => {
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
+        <div>
+          <Timeline
+            groups={allRedmineGroups}
+            items={items}
+            defaultTimeStart={moment().add(-12, "hour")}
+            defaultTimeEnd={moment().add(12, "hour")}
+          />
+        </div>
       </main>
     </>
   );
