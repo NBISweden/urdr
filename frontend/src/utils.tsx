@@ -179,7 +179,7 @@ export const getTimeEntries = async (
   from_date: Date,
   to_date: Date,
   context: any,
-  user_id: string
+  user_id?: string
 ) => {
   // The ofset param is used to get all time_entries
   // from the api, as the limit per batch is 100
