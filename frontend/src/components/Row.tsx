@@ -10,6 +10,7 @@ import eyeSlash from "../icons/eye-slash.svg";
 import eye from "../icons/eye.svg";
 import { dateFormat } from "../utils";
 import { PUBLIC_REDMINE_URL } from "../utils";
+import { Tooltip } from "./Tooltip";
 
 export const Row = ({
   topic,
@@ -106,7 +107,9 @@ export const Row = ({
               >{`# ${topic.issue.id}`}</a>
             </p>
             {isFav ? (
-              <div className="issuetooltip">
+              <Tooltip
+                content={`${topic.issue.subject} - ${topic.activity.name}`}
+              >
                 <textarea
                   aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
                   className="issue-textarea"
@@ -130,10 +133,7 @@ export const Row = ({
                   }}
                   maxLength={100}
                 />
-                <span className="tooltiptext">
-                  {topic.issue.subject} - {topic.activity.name}
-                </span>
-              </div>
+              </Tooltip>
             ) : (
               <p className="issue-label-text">
                 {topic.custom_name
