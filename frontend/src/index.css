@@ -708,13 +708,16 @@ Other button classes are defined further down together with other classes for th
   overflow: hidden;
 }
 
-.help-wrapper .page-wrapper {
+.help-wrapper {
   background-color: hsl(0deg 0% 97%);
   padding: 0 3rem 3rem;
   position: relative;
 }
 
 .page-wrapper {
+  background-color: hsl(0deg 0% 97%);
+  padding: 0 3rem 3rem;
+  position: relative;
   height: 650vh;
 }
 
