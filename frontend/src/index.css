@@ -816,16 +816,16 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   width: 100%;
   border-radius: 4px;
-  overflow: hidden;
+  /* overflow-x: hidden; */
 }
 
 .bar-chart-section {
-  overflow: hidden;
+  /* overflow-x: hidden; */
   height: 100%;
   padding-left: 0.3rem;
 }
 
-.bar-chart-section > p {
+.bar-chart-section p {
   display: block ruby;
   margin: 0;
   font-size: 0.8rem;

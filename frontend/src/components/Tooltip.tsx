@@ -1,10 +1,10 @@
 import React, { ReactChild, useState } from "react";
 
 export const Tooltip = ({
-  text,
+  content,
   children,
 }: {
-  text: string;
+  content: string | JSX.Element;
   children: ReactChild;
 }) => {
   const [visible, setVisible] = useState(false);
@@ -15,7 +15,7 @@ export const Tooltip = ({
       onMouseLeave={() => setVisible(false)}
     >
       {children}
-      {visible && <span className="tooltip-box">{text}</span>}
+      {visible && <span className="tooltip-box">{content}</span>}
     </div>
   );
 };

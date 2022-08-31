@@ -107,7 +107,9 @@ export const Row = ({
               >{`# ${topic.issue.id}`}</a>
             </p>
             {isFav ? (
-              <Tooltip text={`${topic.issue.subject} - ${topic.activity.name}`}>
+              <Tooltip
+                content={`${topic.issue.subject} - ${topic.activity.name}`}
+              >
                 <textarea
                   aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
                   className="issue-textarea"

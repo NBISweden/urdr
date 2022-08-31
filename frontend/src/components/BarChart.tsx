@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { getTimeEntries } from "../utils";
 import { FetchedTimeEntry } from "../model";
+import { Tooltip } from "./Tooltip";
 
 export const BarChart = ({ loading }: { loading: boolean }) => {
   const [spentTime, setSpentTime] = useState<{
@@ -87,7 +88,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
         ) : Object.keys(spentTime).includes("Loading") ? (
           <div className="bar-chart-section">Loading...</div>
         ) : (
-          Object.keys(spentTime).map((key) => {
+          Object.keys(spentTime).map((key, index) => {
             // If the number of hours is so low that the width would be rounded down to 0%,
             // make it a thin slice anyway to show that it's there
             const width =
@@ -103,13 +104,35 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                   backgroundColor: `${
                     colorScheme[key] ? colorScheme[key] : "hsl(291deg 13% 90%)"
                   }`,
+                  borderRadius: `${
+                    index === 0
+                      ? "4px 0 0 4px"
+                      : index === Object.keys(spentTime).length - 1
+                      ? "0 4px 4px 0"
+                      : "0"
+                  }`,
                 }}
                 className="bar-chart-section"
               >
-                <p>{spentTime[key].name}</p>
-                <p>
-                  {spentTime[key].hours}h, {getPercent(spentTime[key].hours)}%
-                </p>
+                <Tooltip
+                  content={
+                    <>
+                      <p>{spentTime[key].name}</p>
+                      <p>
+                        {spentTime[key].hours}h,{" "}
+                        {getPercent(spentTime[key].hours)}%
+                      </p>
+                    </>
+                  }
+                >
+                  <div style={{ width: "100%", overflow: "hidden" }}>
+                    <p>{spentTime[key].name}</p>
+                    <p>
+                      {spentTime[key].hours}h,{" "}
+                      {getPercent(spentTime[key].hours)}%
+                    </p>
+                  </div>
+                </Tooltip>
               </div>
             );
           })
