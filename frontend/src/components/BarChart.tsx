@@ -21,6 +21,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   }, [loading]);
 
   const getHoursPerActivity = async () => {
+    setSpentTime({ Loading: 0 });
     const timeEntries = await getTimeEntries(
       undefined,
       startDate,
@@ -83,7 +84,13 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     <section className="overview-wrapper">
       <h2 className="overview-heading">This year's work</h2>
       <div className="bar-chart-wrapper">
-        {Object.keys(spentTime).length > 0 ? (
+        {Object.keys(spentTime).length === 0 ? (
+          <div className="bar-chart-section">
+            Nothing to display - you haven't logged any time yet.
+          </div>
+        ) : Object.keys(spentTime).includes("Loading") ? (
+          <div className="bar-chart-section">Loading...</div>
+        ) : (
           Object.keys(spentTime).map((key) => {
             // If the number of hours is so low that the width would be rounded down to 0%,
             // make it a thin slice anyway to show that it's there
@@ -110,10 +117,6 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
               </div>
             );
           })
-        ) : (
-          <div className="bar-chart-section">
-            Nothing to display - you haven't logged any time yet.
-          </div>
         )}
       </div>
     </section>
