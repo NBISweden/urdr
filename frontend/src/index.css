@@ -392,16 +392,12 @@ Other button classes are defined further down together with other classes for th
   opacity: 1;
 }
 
-.issuetooltip {
+.tooltip-wrapper {
   width: 100%;
   position: relative;
-  display: inline-block;
-  opacity: 1;
-  z-index: 1;
 }
 
-.tooltiptext {
-  /* visibility: hidden; */
+.tooltip-box {
   width: auto;
   height: auto;
   background-color: hsl(0deg 0% 90%);
@@ -414,7 +410,7 @@ Other button classes are defined further down together with other classes for th
   margin-left: -60px;
 }
 
-.tooltiptext::after {
+.tooltip-box::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -424,10 +420,6 @@ Other button classes are defined further down together with other classes for th
   border-style: solid;
   border-color: hsl(0deg 0% 0%) transparent transparent transparent;
 }
-
-/* .issuetooltip:hover .tooltiptext {
-  visibility: visible;
-} */
 
 .dropdown-button {
   margin-right: 1rem;

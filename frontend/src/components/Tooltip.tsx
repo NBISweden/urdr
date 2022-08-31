@@ -10,12 +10,12 @@ export const Tooltip = ({
   const [visible, setVisible] = useState(false);
   return (
     <div
-      className="issuetooltip"
+      className="tooltip-wrapper"
       onMouseEnter={() => setVisible(true)}
       onMouseLeave={() => setVisible(false)}
     >
       {children}
-      {visible && <span className="tooltiptext">{text}</span>}
+      {visible && <span className="tooltip-box">{text}</span>}
     </div>
   );
 };

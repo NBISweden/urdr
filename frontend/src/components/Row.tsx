@@ -107,7 +107,6 @@ export const Row = ({
               >{`# ${topic.issue.id}`}</a>
             </p>
             {isFav ? (
-              // <div className="issuetooltip">
               <Tooltip text={`${topic.issue.subject} - ${topic.activity.name}`}>
                 <textarea
                   aria-label={`Custom name for the issue ${topic.issue.id}, ${topic.issue.subject}, on the activity ${topic.activity.name}`}
@@ -132,10 +131,6 @@ export const Row = ({
                   }}
                   maxLength={100}
                 />
-                {/* <span className="tooltiptext">
-                  {topic.issue.subject} - {topic.activity.name}
-                </span> */}
-                {/* </div> */}
               </Tooltip>
             ) : (
               <p className="issue-label-text">
