@@ -59,6 +59,18 @@ export const VacationPlanner = () => {
     return false;
   };
 
+  const hasAlreadyReported = async (start_date: Date, end_date: Date) => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
+      start_date,
+      end_date,
+      context,
+      "me"
+    );
+    return myReportedEntries.length;
+  };
+
   React.useEffect(() => {
     toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
@@ -98,7 +110,8 @@ export const VacationPlanner = () => {
       const vacation_entries: FetchedTimeEntry[] = [];
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date(),
+          new Date(2022),
+          new Date(2023),
           group.toString()
         );
         vacation_entries.push(...entries);
@@ -110,7 +123,11 @@ export const VacationPlanner = () => {
     fetchTimeEntriesFromGroups();
   }, []);
 
-  const getVacationTimeEntries = async (fromday: Date, user_id: string) => {
+  const getVacationTimeEntries = async (
+    fromDate: Date,
+    toDate: Date,
+    user_id: string
+  ) => {
     const issue: Issue = {
       id: 3499,
       subject: "NBIS General - Absence (Vacation/VAB/Other)",
@@ -123,11 +140,10 @@ export const VacationPlanner = () => {
       is_hidden: false,
     };
 
-    const currentWeekArray: Date[] = getFullWeek(fromday);
     const vacationTimeEntries = await getTimeEntries(
       vacation_pair,
-      currentWeekArray[0],
-      currentWeekArray[0],
+      fromDate,
+      toDate,
       context,
       user_id
     );
@@ -178,8 +194,23 @@ export const VacationPlanner = () => {
     } else if (
       startDate.getTime() &&
       endDate.getTime() &&
-      endDate > startDate
+      endDate >= startDate
     ) {
+      let reportedEntries: number = await hasAlreadyReported(
+        startDate,
+        endDate
+      );
+      if (reportedEntries > 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 10000,
+            message: "Vacation has already been reported on this period.",
+          },
+        ]);
+        return;
+      }
       const dates_interval: Interval = { start: startDate, end: endDate };
       const all_days = eachDayOfInterval(dates_interval);
       let reportable_days = all_days.slice();
