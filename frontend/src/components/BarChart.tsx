@@ -62,7 +62,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     18: "hsl(0deg 0% 75%)", // Administration
     33: "hsl(185deg 24% 80%)", // Consultation
     84: "hsl(76deg 55% 65%)", // Consultation (DM)
-    20: "hsl(185deg 24% 60%) ", // Core Facility Support
+    20: "hsl(185deg 24% 60%)", // Core Facility Support
     8: "hsl(186deg 30% 86%)", // Design
     9: "hsl(26deg 91% 65%)", // Development
     14: "hsl(291deg 13% 81%)", // Implementation
