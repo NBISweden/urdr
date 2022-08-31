@@ -4,7 +4,9 @@ import { getTimeEntries } from "../utils";
 import { FetchedTimeEntry } from "../model";
 
 export const BarChart = ({ loading }: { loading: boolean }) => {
-  const [spentTime, setSpentTime] = useState<{ [key: string]: number }>({});
+  const [spentTime, setSpentTime] = useState<{
+    [key: string]: { hours: number; name: string };
+  }>({});
   const [total, setTotal] = useState<number>(0);
   const context = useContext(AuthContext);
   const today = new Date();
@@ -21,40 +23,34 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   }, [loading]);
 
   const getHoursPerActivity = async () => {
-    setSpentTime({ Loading: 0 });
+    setSpentTime({ Loading: { hours: 0, name: "" } });
     const timeEntries = await getTimeEntries(
       undefined,
       startDate,
       today,
       context
     );
-    let activityHours: { [key: string]: number } = {};
+    let activityHours: { [key: string]: { hours: number; name: string } } = {};
     timeEntries.map((entry: FetchedTimeEntry) => {
-      if (entry.activity.name === "Absence (Vacation/VAB/Other)") {
+      // Don't show Absence
+      if (entry.activity.id === 19) {
         return;
       }
-      if (!activityHours[entry.activity.name]) {
-        activityHours[entry.activity.name] = 0;
+      if (!activityHours[entry.activity.id]) {
+        activityHours[entry.activity.id] = {
+          hours: 0,
+          name: entry.activity.name,
+        };
       }
-      activityHours[entry.activity.name] += entry.hours;
+      activityHours[entry.activity.id].hours += entry.hours;
     });
-    const sortedActivityHours = Object.keys(activityHours)
-      .sort()
-      .reduce(
-        (previousKey, currentKey) => ({
-          ...previousKey,
-          [currentKey]: activityHours[currentKey],
-        }),
-        {}
-      );
-    setSpentTime(sortedActivityHours);
+    setSpentTime(activityHours);
   };
 
   useEffect(() => {
-    const total = Object.values(spentTime).reduce(
-      (previousValue, currentValue) => previousValue + currentValue,
-      0
-    );
+    const allActivities = Object.values(spentTime);
+    let total = 0;
+    allActivities.forEach((entry) => (total += entry.hours));
     setTotal(total);
   }, [spentTime]);
 
@@ -63,21 +59,21 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   };
 
   const colorScheme: { [key: string]: string } = {
-    Administration: "hsl(0deg 0% 75%)",
-    Consultation: "hsl(185deg 24% 80%)",
-    "Consultation (DM)": "hsl(76deg 55% 65%)",
-    "Core Facility Support": "hsl(185deg 24% 60%) ",
-    Design: "hsl(186deg 30% 86%)",
-    Development: "hsl(26deg 91% 65%)",
-    Implementation: "hsl(291deg 13% 81%)",
-    "Internal consultation": "hsl(0deg 0% 83%)",
-    "Internal NBIS": "hsl(76deg 55% 77%)",
-    "NBIS management": "hsl(26deg 91% 54%)",
-    "Presenting (outreach)": "hsl(27deg 91% 77%)",
-    "Professional Development": "hsl(288deg 13% 61%)",
-    Teaching: "hsl(186deg 30% 60%)",
-    Support: "hsl(76deg 55% 53%)",
-    "Support (DM)": "hsl(291deg 13% 90%)",
+    18: "hsl(0deg 0% 75%)", // Administration
+    33: "hsl(185deg 24% 80%)", // Consultation
+    84: "hsl(76deg 55% 65%)", // Consultation (DM)
+    20: "hsl(185deg 24% 60%) ", // Core Facility Support
+    8: "hsl(186deg 30% 86%)", // Design
+    9: "hsl(26deg 91% 65%)", // Development
+    14: "hsl(291deg 13% 81%)", // Implementation
+    34: "hsl(0deg 0% 83%)", // Internal consultation
+    35: "hsl(76deg 55% 77%)", // Internal NBIS
+    104: "hsl(26deg 91% 54%)", // NBIS management
+    12: "hsl(27deg 91% 77%)", // Presenting (outreach)
+    10: "hsl(288deg 13% 61%)", // Professional Development
+    11: "hsl(186deg 30% 60%)", // Teaching
+    13: "hsl(76deg 55% 53%)", // Support
+    85: "hsl(291deg 13% 90%)", // Support (DM)
   };
 
   return (
@@ -95,13 +91,13 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
             // If the number of hours is so low that the width would be rounded down to 0%,
             // make it a thin slice anyway to show that it's there
             const width =
-              getPercent(spentTime[key]) > 0
-                ? `${getPercent(spentTime[key])}%`
+              getPercent(spentTime[key].hours) > 0
+                ? `${getPercent(spentTime[key].hours)}%`
                 : "4px";
 
             return (
               <div
-                key={spentTime[key]}
+                key={spentTime[key].name}
                 style={{
                   width: width,
                   backgroundColor: `${
@@ -110,9 +106,9 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                 }}
                 className="bar-chart-section"
               >
-                <p>{key}</p>
+                <p>{spentTime[key].name}</p>
                 <p>
-                  {spentTime[key]}h, {getPercent(spentTime[key])}%
+                  {spentTime[key].hours}h, {getPercent(spentTime[key].hours)}%
                 </p>
               </div>
             );
