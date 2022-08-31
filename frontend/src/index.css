@@ -129,7 +129,7 @@ Other button classes are defined further down together with other classes for th
 /* stylelint-enable selector-class-pattern */
 
 .usr-header,
-.help-header {
+.page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -148,7 +148,7 @@ Other button classes are defined further down together with other classes for th
     width: 200vw;
   }
 
-  .help-header {
+  .page-header {
     width: 200vw;
   }
 }
@@ -704,6 +704,13 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(0deg 0% 97%);
   padding: 0 3rem 3rem;
   position: relative;
+}
+
+.page-wrapper {
+  background-color: hsl(0deg 0% 97%);
+  padding: 0 3rem 3rem;
+  position: relative;
+  height: 650vh;
 }
 
 @media (max-width: 700px) and (orientation: portrait) {

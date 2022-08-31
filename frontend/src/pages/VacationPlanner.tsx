@@ -22,9 +22,16 @@ import {
   getUsersInGroups,
   getGroups,
 } from "../utils";
-import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
+import {
+  eachDayOfInterval,
+  Interval,
+  format as formatDate,
+  getISOWeekYear,
+} from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { TimeTravel } from "../components/TimeTravel";
+import { HeaderUser } from "../components/HeaderUser";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -301,10 +308,11 @@ export const VacationPlanner = () => {
           ></ClimbingBoxLoader>
         }
       ></LoadingOverlay>
-      <header>
-        <h3>Vacation reporting </h3>
+      <header className="page-header">
+        <h1 className="help-title">Vacation reporting</h1>
+        <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
-      <main>
+      <main className="page-wrapper">
         <div className="vacation-plan-dates-wrapper">
           <div className="vacation-plan-container">
             <label
