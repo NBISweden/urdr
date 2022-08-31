@@ -125,7 +125,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                     </>
                   }
                 >
-                  <div style={{ width: "100%", overflow: "hidden" }}>
+                  <div className="bar-chart-label">
                     <p>{spentTime[key].name}</p>
                     <p>
                       {spentTime[key].hours}h,{" "}

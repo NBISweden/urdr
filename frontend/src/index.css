@@ -407,7 +407,7 @@ Other button classes are defined further down together with other classes for th
   position: absolute;
   bottom: 125%;
   left: 50%;
-  margin-left: -60px;
+  transform: translateX(-50%);
 }
 
 .tooltip-box::after {
@@ -816,11 +816,9 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   width: 100%;
   border-radius: 4px;
-  /* overflow-x: hidden; */
 }
 
 .bar-chart-section {
-  /* overflow-x: hidden; */
   height: 100%;
   padding-left: 0.3rem;
 }
@@ -829,6 +827,11 @@ Other button classes are defined further down together with other classes for th
   display: block ruby;
   margin: 0;
   font-size: 0.8rem;
+}
+
+.bar-chart-label {
+  width: 100%;
+  overflow: hidden;
 }
 
 .vacation-plan-picker-label {
