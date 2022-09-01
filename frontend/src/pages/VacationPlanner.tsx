@@ -39,6 +39,10 @@ export const VacationPlanner = () => {
   const timelineOptions = {
     avoidOverlappingGridLines: true,
     colors: ["#BFD6D8"],
+    // This line makes the entire category's tooltip active.
+    focusTarget: "category",
+    // Use an HTML tooltip.
+    tooltip: { isHtml: true },
     timeline: {
       showRowLabels: true,
       rowLabelStyle: {
@@ -125,14 +129,15 @@ export const VacationPlanner = () => {
       vacationRows.push([
         { type: "string", id: "Group" },
         { type: "string", id: "User" },
+        { type: "string", role: "tooltip", p: { html: true } },
         { type: "date", id: "Start" },
         { type: "date", id: "End" },
       ]);
 
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date("2020-01-01"),
-          new Date("2022-03-03"),
+          new Date("2022-08-01"),
+          new Date("2022-10-03"),
           group.toString()
         );
         entries.map((entry) => {
@@ -142,6 +147,7 @@ export const VacationPlanner = () => {
           vacationRows.push([
             obj_groups[entry.group],
             entry.user.name ? entry.user.name : entry.user,
+            "test",
             new Date(entry.spent_on),
             new Date(entry.spent_on).getTime() + 86400000,
           ]);
@@ -368,13 +374,17 @@ export const VacationPlanner = () => {
           </div>
         </div>
         <div>
-          <Chart
-            chartType="Timeline"
-            data={vacationRows}
-            width="100%"
-            height="400px"
-            options={timelineOptions}
-          />
+          {vacationRows.length > 1 ? (
+            <Chart
+              chartType="Timeline"
+              data={vacationRows}
+              width="100%"
+              height="400px"
+              options={timelineOptions}
+            />
+          ) : (
+            <p>No time entries were found</p>
+          )}
         </div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
