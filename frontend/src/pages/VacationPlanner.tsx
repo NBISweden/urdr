@@ -18,19 +18,12 @@ import {
   dateFormat,
   isWeekday,
   getTimeEntries,
-  getFullWeek,
   getUsersInGroups,
   getGroups,
 } from "../utils";
-import {
-  eachDayOfInterval,
-  Interval,
-  format as formatDate,
-  getISOWeekYear,
-} from "date-fns";
+import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
-import { TimeTravel } from "../components/TimeTravel";
 import { HeaderUser } from "../components/HeaderUser";
 
 export const VacationPlanner = () => {
@@ -211,9 +204,9 @@ export const VacationPlanner = () => {
         setToastList([
           ...toastList,
           {
-            type: "info",
+            type: "warning",
             timeout: 10000,
-            message: "Vacation has already been reported on this period.",
+            message: "Time entries have already been reported on this period.",
           },
         ]);
         return;
