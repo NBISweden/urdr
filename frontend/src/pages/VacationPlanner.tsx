@@ -25,16 +25,32 @@ import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
+import { Chart } from "react-google-charts";
+import { IdName } from "../model";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [vacationEntries, setVacationEntries] = useState<FetchedTimeEntry[]>(
-    []
-  );
+  const [vacationRows, setVacationRows] = useState<[]>([]);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [redmineGroups, setRedmineGroups] = useState({});
+
+  const timelineOptions = {
+    avoidOverlappingGridLines: true,
+    colors: ["#BFD6D8"],
+    timeline: {
+      showRowLabels: true,
+      rowLabelStyle: {
+        fontName: "Lato",
+        fontSize: 17,
+      },
+      barLabelStyle: {
+        fontName: "Lato",
+        fontSize: 16,
+      },
+    },
+  };
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -83,8 +99,6 @@ export const VacationPlanner = () => {
         redmine_groups.map((item) => [item["id"], item["name"]])
       );
 
-      setRedmineGroups(obj_groups);
-
       // Take the first group
       let first_group: string = Object.keys(users)[0];
       let group_users = users[parseInt(first_group)];
@@ -105,20 +119,37 @@ export const VacationPlanner = () => {
       }
 
       // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-1);
+      let sliced_users = group_users.slice(-6);
 
-      const vacation_entries: FetchedTimeEntry[] = [];
+      let vacationRows: [] = [];
+      vacationRows.push([
+        { type: "string", id: "Group" },
+        { type: "string", id: "User" },
+        { type: "date", id: "Start" },
+        { type: "date", id: "End" },
+      ]);
+
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date(2022),
-          new Date(2023),
+          new Date("2020-01-01"),
+          new Date("2022-03-03"),
           group.toString()
         );
-        vacation_entries.push(...entries);
+        entries.map((entry) => {
+          entry.group = first_group;
+        });
+        entries.map((entry: FetchedTimeEntry) => {
+          vacationRows.push([
+            obj_groups[entry.group],
+            entry.user.name ? entry.user.name : entry.user,
+            new Date(entry.spent_on),
+            new Date(entry.spent_on).getTime() + 86400000,
+          ]);
+        });
       }
       toggleLoadingPage(false);
 
-      setVacationEntries([...vacationEntries, ...vacation_entries.slice(-1)]);
+      setVacationRows(vacationRows);
     };
     fetchTimeEntriesFromGroups();
   }, []);
@@ -336,9 +367,15 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
-        <h3>Time entries</h3>
-        <div>{JSON.stringify(Object.values(redmineGroups))}</div>
-        <div>{JSON.stringify(vacationEntries)}</div>
+        <div>
+          <Chart
+            chartType="Timeline"
+            data={vacationRows}
+            width="100%"
+            height="400px"
+            options={timelineOptions}
+          />
+        </div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
