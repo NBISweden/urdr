@@ -144,8 +144,8 @@ export const VacationPlanner = () => {
 
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date("2021-12-10"),
-          new Date("2022-01-15"),
+          new Date(2021, 11, 20),
+          new Date(2021, 12, 30),
           group.toString()
         );
         entries.map((entry) => {
