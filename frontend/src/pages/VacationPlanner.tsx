@@ -26,18 +26,22 @@ import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { Chart } from "react-google-charts";
-import { IdName } from "../model";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
   const [vacationRows, setVacationRows] = useState<[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<{
+    id: number;
+    name: string;
+  }>(undefined);
+  const [redmineGroups, setRedmineGroups] = useState<[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const timelineOptions = {
-    avoidOverlappingGridLines: true,
+    avoidOverlappingGridLines: false,
     colors: ["#BFD6D8"],
     // This line makes the entire category's tooltip active.
     focusTarget: "category",
@@ -99,14 +103,15 @@ export const VacationPlanner = () => {
       const redmine_groups: [{ id: number; name: string }] = await getGroups(
         context
       );
-      const obj_groups = Object.fromEntries(
-        redmine_groups.map((item) => [item["id"], item["name"]])
-      );
 
-      // Take the first group
-      let first_group: string = Object.keys(users)[0];
-      let all_group_users = users[parseInt(first_group)];
-      let group_users = [...new Set(all_group_users)];
+      setRedmineGroups(redmine_groups);
+
+      let groupId: number = selectedGroup
+        ? selectedGroup.id
+        : redmine_groups[0].id;
+
+      let all_group_users: number[] = users[groupId];
+      let group_users: number[] = [...new Set(all_group_users)];
 
       if (!group_users) {
         toggleLoadingPage(false);
@@ -123,11 +128,10 @@ export const VacationPlanner = () => {
       }
 
       // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-6);
+      let sliced_users = group_users.slice(-12);
 
       let vacationRows: [] = [];
       vacationRows.push([
-        { type: "string", id: "Group" },
         { type: "string", id: "User" },
         { type: "string", role: "tooltip", p: { html: true } },
         { type: "date", id: "Start" },
@@ -136,16 +140,15 @@ export const VacationPlanner = () => {
 
       for await (let group of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date("2022-08-01"),
-          new Date("2022-10-03"),
+          new Date("2021-12-10"),
+          new Date("2022-01-15"),
           group.toString()
         );
         entries.map((entry) => {
-          entry.group = first_group;
+          entry.group = groupId;
         });
         entries.map((entry: FetchedTimeEntry) => {
           vacationRows.push([
-            obj_groups[entry.group],
             entry.user.name ? entry.user.name : entry.user,
             "test",
             new Date(entry.spent_on),
@@ -158,7 +161,7 @@ export const VacationPlanner = () => {
       setVacationRows(vacationRows);
     };
     fetchTimeEntriesFromGroups();
-  }, []);
+  }, [selectedGroup]);
 
   const getVacationTimeEntries = async (
     fromDate: Date,
@@ -372,6 +375,30 @@ export const VacationPlanner = () => {
               Submit
             </button>
           </div>
+        </div>
+        <div className="group-select-wrapper">
+          <select
+            className="col-3 footer-field"
+            name="activity"
+            id="select-activity"
+            onChange={(e) => {
+              const groupId = e.target.value;
+              const group = redmineGroups.find((group) => {
+                return group.id == groupId;
+              });
+              setSelectedGroup(group);
+            }}
+            style={{ width: "50%" }}
+          >
+            {redmineGroups &&
+              redmineGroups.map((group) => {
+                return (
+                  <option value={group.id} key={group.id}>
+                    {group.name}
+                  </option>
+                );
+              })}
+          </select>
         </div>
         <div>
           {vacationRows.length > 1 ? (

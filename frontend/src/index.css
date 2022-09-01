@@ -858,3 +858,7 @@ Other button classes are defined further down together with other classes for th
   height: 3em;
   width: 8em;
 }
+
+.group-select-wrapper {
+  margin: 3em;
+}
