@@ -41,6 +41,10 @@ export const VacationPlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const timelineOptions = {
+    hAxis: {
+      minValue: new Date(2021, 11, 20),
+      maxValue: new Date(2021, 12, 30),
+    },
     avoidOverlappingGridLines: false,
     colors: ["#BFD6D8"],
     // This line makes the entire category's tooltip active.
