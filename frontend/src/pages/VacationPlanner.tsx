@@ -101,8 +101,8 @@ export const VacationPlanner = () => {
 
       // Take the first group
       let first_group: string = Object.keys(users)[0];
-      let group_users = users[parseInt(first_group)];
-      // Make users unique TODO
+      let all_group_users = users[parseInt(first_group)];
+      let group_users = [...new Set(all_group_users)];
 
       if (!group_users) {
         toggleLoadingPage(false);
