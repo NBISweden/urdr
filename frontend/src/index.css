@@ -847,18 +847,18 @@ Other button classes are defined further down together with other classes for th
 
 .vacation-plan-dates-wrapper {
   display: flex;
-  margin-right: 2em;
+  margin-right: 2rem;
 }
 
 .vacation-plan-container {
-  margin: 3em;
+  margin: 3rem;
 }
 
 .apply-dates-button {
-  height: 3em;
-  width: 8em;
+  height: 3rem;
+  width: 8rem;
 }
 
 .group-select-wrapper {
-  margin-bottom: 3em;
+  margin-bottom: 3rem;
 }
