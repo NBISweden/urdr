@@ -833,12 +833,12 @@ Other button classes are defined further down together with other classes for th
 .bar-chart-section p {
   margin: 0;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .bar-chart-label {
   width: 100%;
   overflow: hidden;
-  height: 2.4rem; /* this leaves space for two lines of text */
 }
 
 .vacation-plan-picker-label {
