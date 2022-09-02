@@ -290,6 +290,7 @@ export const VacationPlanner = () => {
   const FromDatePicker = () => (
     <div>
       <DatePicker
+        filterDate={isWeekday}
         dateFormat={dateFormat}
         isClearable={true}
         selected={startDate ? startDate : undefined}
@@ -311,6 +312,7 @@ export const VacationPlanner = () => {
   const ToDatePicker = () => (
     <div>
       <DatePicker
+        filterDate={isWeekday}
         dateFormat={dateFormat}
         isClearable={true}
         selected={endDate ? endDate : undefined}
