@@ -4,7 +4,7 @@ ENV XDG_CACHE_HOME='/tmp/.cache'
 
 WORKDIR /app
 
-SHELL ["ash", "-o", "pipefail", "-c"]
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk --no-cache add \
         'curl=~7.83.1' \
