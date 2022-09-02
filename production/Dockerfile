@@ -6,8 +6,8 @@ WORKDIR /go
 
 COPY ./ .
 
-RUN apk --update add gcc=10.3.1_git20211027-r0 \
-    musl-dev=1.2.2-r7 --no-cache && \
+RUN apk -U upgrade; \
+    apk add gcc musl-dev; \
     rm -rf /var/cache/apk/*
 
 RUN go build -o ./urdr ./cmd && \
