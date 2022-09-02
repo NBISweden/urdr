@@ -23,7 +23,9 @@ jobs:
 
       - name: Get swag
         run: |
-          go install github.com/swaggo/swag/cmd/swag
+          go get github.com/swaggo/swag/gen@v1.8.5
+          go get github.com/swaggo/swag/cmd/swag@v1.8.5
+          go install github.com/swaggo/swag/cmd/swag@v1.8.5
         working-directory: backend
 
       - name: Check that docs can be created
