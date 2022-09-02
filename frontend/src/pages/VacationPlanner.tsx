@@ -381,6 +381,7 @@ export const VacationPlanner = () => {
           </div>
         </div>
         <div className="group-select-wrapper">
+          <span> Filter by group: </span>
           <select
             className="col-3 footer-field"
             name="activity"
@@ -392,7 +393,6 @@ export const VacationPlanner = () => {
               });
               setSelectedGroup(group);
             }}
-            style={{ width: "50%" }}
           >
             {redmineGroups &&
               redmineGroups.map((group) => {
