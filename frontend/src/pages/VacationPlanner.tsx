@@ -383,6 +383,7 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
+        <h4>Reported vacation</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>
           <select
