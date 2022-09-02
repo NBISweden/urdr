@@ -6,8 +6,9 @@ WORKDIR /go
 
 COPY ./ .
 
-RUN apk -U upgrade; \
-    apk add gcc musl-dev; \
+RUN apk --no-cache add \
+        'gcc=~11.2.1' \
+        'musl-dev=~1.2.3'; \
     rm -rf /var/cache/apk/*
 
 RUN go build -o ./urdr ./cmd && \

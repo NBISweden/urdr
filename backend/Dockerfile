@@ -4,8 +4,12 @@ ENV XDG_CACHE_HOME='/tmp/.cache'
 
 WORKDIR /app
 
-RUN apk -U upgrade; \
-    apk add curl gcc musl-dev; \
+SHELL ["ash", "-o", "pipefail", "-c"]
+
+RUN apk --no-cache add \
+        'curl=~7.83.1' \
+        'gcc=~11.2.1' \
+        'musl-dev=~1.2.3'; \
     rm -rf /var/cache/apk/*; \
     curl --fail --location \
         'https://raw.githubusercontent.com/cosmtrek/air/v1.29.0/install.sh' | \
