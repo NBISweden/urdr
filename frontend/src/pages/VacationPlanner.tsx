@@ -156,6 +156,7 @@ export const VacationPlanner = () => {
             entry.user.name ? entry.user.name : entry.user,
             "test",
             new Date(entry.spent_on),
+            // One day later
             new Date(entry.spent_on).getTime() + 86400000,
           ]);
         });
@@ -250,7 +251,7 @@ export const VacationPlanner = () => {
           {
             type: "warning",
             timeout: 10000,
-            message: "Time entries have already been reported on this period.",
+            message: "Time has already been reported on this period",
           },
         ]);
         return;
