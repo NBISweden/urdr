@@ -23,7 +23,7 @@ jobs:
 
       - name: Get swag
         run: |
-          go get -u github.com/swaggo/swag/cmd/swag
+          go install github.com/swaggo/swag/cmd/swag
         working-directory: backend
 
       - name: Check that docs can be created
