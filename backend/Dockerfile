@@ -11,8 +11,8 @@ RUN apk --no-cache add \
         'gcc=~11.2.1' \
         'musl-dev=~1.2.3'; \
     rm -rf /var/cache/apk/*; \
-    curl --fail --location \
-        'https://raw.githubusercontent.com/cosmtrek/air/v1.29.0/install.sh' | \
-    sh -e -s v1.29.0 && cp -v ./bin/air /bin/air
+    curl --silent --fail --location \
+        'https://raw.githubusercontent.com/cosmtrek/air/v1.40.4/install.sh' | \
+    sh -e -s v1.40.4 && cp -v ./bin/air /bin/air
 
 CMD ["air"]
