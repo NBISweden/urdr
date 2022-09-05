@@ -21,7 +21,12 @@ import {
   getUsersInGroups,
   getGroups,
 } from "../utils";
-import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
+import {
+  eachDayOfInterval,
+  Interval,
+  format as formatDate,
+  addDays,
+} from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
@@ -99,6 +104,89 @@ export const VacationPlanner = () => {
     return myReportedEntries.length;
   };
 
+  const getVacationRanges = (entries: FetchedTimeEntry[]) => {
+    const dates: { dateRanges: [Date][]; userName: string } =
+      findConsecutiveDates(entries);
+    const vacationRanges: {
+      startDate: Date;
+      endDate: Date;
+      userName: string;
+    }[] = dates.dateRanges.map((range: Date[]) => {
+      if (range.length === 1) {
+        let date = range[range.length - 1];
+        return { startDate: date, endDate: date, userName: dates.userName };
+      } else if (range.length > 1) {
+        let fromDate = range[range.length - 1];
+        let toDate = range[0];
+        return {
+          startDate: fromDate,
+          endDate: toDate,
+          userName: dates.userName,
+        };
+      }
+    });
+    return vacationRanges;
+  };
+
+  const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
+    let rangesIndex: number = 0;
+    let userName: string | IdName = "";
+    const dateRanges: [Date][] = entries.reduce(
+      (
+        entryRanges: [Date][],
+        entry: FetchedTimeEntry,
+        index,
+        fetchedEntries: FetchedTimeEntry[]
+      ) => {
+        // Find out the last date we last appended to a range array
+        userName = entry.user.name ? entry.user.name : entry.user;
+
+        let lastInRange: Date = entryRanges[rangesIndex]
+          ? entryRanges[rangesIndex].slice(-1).pop()
+          : undefined;
+        // Use the last appended date as toDate or first next iteration value (first)
+        const toDate = lastInRange ? lastInRange : new Date(entry.spent_on);
+        // Use next element in fetchedEntries as fromDate, and if it does not exist, use toDate
+        const fromDate = fetchedEntries[index + 1]
+          ? new Date(fetchedEntries[index + 1].spent_on)
+          : toDate;
+
+        // Initialise the entryRanges with the first entry date
+        if (index === 0) {
+          entryRanges.push([toDate]);
+        }
+        // If it's friday, the next reportable day is 3 days away, otherwise 1 day
+        let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
+        // If dates are consecutive ...
+        if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
+          // And the date is not aalready present
+          if (
+            !entryRanges
+              .flat()
+              .find((date) => date.getTime() === fromDate.getTime())
+          ) {
+            // Add date to entry ranges
+            entryRanges[rangesIndex].push(fromDate);
+          }
+        } else {
+          // Otherwise add a new range array, if the date does not already exist
+          if (
+            !entryRanges
+              .flat()
+              .find((date) => date.getTime() === fromDate.getTime())
+          ) {
+            entryRanges.push([fromDate]);
+            rangesIndex++;
+          }
+        }
+
+        return entryRanges;
+      },
+      []
+    );
+    return { dateRanges: dateRanges, userName: userName };
+  };
+
   React.useEffect(() => {
     toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
@@ -142,24 +230,39 @@ export const VacationPlanner = () => {
         { type: "date", id: "End" },
       ]);
 
-      for await (let group of sliced_users) {
+      for await (let user of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date(2021, 11, 20),
-          new Date(2021, 12, 30),
-          group.toString()
+          new Date(2021, 10, 20),
+          new Date(2022, 2, 30),
+          user.toString()
         );
-        entries.map((entry) => {
-          entry.group = groupId;
-        });
-        entries.map((entry: FetchedTimeEntry) => {
-          vacationRows.push([
-            entry.user.name ? entry.user.name : entry.user,
-            "test",
-            new Date(entry.spent_on),
-            // One day later
-            new Date(entry.spent_on).getTime() + 86400000,
-          ]);
-        });
+        const vacationRanges: {
+          startDate: Date;
+          endDate: Date;
+          userName: string;
+        }[] = getVacationRanges(entries);
+
+        vacationRanges.map(
+          (range: { startDate: Date; endDate: Date; userName: string }) => {
+            range.group = groupId;
+          }
+        );
+
+        vacationRanges.map(
+          (range: {
+            startDate: Date;
+            endDate: Date;
+            userName: string;
+            group: string;
+          }) => {
+            vacationRows.push([
+              range.userName,
+              "test",
+              range.startDate,
+              range.endDate,
+            ]);
+          }
+        );
       }
       toggleLoadingPage(false);
 
