@@ -31,6 +31,8 @@ import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { Chart } from "react-google-charts";
+import trash from "../icons/trash.svg";
+import pencil from "../icons/pencil.svg";
 
 export const VacationPlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -434,6 +436,49 @@ export const VacationPlanner = () => {
     </div>
   );
 
+  const data = [
+    {
+      StartDate: "2022-09-01",
+      EndDate: "2022-09-05",
+    },
+    {
+      StartDate: "2022-07-01",
+      EndDate: "2022-07-31",
+    },
+    {
+      StartDate: "2022-01-01",
+      EndDate: "2022-01-07",
+    },
+    {
+      StartDate: "2021-12-22",
+      EndDate: "2021-12-31",
+    },
+    {
+      StartDate: "2021-12-13",
+      EndDate: "2021-12-13",
+    },
+  ];
+
+  const VacationHeadings = () => (
+    <tr>
+      <th>Start date</th>
+      <th>End date</th>
+      <th>Actions</th>
+    </tr>
+  );
+  const vacationTable = data.map((element) => {
+    return (
+      <tr>
+        <td>{element.StartDate}</td>
+        <td>{element.EndDate}</td>
+        <td className="image-container">
+          <img src={pencil} className="pencil-icon" alt="pencil to edit" />
+          <img src={trash} className="trash-icon" alt="trash icon to delete" />
+        </td>
+      </tr>
+    );
+  });
+
   return (
     <>
       <LoadingOverlay
@@ -486,6 +531,13 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
+        <div className="table-wrapper">
+          <table>
+            {VacationHeadings()}
+            {vacationTable}
+          </table>
+        </div>
+
         <h4>Reported vacation</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>

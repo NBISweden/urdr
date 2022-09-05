@@ -848,10 +848,40 @@ Other button classes are defined further down together with other classes for th
 .vacation-plan-dates-wrapper {
   display: flex;
   margin-right: 2rem;
+  align-items: center;
 }
 
 .vacation-plan-container {
   margin: 3rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 70%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.pencil-icon {
+  width: 1.25rem;
+}
+
+.trash-icon {
+  width: 1.25rem;
 }
 
 .apply-dates-button {
