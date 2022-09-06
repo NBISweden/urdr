@@ -110,33 +110,32 @@ export const VacationPlanner = () => {
       {
         type: "warning",
         timeout: 5000,
-        message: error.message,
+        message: "Error deleting entries. " + error.message,
       },
     ]);
     return false;
   };
 
   const removeTimeEntries = async (entryIds: number[]) => {
+    let removed = undefined;
     for await (let entryId of entryIds) {
       let entry: TimeEntry = { id: entryId, hours: 0 };
-
-      const removed = await reportTime(entry, onErrorRemovingEntries, context);
-      if (!removed) {
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 8000,
-            message:
-              "Something went wrong! Your absence plan could not be deleted",
-          },
-        ]);
-      }
+      removed = await reportTime(entry, onErrorRemovingEntries, context);
+    }
+    if (removed) {
+      setToastList([
+        ...toastList,
+        {
+          type: "info",
+          timeout: 8000,
+          message: "Absence period was successfully removed",
+        },
+      ]);
     }
   };
 
-  const removeEntries = async () => {
-    removeTimeEntries([75079, 134]);
+  const onRemoveEntriesButton = async (entryIds: number[]) => {
+    removeTimeEntries(entryIds);
   };
 
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
@@ -546,7 +545,7 @@ export const VacationPlanner = () => {
               type="button"
               className="basic-button apply-dates-button"
               title="Apply selected dates"
-              onClick={() => removeEntries()}
+              onClick={() => onRemoveEntriesButton([1111])}
             >
               Remove entries
             </button>
