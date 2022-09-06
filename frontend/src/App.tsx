@@ -49,14 +49,16 @@ export const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/vacation"
-                element={
-                  <ProtectedRoute>
-                    <VacationPlanner />
-                  </ProtectedRoute>
-                }
-              />
+              {/*
+                <Route
+                  path="/vacation"
+                  element={
+                    <ProtectedRoute>
+                      <VacationPlanner />
+                    </ProtectedRoute>
+                  }
+                />
+              */}
             </Routes>
           </AuthProvider>
         </BrowserRouter>
