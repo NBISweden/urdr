@@ -104,6 +104,41 @@ export const VacationPlanner = () => {
     return myReportedEntries.length;
   };
 
+  const onErrorRemovingEntries = (error: any) => {
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: error.message,
+      },
+    ]);
+    return false;
+  };
+
+  const removeTimeEntries = async (entryIds: number[]) => {
+    for await (let entryId of entryIds) {
+      let entry: TimeEntry = { id: entryId, hours: 0 };
+
+      const removed = await reportTime(entry, onErrorRemovingEntries, context);
+      if (!removed) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 8000,
+            message:
+              "Something went wrong! Your absence plan could not be deleted",
+          },
+        ]);
+      }
+    }
+  };
+
+  const removeEntries = async () => {
+    removeTimeEntries([75079, 134]);
+  };
+
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
     const vacationDates: {
       dateRanges: { entryIds: number[]; dates: Date[] }[];
@@ -260,6 +295,7 @@ export const VacationPlanner = () => {
           startDate: Date;
           endDate: Date;
           userName: string;
+          entryIds: number[];
         }[] = getVacationRanges(entries);
 
         vacationRanges.map(
@@ -503,6 +539,16 @@ export const VacationPlanner = () => {
               onClick={() => validateDates()}
             >
               Submit
+            </button>
+          </div>
+          <div className="vacation-plan-container">
+            <button
+              type="button"
+              className="basic-button apply-dates-button"
+              title="Apply selected dates"
+              onClick={() => removeEntries()}
+            >
+              Remove entries
             </button>
           </div>
         </div>
