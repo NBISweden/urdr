@@ -2,6 +2,7 @@
 *.db
 *.env
 .vscode/
+.idea
 /backend/tmp/
 /backend/urdr
 /backend/vendor/

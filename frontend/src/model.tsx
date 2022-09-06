@@ -46,6 +46,7 @@ export interface FetchedTimeEntry {
   spent_on: string;
   created_on: string;
   updated_on: string;
+  group?: string;
 }
 
 type ToastType = "success" | "warning" | "info";

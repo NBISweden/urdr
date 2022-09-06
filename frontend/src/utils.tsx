@@ -5,8 +5,12 @@ import React, {
   ElementType,
   MouseEventHandler,
 } from "react";
+import { TimeEntry } from "./model";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
+import { IssueActivityPair, FetchedTimeEntry } from "./model";
+
+import { format as formatDate } from "date-fns";
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
@@ -167,4 +171,107 @@ export const useEscaper = (
       document.removeEventListener("keydown", handleEscape);
     };
   }, [ref]);
+};
+
+// Retrieve time entries via api
+export const getTimeEntries = async (
+  issueActivity: IssueActivityPair,
+  from_date: Date,
+  to_date: Date,
+  context: any,
+  user_id?: string
+) => {
+  // The ofset param is used to get all time_entries
+  // from the api, as the limit per batch is 100
+  let offset: number = 0;
+  let gotTotal = false;
+
+  let queryparams = new URLSearchParams({
+    issue_id: issueActivity ? `${issueActivity.issue.id}` : "",
+    activity_id: issueActivity ? `${issueActivity.activity.id}` : "",
+    from: formatDate(from_date, dateFormat),
+    to: formatDate(to_date, dateFormat),
+    offset: `${offset}`,
+    limit: "100",
+    user_id: user_id ? user_id : "me",
+  });
+
+  if (!issueActivity) {
+    queryparams.delete("issue_id");
+    queryparams.delete("activity_id");
+  }
+  let allEntries: FetchedTimeEntry[] = [];
+
+  while (gotTotal === false) {
+    let entries: { total_count: number; time_entries: FetchedTimeEntry[] };
+
+    entries = await getApiEndpoint(`/api/time_entries?${queryparams}`, context);
+    if (entries) {
+      if (entries.total_count > 100 && entries.time_entries.length == 100) {
+        offset += 100;
+        queryparams.set("offset", offset.toString());
+      } else {
+        gotTotal = true;
+      }
+      allEntries.push(...entries.time_entries);
+    } else {
+      gotTotal = true;
+    }
+  }
+  if (allEntries) return allEntries;
+
+  return null;
+};
+
+export const reportTime = async (
+  timeEntry: TimeEntry,
+  onError: (error: any) => {},
+  context: any
+) => {
+  let logout = false;
+  const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
+    body: JSON.stringify({ time_entry: timeEntry }),
+    method: "POST",
+    headers: headers,
+  })
+    .then((response) => {
+      if (response.ok) {
+        return true;
+      } else if (response.status === 401) {
+        logout = true;
+      } else if (response.status === 422) {
+        throw new Error(
+          `Invalid issue-activity combination for (${timeEntry.issue_id}) or invalid amount of time entered`
+        );
+      } else {
+        throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
+      }
+    })
+    .catch((error) => {
+      onError(error);
+    });
+  if (logout) context.setUser(null);
+  return saved;
+};
+
+export const getUsersInGroups = async (context: any) => {
+  let users: { group_id: number; users: number[] } = await getApiEndpoint(
+    "/api/users_in_group",
+    context
+  );
+  return users;
+};
+
+export const getGroups = async (context: any) => {
+  let groups: [{ id: number; name: string }] = await getApiEndpoint(
+    "/api/groups",
+    context
+  );
+  return groups;
+};
+
+// Filter for weekdays. Return only Monday through Friday.
+export const isWeekday = (dt: Date) => {
+  const day = dt.getDay();
+  return day !== 0 && day !== 6;
 };

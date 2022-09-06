@@ -39,6 +39,6 @@ jobs:
              PUBLIC_REDMINE_URL="https://urdr-test-redmine.nbis.se"
              END
 
-             TAG="$tag" docker-compose --env-file urdr.env build nginx --build-arg BUILDKIT_INLINE_CACHE=1
+             TAG="$tag" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1 nginx
 
              docker push "ghcr.io/nbisweden/urdr-web:$tag"

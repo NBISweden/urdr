@@ -25,6 +25,8 @@ import {
   headers,
   getFullWeek,
   dateFormat,
+  getTimeEntries,
+  reportTime,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
@@ -35,6 +37,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
   event.preventDefault();
@@ -101,27 +104,17 @@ export const Report = () => {
     setIsLoading(state);
   };
 
-  // Retrieve time entries via api
-  const getTimeEntries = async (rowTopic: IssueActivityPair, days: Date[]) => {
-    let queryparams = new URLSearchParams({
-      issue_id: `${rowTopic.issue.id}`,
-      activity_id: `${rowTopic.activity.id}`,
-      from: formatDate(days[0], dateFormat),
-      to: formatDate(days[4], dateFormat),
-    });
-    let entries: { time_entries: FetchedTimeEntry[] } = await getApiEndpoint(
-      `/api/time_entries?${queryparams}`,
-      context
-    );
-    if (entries) return entries.time_entries;
-    return null;
-  };
-
   // Retrieve time entries for given rows
   const getAllEntries = async (rows: IssueActivityPair[]) => {
     let allEntries = [];
     for await (let row of rows) {
-      const entries = await getTimeEntries(row, currentWeekArray);
+      const entries = await getTimeEntries(
+        row,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context,
+        "me"
+      );
       allEntries.push(...entries);
     }
     setTimeEntries(allEntries);
@@ -385,44 +378,18 @@ export const Report = () => {
     }
   };
 
-  // Try to ...
-  const reportTime = async (timeEntry: TimeEntry) => {
-    let logout = false;
-    toggleLoadingPage(true);
-    const saved = await fetch(`${PUBLIC_API_URL}/api/time_entries`, {
-      body: JSON.stringify({ time_entry: timeEntry }),
-      method: "POST",
-      headers: headers,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return true;
-        } else if (response.status === 401) {
-          logout = true;
-        } else if (response.status === 422) {
-          throw new Error(
-            `Invalid issue-activity combination for (${timeEntry.issue_id}) or invalid amount of time entered`
-          );
-        } else {
-          throw new Error(`Time report on issue ${timeEntry.issue_id} failed.`);
-        }
-      })
-      .catch((error) => {
-        toggleLoadingPage(false);
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 5000,
-            message: error.message,
-          },
-        ]);
-        return false;
-      });
-    if (logout) context.setUser(null);
-    return saved;
+  const onErrorSavingEntries = (error: any) => {
+    toggleLoadingPage(false);
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: error.message,
+      },
+    ]);
+    return false;
   };
-
   // Check for ...
   const handleSave = async () => {
     setShowUnsavedWarning(false);
@@ -439,7 +406,8 @@ export const Report = () => {
     }
     const unsavedEntries = [];
     for await (let entry of newTimeEntries) {
-      const saved = await reportTime(entry);
+      toggleLoadingPage(true);
+      const saved = await reportTime(entry, onErrorSavingEntries, context);
       if (!saved) {
         unsavedEntries.push(entry);
       }
@@ -863,6 +831,7 @@ export const Report = () => {
               </div>
             </div>
           </section>
+          <BarChart loading={isLoading}></BarChart>
         </main>
         <div className="footer">
           <section className="footer-container">

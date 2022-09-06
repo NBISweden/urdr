@@ -7,6 +7,7 @@ import { Cell } from "../components/Cell";
 import { IssueActivityPair, FetchedTimeEntry } from "../model";
 import { QuickAdd } from "../components/QuickAdd";
 import weektravel from "../images/weektravel.png";
+import { BarChart } from "../components/BarChart";
 
 export const Help = () => {
   const context = React.useContext(AuthContext);
@@ -47,7 +48,7 @@ export const Help = () => {
   };
   return (
     <>
-      <header className="help-header">
+      <header className="page-header">
         <h1 className="help-title">What is urdr?</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
@@ -207,6 +208,35 @@ export const Help = () => {
             onBlurRow={() => {}}
           />
         </div>
+        <h2 className="help-subtitle">The yearly overview</h2>
+        <p className="help-info">
+          The purpose of the yearly overview is to show you what you have spent
+          your time on between January 1st and December 31st of the current
+          year.
+        </p>
+        <p className="help-info">
+          The rectangular bars of the chart have labels like "Support" or
+          "Administration" that correspond to the activities you have reported
+          hours on. Therefore, all hours you have logged on "Support" will be
+          summed up into one single rectangle even though they were spent in
+          different support projects.
+        </p>
+        <BarChart loading={false}></BarChart>
+        <p className="help-info">
+          Absence is <b>not</b> included in the bar chart. When the bar chart is
+          generated, all hours logged during the current year on anything but
+          Absence are summed up. Then, a percentage for every activity is
+          calculated based on the total and rounded to two decimals.
+        </p>
+        <p className="help-info">
+          In sections with very few hours logged, you might not be able to
+          properly see what activity, hours and percentage they show. Hover over
+          the section to see the full label text. In rare situations, you might
+          have logged so few hours on an activity that its percentage would be
+          rounded down to zero during calculations. In that case, you will still
+          see a thin section displayed in the chart. Hover over it to see what
+          it belongs to.
+        </p>
         <h2 className="help-subtitle">Time travelling</h2>
         <p className="help-info">
           Users can navigate across different weeks by using the left and right
