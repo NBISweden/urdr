@@ -107,44 +107,56 @@ export const VacationPlanner = () => {
   };
 
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
-    const dates: { dateRanges: [Date][]; userName: string } =
-      findConsecutiveDates(entries);
+    const vacationDates: {
+      dateRanges: { entryIds: number[]; dates: Date[] }[];
+      userName: string;
+    } = findConsecutiveDates(entries);
     const vacationRanges: {
       startDate: Date;
       endDate: Date;
       userName: string;
-    }[] = dates.dateRanges.map((range: Date[]) => {
-      if (range.length === 1) {
-        let date = range[range.length - 1];
-        return { startDate: date, endDate: date, userName: dates.userName };
-      } else if (range.length > 1) {
-        let fromDate = range[range.length - 1];
-        let toDate = range[0];
-        return {
-          startDate: fromDate,
-          endDate: toDate,
-          userName: dates.userName,
-        };
+      entryIds: number[];
+    }[] = vacationDates.dateRanges.map(
+      (range: { entryIds: number[]; dates: Date[] }) => {
+        if (range.dates.length === 1) {
+          let date = range.dates[range.dates.length - 1];
+          return {
+            startDate: date,
+            endDate: date,
+            userName: vacationDates.userName,
+            entryIds: range.entryIds,
+          };
+        } else if (range.dates.length > 1) {
+          let fromDate = range.dates[range.dates.length - 1];
+          let toDate = range.dates[0];
+          return {
+            startDate: fromDate,
+            endDate: toDate,
+            userName: vacationDates.userName,
+            entryIds: range.entryIds,
+          };
+        }
       }
-    });
+    );
     return vacationRanges;
   };
 
   const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
     let rangesIndex: number = 0;
     let userName: string | IdName = "";
-    const dateRanges: [Date][] = entries.reduce(
+    const dateRanges: { entryIds: number[]; dates: Date[] }[] = entries.reduce(
       (
-        entryRanges: [Date][],
+        entryRanges: { entryIds: number[]; dates: Date[] }[],
         entry: FetchedTimeEntry,
         index,
         fetchedEntries: FetchedTimeEntry[]
       ) => {
         // Find out the last date we last appended to a range array
         userName = entry.user.name ? entry.user.name : entry.user;
+        let entryId: number = entry.id;
 
         let lastInRange: Date = entryRanges[rangesIndex]
-          ? entryRanges[rangesIndex].slice(-1).pop()
+          ? entryRanges[rangesIndex].dates.slice(-1).pop()
           : undefined;
         // Use the last appended date as toDate or first next iteration value (first)
         const toDate = lastInRange ? lastInRange : new Date(entry.spent_on);
@@ -155,7 +167,7 @@ export const VacationPlanner = () => {
 
         // Initialise the entryRanges with the first entry date
         if (index === 0) {
-          entryRanges.push([toDate]);
+          entryRanges.push({ entryIds: [entryId], dates: [toDate] });
         }
         // If it's friday, the next reportable day is 3 days away, otherwise 1 day
         let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
@@ -164,20 +176,28 @@ export const VacationPlanner = () => {
           // And the date is not aalready present
           if (
             !entryRanges
+              .map((obj: { entryIds: number[]; dates: Date[] }) => {
+                return obj.dates;
+              })
               .flat()
-              .find((date) => date.getTime() === fromDate.getTime())
+              .find((date: Date) => date.getTime() === fromDate.getTime())
           ) {
             // Add date to entry ranges
-            entryRanges[rangesIndex].push(fromDate);
+            entryRanges[rangesIndex].dates.push(fromDate);
+            entryRanges[rangesIndex].entryIds.push(entryId);
           }
         } else {
           // Otherwise add a new range array, if the date does not already exist
           if (
             !entryRanges
+              .map((issueDates: { entryIds: number[]; dates: Date[] }) => {
+                return issueDates.dates;
+              })
               .flat()
-              .find((date) => date.getTime() === fromDate.getTime())
+              .find((date: Date) => date.getTime() === fromDate.getTime())
           ) {
-            entryRanges.push([fromDate]);
+            entryRanges.push({ entryIds: [entryId], dates: [fromDate] });
+
             rangesIndex++;
           }
         }
