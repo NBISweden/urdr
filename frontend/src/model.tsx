@@ -28,11 +28,11 @@ export interface Issue {
 
 export interface TimeEntry {
   id: number;
-  issue_id: number;
-  activity_id: number;
+  issue_id?: number;
+  activity_id?: number;
   hours: number;
-  comments: string;
-  spent_on: string;
+  comments?: string;
+  spent_on?: string;
 }
 
 export interface FetchedTimeEntry {
