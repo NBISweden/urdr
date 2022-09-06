@@ -855,20 +855,38 @@ Other button classes are defined further down together with other classes for th
   margin: 3rem;
 }
 
+.table-wrapper {
+  padding: 1.5rem 0px;
+}
+
 table {
   border-collapse: collapse;
   width: 70%;
 }
 
-td, th {
-  border: 1px solid #dddddd;
+td {
+  border: none;
   text-align: left;
   padding: 8px;
 }
 
-tr:nth-child(even) {
-  background-color: #dddddd;
+th {
+  border-top: 1px solid hsl(0deg 0% 90%);
+  text-align: left;
+  padding: 8px;
+  background-color: hsl(185deg 92% 20%);
+  color: white;
+
 }
+
+tr:nth-child(even) {
+  background-color: hsl(186deg 30% 94%);
+}
+
+tr:last-of-type td {
+  border-bottom: 1px solid hsl(0deg 0% 90%);
+}
+
 
 .image-container {
   display: flex;

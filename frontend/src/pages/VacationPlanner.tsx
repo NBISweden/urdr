@@ -459,11 +459,13 @@ export const VacationPlanner = () => {
     },
   ];
 
+  //The empty heading tags make the top border go all the way out
   const VacationHeadings = () => (
     <tr>
       <th>Start date</th>
       <th>End date</th>
-      <th>Actions</th>
+      <th></th>
+      <th></th>
     </tr>
   );
   const vacationTable = data.map((element) => {
@@ -471,8 +473,10 @@ export const VacationPlanner = () => {
       <tr>
         <td>{element.StartDate}</td>
         <td>{element.EndDate}</td>
-        <td className="image-container">
+        <td>
           <img src={pencil} className="pencil-icon" alt="pencil to edit" />
+        </td>
+        <td>
           <img src={trash} className="trash-icon" alt="trash icon to delete" />
         </td>
       </tr>
