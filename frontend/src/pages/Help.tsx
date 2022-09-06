@@ -210,7 +210,7 @@ export const Help = () => {
         </div>
         <h2 className="help-subtitle">The yearly overview</h2>
         <p className="help-info">
-          The idea of the yearly overview is to show you what you have spent
+          The purpose of the yearly overview is to show you what you have spent
           your time on between January 1st and December 31st of the current
           year.
         </p>
@@ -233,7 +233,7 @@ export const Help = () => {
           properly see what activity, hours and percentage they show. Hover over
           the section to see the full label text. In rare situations, you might
           have logged so few hours on an activity that its percentage would be
-          rounded down to 0 during calculations. In that case, you will still
+          rounded down to zero during calculations. In that case, you will still
           see a thin section displayed in the chart. Hover over it to see what
           it belongs to.
         </p>
