@@ -211,14 +211,14 @@ export const Help = () => {
         <h2 className="help-subtitle">The yearly overview</h2>
         <p className="help-info">
           The idea of the yearly overview is to show you what you have spent
-          your time on during the current year. It includes hours logged between
-          January 1st and December 31st of the current year.
+          your time on between January 1st and December 31st of the current
+          year.
         </p>
         <p className="help-info">
-          The fields of the bar chart are based on activities like "Support" or
-          "Administration" but do not show different issues or projects. That
-          means for example that all hours you have logged on "Support" will be
-          summed up into one single bar section even though they were spent in
+          The rectangular bars of the chart have labels like "Support" or
+          "Administration" that correspond to the activities you have reported
+          hours on. Therefore, all hours you have logged on "Support" will be
+          summed up into one single rectangle even though they were spent in
           different support projects.
         </p>
         <BarChart loading={false}></BarChart>
