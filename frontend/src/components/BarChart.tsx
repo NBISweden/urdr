@@ -80,7 +80,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
 
   return (
     <section className="overview-wrapper">
-      <h2 className="overview-heading">This year's work</h2>
+      <h2 className="overview-heading">Yearly overview</h2>
       <div className="bar-chart-wrapper">
         {Object.keys(spentTime).length === 0 ? (
           <div className="bar-chart-section">
