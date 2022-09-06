@@ -12,6 +12,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
   const context = useContext(AuthContext);
   const today = new Date();
   const startDate = new Date(`January 1, ${today.getFullYear()}`);
+  const endDate = new Date(`December 31, ${today.getFullYear()}`);
 
   useEffect(() => {
     // Whenever the user has saved changes we want to fetch the year's time entries
@@ -28,7 +29,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     const timeEntries = await getTimeEntries(
       undefined,
       startDate,
-      today,
+      endDate,
       context
     );
     let activityHours: { [key: string]: { hours: number; name: string } } = {};
@@ -79,7 +80,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
 
   return (
     <section className="overview-wrapper">
-      <h2 className="overview-heading">This year's work</h2>
+      <h2 className="overview-heading">Yearly overview</h2>
       <div className="bar-chart-wrapper">
         {Object.keys(spentTime).length === 0 ? (
           <div className="bar-chart-section">
