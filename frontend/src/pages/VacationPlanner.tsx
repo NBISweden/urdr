@@ -151,12 +151,12 @@ export const VacationPlanner = () => {
           message: "Absence period was successfully removed",
         },
       ]);
+      setReloadPage(!reloadPage);
     }
   };
 
   const onRemoveEntriesButton = async (entryIds: number[]) => {
     await removeTimeEntries(entryIds);
-    setReloadPage(!reloadPage);
   };
 
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
