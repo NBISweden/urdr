@@ -305,7 +305,7 @@ export const VacationPlanner = () => {
         issue_id: 3499,
         activity_id: 19,
         hours: 8,
-        comments: "",
+        comments: "Reported using the Urdr absence planner",
         spent_on: formatDate(vacation_day, dateFormat),
       };
       const saved = await reportTime(
