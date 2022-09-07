@@ -210,8 +210,6 @@ export const VacationPlanner = () => {
     entryRanges: { entryIds: number[]; dates: Date[] }[],
     targetDate: Date
   ) => {
-    console.log("date existsdd");
-    console.log(entryRanges);
     return entryRanges
       .map((obj: { entryIds: number[]; dates: Date[] }) => {
         return obj.dates;
@@ -264,13 +262,10 @@ export const VacationPlanner = () => {
           // If dates are consecutive ...
 
           if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
-            // And the date is not aalready present
+            // And the date is not already present
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges[rangesIndex].dates.push(fromDate);
               entryRanges[rangesIndex].entryIds.push(fromEntryId);
-              if (!entryExists(entryRanges, fromEntryId)) {
-                entryRanges[rangesIndex].entryIds.push(fromEntryId);
-              }
             } else if (dateExists(entryRanges, fromDate)) {
               if (!entryExists(entryRanges, fromEntryId)) {
                 entryRanges[rangesIndex].entryIds.push(fromEntryId);
@@ -290,12 +285,10 @@ export const VacationPlanner = () => {
       },
       []
     );
-    console.log(dateRanges);
     return { dateRanges: dateRanges, userName: userName };
   };
 
   React.useEffect(() => {
-    console.log("tjenare");
     toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
       const users: { group_id: number; users: number[] } =
@@ -498,6 +491,7 @@ export const VacationPlanner = () => {
           message: "Vacation plan submitted!",
         },
       ]);
+      setReloadPage(!reloadPage);
     } else {
       setToastList([
         ...toastList,
