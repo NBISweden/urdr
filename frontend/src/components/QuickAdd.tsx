@@ -244,9 +244,7 @@ export const QuickAdd = ({
   return (
     <div className="row quick-add">
       <div className="col-4 quick-add-input-wrapper">
-        <label htmlFor="input-issue" className="hidden">
-          Issue (e.g. 3499) / free text
-        </label>
+        <label htmlFor="input-issue">Issue (e.g. 3499) / free text</label>
         <input
           id="input-issue"
           aria-keyshortcuts="ctrl+a"
@@ -275,9 +273,7 @@ export const QuickAdd = ({
       </div>
 
       <div className="col-4">
-        <label htmlFor="select-activity" className="hidden">
-          Select activity
-        </label>
+        <label htmlFor="select-activity">Select activity</label>
         <select
           className="quick-add-input"
           name="activity"

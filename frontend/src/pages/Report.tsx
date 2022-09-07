@@ -847,11 +847,11 @@ export const Report = () => {
               <Toast onCloseToast={handleCloseToast} toastList={toastList} />
             )}
             <div className="col-4 save-changes">
-              <div className="unsaved-alert-p">
-                {showUnsavedWarning && (
-                  <p role="status">⚠ You have unsaved changes</p>
-                )}
-              </div>
+              {showUnsavedWarning && (
+                <p role="status" className="unsaved-alert">
+                  ⚠ You have unsaved changes
+                </p>
+              )}
               <button
                 className="basic-button save-button"
                 aria-keyshortcuts="ctrl+s"

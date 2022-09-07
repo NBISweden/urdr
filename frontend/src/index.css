@@ -348,7 +348,7 @@ Other button classes are defined further down together with other classes for th
 
 .footer-container {
   margin-top: 0.2rem;
-  padding: 0.5rem 1rem 1rem 1rem;
+  padding: 1rem;
   background-color: hsl(0deg 0% 97%);
   display: flex;
 }
@@ -545,11 +545,10 @@ Other button classes are defined further down together with other classes for th
 }
 
 /* The unsaved changes alert message box */
-.unsaved-alert-p {
+.unsaved-alert {
   color: hsl(26deg 91% 42%); /* Red */
-  margin-right: 2rem;
-  text-align: right;
   min-height: 2rem;
+  margin: 0;
 }
 
 .comment-container {
@@ -768,12 +767,6 @@ Other button classes are defined further down together with other classes for th
   top: 3px;
   right: 3px;
   width: 0.7rem;
-}
-
-@media (max-width: 992px) {
-  .hidden {
-    visibility: hidden;
-  }
 }
 
 .row-focused {
