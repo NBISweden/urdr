@@ -194,6 +194,32 @@ export const VacationPlanner = () => {
     return vacationRanges;
   };
 
+  const entryExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    entryId: number
+  ) => {
+    return !entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.entryIds;
+      })
+      .flat()
+      .includes(entryId);
+  };
+
+  const dateExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    targetDate: Date
+  ) => {
+    console.log("date existsdd");
+    console.log(entryRanges);
+    return entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.dates;
+      })
+      .flat()
+      .find((date: Date) => date.getTime() === targetDate.getTime());
+  };
+
   const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
     let rangesIndex: number = 0;
     let userName: string | IdName = "";
@@ -206,7 +232,6 @@ export const VacationPlanner = () => {
       ) => {
         // Find out the last date we last appended to a range array
         userName = entry.user.name ? entry.user.name : entry.user;
-        let entryId: number = entry.id;
 
         let lastInRange: Date = entryRanges[rangesIndex]
           ? entryRanges[rangesIndex].dates.slice(-1).pop()
@@ -218,39 +243,45 @@ export const VacationPlanner = () => {
           ? new Date(fetchedEntries[index + 1].spent_on)
           : toDate;
 
+        let toEntryId: number = entry.id;
+        let fromEntryId: number = fetchedEntries[index + 1]
+          ? fetchedEntries[index + 1].id
+          : toEntryId;
+
         // Initialise the entryRanges with the first entry date
         if (index === 0) {
-          entryRanges.push({ entryIds: [entryId], dates: [toDate] });
-        }
-        // If it's friday, the next reportable day is 3 days away, otherwise 1 day
-        let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
-        // If dates are consecutive ...
-        if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
-          // And the date is not aalready present
-          if (
-            !entryRanges
-              .map((obj: { entryIds: number[]; dates: Date[] }) => {
-                return obj.dates;
-              })
-              .flat()
-              .find((date: Date) => date.getTime() === fromDate.getTime())
-          ) {
-            // Add date to entry ranges
-            entryRanges[rangesIndex].dates.push(fromDate);
-            entryRanges[rangesIndex].entryIds.push(entryId);
+          if (fetchedEntries.length > 1) {
+            entryRanges.push({
+              entryIds: [toEntryId, fromEntryId],
+              dates: [toDate, fromDate],
+            });
+          } else {
+            entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
           }
         } else {
-          // Otherwise add a new range array, if the date does not already exist
-          if (
-            !entryRanges
-              .map((issueDates: { entryIds: number[]; dates: Date[] }) => {
-                return issueDates.dates;
-              })
-              .flat()
-              .find((date: Date) => date.getTime() === fromDate.getTime())
-          ) {
-            entryRanges.push({ entryIds: [entryId], dates: [fromDate] });
+          // If it's friday, the next reportable day is 3 days away, otherwise 1 day
+          let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
+          // If dates are consecutive ...
 
+          if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
+            // And the date is not aalready present
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges[rangesIndex].dates.push(fromDate);
+              entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
+            // Add date to entry ranges
+          } else {
+            // Otherwise add a new range array, if the date does not already exist
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+            }
             rangesIndex++;
           }
         }
@@ -259,6 +290,7 @@ export const VacationPlanner = () => {
       },
       []
     );
+    console.log(dateRanges);
     return { dateRanges: dateRanges, userName: userName };
   };
 
