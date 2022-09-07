@@ -46,11 +46,27 @@ export const VacationPlanner = () => {
   const [redmineGroups, setRedmineGroups] = useState<[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [tableData, setTableData] = useState<
+    { startDate: Date; endDate: Date; userName: string; entryIds: number[] }[]
+  >([]);
+  const vacationFrom: Date = getVacationFrom();
+  const vacationTo: Date = getVacationTo();
+
+  function getVacationFrom() {
+    let today = new Date();
+
+    return new Date(today.setMonth(today.getMonth() - 1));
+  }
+  function getVacationTo() {
+    let today = new Date();
+
+    return new Date(today.setMonth(today.getMonth() + 12));
+  }
 
   const timelineOptions = {
     hAxis: {
-      minValue: new Date(2021, 11, 20),
-      maxValue: new Date(2021, 12, 30),
+      minValue: vacationFrom,
+      maxValue: vacationTo,
     },
     avoidOverlappingGridLines: false,
     colors: ["#BFD6D8"],
@@ -288,8 +304,8 @@ export const VacationPlanner = () => {
 
       for await (let user of sliced_users) {
         let entries = await getVacationTimeEntries(
-          new Date(2021, 10, 20),
-          new Date(2022, 2, 30),
+          vacationFrom,
+          vacationTo,
           user.toString()
         );
         const vacationRanges: {
@@ -325,6 +341,19 @@ export const VacationPlanner = () => {
 
       setVacationRows(vacationRows);
     };
+
+    const fetchTimeEntriesForUser = async () => {
+      let entries = await getVacationTimeEntries(
+        vacationFrom,
+        vacationTo,
+        "me"
+      );
+
+      const data = getVacationRanges(entries);
+      setTableData(data);
+    };
+
+    fetchTimeEntriesForUser();
     fetchTimeEntriesFromGroups();
   }, [selectedGroup]);
 
@@ -523,11 +552,11 @@ export const VacationPlanner = () => {
       <th></th>
     </tr>
   );
-  const vacationTable = data.map((element) => {
+  const vacationTable = tableData.map((element) => {
     return (
       <tr>
-        <td>{element.StartDate}</td>
-        <td>{element.EndDate}</td>
+        <td>{element.startDate}</td>
+        <td>{element.endDate}</td>
         <td>
           <img src={pencil} className="pencil-icon" alt="pencil to edit" />
         </td>
@@ -603,7 +632,28 @@ export const VacationPlanner = () => {
         <div className="table-wrapper">
           <table>
             {VacationHeadings()}
-            {vacationTable}
+            {tableData.map((element, index) => {
+              return (
+                <tr key={index.toString()}>
+                  <td>{formatDate(element.startDate, dateFormat)}</td>
+                  <td>{formatDate(element.endDate, dateFormat)}</td>
+                  <td>
+                    <img
+                      src={pencil}
+                      className="pencil-icon"
+                      alt="pencil to edit"
+                    />
+                  </td>
+                  <td>
+                    <img
+                      src={trash}
+                      className="trash-icon"
+                      alt="trash icon to delete"
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </table>
         </div>
 
