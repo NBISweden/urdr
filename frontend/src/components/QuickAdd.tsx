@@ -185,7 +185,7 @@ export const QuickAdd = ({
   };
 
   const getSearchClasses = () => {
-    let classes = "col-3 footer-field ";
+    let classes = "quick-add-input ";
     if (search.text != "") classes += issue ? "valid" : "invalid";
     return classes;
   };
@@ -242,17 +242,11 @@ export const QuickAdd = ({
   };
 
   return (
-    <div>
-      <h2> Add a new row</h2>
-      <div className="row">
-        <label htmlFor="input-issue" className="col-3 input-label hidden">
+    <div className="row quick-add">
+      <div className="col-4 quick-add-input-wrapper">
+        <label htmlFor="input-issue" className="hidden">
           Issue (e.g. 3499) / free text
         </label>
-        <label htmlFor="select-activity" className="col-3 select-label hidden">
-          Select activity
-        </label>
-      </div>
-      <div className="row">
         <input
           id="input-issue"
           aria-keyshortcuts="ctrl+a"
@@ -278,12 +272,17 @@ export const QuickAdd = ({
           alt="Validity"
           aria-label="Indicator for validity of issue number - x for not valid, check for valid."
         />
+      </div>
+
+      <div className="col-4">
+        <label htmlFor="select-activity" className="hidden">
+          Select activity
+        </label>
         <select
-          className="col-3 footer-field"
+          className="quick-add-input"
           name="activity"
           id="select-activity"
           onChange={handleSetActivity}
-          style={{ width: "50%" }}
         >
           {activities &&
             activities.map((activity) => {
@@ -294,8 +293,10 @@ export const QuickAdd = ({
               );
             })}
         </select>
-        <button className="col-3 basic-button plus-button" onClick={handleAdd}>
-          <img src={plus} alt="Add line" />
+      </div>
+      <div className="col-4">
+        <button className="basic-button add-button" onClick={handleAdd}>
+          Add row
         </button>
       </div>
       {search.suggestions.length > 0 && isAutoCompleteVisible && (
