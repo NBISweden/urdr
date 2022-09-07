@@ -244,9 +244,10 @@ export const QuickAdd = ({
   return (
     <div className="row quick-add">
       <div className="col-4 quick-add-input-wrapper">
-        <label htmlFor="input-issue">Issue (e.g. 3499) / free text</label>
+        <label htmlFor="input-issue">Search issue</label>
         <input
           id="input-issue"
+          placeholder="3499, analysis, ..."
           aria-keyshortcuts="ctrl+a"
           ref={issueInputRef}
           autoComplete="off"
