@@ -489,6 +489,11 @@ Other button classes are defined further down together with other classes for th
   height: 2rem;
 }
 
+.quick-add label {
+  font-size: 0.8rem;
+  color: hsl(276deg 46% 16%);
+}
+
 .quick-add-input-wrapper {
   position: relative;
 }
