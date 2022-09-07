@@ -51,12 +51,14 @@ export const VacationPlanner = () => {
   >([]);
   const vacationFrom: Date = getVacationFrom();
   const vacationTo: Date = getVacationTo();
+  const [reloadPage, setReloadPage] = useState<boolean>(false);
 
   function getVacationFrom() {
     let today = new Date();
 
     return new Date(today.setMonth(today.getMonth() - 1));
   }
+
   function getVacationTo() {
     let today = new Date();
 
@@ -153,7 +155,8 @@ export const VacationPlanner = () => {
   };
 
   const onRemoveEntriesButton = async (entryIds: number[]) => {
-    removeTimeEntries(entryIds);
+    await removeTimeEntries(entryIds);
+    setReloadPage(!reloadPage);
   };
 
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
@@ -260,6 +263,7 @@ export const VacationPlanner = () => {
   };
 
   React.useEffect(() => {
+    console.log("tjenare");
     toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
       const users: { group_id: number; users: number[] } =
@@ -355,7 +359,7 @@ export const VacationPlanner = () => {
 
     fetchTimeEntriesForUser();
     fetchTimeEntriesFromGroups();
-  }, [selectedGroup]);
+  }, [selectedGroup, reloadPage]);
 
   const getVacationTimeEntries = async (
     fromDate: Date,
@@ -520,31 +524,8 @@ export const VacationPlanner = () => {
     </div>
   );
 
-  const data = [
-    {
-      StartDate: "2022-09-01",
-      EndDate: "2022-09-05",
-    },
-    {
-      StartDate: "2022-07-01",
-      EndDate: "2022-07-31",
-    },
-    {
-      StartDate: "2022-01-01",
-      EndDate: "2022-01-07",
-    },
-    {
-      StartDate: "2021-12-22",
-      EndDate: "2021-12-31",
-    },
-    {
-      StartDate: "2021-12-13",
-      EndDate: "2021-12-13",
-    },
-  ];
-
   //The empty heading tags make the top border go all the way out
-  const VacationHeadings = () => (
+  const getVacationHeadings = () => (
     <tr>
       <th>Start date</th>
       <th>End date</th>
@@ -552,16 +533,27 @@ export const VacationPlanner = () => {
       <th></th>
     </tr>
   );
-  const vacationTable = tableData.map((element) => {
+  const getVacationTable = tableData.map((element, index) => {
     return (
-      <tr>
-        <td>{element.startDate}</td>
-        <td>{element.endDate}</td>
+      <tr key={index.toString()}>
+        <td>{formatDate(element.startDate, dateFormat)}</td>
+        <td>{formatDate(element.endDate, dateFormat)}</td>
         <td>
           <img src={pencil} className="pencil-icon" alt="pencil to edit" />
         </td>
         <td>
-          <img src={trash} className="trash-icon" alt="trash icon to delete" />
+          <button
+            onClick={() => {
+              onRemoveEntriesButton(element.entryIds);
+            }}
+            className="trash-button"
+          >
+            <img
+              src={trash}
+              className="trash-icon"
+              alt="trash icon to delete"
+            />
+          </button>
         </td>
       </tr>
     );
@@ -631,29 +623,8 @@ export const VacationPlanner = () => {
         </div>
         <div className="table-wrapper">
           <table>
-            {VacationHeadings()}
-            {tableData.map((element, index) => {
-              return (
-                <tr key={index.toString()}>
-                  <td>{formatDate(element.startDate, dateFormat)}</td>
-                  <td>{formatDate(element.endDate, dateFormat)}</td>
-                  <td>
-                    <img
-                      src={pencil}
-                      className="pencil-icon"
-                      alt="pencil to edit"
-                    />
-                  </td>
-                  <td>
-                    <img
-                      src={trash}
-                      className="trash-icon"
-                      alt="trash icon to delete"
-                    />
-                  </td>
-                </tr>
-              );
-            })}
+            {getVacationHeadings()}
+            {getVacationTable}
           </table>
         </div>
 
