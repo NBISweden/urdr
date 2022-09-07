@@ -264,7 +264,7 @@ export const QuickAdd = ({
         />
         <img
           className={
-            search.text === "" ? "validation-icon hiden" : "validation-icon"
+            search.text === "" ? "validation-icon hidden" : "validation-icon"
           }
           src={getValidationIconSrc()}
           alt="Validity"
