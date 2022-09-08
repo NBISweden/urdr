@@ -856,7 +856,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .table-wrapper {
-  padding: 1.5rem 0px;
+  padding: 1.5rem 0;
 }
 
 table {
