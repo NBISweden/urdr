@@ -49,6 +49,21 @@ sqlite3 backend/database.db <backend/sql/schema.sql
 sqlite3 backend/database.db <backend/sql/setting-defaults.sql
 ```
 
+The database must also contain infromation about invalid issue+activity
+pairs, as well as information about Redmine groups and users.  In
+production, this is information that is updated on a regular basis
+by running the two update script in `backend/sql`.  On a development
+system, these scripts may be invoked like so:
+
+```shell
+./backend/sql/update-invalid_entry.sh "$REDMINE_REPO"/docker-compose.yml backend/database.db
+./backend/sql/update-groups.sh        "$REDMINE_REPO"/docker-compose.yml backend/database.db
+```
+
+... where `"$REDMINE_REPO"` is some path to the cloned `ops-redmine`
+repository.  Note that the Redmine `postgres` container is assumed to be
+running when these scripts are called.
+
 The name and location of the database file are configurable by setting
 `BACKEND_DB_PATH` in the `urdr.env` file. The value of that variable is
 a pathname relative to the `backend` directory, and the default value is
