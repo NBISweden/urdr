@@ -273,7 +273,6 @@ export const QuickAdd = ({
             aria-label="Indicator for validity of issue number - x for not valid, check for valid."
           />
         </div>
-
         <div className="quick-add-input-wrapper">
           <label htmlFor="select-activity">Select activity</label>
           <select
