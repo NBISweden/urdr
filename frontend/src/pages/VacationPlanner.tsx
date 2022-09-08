@@ -156,7 +156,9 @@ export const VacationPlanner = () => {
   };
 
   const onRemoveEntriesButton = async (entryIds: number[]) => {
+    toggleLoadingPage(true);
     await removeTimeEntries(entryIds);
+    toggleLoadingPage(false);
   };
 
   const getVacationRanges = (entries: FetchedTimeEntry[]) => {
@@ -261,7 +263,12 @@ export const VacationPlanner = () => {
           let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
           // If dates are consecutive ...
 
-          if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
+          if (
+            fromDate.getTime() +
+              86400000 * daysToNextReportableDay -
+              toDate.getTime() ===
+            0
+          ) {
             // And the date is not already present
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges[rangesIndex].dates.push(fromDate);
@@ -634,16 +641,6 @@ export const VacationPlanner = () => {
               onClick={() => validateDates()}
             >
               Submit
-            </button>
-          </div>
-          <div className="vacation-plan-container">
-            <button
-              type="button"
-              className="basic-button apply-dates-button"
-              title="Apply selected dates"
-              onClick={() => onRemoveEntriesButton([1111])}
-            >
-              Remove entries
             </button>
           </div>
         </div>
