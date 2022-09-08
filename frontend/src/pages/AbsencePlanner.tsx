@@ -299,7 +299,6 @@ export const AbsencePlanner = () => {
   };
 
   React.useEffect(() => {
-    toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
       const users: { group_id: number; users: number[] } =
         await getUsersInGroups(context);
@@ -331,7 +330,7 @@ export const AbsencePlanner = () => {
       }
 
       // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-12);
+      let sliced_users = group_users.slice(-1);
 
       let absenceRows: [] = [];
       absenceRows.push([
@@ -376,20 +375,20 @@ export const AbsencePlanner = () => {
           }
         );
       }
-      toggleLoadingPage(false);
 
       setAbsenceRows(absenceRows);
     };
 
     const fetchTimeEntriesForUser = async () => {
+      toggleLoadingPage(true);
       let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
 
       const data = getAbsenceRanges(entries);
       setTableData(data);
+      toggleLoadingPage(false);
     };
-
     fetchTimeEntriesForUser();
-    fetchTimeEntriesFromGroups();
+    //fetchTimeEntriesFromGroups();
   }, [selectedGroup, reloadPage]);
 
   const getAbsenceTimeEntries = async (
