@@ -631,13 +631,16 @@ export const AbsencePlanner = () => {
             </button>
           </div>
         </div>
-        <div className="table-wrapper">
-          <table>
-            {getAbsenceHeadings()}
-            {getAbsenceTable}
-          </table>
-        </div>
-
+        {tableData.length > 0 ? (
+          <div className="table-wrapper">
+            <table>
+              {getAbsenceHeadings()}
+              {getAbsenceTable}
+            </table>
+          </div>
+        ) : (
+          <> </>
+        )}
         <h4>Reported absence</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>
@@ -673,7 +676,7 @@ export const AbsencePlanner = () => {
               options={timelineOptions}
             />
           ) : (
-            <p>No time entries were found</p>
+            <p>No absence entries were found</p>
           )}
         </div>
         {toastList.length > 0 && (
