@@ -215,6 +215,14 @@ export const AbsencePlanner = () => {
       .find((date: Date) => date.getTime() === targetDate.getTime());
   };
 
+  const areDatesConsecutive = (fDate: Date, tDate: Date) => {
+    let daysToNextReportableDay: number = fDate.getDay() === 5 ? 3 : 1;
+    return (
+      fDate.getTime() + 86400000 * daysToNextReportableDay - tDate.getTime() ===
+      0
+    );
+  };
+
   const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
     let rangesIndex: number = 0;
     let userName: string | IdName = "";
@@ -246,24 +254,24 @@ export const AbsencePlanner = () => {
         // Initialise the entryRanges with the first entry date
         if (index === 0) {
           if (fetchedEntries.length > 1) {
-            entryRanges.push({
-              entryIds: [toEntryId, fromEntryId],
-              dates: [toDate, fromDate],
-            });
+            if (areDatesConsecutive(fromDate, toDate)) {
+              entryRanges.push({
+                entryIds: [toEntryId, fromEntryId],
+                dates: [toDate, fromDate],
+              });
+            } else {
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+              entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
+              rangesIndex++;
+            }
           } else {
             entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
           }
         } else {
           // If it's friday, the next reportable day is 3 days away, otherwise 1 day
-          let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
           // If dates are consecutive ...
 
-          if (
-            fromDate.getTime() +
-              86400000 * daysToNextReportableDay -
-              toDate.getTime() ===
-            0
-          ) {
+          if (areDatesConsecutive(fromDate, toDate)) {
             // And the date is not already present
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges[rangesIndex].dates.push(fromDate);
