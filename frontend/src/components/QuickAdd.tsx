@@ -242,68 +242,70 @@ export const QuickAdd = ({
   };
 
   return (
-    <div className="row quick-add">
-      <div className="col-4 quick-add-input-wrapper">
-        <label htmlFor="input-issue">Search issue</label>
-        <input
-          id="input-issue"
-          placeholder="3499, analysis, ..."
-          aria-keyshortcuts="ctrl+a"
-          ref={issueInputRef}
-          autoComplete="off"
-          className={getSearchClasses()}
-          type="text"
-          onKeyUp={(ev) => {
-            handleInputToAutocompleteFocus(ev);
-          }}
-          min={0}
-          onChange={(e) => {
-            setSearch({ ...search, text: e.target.value });
-            setIssue(null);
-          }}
-          title={(issue && issue.subject) || ""}
-        />
-        <img
-          className={
-            search.text === "" ? "validation-icon hidden" : "validation-icon"
-          }
-          src={getValidationIconSrc()}
-          alt="Validity"
-          aria-label="Indicator for validity of issue number - x for not valid, check for valid."
-        />
-      </div>
+    <div className="quick-add-wrapper">
+      <div className="quick-add">
+        <div className="quick-add-input-wrapper">
+          <label htmlFor="input-issue">Search issue</label>
+          <input
+            id="input-issue"
+            placeholder="3499, analysis, ..."
+            aria-keyshortcuts="ctrl+a"
+            ref={issueInputRef}
+            autoComplete="off"
+            className={getSearchClasses()}
+            type="text"
+            onKeyUp={(ev) => {
+              handleInputToAutocompleteFocus(ev);
+            }}
+            min={0}
+            onChange={(e) => {
+              setSearch({ ...search, text: e.target.value });
+              setIssue(null);
+            }}
+            title={(issue && issue.subject) || ""}
+          />
+          <img
+            className={
+              search.text === "" ? "validation-icon hidden" : "validation-icon"
+            }
+            src={getValidationIconSrc()}
+            alt="Validity"
+            aria-label="Indicator for validity of issue number - x for not valid, check for valid."
+          />
+        </div>
 
-      <div className="col-4">
-        <label htmlFor="select-activity">Select activity</label>
-        <select
-          className="quick-add-input"
-          name="activity"
-          id="select-activity"
-          onChange={handleSetActivity}
-        >
-          {activities &&
-            activities.map((activity) => {
-              return (
-                <option value={activity.id} key={activity.id}>
-                  {activity.name}
-                </option>
-              );
-            })}
-        </select>
-      </div>
-      <div className="col-4">
-        <button className="basic-button add-button" onClick={handleAdd}>
-          Add row
-        </button>
+        <div className="quick-add-input-wrapper">
+          <label htmlFor="select-activity">Select activity</label>
+          <select
+            className="quick-add-input"
+            name="activity"
+            id="select-activity"
+            onChange={handleSetActivity}
+          >
+            {activities &&
+              activities.map((activity) => {
+                return (
+                  <option value={activity.id} key={activity.id}>
+                    {activity.name}
+                  </option>
+                );
+              })}
+          </select>
+        </div>
+        <div className="quick-add-input-wrapper">
+          <button className="basic-button add-button" onClick={handleAdd}>
+            Add row
+          </button>
+        </div>
       </div>
       {search.suggestions.length > 0 && isAutoCompleteVisible && (
         <ul
           id="suggestions-ul"
-          className="col-8 autocomplete-container"
+          className="autocomplete-container"
           ref={suggestionsRef}
         >
           {search.suggestions.map((item, index) => (
-            <li key={item.id} className="autocomplete-item">
+            <li key={item.id}>
               <button
                 id={"suggestion-btn-" + index.toString()}
                 onKeyUp={(ev) => {

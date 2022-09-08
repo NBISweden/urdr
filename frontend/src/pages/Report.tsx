@@ -835,18 +835,16 @@ export const Report = () => {
         </main>
         <div className="footer">
           <section className="footer-container">
-            <div className="col-8">
-              <QuickAdd
-                addIssueActivity={addIssueActivityHandler}
-                toastList={toastList}
-                onToastListUpdate={handleToastListUpdate}
-                issueInputRef={issueInputRef}
-              ></QuickAdd>
-            </div>
+            <QuickAdd
+              addIssueActivity={addIssueActivityHandler}
+              toastList={toastList}
+              onToastListUpdate={handleToastListUpdate}
+              issueInputRef={issueInputRef}
+            ></QuickAdd>
             {toastList.length > 0 && (
               <Toast onCloseToast={handleCloseToast} toastList={toastList} />
             )}
-            <div className="col-4 save-changes">
+            <div className="save-changes">
               {showUnsavedWarning && (
                 <p role="status" className="unsaved-alert">
                   ⚠ You have unsaved changes
