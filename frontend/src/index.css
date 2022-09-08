@@ -433,7 +433,7 @@ Other button classes are defined further down together with other classes for th
   flex-direction: column;
   align-items: end;
   justify-content: end;
-  flex-grow: 1;
+  width: 25%;
   margin-left: 2rem;
 }
 
@@ -484,12 +484,13 @@ Other button classes are defined further down together with other classes for th
 }
 
 .quick-add-wrapper {
-  flex-grow: 3;
+  width: 75%;
 }
 
 .quick-add {
   align-items: flex-end;
   display: flex;
+  height: 100%;
 }
 
 .quick-add-input {
@@ -498,7 +499,6 @@ Other button classes are defined further down together with other classes for th
 }
 
 .quick-add label {
-  font-size: 0.8rem;
   color: hsl(276deg 46% 16%);
 }
 
@@ -539,6 +539,10 @@ Other button classes are defined further down together with other classes for th
   .quick-add {
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
+  }
+
+  .quick-add-wrapper {
     width: 100%;
   }
 
