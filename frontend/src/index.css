@@ -841,17 +841,17 @@ Other button classes are defined further down together with other classes for th
   overflow: hidden;
 }
 
-.vacation-plan-picker-label {
+.absence-plan-picker-label {
   margin: 0 0 0.1rem;
 }
 
-.vacation-plan-dates-wrapper {
+.absence-plan-dates-wrapper {
   display: flex;
   margin-right: 2rem;
   align-items: center;
 }
 
-.vacation-plan-container {
+.absence-plan-container {
   margin: 3rem;
 }
 
@@ -876,7 +876,6 @@ th {
   padding: 8px;
   background-color: hsl(185deg 92% 20%);
   color: white;
-
 }
 
 tr:nth-child(even) {
@@ -886,7 +885,6 @@ tr:nth-child(even) {
 tr:last-of-type td {
   border-bottom: 1px solid hsl(0deg 0% 90%);
 }
-
 
 .image-container {
   display: flex;
@@ -906,7 +904,7 @@ tr:last-of-type td {
   border: none;
   display: flex;
   background: none;
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .apply-dates-button {

@@ -391,9 +391,9 @@ export const AbsencePlanner = () => {
   ) => {
     const issue: Issue = {
       id: 3499,
-      subject: "NBIS General - Absence (Absence/VAB/Other)",
+      subject: "NBIS General - Absence (Vacation/VAB/Other)",
     };
-    const id_name: IdName = { id: 19, name: "Absence (Absence/VAB/Other)" };
+    const id_name: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
     const absence_pair: IssueActivityPair = {
       issue: issue,
       activity: id_name,

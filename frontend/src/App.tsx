@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Login } from "./pages/Login";
 import { Report } from "./pages/Report";
 import { Help } from "./pages/Help";
-import { VacationPlanner } from "./pages/VacationPlanner";
+import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek } from "date-fns";
@@ -50,10 +50,10 @@ export const App = () => {
                 }
               />
               <Route
-                path="/vacation"
+                path="/absence"
                 element={
                   <ProtectedRoute>
-                    <VacationPlanner />
+                    <AbsencePlanner />
                   </ProtectedRoute>
                 }
               />
