@@ -14,10 +14,10 @@
 
 unset -v err
 
-if [ ! -f "$1" ] || [ "${1##*/}" != 'docker-compose.yml' ]; then
+if [ ! -f "$1" ] || [ "${1%.yml}" = "$1" ]; then
 	cat >&2 <<-'END_ERROR'
 	ERROR: The first argument is supposed to be a the pathname to
-	       the ops-redmine repository's docker-compose.yml file
+	       the ops-redmine repository's docker-compose.yml file.
 	END_ERROR
 	err=1
 fi
