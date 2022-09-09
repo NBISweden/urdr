@@ -34,7 +34,7 @@ file `urdr.env`, using `urdr.env.default` as the template. If you
 are on Linux, you need to set the variables `REDMINE_URL` and
 `PUBLIC_REDMINE_URL` to the
 value `"http://172.17.0.1:3000"`. The `PUBLIC_API_URL`
-variable should be set to the URL from which the service is publically
+variable should be set to the URL from which the service is publicly
 accessible, e.g. `"http://localhost:4567"` during development.
 
 The database used by the Urdr backend containing the Urdr schema and
@@ -48,6 +48,21 @@ rm -f backend/database.db
 sqlite3 backend/database.db <backend/sql/schema.sql
 sqlite3 backend/database.db <backend/sql/setting-defaults.sql
 ```
+
+The database must also contain information about invalid issue+activity
+pairs, as well as information about Redmine groups and users.  In
+production, this is information that is updated on a regular basis
+by running the two update script in `backend/sql`.  On a development
+system, these scripts may be invoked like so:
+
+```shell
+./backend/sql/update-invalid_entry.sh "$REDMINE_REPO"/docker-compose.yml backend/database.db
+./backend/sql/update-groups.sh        "$REDMINE_REPO"/docker-compose.yml backend/database.db
+```
+
+... where `"$REDMINE_REPO"` is some path to the cloned `ops-redmine`
+repository.  Note that the Redmine `postgres` container is assumed to be
+running when these scripts are called.
 
 The name and location of the database file are configurable by setting
 `BACKEND_DB_PATH` in the `urdr.env` file. The value of that variable is
