@@ -583,41 +583,6 @@ export const AbsencePlanner = () => {
     </div>
   );
 
-  //The empty heading tags make the top border go all the way out
-  const getAbsenceHeadings = () => (
-    <tr>
-      <th>Start date</th>
-      <th>End date</th>
-      <th></th>
-      <th></th>
-    </tr>
-  );
-  const getAbsenceTable = tableData.map((element, index) => {
-    return (
-      <tr key={index.toString()}>
-        <td>{formatDate(element.startDate, dateFormat)}</td>
-        <td>{formatDate(element.endDate, dateFormat)}</td>
-        <td>
-          <img src={pencil} className="table-icon" alt="pencil to edit" />
-        </td>
-        <td>
-          <button
-            onClick={() => {
-              onRemoveEntriesButton(element.entryIds);
-            }}
-            className="trash-button"
-          >
-            <img
-              src={trash}
-              className="table-icon"
-              alt="trash icon to delete"
-            />
-          </button>
-        </td>
-      </tr>
-    );
-  });
-
   return (
     <>
       <LoadingOverlay
@@ -673,8 +638,42 @@ export const AbsencePlanner = () => {
         {tableData.length > 0 ? (
           <div className="table-wrapper">
             <table>
-              {getAbsenceHeadings()}
-              {getAbsenceTable}
+              {/*The empty heading tags make the top border go all the way out*/}
+              <tr>
+                <th>Start date</th>
+                <th>End date</th>
+                <th></th>
+                <th></th>
+              </tr>
+              {tableData.map((element, index) => {
+                return (
+                  <tr key={index.toString()}>
+                    <td>{formatDate(element.startDate, dateFormat)}</td>
+                    <td>{formatDate(element.endDate, dateFormat)}</td>
+                    <td>
+                      <img
+                        src={pencil}
+                        className="table-icon"
+                        alt="pencil to edit"
+                      />
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          onRemoveEntriesButton(element.entryIds);
+                        }}
+                        className="trash-button"
+                      >
+                        <img
+                          src={trash}
+                          className="table-icon"
+                          alt="trash icon to delete"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </table>
           </div>
         ) : (
