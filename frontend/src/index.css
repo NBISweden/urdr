@@ -865,17 +865,65 @@ Other button classes are defined further down together with other classes for th
   overflow: hidden;
 }
 
-.vacation-plan-picker-label {
+.absence-plan-picker-label {
   margin: 0 0 0.1rem;
 }
 
-.vacation-plan-dates-wrapper {
+.absence-plan-dates-wrapper {
   display: flex;
   margin-right: 2rem;
+  align-items: center;
 }
 
-.vacation-plan-container {
+.absence-plan-container {
   margin: 3rem;
+}
+
+.table-wrapper {
+  padding: 1.5rem 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 70%;
+}
+
+td {
+  border: none;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  border-top: 1px solid hsl(0deg 0% 90%);
+  text-align: left;
+  padding: 8px;
+  background-color: hsl(185deg 92% 20%);
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: hsl(186deg 30% 94%);
+}
+
+tr:last-of-type td {
+  border-bottom: 1px solid hsl(0deg 0% 90%);
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.table-icon {
+  width: 1.25rem;
+}
+
+.trash-button {
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .apply-dates-button {

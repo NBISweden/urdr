@@ -21,22 +21,19 @@ import {
   getUsersInGroups,
   getGroups,
 } from "../utils";
-import {
-  eachDayOfInterval,
-  Interval,
-  format as formatDate,
-  addDays,
-} from "date-fns";
+import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { Chart } from "react-google-charts";
+import trash from "../icons/trash.svg";
+import pencil from "../icons/pencil.svg";
 
-export const VacationPlanner = () => {
+export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [vacationRows, setVacationRows] = useState<[]>([]);
+  const [absenceRows, setAbsenceRows] = useState<[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<{
     id: number;
     name: string;
@@ -44,11 +41,20 @@ export const VacationPlanner = () => {
   const [redmineGroups, setRedmineGroups] = useState<[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [tableData, setTableData] = useState<
+    { startDate: Date; endDate: Date; userName: string; entryIds: number[] }[]
+  >([]);
+  const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [reportedDates, setReportedDates] = useState<string[]>([]);
+
+  let today = new Date();
+  const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
+  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
 
   const timelineOptions = {
     hAxis: {
-      minValue: new Date(2021, 11, 20),
-      maxValue: new Date(2021, 12, 30),
+      minValue: absenceFrom,
+      maxValue: absenceTo,
     },
     avoidOverlappingGridLines: false,
     colors: ["#BFD6D8"],
@@ -80,7 +86,7 @@ export const VacationPlanner = () => {
     return;
   };
 
-  const onVacationReportError = (error: any) => {
+  const onAbsenceReportError = (error: any) => {
     setToastList([
       ...toastList,
       {
@@ -104,36 +110,136 @@ export const VacationPlanner = () => {
     return myReportedEntries.length;
   };
 
-  const getVacationRanges = (entries: FetchedTimeEntry[]) => {
-    const dates: { dateRanges: [Date][]; userName: string } =
-      findConsecutiveDates(entries);
-    const vacationRanges: {
+  const getReportedEntryDates = async () => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
+      absenceFrom,
+      absenceTo,
+      context,
+      "me"
+    );
+    let datesWithEntries: string[] = myReportedEntries.map(
+      (entry: FetchedTimeEntry) => {
+        return entry.spent_on;
+      }
+    );
+    let uniqueDates: string[] = datesWithEntries.filter((element, index) => {
+      return datesWithEntries.indexOf(element) === index;
+    });
+    return uniqueDates;
+  };
+
+  const onErrorRemovingEntries = (error: any) => {
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: "Error deleting entries. " + error.message,
+      },
+    ]);
+    return false;
+  };
+
+  const removeTimeEntries = async (entryIds: number[]) => {
+    let removed = undefined;
+    for await (let entryId of entryIds) {
+      let entry: TimeEntry = { id: entryId, hours: 0 };
+      removed = await reportTime(entry, onErrorRemovingEntries, context);
+    }
+    if (removed) {
+      setToastList([
+        ...toastList,
+        {
+          type: "info",
+          timeout: 8000,
+          message: "Absence period was successfully removed",
+        },
+      ]);
+      setReloadPage(!reloadPage);
+    }
+  };
+
+  const onRemoveEntriesButton = async (entryIds: number[]) => {
+    toggleLoadingPage(true);
+    await removeTimeEntries(entryIds);
+    toggleLoadingPage(false);
+  };
+
+  const getAbsenceRanges = (entries: FetchedTimeEntry[]) => {
+    const absenceDates: {
+      dateRanges: { entryIds: number[]; dates: Date[] }[];
+      userName: string;
+    } = findConsecutiveDates(entries);
+    const absenceRanges: {
       startDate: Date;
       endDate: Date;
       userName: string;
-    }[] = dates.dateRanges.map((range: Date[]) => {
-      if (range.length === 1) {
-        let date = range[range.length - 1];
-        return { startDate: date, endDate: date, userName: dates.userName };
-      } else if (range.length > 1) {
-        let fromDate = range[range.length - 1];
-        let toDate = range[0];
-        return {
-          startDate: fromDate,
-          endDate: toDate,
-          userName: dates.userName,
-        };
+      entryIds: number[];
+    }[] = absenceDates.dateRanges.map(
+      (range: { entryIds: number[]; dates: Date[] }) => {
+        if (range.dates.length === 1) {
+          let date = range.dates[range.dates.length - 1];
+          return {
+            startDate: date,
+            endDate: date,
+            userName: absenceDates.userName,
+            entryIds: range.entryIds,
+          };
+        } else if (range.dates.length > 1) {
+          let fromDate = range.dates[range.dates.length - 1];
+          let toDate = range.dates[0];
+          return {
+            startDate: fromDate,
+            endDate: toDate,
+            userName: absenceDates.userName,
+            entryIds: range.entryIds,
+          };
+        }
       }
-    });
-    return vacationRanges;
+    );
+    return absenceRanges;
+  };
+
+  const entryExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    entryId: number
+  ) => {
+    return entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.entryIds;
+      })
+      .flat()
+      .includes(entryId);
+  };
+
+  const dateExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    targetDate: Date
+  ) => {
+    return entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.dates;
+      })
+      .flat()
+      .find((date: Date) => date.getTime() === targetDate.getTime());
+  };
+
+  const areDatesConsecutive = (fDate: Date, tDate: Date) => {
+    let daysToNextReportableDay: number = fDate.getDay() === 5 ? 3 : 1;
+    return (
+      fDate.getTime() + 86400000 * daysToNextReportableDay - tDate.getTime() ===
+      0
+    );
   };
 
   const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
     let rangesIndex: number = 0;
     let userName: string | IdName = "";
-    const dateRanges: [Date][] = entries.reduce(
+    const dateRanges: { entryIds: number[]; dates: Date[] }[] = entries.reduce(
       (
-        entryRanges: [Date][],
+        entryRanges: { entryIds: number[]; dates: Date[] }[],
         entry: FetchedTimeEntry,
         index,
         fetchedEntries: FetchedTimeEntry[]
@@ -142,7 +248,7 @@ export const VacationPlanner = () => {
         userName = entry.user.name ? entry.user.name : entry.user;
 
         let lastInRange: Date = entryRanges[rangesIndex]
-          ? entryRanges[rangesIndex].slice(-1).pop()
+          ? entryRanges[rangesIndex].dates.slice(-1).pop()
           : undefined;
         // Use the last appended date as toDate or first next iteration value (first)
         const toDate = lastInRange ? lastInRange : new Date(entry.spent_on);
@@ -151,32 +257,51 @@ export const VacationPlanner = () => {
           ? new Date(fetchedEntries[index + 1].spent_on)
           : toDate;
 
+        let toEntryId: number = entry.id;
+        let fromEntryId: number = fetchedEntries[index + 1]
+          ? fetchedEntries[index + 1].id
+          : toEntryId;
+
         // Initialise the entryRanges with the first entry date
         if (index === 0) {
-          entryRanges.push([toDate]);
-        }
-        // If it's friday, the next reportable day is 3 days away, otherwise 1 day
-        let daysToNextReportableDay: number = fromDate.getDay() === 5 ? 3 : 1;
-        // If dates are consecutive ...
-        if (addDays(fromDate, daysToNextReportableDay) - toDate === 0) {
-          // And the date is not aalready present
-          if (
-            !entryRanges
-              .flat()
-              .find((date) => date.getTime() === fromDate.getTime())
-          ) {
-            // Add date to entry ranges
-            entryRanges[rangesIndex].push(fromDate);
+          if (fetchedEntries.length > 1) {
+            if (areDatesConsecutive(fromDate, toDate)) {
+              entryRanges.push({
+                entryIds: [toEntryId, fromEntryId],
+                dates: [toDate, fromDate],
+              });
+            } else {
+              entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+              rangesIndex++;
+            }
+          } else {
+            entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
           }
         } else {
-          // Otherwise add a new range array, if the date does not already exist
-          if (
-            !entryRanges
-              .flat()
-              .find((date) => date.getTime() === fromDate.getTime())
-          ) {
-            entryRanges.push([fromDate]);
-            rangesIndex++;
+          // If it's friday, the next reportable day is 3 days away, otherwise 1 day
+          // If dates are consecutive ...
+
+          if (areDatesConsecutive(fromDate, toDate)) {
+            // And the date is not already present
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges[rangesIndex].dates.push(fromDate);
+              entryRanges[rangesIndex].entryIds.push(fromEntryId);
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
+          } else {
+            // Otherwise add a new range array, if the date does not already exist
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+              rangesIndex++;
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
           }
         }
 
@@ -188,7 +313,6 @@ export const VacationPlanner = () => {
   };
 
   React.useEffect(() => {
-    toggleLoadingPage(true);
     const fetchTimeEntriesFromGroups = async () => {
       const users: { group_id: number; users: number[] } =
         await getUsersInGroups(context);
@@ -220,10 +344,10 @@ export const VacationPlanner = () => {
       }
 
       // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-12);
+      let sliced_users = group_users.slice(-1);
 
-      let vacationRows: [] = [];
-      vacationRows.push([
+      let absenceRows: [] = [];
+      absenceRows.push([
         { type: "string", id: "User" },
         { type: "string", role: "tooltip", p: { html: true } },
         { type: "date", id: "Start" },
@@ -231,31 +355,32 @@ export const VacationPlanner = () => {
       ]);
 
       for await (let user of sliced_users) {
-        let entries = await getVacationTimeEntries(
-          new Date(2021, 10, 20),
-          new Date(2022, 2, 30),
+        let entries = await getAbsenceTimeEntries(
+          absenceFrom,
+          absenceTo,
           user.toString()
         );
-        const vacationRanges: {
+        const absenceRanges: {
           startDate: Date;
           endDate: Date;
           userName: string;
-        }[] = getVacationRanges(entries);
+          entryIds: number[];
+        }[] = getAbsenceRanges(entries);
 
-        vacationRanges.map(
+        absenceRanges.map(
           (range: { startDate: Date; endDate: Date; userName: string }) => {
             range.group = groupId;
           }
         );
 
-        vacationRanges.map(
+        absenceRanges.map(
           (range: {
             startDate: Date;
             endDate: Date;
             userName: string;
             group: string;
           }) => {
-            vacationRows.push([
+            absenceRows.push([
               range.userName,
               "test",
               range.startDate,
@@ -264,14 +389,25 @@ export const VacationPlanner = () => {
           }
         );
       }
-      toggleLoadingPage(false);
 
-      setVacationRows(vacationRows);
+      setAbsenceRows(absenceRows);
     };
-    fetchTimeEntriesFromGroups();
-  }, [selectedGroup]);
 
-  const getVacationTimeEntries = async (
+    const fetchTimeEntriesForUser = async () => {
+      toggleLoadingPage(true);
+      let datesRep: string[] = await getReportedEntryDates();
+      setReportedDates(datesRep);
+      let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+
+      const data = getAbsenceRanges(entries);
+      setTableData(data);
+      toggleLoadingPage(false);
+    };
+    fetchTimeEntriesForUser();
+    fetchTimeEntriesFromGroups();
+  }, [selectedGroup, reloadPage]);
+
+  const getAbsenceTimeEntries = async (
     fromDate: Date,
     toDate: Date,
     user_id: string
@@ -280,39 +416,35 @@ export const VacationPlanner = () => {
       id: 3499,
       subject: "NBIS General - Absence (Vacation/VAB/Other)",
     };
-    const id_name: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
-    const vacation_pair: IssueActivityPair = {
+    const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
+    const absence_pair: IssueActivityPair = {
       issue: issue,
-      activity: id_name,
+      activity: activity,
       custom_name: "",
       is_hidden: false,
     };
 
-    const vacationTimeEntries = await getTimeEntries(
-      vacation_pair,
+    const absenceTimeEntries = await getTimeEntries(
+      absence_pair,
       fromDate,
       toDate,
       context,
       user_id
     );
 
-    return vacationTimeEntries;
+    return absenceTimeEntries;
   };
 
-  const reportVacationTime = async (reportable_days: Date[]) => {
-    for await (let vacation_day of reportable_days) {
+  const reportAbsenceTime = async (reportable_days: Date[]) => {
+    for await (let absence_day of reportable_days) {
       const time_entry: TimeEntry = {
         issue_id: 3499,
         activity_id: 19,
         hours: 8,
         comments: "Reported using the Urdr absence planner",
-        spent_on: formatDate(vacation_day, dateFormat),
+        spent_on: formatDate(absence_day, dateFormat),
       };
-      const saved = await reportTime(
-        time_entry,
-        onVacationReportError,
-        context
-      );
+      const saved = await reportTime(time_entry, onAbsenceReportError, context);
 
       if (!saved) {
         setToastList([
@@ -321,7 +453,7 @@ export const VacationPlanner = () => {
             type: "warning",
             timeout: 5000,
             message:
-              "Something went wrong! Your vacation plan could not be submitted",
+              "Something went wrong! Your absence plan could not be submitted",
           },
         ]);
       }
@@ -364,7 +496,7 @@ export const VacationPlanner = () => {
       let reportable_days = all_days.slice();
       reportable_days = reportable_days.filter((date) => isWeekday(date));
       toggleLoadingPage(true);
-      await reportVacationTime(reportable_days);
+      await reportAbsenceTime(reportable_days);
       toggleLoadingPage(false);
       setStartDate(undefined);
       setEndDate(undefined);
@@ -373,9 +505,10 @@ export const VacationPlanner = () => {
         {
           type: "info",
           timeout: 10000,
-          message: "Vacation plan submitted!",
+          message: "Absence plan submitted!",
         },
       ]);
+      setReloadPage(!reloadPage);
     } else {
       setToastList([
         ...toastList,
@@ -388,12 +521,18 @@ export const VacationPlanner = () => {
     }
   };
 
+  const isDayEnabled = (date: Date) => {
+    return (
+      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
+    );
+  };
+
   const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
     <div>
       <DatePicker
-        filterDate={isWeekday}
+        filterDate={isDayEnabled}
         dateFormat={dateFormat}
         isClearable={true}
         selected={startDate ? startDate : undefined}
@@ -415,7 +554,7 @@ export const VacationPlanner = () => {
   const ToDatePicker = () => (
     <div>
       <DatePicker
-        filterDate={isWeekday}
+        filterDate={isDayEnabled}
         dateFormat={dateFormat}
         isClearable={true}
         selected={endDate ? endDate : undefined}
@@ -452,30 +591,30 @@ export const VacationPlanner = () => {
         }
       ></LoadingOverlay>
       <header className="page-header">
-        <h1 className="help-title">Vacation reporting</h1>
+        <h1 className="help-title">Absence reporting</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <div className="vacation-plan-dates-wrapper">
-          <div className="vacation-plan-container">
+        <div className="absence-plan-dates-wrapper">
+          <div className="absence-plan-container">
             <label
-              htmlFor="vacation-plan-picker"
-              className="vacation-plan-picker-label"
+              htmlFor="absence-plan-picker"
+              className="absence-plan-picker-label"
             >
               From:
             </label>
             <FromDatePicker />
           </div>
-          <div className="vacation-plan-container">
+          <div className="absence-plan-container">
             <label
-              htmlFor="vacation-plan-picker"
-              className="vacation-plan-picker-label"
+              htmlFor="absence-plan-picker"
+              className="absence-plan-picker-label"
             >
               To:
             </label>
             <ToDatePicker />
           </div>
-          <div className="vacation-plan-container">
+          <div className="absence-plan-container">
             <button
               type="button"
               className="basic-button apply-dates-button"
@@ -486,7 +625,51 @@ export const VacationPlanner = () => {
             </button>
           </div>
         </div>
-        <h4>Reported vacation</h4>
+        {tableData.length > 0 ? (
+          <div className="table-wrapper">
+            <table>
+              {/*The empty heading tags make the top border go all the way out*/}
+              <tr>
+                <th>Start date</th>
+                <th>End date</th>
+                <th></th>
+                <th></th>
+              </tr>
+              {tableData.map((element, index) => {
+                return (
+                  <tr key={index.toString()}>
+                    <td>{formatDate(element.startDate, dateFormat)}</td>
+                    <td>{formatDate(element.endDate, dateFormat)}</td>
+                    <td>
+                      <img
+                        src={pencil}
+                        className="table-icon"
+                        alt="pencil to edit"
+                      />
+                    </td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          onRemoveEntriesButton(element.entryIds);
+                        }}
+                        className="trash-button"
+                      >
+                        <img
+                          src={trash}
+                          className="table-icon"
+                          alt="trash icon to delete"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </table>
+          </div>
+        ) : (
+          <> </>
+        )}
+        <h4>Reported absence</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>
           <select
@@ -512,16 +695,16 @@ export const VacationPlanner = () => {
           </select>
         </div>
         <div>
-          {vacationRows.length > 1 ? (
+          {absenceRows.length > 1 ? (
             <Chart
               chartType="Timeline"
-              data={vacationRows}
+              data={absenceRows}
               width="100%"
               height="400px"
               options={timelineOptions}
             />
           ) : (
-            <p>No time entries were found</p>
+            <p>No absence entries were found</p>
           )}
         </div>
         {toastList.length > 0 && (
