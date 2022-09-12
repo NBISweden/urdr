@@ -598,7 +598,7 @@ export const AbsencePlanner = () => {
         <td>{formatDate(element.startDate, dateFormat)}</td>
         <td>{formatDate(element.endDate, dateFormat)}</td>
         <td>
-          <img src={pencil} className="pencil-icon" alt="pencil to edit" />
+          <img src={pencil} className="table-icon" alt="pencil to edit" />
         </td>
         <td>
           <button
@@ -609,7 +609,7 @@ export const AbsencePlanner = () => {
           >
             <img
               src={trash}
-              className="trash-icon"
+              className="table-icon"
               alt="trash icon to delete"
             />
           </button>
