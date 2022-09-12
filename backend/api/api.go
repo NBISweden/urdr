@@ -31,7 +31,9 @@ var db *database.Database
 func Setup() *fiber.App {
 
 	// Fiber instance
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		Prefork: true,
+	})
 
 	storage := sqlite3.New(sqlite3.Config{
 		Database:   config.Config.App.SessionDBPath,
