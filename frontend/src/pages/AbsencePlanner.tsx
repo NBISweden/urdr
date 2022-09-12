@@ -44,22 +44,14 @@ export const AbsencePlanner = () => {
   const [tableData, setTableData] = useState<
     { startDate: Date; endDate: Date; userName: string; entryIds: number[] }[]
   >([]);
-  const absenceFrom: Date = getAbsenceFrom();
-  const absenceTo: Date = getAbsenceTo();
+  let absenceFrom: Date;
+  let absenceTo: Date;
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [reportedDates, setReportedDates] = useState<string[]>([]);
 
-  function getAbsenceFrom() {
-    let today = new Date();
-
-    return new Date(today.setMonth(today.getMonth() - 1));
-  }
-
-  function getAbsenceTo() {
-    let today = new Date();
-
-    return new Date(today.setMonth(today.getMonth() + 12));
-  }
+  let today = new Date();
+  absenceFrom = new Date(today.setMonth(today.getMonth() - 1));
+  absenceTo = new Date(today.setMonth(today.getMonth() + 12));
 
   const timelineOptions = {
     hAxis: {
