@@ -307,10 +307,6 @@ export const AbsencePlanner = () => {
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
               rangesIndex++;
-            } else if (dateExists(entryRanges, fromDate)) {
-              if (!entryExists(entryRanges, fromEntryId)) {
-                entryRanges[rangesIndex].entryIds.push(fromEntryId);
-              }
             }
           }
         }
