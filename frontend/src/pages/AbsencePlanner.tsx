@@ -319,7 +319,6 @@ export const AbsencePlanner = () => {
       },
       []
     );
-    console.log(dateRanges);
     return { dateRanges: dateRanges, userName: userName };
   };
 
