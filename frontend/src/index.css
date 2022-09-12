@@ -892,17 +892,12 @@ tr:last-of-type td {
   justify-content: space-evenly;
 }
 
-.pencil-icon {
-  width: 1.25rem;
-}
-
-.trash-icon {
+.table-icon {
   width: 1.25rem;
 }
 
 .trash-button {
   border: none;
-  display: flex;
   background: none;
   cursor: pointer;
 }
