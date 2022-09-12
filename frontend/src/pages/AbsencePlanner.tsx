@@ -281,8 +281,8 @@ export const AbsencePlanner = () => {
                 dates: [toDate, fromDate],
               });
             } else {
-              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
               entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
               rangesIndex++;
             }
           } else {
@@ -307,6 +307,10 @@ export const AbsencePlanner = () => {
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
               rangesIndex++;
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
             }
           }
         }
@@ -315,6 +319,7 @@ export const AbsencePlanner = () => {
       },
       []
     );
+    console.log(dateRanges);
     return { dateRanges: dateRanges, userName: userName };
   };
 
