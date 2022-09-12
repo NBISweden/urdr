@@ -47,6 +47,7 @@ export const AbsencePlanner = () => {
   const absenceFrom: Date = getAbsenceFrom();
   const absenceTo: Date = getAbsenceTo();
   const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [reportedDates, setReportedDates] = useState<string[]>([]);
 
   function getAbsenceFrom() {
     let today = new Date();
@@ -117,6 +118,26 @@ export const AbsencePlanner = () => {
       "me"
     );
     return myReportedEntries.length;
+  };
+
+  const getReportedEntryDates = async () => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
+      absenceFrom,
+      absenceTo,
+      context,
+      "me"
+    );
+    let datesWithEntries: string[] = myReportedEntries.map(
+      (entry: FetchedTimeEntry) => {
+        return entry.spent_on;
+      }
+    );
+    let uniqueDates: string[] = datesWithEntries.filter((element, index) => {
+      return datesWithEntries.indexOf(element) === index;
+    });
+    return uniqueDates;
   };
 
   const onErrorRemovingEntries = (error: any) => {
@@ -195,7 +216,7 @@ export const AbsencePlanner = () => {
     entryRanges: { entryIds: number[]; dates: Date[] }[],
     entryId: number
   ) => {
-    return !entryRanges
+    return entryRanges
       .map((obj: { entryIds: number[]; dates: Date[] }) => {
         return obj.entryIds;
       })
@@ -281,13 +302,16 @@ export const AbsencePlanner = () => {
                 entryRanges[rangesIndex].entryIds.push(fromEntryId);
               }
             }
-            // Add date to entry ranges
           } else {
             // Otherwise add a new range array, if the date does not already exist
             if (!dateExists(entryRanges, fromDate)) {
               entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+              rangesIndex++;
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
             }
-            rangesIndex++;
           }
         }
 
@@ -381,6 +405,8 @@ export const AbsencePlanner = () => {
 
     const fetchTimeEntriesForUser = async () => {
       toggleLoadingPage(true);
+      let datesRep: string[] = await getReportedEntryDates();
+      setReportedDates(datesRep);
       let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
 
       const data = getAbsenceRanges(entries);
@@ -388,7 +414,7 @@ export const AbsencePlanner = () => {
       toggleLoadingPage(false);
     };
     fetchTimeEntriesForUser();
-    //fetchTimeEntriesFromGroups();
+    fetchTimeEntriesFromGroups();
   }, [selectedGroup, reloadPage]);
 
   const getAbsenceTimeEntries = async (
@@ -400,10 +426,10 @@ export const AbsencePlanner = () => {
       id: 3499,
       subject: "NBIS General - Absence (Vacation/VAB/Other)",
     };
-    const id_name: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
+    const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
     const absence_pair: IssueActivityPair = {
       issue: issue,
-      activity: id_name,
+      activity: activity,
       custom_name: "",
       is_hidden: false,
     };
@@ -505,12 +531,18 @@ export const AbsencePlanner = () => {
     }
   };
 
+  const isDayEnabled = (date: Date) => {
+    return (
+      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
+    );
+  };
+
   const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
     <div>
       <DatePicker
-        filterDate={isWeekday}
+        filterDate={isDayEnabled}
         dateFormat={dateFormat}
         isClearable={true}
         selected={startDate ? startDate : undefined}
@@ -532,7 +564,7 @@ export const AbsencePlanner = () => {
   const ToDatePicker = () => (
     <div>
       <DatePicker
-        filterDate={isWeekday}
+        filterDate={isDayEnabled}
         dateFormat={dateFormat}
         isClearable={true}
         selected={endDate ? endDate : undefined}
