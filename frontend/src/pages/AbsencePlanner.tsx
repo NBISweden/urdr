@@ -677,14 +677,19 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
+        <button onClick={() => setShowConfirmDialogue(true)}>
+          Show Dialogue
+        </button>
         <Alert
+          content="Some stuff"
           isOpen={showConfirmDialogue}
           title="Deleting absence period"
-          content="Are you sure you want to delete the entire absence period?"
           confirmButtonLabel="Yes"
           onCancel={() => setShowConfirmDialogue(false)}
           onConfirm={() => setShowConfirmDialogue(false)}
-        ></Alert>
+        >
+          <p>Testing</p>
+        </Alert>
         <div className="absence-plan-dates-wrapper">
           <div className="absence-plan-container">
             <label
