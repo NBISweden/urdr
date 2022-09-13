@@ -2,6 +2,7 @@ import "../index.css";
 import React, { useState, useRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
+import { Alert } from "../components/Alert";
 import {
   ToastMsg,
   TimeEntry,
@@ -47,6 +48,8 @@ export const AbsencePlanner = () => {
   >([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [reportedDates, setReportedDates] = useState<string[]>([]);
+  const [showConfirmDialogue, setShowConfirmDialogue] =
+    useState<boolean>(false);
 
   let today = new Date();
   const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
@@ -674,6 +677,14 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
+        <Alert
+          isOpen={showConfirmDialogue}
+          title="Deleting absence period"
+          content="Are you sure you want to delete the entire absence period?"
+          confirmButtonLabel="Yes"
+          onCancel={() => setShowConfirmDialogue(false)}
+          onConfirm={() => setShowConfirmDialogue(false)}
+        ></Alert>
         <div className="absence-plan-dates-wrapper">
           <div className="absence-plan-container">
             <label
