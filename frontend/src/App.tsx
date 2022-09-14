@@ -7,6 +7,7 @@ import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek } from "date-fns";
+import { ConfirmDialogueProvider } from "./components/ConfirmDialogueProvider";
 
 // Route calls
 // Order of routes is critical.
@@ -22,42 +23,44 @@ export const App = () => {
       <React.StrictMode>
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/report/:year/:week"
-                element={
-                  <ProtectedRoute>
-                    <Report />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/*"
-                element={
-                  <Navigate
-                    replace
-                    to={`/report/${currentYear}/${currentWeek}`}
-                  />
-                }
-              />
-              <Route
-                path="/help"
-                element={
-                  <ProtectedRoute>
-                    <Help />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/absence"
-                element={
-                  <ProtectedRoute>
-                    <AbsencePlanner />
-                  </ProtectedRoute>
-                }
-              />
-            </Routes>
+            <ConfirmDialogueProvider>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/report/:year/:week"
+                  element={
+                    <ProtectedRoute>
+                      <Report />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/*"
+                  element={
+                    <Navigate
+                      replace
+                      to={`/report/${currentYear}/${currentWeek}`}
+                    />
+                  }
+                />
+                <Route
+                  path="/help"
+                  element={
+                    <ProtectedRoute>
+                      <Help />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/absence"
+                  element={
+                    <ProtectedRoute>
+                      <AbsencePlanner />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </ConfirmDialogueProvider>
           </AuthProvider>
         </BrowserRouter>
       </React.StrictMode>

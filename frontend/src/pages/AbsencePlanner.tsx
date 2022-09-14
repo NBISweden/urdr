@@ -2,7 +2,6 @@ import "../index.css";
 import React, { useState, useRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
-import { Alert } from "../components/Alert";
 import {
   ToastMsg,
   TimeEntry,
@@ -30,6 +29,7 @@ import { Chart } from "react-google-charts";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { FetchedTimeEntry } from "../model";
+import { useConfirm } from "../components/ConfirmDialogueProvider";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -48,8 +48,6 @@ export const AbsencePlanner = () => {
   >([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [reportedDates, setReportedDates] = useState<string[]>([]);
-  const [showConfirmDialogue, setShowConfirmDialogue] =
-    useState<boolean>(false);
 
   let today = new Date();
   const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
@@ -655,6 +653,23 @@ export const AbsencePlanner = () => {
     </div>
   );
 
+  const confirm: ({}) => any = useConfirm();
+  const testingProvider = async () => {
+    const choice = await confirm({
+      title: "Testing the fancy stuff",
+      content: "Do you really wanna do this",
+      confirmButtonLabel: "Absolutely",
+    });
+
+    if (!choice) {
+      console.log("Aborting");
+      return;
+    } else {
+      console.log("Confirmed");
+      return;
+    }
+  };
+
   return (
     <>
       <LoadingOverlay
@@ -677,19 +692,7 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <button onClick={() => setShowConfirmDialogue(true)}>
-          Show Dialogue
-        </button>
-        <Alert
-          content="Some stuff"
-          isOpen={showConfirmDialogue}
-          title="Deleting absence period"
-          confirmButtonLabel="Yes"
-          onCancel={() => setShowConfirmDialogue(false)}
-          onConfirm={() => setShowConfirmDialogue(false)}
-        >
-          <p>Testing</p>
-        </Alert>
+        <button onClick={() => testingProvider()}>Show Dialogue</button>
         <div className="absence-plan-dates-wrapper">
           <div className="absence-plan-container">
             <label
