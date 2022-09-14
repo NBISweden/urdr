@@ -48,6 +48,7 @@ export const AbsencePlanner = () => {
   >([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [reportedDates, setReportedDates] = useState<string[]>([]);
+  const confirm: ({}) => any = useConfirm();
 
   let today = new Date();
   const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
@@ -214,20 +215,32 @@ export const AbsencePlanner = () => {
   };
 
   const onRemoveEntriesButton = async (entryIds: number[]) => {
-    toggleLoadingPage(true);
-    const removed: boolean = await removeTimeEntries(entryIds);
-    if (removed) {
-      setToastList([
-        ...toastList,
-        {
-          type: "info",
-          timeout: 8000,
-          message: "Absence period was successfully removed",
-        },
-      ]);
+    // Open the dialogue first, using the confirm function
+    const isConfirmed = await confirm({
+      title: "Deleting absence period",
+      content: "Do you really want to delete the whole absence period?",
+      confirmButtonLabel: "Yes",
+    });
+    // The confirm function will return a boolean indicating if the user aborts (false) or confirms (true)
+    if (!isConfirmed) {
+      return;
+    } else {
+      toggleLoadingPage(true);
+      const removed: boolean = await removeTimeEntries(entryIds);
+      if (removed) {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 8000,
+            message: "Absence period was successfully removed",
+          },
+        ]);
+      }
+      toggleLoadingPage(false);
+      setReloadPage(!reloadPage);
+      return;
     }
-    toggleLoadingPage(false);
-    setReloadPage(!reloadPage);
   };
 
   const getAbsenceRanges = (entries: FetchedTimeEntry[]) => {
@@ -653,23 +666,6 @@ export const AbsencePlanner = () => {
     </div>
   );
 
-  const confirm: ({}) => any = useConfirm();
-  const testingProvider = async () => {
-    const choice = await confirm({
-      title: "Testing the fancy stuff",
-      content: "Do you really wanna do this",
-      confirmButtonLabel: "Absolutely",
-    });
-
-    if (!choice) {
-      console.log("Aborting");
-      return;
-    } else {
-      console.log("Confirmed");
-      return;
-    }
-  };
-
   return (
     <>
       <LoadingOverlay
@@ -692,7 +688,6 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <button onClick={() => testingProvider()}>Show Dialogue</button>
         <div className="absence-plan-dates-wrapper">
           <div className="absence-plan-container">
             <label
