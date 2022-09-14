@@ -879,13 +879,60 @@ Other button classes are defined further down together with other classes for th
   margin: 3rem;
 }
 
+.planned-absence {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+
+}
+.red {
+  /*background-color:coral;*/
+  width: 40%;
+  margin: 1.25rem 16rem 1.25rem 0;
+
+}
+
+.blue {
+  /*background-color:lightblue;*/
+  width: 40%;
+  margin: 1.25rem 0 1.25rem 10rem;
+}
+
+.planned-absence-heading {
+  margin-top: 2rem;
+  font-weight: 700;
+}
+
+.parent {
+  display: flex;
+  font-weight: 550;
+  margin: 2rem 6rem 2rem 2rem;
+}
+
+.add-absence {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  margin-right: 11.5rem;
+  margin-bottom: 2rem;
+}
+
+.add-button {
+  background-color: hsl(288deg 46% 22%);
+  color: white;
+}
+
+.date-box {
+  min-width: 0;
+}
+
 .table-wrapper {
   padding: 1.5rem 0;
 }
 
 table {
   border-collapse: collapse;
-  width: 70%;
+  width: 100%;
 }
 
 td {

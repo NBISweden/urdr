@@ -659,47 +659,45 @@ export const AbsencePlanner = () => {
   const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
-    <div>
-      <DatePicker
-        filterDate={isDayEnabled}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={startDate ? startDate : undefined}
-        onChange={(date: Date) => setStartDate(date)}
-        showWeekNumbers
-        minDate={new Date()}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsStart
-        startDate={startDate}
-        endDate={endDate}
-        monthsShown={2}
-      />
-    </div>
+    <DatePicker
+      id="from-date"
+      filterDate={isDayEnabled}
+      dateFormat={dateFormat}
+      isClearable={true}
+      selected={startDate ? startDate : undefined}
+      onChange={(date: Date) => setStartDate(date)}
+      showWeekNumbers
+      minDate={new Date()}
+      maxDate={new Date("2030-01-01")}
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsStart
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+    />
   );
 
   const ToDatePicker = () => (
-    <div>
-      <DatePicker
-        filterDate={isDayEnabled}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={endDate ? endDate : undefined}
-        onChange={(date: Date) => setEndDate(date)}
-        showWeekNumbers
-        minDate={startDate}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsEnd
-        startDate={startDate}
-        endDate={endDate}
-        monthsShown={2}
-      />
-    </div>
+    <DatePicker
+      id="to-date"
+      filterDate={isDayEnabled}
+      dateFormat={dateFormat}
+      isClearable={true}
+      selected={endDate ? endDate : undefined}
+      onChange={(date: Date) => setEndDate(date)}
+      showWeekNumbers
+      minDate={startDate}
+      maxDate={new Date("2030-01-01")}
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsEnd
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+    />
   );
 
   return (
@@ -724,93 +722,89 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <div className="absence-plan-dates-wrapper">
-          <div className="absence-plan-container">
-            <label
-              htmlFor="absence-plan-picker"
-              className="absence-plan-picker-label"
-            >
-              From:
-            </label>
-            <FromDatePicker />
+        <h4 className="planned-absence-heading">Planned absence periods</h4>
+        <div className="planned-absence">
+          <div className="red">
+            {tableData.length > 0 ? (
+              <div className="table-wrapper">
+                <table>
+                  {/*The empty heading tags make the top border go all the way out*/}
+                  <tr>
+                    <th>Start date</th>
+                    <th>End date</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                  {tableData.map((element, index) => {
+                    return (
+                      <tr key={index.toString()}>
+                        <td>{formatDate(element.startDate, dateFormat)}</td>
+                        <td>{formatDate(element.endDate, dateFormat)}</td>
+                        <td>
+                          <img
+                            src={pencil}
+                            className="table-icon"
+                            alt="pencil to edit"
+                          />
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => {
+                              onRemoveEntriesButton(element.entryIds);
+                            }}
+                            className="trash-button"
+                          >
+                            <img
+                              src={trash}
+                              className="table-icon"
+                              alt="trash icon to delete"
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </table>
+              </div>
+            ) : (
+              <> </>
+            )}
           </div>
-          <div className="absence-plan-container">
-            <label
-              htmlFor="absence-plan-picker"
-              className="absence-plan-picker-label"
-            >
-              To:
-            </label>
-            <ToDatePicker />
-          </div>
-          <div className="absence-plan-container">
-            <button
-              type="button"
-              className="basic-button apply-dates-button"
-              title="Apply selected dates"
-              onClick={() => validateDates()}
-            >
-              Submit
-            </button>
+          <div className="blue">
+            <div className="parent">
+              <p>
+                To add an absence period, enter a start and end date. Urdr will
+                report eight hours of absence for each work day during that
+                period. You can only use this feature, if you haven't reported
+                any time during that period yet.
+              </p>
+            </div>
+            <div className="parent">
+              <div className="date-box">
+                <label htmlFor="from-date" className="date-label">
+                  Start date
+                </label>
+                <FromDatePicker />
+              </div>
+              <div className="date-box">
+                <label htmlFor="to-date" className="date-label">
+                  End date
+                </label>
+                <ToDatePicker />
+              </div>
+            </div>
+            <div className="add-absence">
+              <button
+                className="add-button"
+                title="Apply selected dates"
+                onClick={() => validateDates()}
+              >
+                {" "}
+                Add absence
+              </button>
+            </div>
           </div>
         </div>
-        {tableData.length > 0 ? (
-          <div className="table-wrapper">
-            <table>
-              {/*The empty heading tags make the top border go all the way out*/}
-              <tr>
-                <th>Start date</th>
-                <th>End date</th>
-                <th></th>
-                <th></th>
-              </tr>
-              {tableData.map((element, index) => {
-                return (
-                  <tr key={index.toString()}>
-                    <td>{formatDate(element.startDate, dateFormat)}</td>
-                    <td>{formatDate(element.endDate, dateFormat)}</td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          toggleLoadingPage(true);
-                          onUpdateAbsenceRanges(
-                            element.entryIds,
-                            element.startDate,
-                            element.endDate
-                          );
-                          toggleLoadingPage(false);
-                        }}
-                        className="edit-range-button"
-                      >
-                        <img
-                          src={pencil}
-                          className="table-icon"
-                          alt="pencil to edit"
-                        />
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          onRemoveEntriesButton(element.entryIds);
-                        }}
-                        className="trash-button"
-                      >
-                        <img
-                          src={trash}
-                          className="table-icon"
-                          alt="trash icon to delete"
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </table>
-          </div>
-        ) : (
-          <> </>
-        )}
         <h4>Reported absence</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>
