@@ -351,6 +351,7 @@ Other button classes are defined further down together with other classes for th
   padding: 1rem;
   background-color: hsl(0deg 0% 97%);
   display: flex;
+  align-items: flex-end;
 }
 
 .favorites-container {
@@ -490,7 +491,6 @@ Other button classes are defined further down together with other classes for th
 .quick-add {
   align-items: flex-end;
   display: flex;
-  height: 100%;
 }
 
 .quick-add-input {
