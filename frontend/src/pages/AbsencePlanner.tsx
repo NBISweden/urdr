@@ -25,7 +25,7 @@ import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
-import { Chart } from "react-google-charts";
+import { Scheduler } from "@aldabil/react-scheduler";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 
@@ -33,7 +33,8 @@ export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [absenceRows, setAbsenceRows] = useState<[]>([]);
+  const [absenceRows, setAbsenceRows] = useState<{}[]>([]);
+  const [absenceUsers, setAbsenceUsers] = useState<{}[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<{
     id: number;
     name: string;
@@ -48,32 +49,11 @@ export const AbsencePlanner = () => {
   const [reportedDates, setReportedDates] = useState<string[]>([]);
 
   let today = new Date();
-  const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
+  const absenceFrom: Date = new Date(
+    new Date().setMonth(today.getMonth() - 24)
+  );
   const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
-
-  const timelineOptions = {
-    hAxis: {
-      minValue: absenceFrom,
-      maxValue: absenceTo,
-    },
-    avoidOverlappingGridLines: false,
-    colors: ["#BFD6D8"],
-    // This line makes the entire category's tooltip active.
-    focusTarget: "category",
-    // Use an HTML tooltip.
-    tooltip: { isHtml: true },
-    timeline: {
-      showRowLabels: true,
-      rowLabelStyle: {
-        fontName: "Lato",
-        fontSize: 17,
-      },
-      barLabelStyle: {
-        fontName: "Lato",
-        fontSize: 16,
-      },
-    },
-  };
+  const [mode, setMode] = useState<"default" | "tabs">("default");
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -170,12 +150,13 @@ export const AbsencePlanner = () => {
   const getAbsenceRanges = (entries: FetchedTimeEntry[]) => {
     const absenceDates: {
       dateRanges: { entryIds: number[]; dates: Date[] }[];
-      userName: string;
+      user: IdName;
     } = findConsecutiveDates(entries);
     const absenceRanges: {
       startDate: Date;
       endDate: Date;
       userName: string;
+      userId: number;
       entryIds: number[];
     }[] = absenceDates.dateRanges.map(
       (range: { entryIds: number[]; dates: Date[] }) => {
@@ -184,7 +165,8 @@ export const AbsencePlanner = () => {
           return {
             startDate: date,
             endDate: date,
-            userName: absenceDates.userName,
+            userName: absenceDates.user.name,
+            userId: absenceDates.user.id,
             entryIds: range.entryIds,
           };
         } else if (range.dates.length > 1) {
@@ -193,7 +175,8 @@ export const AbsencePlanner = () => {
           return {
             startDate: fromDate,
             endDate: toDate,
-            userName: absenceDates.userName,
+            userName: absenceDates.user.name,
+            userId: absenceDates.user.id,
             entryIds: range.entryIds,
           };
         }
@@ -236,7 +219,7 @@ export const AbsencePlanner = () => {
 
   const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
     let rangesIndex: number = 0;
-    let userName: string | IdName = "";
+    let user: IdName;
     const dateRanges: { entryIds: number[]; dates: Date[] }[] = entries.reduce(
       (
         entryRanges: { entryIds: number[]; dates: Date[] }[],
@@ -245,7 +228,7 @@ export const AbsencePlanner = () => {
         fetchedEntries: FetchedTimeEntry[]
       ) => {
         // Find out the last date we last appended to a range array
-        userName = entry.user.name ? entry.user.name : entry.user;
+        user = entry.user;
 
         let lastInRange: Date = entryRanges[rangesIndex]
           ? entryRanges[rangesIndex].dates.slice(-1).pop()
@@ -309,7 +292,11 @@ export const AbsencePlanner = () => {
       },
       []
     );
-    return { dateRanges: dateRanges, userName: userName };
+    return { dateRanges: dateRanges, user: user };
+  };
+
+  const getUniqueListBy = (arr: {}[], key: string) => {
+    return [...new Map(arr.map((item) => [item[key], item])).values()];
   };
 
   React.useEffect(() => {
@@ -344,15 +331,10 @@ export const AbsencePlanner = () => {
       }
 
       // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-1);
+      let sliced_users = group_users.slice(-4);
 
-      let absenceRows: [] = [];
-      absenceRows.push([
-        { type: "string", id: "User" },
-        { type: "string", role: "tooltip", p: { html: true } },
-        { type: "date", id: "Start" },
-        { type: "date", id: "End" },
-      ]);
+      let absenceEvents: {}[] = [];
+      let userObjects: {}[] = [];
 
       for await (let user of sliced_users) {
         let entries = await getAbsenceTimeEntries(
@@ -364,6 +346,7 @@ export const AbsencePlanner = () => {
           startDate: Date;
           endDate: Date;
           userName: string;
+          userId: number;
           entryIds: number[];
         }[] = getAbsenceRanges(entries);
 
@@ -378,19 +361,25 @@ export const AbsencePlanner = () => {
             startDate: Date;
             endDate: Date;
             userName: string;
+            userId: number;
             group: string;
           }) => {
-            absenceRows.push([
-              range.userName,
-              "test",
-              range.startDate,
-              range.endDate,
-            ]);
+            absenceEvents.push({
+              title: range.userName,
+              start: range.startDate,
+              end: range.endDate,
+              userId: range.userId,
+            });
+            userObjects.push({
+              userId: range.userId,
+              name: range.userName,
+            });
           }
         );
       }
-
-      setAbsenceRows(absenceRows);
+      const uniqueUsers = getUniqueListBy(userObjects, "userId");
+      setAbsenceUsers(uniqueUsers);
+      setAbsenceRows(absenceEvents);
     };
 
     const fetchTimeEntriesForUser = async () => {
@@ -696,12 +685,22 @@ export const AbsencePlanner = () => {
         </div>
         <div>
           {absenceRows.length > 1 ? (
-            <Chart
-              chartType="Timeline"
-              data={absenceRows}
-              width="100%"
-              height="400px"
-              options={timelineOptions}
+            <Scheduler
+              view="month"
+              week={{
+                weekDays: [0, 1, 2, 3, 4],
+                weekStartOn: 1,
+                step: 60,
+              }}
+              month={{
+                weekDays: [0, 1, 2, 3, 4],
+                weekStartOn: 1,
+                startHour: 0,
+                endHour: 0,
+              }}
+              events={absenceRows}
+              resourceViewMode={mode}
+              selectedDate={new Date()}
             />
           ) : (
             <p>No absence entries were found</p>
