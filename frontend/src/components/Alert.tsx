@@ -30,11 +30,27 @@ export const Alert = ({
       style={{ display: `${isOpen ? "block" : "none"}` }}
     >
       <div className="alert-wrapper">
-        <h1>{title}</h1>
-        {!children && <p>{content}</p>}
-        {children}
-        <button onClick={onCancel}>Cancel</button>
-        <button onClick={onConfirm}>{confirmButtonLabel}</button>
+        <section className="alert-title-wrapper">
+          <h2>{title}</h2>
+        </section>
+        <section className="alert-content-wrapper">
+          {!children && <p>{content}</p>}
+          {children}
+        </section>
+        <section className="alert-buttons-wrapper">
+          <button
+            onClick={onCancel}
+            className="basic-button alert-cancel-button"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="basic-button alert-confirm-button"
+          >
+            {confirmButtonLabel}
+          </button>
+        </section>
       </div>
     </section>
   );
