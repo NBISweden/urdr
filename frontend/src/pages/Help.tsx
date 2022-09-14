@@ -153,9 +153,9 @@ export const Help = () => {
         <p className="help-info">
           In order to add a new row, you first find an issue by using its id or
           it's subject, and then select an activity, which will be linked to the
-          issue. After selecting your desired issue and clicking on the plus
-          button, a new row will be appended to the bottom of the list of recent
-          rows.
+          issue. After selecting your desired issue and clicking on the "Add
+          row"-button, a new row will be appended to the bottom of the list of
+          recent rows.
         </p>
         <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">The sum row</h2>
