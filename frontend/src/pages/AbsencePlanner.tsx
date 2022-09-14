@@ -309,8 +309,15 @@ export const AbsencePlanner = () => {
               });
             } else {
               entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
-              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
-              rangesIndex++;
+              if (!dateExists(entryRanges, fromDate)) {
+                entryRanges.push({
+                  entryIds: [fromEntryId],
+                  dates: [fromDate],
+                });
+                rangesIndex++;
+              } else {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
             }
           } else {
             entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
@@ -692,8 +699,8 @@ export const AbsencePlanner = () => {
                         onClick={() => {
                           onUpdateAbsenceRanges(
                             element.entryIds,
-                            new Date(),
-                            new Date()
+                            new Date("2023-01-03"),
+                            new Date("2023-01-03")
                           );
                         }}
                         className="edit-range-button"
