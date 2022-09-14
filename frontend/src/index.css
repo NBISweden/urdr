@@ -920,7 +920,8 @@ tr:last-of-type td {
   width: 1.25rem;
 }
 
-.trash-button {
+.trash-button,
+.edit-range-button {
   border: none;
   background: none;
   cursor: pointer;
