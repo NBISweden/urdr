@@ -143,11 +143,53 @@ export const AbsencePlanner = () => {
   };
 
   const removeTimeEntries = async (entryIds: number[]) => {
-    let removed = undefined;
+    let allRemoved: boolean = true;
     for await (let entryId of entryIds) {
       let entry: TimeEntry = { id: entryId, hours: 0 };
-      removed = await reportTime(entry, onErrorRemovingEntries, context);
+      const result = await reportTime(entry, onErrorRemovingEntries, context);
+      if (!result) {
+        allRemoved = false;
+      }
     }
+    return allRemoved;
+  };
+
+  const onUpdateAbsenceRanges = async (
+    oldEntryIds: number[],
+    newAbsenceStart: Date,
+    newAbsenceEnd: Date
+  ) => {
+    const removedAll = await removeTimeEntries(oldEntryIds);
+    if (removedAll) {
+      const reportable_days = getReportableDays(newAbsenceStart, newAbsenceEnd);
+      const added = await reportAbsenceTime(reportable_days);
+      if (added) {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 8000,
+            message: "The absence period was successfully updated",
+          },
+        ]);
+      } else {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 8000,
+            message:
+              "Something went wrong! Your absence plan could not be updated",
+          },
+        ]);
+      }
+    }
+    setReloadPage(!reloadPage);
+  };
+
+  const onRemoveEntriesButton = async (entryIds: number[]) => {
+    toggleLoadingPage(true);
+    const removed: boolean = await removeTimeEntries(entryIds);
     if (removed) {
       setToastList([
         ...toastList,
@@ -157,14 +199,9 @@ export const AbsencePlanner = () => {
           message: "Absence period was successfully removed",
         },
       ]);
-      setReloadPage(!reloadPage);
     }
-  };
-
-  const onRemoveEntriesButton = async (entryIds: number[]) => {
-    toggleLoadingPage(true);
-    await removeTimeEntries(entryIds);
     toggleLoadingPage(false);
+    setReloadPage(!reloadPage);
   };
 
   const getAbsenceRanges = (entries: FetchedTimeEntry[]) => {
@@ -434,8 +471,16 @@ export const AbsencePlanner = () => {
 
     return absenceTimeEntries;
   };
+  const getReportableDays = (frDate: Date, toDate: Date): Date[] => {
+    const dates_interval: Interval = { start: frDate, end: toDate };
+    const all_days = eachDayOfInterval(dates_interval);
+    let reportable_days = all_days.slice();
+    reportable_days = reportable_days.filter((date) => isWeekday(date));
+    return reportable_days;
+  };
 
   const reportAbsenceTime = async (reportable_days: Date[]) => {
+    let allReported: boolean = true;
     for await (let absence_day of reportable_days) {
       const time_entry: TimeEntry = {
         issue_id: 3499,
@@ -447,17 +492,10 @@ export const AbsencePlanner = () => {
       const saved = await reportTime(time_entry, onAbsenceReportError, context);
 
       if (!saved) {
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 5000,
-            message:
-              "Something went wrong! Your absence plan could not be submitted",
-          },
-        ]);
+        allReported = false;
       }
     }
+    return allReported;
   };
 
   const validateDates = async () => {
@@ -491,23 +529,32 @@ export const AbsencePlanner = () => {
         ]);
         return;
       }
-      const dates_interval: Interval = { start: startDate, end: endDate };
-      const all_days = eachDayOfInterval(dates_interval);
-      let reportable_days = all_days.slice();
-      reportable_days = reportable_days.filter((date) => isWeekday(date));
+      const reportable_days = getReportableDays(startDate, endDate);
       toggleLoadingPage(true);
-      await reportAbsenceTime(reportable_days);
+      const allReported = await reportAbsenceTime(reportable_days);
       toggleLoadingPage(false);
       setStartDate(undefined);
       setEndDate(undefined);
-      setToastList([
-        ...toastList,
-        {
-          type: "info",
-          timeout: 10000,
-          message: "Absence plan submitted!",
-        },
-      ]);
+      if (!allReported) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Something went wrong! Your absence plan could not be submitted",
+          },
+        ]);
+      } else {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 10000,
+            message: "Absence plan submitted!",
+          },
+        ]);
+      }
       setReloadPage(!reloadPage);
     } else {
       setToastList([
@@ -641,11 +688,22 @@ export const AbsencePlanner = () => {
                     <td>{formatDate(element.startDate, dateFormat)}</td>
                     <td>{formatDate(element.endDate, dateFormat)}</td>
                     <td>
-                      <img
-                        src={pencil}
-                        className="table-icon"
-                        alt="pencil to edit"
-                      />
+                      <button
+                        onClick={() => {
+                          onUpdateAbsenceRanges(
+                            element.entryIds,
+                            new Date(),
+                            new Date()
+                          );
+                        }}
+                        className="edit-range-button"
+                      >
+                        <img
+                          src={pencil}
+                          className="table-icon"
+                          alt="pencil to edit"
+                        />
+                      </button>
                     </td>
                     <td>
                       <button
