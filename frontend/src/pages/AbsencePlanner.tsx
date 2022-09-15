@@ -751,7 +751,7 @@ export const AbsencePlanner = () => {
       <main className="page-wrapper">
         <h4 className="planned-absence-heading">Planned absence periods</h4>
         <div className="planned-absence">
-          <div className="red">
+          <div className="calendar-box">
             {tableData.length > 0 ? (
               <div className="table-wrapper">
                 <table>
@@ -797,8 +797,8 @@ export const AbsencePlanner = () => {
               <> </>
             )}
           </div>
-          <div className="blue">
-            <div className="parent">
+          <div className="add-absence-box">
+            <div className="add-absence-row">
               <p>
                 To add an absence period, enter a start and end date. Urdr will
                 report eight hours of absence for each work day during that
@@ -806,7 +806,7 @@ export const AbsencePlanner = () => {
                 any time during that period yet.
               </p>
             </div>
-            <div className="parent">
+            <div className="add-absence-row">
               <div className="date-box">
                 <label htmlFor="from-date" className="date-label">
                   Start date
