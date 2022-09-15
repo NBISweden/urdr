@@ -28,8 +28,7 @@ import { HeaderUser } from "../components/HeaderUser";
 import { Chart } from "react-google-charts";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
-import { FetchedTimeEntry } from "../model";
-import { useConfirm } from "../components/ConfirmDialogueProvider";
+import { useConfirm } from "../components/ConfirmDialogProvider";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
