@@ -28,6 +28,7 @@ import { HeaderUser } from "../components/HeaderUser";
 import { Chart } from "react-google-charts";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
+import { FetchedTimeEntry } from "../model";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -107,7 +108,7 @@ export const AbsencePlanner = () => {
       context,
       "me"
     );
-    return myReportedEntries.length;
+    return myReportedEntries;
   };
 
   const getReportedEntryDates = async () => {
@@ -159,29 +160,53 @@ export const AbsencePlanner = () => {
     newAbsenceStart: Date,
     newAbsenceEnd: Date
   ) => {
-    const removedAll = await removeTimeEntries(oldEntryIds);
-    if (removedAll) {
-      const reportable_days = getReportableDays(newAbsenceStart, newAbsenceEnd);
-      const added = await reportAbsenceTime(reportable_days);
-      if (added) {
-        setToastList([
-          ...toastList,
-          {
-            type: "info",
-            timeout: 8000,
-            message: "The absence period was successfully updated",
-          },
-        ]);
-      } else {
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 8000,
-            message:
-              "Something went wrong! Your absence plan could not be updated",
-          },
-        ]);
+    const reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
+      newAbsenceStart,
+      newAbsenceEnd
+    );
+    const filteredReportedEntries: FetchedTimeEntry[] = reportedEntries.filter(
+      (entry: FetchedTimeEntry) => {
+        return !oldEntryIds.includes(entry.id);
+      }
+    );
+    if (filteredReportedEntries.length > 0) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 8000,
+          message:
+            "The absence plan was not updated. Time has already been reported on this period",
+        },
+      ]);
+    } else {
+      const removedAll = await removeTimeEntries(oldEntryIds);
+      if (removedAll) {
+        const reportable_days = getReportableDays(
+          newAbsenceStart,
+          newAbsenceEnd
+        );
+        const added = await reportAbsenceTime(reportable_days);
+        if (added) {
+          setToastList([
+            ...toastList,
+            {
+              type: "info",
+              timeout: 8000,
+              message: "The absence period was successfully updated",
+            },
+          ]);
+        } else {
+          setToastList([
+            ...toastList,
+            {
+              type: "warning",
+              timeout: 8000,
+              message:
+                "Something went wrong! Your absence plan could not be updated",
+            },
+          ]);
+        }
       }
     }
     setReloadPage(!reloadPage);
@@ -521,11 +546,11 @@ export const AbsencePlanner = () => {
       endDate.getTime() &&
       endDate >= startDate
     ) {
-      let reportedEntries: number = await hasAlreadyReported(
+      let reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
         startDate,
         endDate
       );
-      if (reportedEntries > 0) {
+      if (reportedEntries.length > 0) {
         setToastList([
           ...toastList,
           {
