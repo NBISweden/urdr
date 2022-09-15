@@ -7,7 +7,7 @@ import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek } from "date-fns";
-import { ConfirmDialogueProvider } from "./components/ConfirmDialogueProvider";
+import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
 
 // Route calls
 // Order of routes is critical.
@@ -23,7 +23,7 @@ export const App = () => {
       <React.StrictMode>
         <BrowserRouter>
           <AuthProvider>
-            <ConfirmDialogueProvider>
+            <ConfirmDialogProvider>
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route
@@ -60,7 +60,7 @@ export const App = () => {
                   }
                 />
               </Routes>
-            </ConfirmDialogueProvider>
+            </ConfirmDialogProvider>
           </AuthProvider>
         </BrowserRouter>
       </React.StrictMode>

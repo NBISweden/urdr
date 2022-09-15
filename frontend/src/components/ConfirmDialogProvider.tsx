@@ -7,9 +7,9 @@ import React, {
 } from "react";
 import { Alert } from "./Alert";
 
-const ConfirmDialogue = createContext(null);
+const ConfirmDialog = createContext(null);
 
-export const ConfirmDialogueProvider = ({ children }) => {
+export const ConfirmDialogProvider = ({ children }) => {
   const [state, setState] = useState<{}>({ isOpen: false });
   const handlerFunction = useRef<(choice: boolean) => void>();
 
@@ -27,17 +27,17 @@ export const ConfirmDialogueProvider = ({ children }) => {
   );
 
   return (
-    <ConfirmDialogue.Provider value={confirm}>
+    <ConfirmDialog.Provider value={confirm}>
       {children}
       <Alert
         {...state}
         onCancel={() => handlerFunction.current(false)}
         onConfirm={() => handlerFunction.current(true)}
       />
-    </ConfirmDialogue.Provider>
+    </ConfirmDialog.Provider>
   );
 };
 
 export const useConfirm = () => {
-  return useContext(ConfirmDialogue);
+  return useContext(ConfirmDialog);
 };

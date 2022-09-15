@@ -215,7 +215,7 @@ export const AbsencePlanner = () => {
   };
 
   const onRemoveEntriesButton = async (entryIds: number[]) => {
-    // Open the dialogue first, using the confirm function
+    // Open the dialog first, using the confirm function
     const isConfirmed = await confirm({
       title: "Deleting absence period",
       content: "Do you really want to delete the whole absence period?",

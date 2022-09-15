@@ -25,13 +25,13 @@ export const Alert = ({
   onConfirm: () => void;
   children: JSX.Element;
 }) => {
-  // Autofocus on cancel button when opening dialogue
+  // Autofocus on cancel button when opening dialog
   const cancelButton = useRef(null);
   useEffect(() => {
     cancelButton.current.focus();
   });
 
-  // Close the dialogue when pressing escape
+  // Close the dialog when pressing escape
   const alert = useRef(null);
   useEscaper(alert, () => onCancel());
 
