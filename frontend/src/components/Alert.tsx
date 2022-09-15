@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useEscaper } from "../utils";
 
 /*
   The Alert component can be filled with a simple string using the content prop. 
@@ -24,21 +25,39 @@ export const Alert = ({
   onConfirm: () => void;
   children: JSX.Element;
 }) => {
+  // Autofocus on cancel button when opening dialogue
+  const cancelButton = useRef(null);
+  useEffect(() => {
+    cancelButton.current.focus();
+  });
+
+  // Close the dialogue when pressing escape
+  const alert = useRef(null);
+  useEscaper(alert, () => onCancel());
+
   return (
     <section
       className="alert-overlay"
       style={{ display: `${isOpen ? "block" : "none"}` }}
+      ref={alert}
     >
-      <div className="alert-wrapper">
+      <div
+        className="alert-wrapper"
+        role="alertdialog"
+        aria-modal={true}
+        aria-labelledby="alertTitle"
+        aria-describedby="alertContent"
+      >
         <section className="alert-title-wrapper">
-          <h2>{title}</h2>
+          <h2 id="alertTitle">{title}</h2>
         </section>
         <section className="alert-content-wrapper">
-          {!children && <p>{content}</p>}
+          {!children && <p id="alertContent">{content}</p>}
           {children}
         </section>
         <section className="alert-buttons-wrapper">
           <button
+            ref={cancelButton}
             onClick={onCancel}
             className="basic-button alert-cancel-button"
           >
