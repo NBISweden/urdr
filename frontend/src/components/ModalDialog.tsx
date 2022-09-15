@@ -2,13 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { useEscaper } from "../utils";
 
 /*
-  The Alert component can be filled with a simple string using the content prop. 
+  The modal component can be filled with a simple string using the content prop. 
   In that case, the component should be rendered without children.
   To fill it with more complex JSX, it can be rendered with children.
   If children are present, the content prop will be ignored.
 */
 
-export const Alert = ({
+export const ModalDialog = ({
   isOpen,
   title,
   content,
@@ -32,40 +32,40 @@ export const Alert = ({
   });
 
   // Close the dialog when pressing escape
-  const alert = useRef(null);
-  useEscaper(alert, () => onCancel());
+  const modal = useRef(null);
+  useEscaper(modal, () => onCancel());
 
   return (
     <section
-      className="alert-overlay"
+      className="modal-overlay"
       style={{ display: `${isOpen ? "block" : "none"}` }}
-      ref={alert}
+      ref={modal}
     >
       <div
-        className="alert-wrapper"
+        className="modal-wrapper"
         role="alertdialog"
         aria-modal={true}
-        aria-labelledby="alertTitle"
-        aria-describedby="alertContent"
+        aria-labelledby="modalTitle"
+        aria-describedby="modalContent"
       >
-        <section className="alert-title-wrapper">
-          <h2 id="alertTitle">{title}</h2>
+        <section className="modal-title-wrapper">
+          <h2 id="modalTitle">{title}</h2>
         </section>
-        <section className="alert-content-wrapper">
-          {!children && <p id="alertContent">{content}</p>}
+        <section className="modal-content-wrapper">
+          {!children && <p id="modalContent">{content}</p>}
           {children}
         </section>
-        <section className="alert-buttons-wrapper">
+        <section className="modal-buttons-wrapper">
           <button
             ref={cancelButton}
             onClick={onCancel}
-            className="basic-button alert-cancel-button"
+            className="basic-button modal-cancel-button"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="basic-button alert-confirm-button"
+            className="basic-button modal-confirm-button"
           >
             {confirmButtonLabel}
           </button>

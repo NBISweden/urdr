@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useContext,
 } from "react";
-import { Alert } from "./Alert";
+import { ModalDialog } from "./ModalDialog";
 
 const ConfirmDialog = createContext(null);
 
@@ -29,7 +29,7 @@ export const ConfirmDialogProvider = ({ children }) => {
   return (
     <ConfirmDialog.Provider value={confirm}>
       {children}
-      <Alert
+      <ModalDialog
         {...state}
         onCancel={() => handlerFunction.current(false)}
         onConfirm={() => handlerFunction.current(true)}
