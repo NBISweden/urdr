@@ -936,3 +936,73 @@ tr:last-of-type td {
   margin-top: 2rem;
   margin-bottom: 3rem;
 }
+
+/* ModalDialog styles */
+
+.modal-overlay {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: -0.2rem;
+  background-color: hsla(0, 0%, 0%, 0.5);
+  z-index: 1;
+}
+
+.modal-wrapper {
+  background-color: white;
+  color: hsl(185deg 92% 11%);
+  height: fit-content;
+  width: fit-content;
+  max-width: 90%;
+  margin: 0 auto;
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  border-radius: 4px;
+}
+
+.modal-title-wrapper {
+  background-color: hsl(70deg 55% 98%);
+  border-bottom: 1px solid hsl(76deg 55% 77%);
+  padding: 1.5rem 1.5rem 0.2rem;
+  border-radius: 4px 4px 0 0;
+}
+
+.modal-content-wrapper {
+  padding: 1rem 1.5rem;
+}
+
+.modal-content-wrapper p {
+  margin: 0;
+}
+
+.modal-buttons-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-radius: 0 0 4px 4px;
+}
+
+.modal-confirm-button {
+  background-color: hsl(185deg 92% 16%);
+  padding: 0.2rem 1rem;
+  margin: 0.25rem;
+}
+
+.modal-confirm-button:hover {
+  background-color: hsl(185deg 92% 11%);
+}
+
+.modal-cancel-button {
+  border: 2px solid hsl(187deg 29% 94%);
+  background-color: white;
+  color: hsl(185deg 92% 11%);
+  padding: 0.2rem 0.5rem;
+  margin: 0.25rem;
+}
+
+.modal-cancel-button:hover {
+  background-color: hsl(187deg 29% 94%);
+}
