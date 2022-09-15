@@ -722,11 +722,13 @@ export const AbsencePlanner = () => {
                     <td>
                       <button
                         onClick={() => {
+                          toggleLoadingPage(true);
                           onUpdateAbsenceRanges(
                             element.entryIds,
                             new Date("2023-01-03"),
                             new Date("2023-01-03")
                           );
+                          toggleLoadingPage(false);
                         }}
                         className="edit-range-button"
                       >
