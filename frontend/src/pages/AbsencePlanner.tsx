@@ -1,5 +1,5 @@
 import "../index.css";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, forwardRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
 import {
@@ -30,6 +30,7 @@ import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { useConfirm } from "../components/ConfirmDialogProvider";
 import { useSelectDates } from "../components/EditPeriodDialogProvider";
+import calender from "../icons/calendar-week-white.svg";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -658,6 +659,30 @@ export const AbsencePlanner = () => {
 
   const context = React.useContext(AuthContext);
 
+  const DatePickerCustomInput = forwardRef(({ onClick }, ref) => (
+    <div className="input-group">
+      <input
+        onClick={onClick}
+        className="form-control dateInput"
+        type="text"
+        ref={ref}
+      />
+      <div className="input-group-append">
+        <button className="btn cal-button">
+          <img
+            src={calender}
+            className="calender table-icon"
+            alt="calender"
+            onClick={onClick}
+            ref={ref}
+          />
+        </button>
+      </div>
+    </div>
+  ));
+
+  const ref = React.createRef();
+
   const FromDatePicker = () => (
     <DatePicker
       id="from-date"
@@ -676,6 +701,7 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
+      customInput={<DatePickerCustomInput ref={ref} />}
     />
   );
 
@@ -697,6 +723,7 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
+      customInput={<DatePickerCustomInput ref={ref} />}
     />
   );
 
@@ -730,16 +757,14 @@ export const AbsencePlanner = () => {
                 <table>
                   {/*The empty heading tags make the top border go all the way out*/}
                   <tr>
+                    <th></th>
+                    <th></th>
                     <th>Start date</th>
                     <th>End date</th>
-                    <th></th>
-                    <th></th>
                   </tr>
                   {tableData.map((element, index) => {
                     return (
                       <tr key={index.toString()}>
-                        <td>{formatDate(element.startDate, dateFormat)}</td>
-                        <td>{formatDate(element.endDate, dateFormat)}</td>
                         <td>
                           <img
                             src={pencil}
@@ -761,6 +786,8 @@ export const AbsencePlanner = () => {
                             />
                           </button>
                         </td>
+                        <td>{formatDate(element.startDate, dateFormat)}</td>
+                        <td>{formatDate(element.endDate, dateFormat)}</td>
                       </tr>
                     );
                   })}
@@ -795,7 +822,7 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence">
               <button
-                className="add-button"
+                className="add-absence-button"
                 title="Apply selected dates"
                 onClick={() => validateDates()}
               >

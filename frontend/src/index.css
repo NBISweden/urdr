@@ -881,15 +881,12 @@ Other button classes are defined further down together with other classes for th
 
 .planned-absence {
   display: flex;
-  align-items: center;
   flex-direction: row;
-
 }
 .red {
   /*background-color:coral;*/
   width: 40%;
   margin: 1.25rem 16rem 1.25rem 0;
-
 }
 
 .blue {
@@ -913,17 +910,23 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   align-items: end;
   justify-content: end;
-  margin-right: 11.5rem;
+  margin-right: 8rem;
   margin-bottom: 2rem;
 }
 
-.add-button {
+.add-absence-button {
   background-color: hsl(288deg 46% 22%);
   color: white;
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.25rem 1rem;
 }
 
 .date-box {
   min-width: 0;
+  width: 50%;
+  margin-right: 2rem;
 }
 
 .table-wrapper {
@@ -977,6 +980,16 @@ tr:last-of-type td {
 .apply-dates-button {
   height: 3rem;
   width: 8rem;
+}
+
+.calender {
+  color: white;
+}
+
+.cal-button {
+  background-color: hsl(185deg 92% 11%);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 .group-select-wrapper {
