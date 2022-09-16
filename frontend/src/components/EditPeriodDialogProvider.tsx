@@ -9,7 +9,7 @@ import { ModalDialog } from "./ModalDialog";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import sv from "date-fns/locale/sv";
-import { dateFormat } from "../utils";
+import { dateFormat, isWeekday } from "../utils";
 
 const EditPeriodDialog = createContext(null);
 
@@ -29,6 +29,7 @@ export const EditPeriodDialogProvider = ({ children }) => {
       <p>Please enter below the new start and end date of your absence.</p>
       <p>From</p>
       <DatePicker
+        filterDate={isWeekday}
         dateFormat={dateFormat}
         isClearable={true}
         selected={updatedAbsenceStartDate ? updatedAbsenceStartDate : undefined}
@@ -48,6 +49,7 @@ export const EditPeriodDialogProvider = ({ children }) => {
       />
       <p>To</p>
       <DatePicker
+        filterDate={isWeekday}
         dateFormat={dateFormat}
         isClearable={true}
         selected={updatedAbsenceEndDate ? updatedAbsenceEndDate : undefined}
