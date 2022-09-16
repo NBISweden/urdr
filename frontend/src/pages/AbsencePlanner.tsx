@@ -29,6 +29,7 @@ import { Chart } from "react-google-charts";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { useConfirm } from "../components/ConfirmDialogProvider";
+import { useSelectDates } from "../components/EditPeriodDialogProvider";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -48,6 +49,7 @@ export const AbsencePlanner = () => {
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [reportedDates, setReportedDates] = useState<string[]>([]);
   const confirm: ({}) => any = useConfirm();
+  const selectDates: ({}) => any = useSelectDates();
 
   let today = new Date();
   const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
@@ -156,57 +158,73 @@ export const AbsencePlanner = () => {
     return allRemoved;
   };
 
-  const onUpdateAbsenceRanges = async (
-    oldEntryIds: number[],
-    newAbsenceStart: Date,
-    newAbsenceEnd: Date
-  ) => {
-    const reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
-      newAbsenceStart,
-      newAbsenceEnd
-    );
-    const filteredReportedEntries: FetchedTimeEntry[] = reportedEntries.filter(
-      (entry: FetchedTimeEntry) => {
-        return !oldEntryIds.includes(entry.id);
-      }
-    );
-    if (filteredReportedEntries.length > 0) {
-      setToastList([
-        ...toastList,
-        {
-          type: "warning",
-          timeout: 8000,
-          message:
-            "The absence plan was not updated. Time has already been reported on this period",
-        },
-      ]);
+  const onUpdateAbsenceRanges = async (oldEntryIds: number[]) => {
+    const selection: { choice: boolean; startDate: Date; endDate: Date } =
+      await selectDates({
+        title: "Change your absence period",
+        confirmButtonLabel: "Update",
+      });
+    if (!selection.choice) {
+      return;
     } else {
-      const removedAll = await removeTimeEntries(oldEntryIds);
-      if (removedAll) {
-        const reportable_days = getReportableDays(
-          newAbsenceStart,
-          newAbsenceEnd
+      if (!selection.startDate || !selection.endDate) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Please fill in both the starting and end date of your absence",
+          },
+        ]);
+      } else {
+        const reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
+          selection.startDate,
+          selection.endDate
         );
-        const added = await reportAbsenceTime(reportable_days);
-        if (added) {
-          setToastList([
-            ...toastList,
-            {
-              type: "info",
-              timeout: 8000,
-              message: "The absence period was successfully updated",
-            },
-          ]);
-        } else {
+        const filteredReportedEntries: FetchedTimeEntry[] =
+          reportedEntries.filter((entry: FetchedTimeEntry) => {
+            return !oldEntryIds.includes(entry.id);
+          });
+        if (filteredReportedEntries.length > 0) {
           setToastList([
             ...toastList,
             {
               type: "warning",
               timeout: 8000,
               message:
-                "Something went wrong! Your absence plan could not be updated",
+                "The absence plan was not updated. Time has already been reported on this period",
             },
           ]);
+        } else {
+          const removedAll = await removeTimeEntries(oldEntryIds);
+          if (removedAll) {
+            const reportable_days = getReportableDays(
+              selection.startDate,
+              selection.endDate
+            );
+            const added = await reportAbsenceTime(reportable_days);
+            if (added) {
+              setToastList([
+                ...toastList,
+                {
+                  type: "info",
+                  timeout: 8000,
+                  message: "The absence period was successfully updated",
+                },
+              ]);
+            } else {
+              setToastList([
+                ...toastList,
+                {
+                  type: "warning",
+                  timeout: 8000,
+                  message:
+                    "Something went wrong! Your absence plan could not be updated",
+                },
+              ]);
+            }
+          }
         }
       }
     }
@@ -736,11 +754,7 @@ export const AbsencePlanner = () => {
                       <button
                         onClick={() => {
                           toggleLoadingPage(true);
-                          onUpdateAbsenceRanges(
-                            element.entryIds,
-                            new Date("2023-01-03"),
-                            new Date("2023-01-03")
-                          );
+                          onUpdateAbsenceRanges(element.entryIds);
                           toggleLoadingPage(false);
                         }}
                         className="edit-range-button"
