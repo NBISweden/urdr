@@ -658,11 +658,13 @@ export const AbsencePlanner = () => {
   };
 
   const context = React.useContext(AuthContext);
+  const ref = React.createRef();
 
-  const DatePickerCustomInput = forwardRef(({ onClick }, ref) => (
+  const DatePickerCustomInput = forwardRef(({ onClick, onChange }, ref) => (
     <div className="input-group">
       <input
         onClick={onClick}
+        onChange={onChange}
         className="form-control dateInput"
         type="text"
         ref={ref}
@@ -680,8 +682,6 @@ export const AbsencePlanner = () => {
       </div>
     </div>
   ));
-
-  const ref = React.createRef();
 
   const FromDatePicker = () => (
     <DatePicker
@@ -701,7 +701,7 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
-      customInput={<DatePickerCustomInput ref={ref} />}
+      customInput={<DatePickerCustomInput />}
     />
   );
 
@@ -723,7 +723,7 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
-      customInput={<DatePickerCustomInput ref={ref} />}
+      customInput={<DatePickerCustomInput />}
     />
   );
 
