@@ -68,6 +68,13 @@ func TestUserGroups(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Non-existing user",
+			args: args{
+				redmineUserId: 0,
+			},
+			want: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
