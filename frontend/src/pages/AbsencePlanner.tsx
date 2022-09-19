@@ -1,5 +1,5 @@
 import "../index.css";
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
 import {
@@ -659,33 +659,11 @@ export const AbsencePlanner = () => {
 
   const context = React.useContext(AuthContext);
 
-  const DatePickerCustomInput = ({ onClick, onChange, type }) => (
-    <div className="input-group">
-      <input
-        onClick={onClick}
-        onChange={onChange}
-        className="form-control dateInput"
-        type="text"
-        value={
-          type === "start"
-            ? startDate && formatDate(startDate, dateFormat)
-            : endDate && formatDate(endDate, dateFormat)
-        }
-      />
-      <div className="input-group-append">
-        <button className="btn cal-button" onClick={onClick}>
-          <img src={calender} className="calender table-icon" alt="calender" />
-        </button>
-      </div>
-    </div>
-  );
-
   const FromDatePicker = () => (
     <DatePicker
       id="from-date"
       filterDate={isDayEnabled}
       dateFormat={dateFormat}
-      isClearable={true}
       selected={startDate ? startDate : undefined}
       onChange={(date: Date) => setStartDate(date)}
       showWeekNumbers
@@ -698,7 +676,8 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
-      customInput={<DatePickerCustomInput type="start" />}
+      className="form-control dateInput"
+      strictParsing
     />
   );
 
@@ -707,7 +686,6 @@ export const AbsencePlanner = () => {
       id="to-date"
       filterDate={isDayEnabled}
       dateFormat={dateFormat}
-      isClearable={true}
       selected={endDate ? endDate : undefined}
       onChange={(date: Date) => setEndDate(date)}
       showWeekNumbers
@@ -720,7 +698,8 @@ export const AbsencePlanner = () => {
       startDate={startDate}
       endDate={endDate}
       monthsShown={2}
-      customInput={<DatePickerCustomInput type="end" />}
+      className="form-control dateInput"
+      strictParsing
     />
   );
 
@@ -809,12 +788,30 @@ export const AbsencePlanner = () => {
                   Start date
                 </label>
                 <FromDatePicker />
+                <div className="input-group-append">
+                  <button className="btn cal-button">
+                    <img
+                      src={calender}
+                      className="calender table-icon"
+                      alt="calender"
+                    />
+                  </button>
+                </div>
               </div>
               <div className="date-box">
                 <label htmlFor="to-date" className="date-label">
                   End date
                 </label>
                 <ToDatePicker />
+                <div className="input-group-append">
+                  <button className="btn cal-button">
+                    <img
+                      src={calender}
+                      className="calender table-icon"
+                      alt="calender"
+                    />
+                  </button>
+                </div>
               </div>
             </div>
             <div className="add-absence">
