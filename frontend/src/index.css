@@ -881,47 +881,56 @@ Other button classes are defined further down together with other classes for th
 
 .planned-absence {
   display: flex;
-  flex-direction: row;
+  justify-content: space-between;
+  padding: 2rem 0;
 }
+
 .calendar-box {
-  width: 40%;
-  margin: 1.25rem 16rem 1.25rem 0;
+  max-width: 50%;
+  flex-grow: 5;
 }
 
 .add-absence-box {
-  width: 40%;
-  margin: 1.25rem 0 1.25rem 10rem;
-}
-
-@media (max-width: 700px) and (orientation: portrait) {
-  .add-absence-box {
-    width: 50%;
-    margin: 1.25rem 0 1.25rem 5rem;
-  }
-
-  .calendar-box {
-    width: 50%;
-    margin: 1.25rem 5rem 1.25rem 0;
-  }
-}
-
-.planned-absence-heading {
-  margin-top: 2rem;
-  font-weight: 700;
+  max-width: 40%;
+  flex-grow: 1;
 }
 
 .add-absence-row {
   display: flex;
-  font-weight: 550;
-  margin: 2rem 6rem 2rem 2rem;
+  justify-content: space-between;
+}
+
+.date-box {
+  width: 45%;
+  position: relative;
+}
+
+@media (max-width: 700px) {
+  .planned-absence,
+  .add-absence-row {
+    flex-direction: column;
+  }
+
+  .calendar-box,
+  .add-absence-box {
+    max-width: 100%;
+  }
+
+  .date-box {
+    width: 100%;
+  }
+}
+
+.planned-absence-heading {
+  padding-top: 2rem;
+  font-weight: 700;
 }
 
 .add-absence {
   display: flex;
   align-items: end;
   justify-content: end;
-  margin-right: 8rem;
-  margin-bottom: 2rem;
+  padding: 2rem 0;
 }
 
 .add-absence-button {
@@ -931,17 +940,6 @@ Other button classes are defined further down together with other classes for th
   border-radius: 0.25rem;
   border: none;
   padding: 0.25rem 1rem;
-}
-
-.date-box {
-  min-width: 0;
-  width: 50%;
-  margin-right: 2rem;
-  position: relative;
-}
-
-.table-wrapper {
-  padding: 1.5rem 0;
 }
 
 table {

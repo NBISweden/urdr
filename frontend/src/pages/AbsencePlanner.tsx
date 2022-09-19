@@ -725,50 +725,61 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <h4 className="planned-absence-heading">Planned absence periods</h4>
+        <h2 className="planned-absence-heading">Planned absence periods</h2>
         <div className="planned-absence">
           <div className="calendar-box">
             {tableData.length > 0 ? (
-              <div className="table-wrapper">
-                <table>
-                  {/*The empty heading tags make the top border go all the way out*/}
-                  <tr>
-                    <th></th>
-                    <th></th>
-                    <th>Start date</th>
-                    <th>End date</th>
-                  </tr>
-                  {tableData.map((element, index) => {
-                    return (
-                      <tr key={index.toString()}>
-                        <td>
+              <table>
+                {/*The empty heading tags make the top border go all the way out*/}
+                <tr>
+                  <th></th>
+                  <th></th>
+                  <th>Start date</th>
+                  <th>End date</th>
+                </tr>
+                {tableData.map((element, index) => {
+                  return (
+                    <tr key={index.toString()}>
+                      <td>
+                        <button
+                          onClick={() => {
+                            toggleLoadingPage(true);
+                            onUpdateAbsenceRanges(
+                              element.entryIds,
+                              new Date("2023-01-03"),
+                              new Date("2023-01-03")
+                            );
+                            toggleLoadingPage(false);
+                          }}
+                          className="edit-range-button"
+                        >
                           <img
                             src={pencil}
                             className="table-icon"
                             alt="pencil to edit"
                           />
-                        </td>
-                        <td>
-                          <button
-                            onClick={() => {
-                              onRemoveEntriesButton(element.entryIds);
-                            }}
-                            className="trash-button"
-                          >
-                            <img
-                              src={trash}
-                              className="table-icon"
-                              alt="trash icon to delete"
-                            />
-                          </button>
-                        </td>
-                        <td>{formatDate(element.startDate, dateFormat)}</td>
-                        <td>{formatDate(element.endDate, dateFormat)}</td>
-                      </tr>
-                    );
-                  })}
-                </table>
-              </div>
+                        </button>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => {
+                            onRemoveEntriesButton(element.entryIds);
+                          }}
+                          className="trash-button"
+                        >
+                          <img
+                            src={trash}
+                            className="table-icon"
+                            alt="trash icon to delete"
+                          />
+                        </button>
+                      </td>
+                      <td>{formatDate(element.startDate, dateFormat)}</td>
+                      <td>{formatDate(element.endDate, dateFormat)}</td>
+                    </tr>
+                  );
+                })}
+              </table>
             ) : (
               <> </>
             )}
