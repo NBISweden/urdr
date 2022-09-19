@@ -799,14 +799,12 @@ export const AbsencePlanner = () => {
                   Start date
                 </label>
                 <FromDatePicker />
-                <div className="input-group-append">
-                  <button className="btn cal-button">
-                    <img
-                      src={calender}
-                      className="calender table-icon"
-                      alt="calender"
-                    />
-                  </button>
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
                 </div>
               </div>
               <div className="date-box">
@@ -814,14 +812,12 @@ export const AbsencePlanner = () => {
                   End date
                 </label>
                 <ToDatePicker />
-                <div className="input-group-append">
-                  <button className="btn cal-button">
-                    <img
-                      src={calender}
-                      className="calender table-icon"
-                      alt="calender"
-                    />
-                  </button>
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
                 </div>
               </div>
             </div>
@@ -831,7 +827,6 @@ export const AbsencePlanner = () => {
                 title="Apply selected dates"
                 onClick={() => validateDates()}
               >
-                {" "}
                 Add absence
               </button>
             </div>

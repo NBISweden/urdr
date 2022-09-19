@@ -983,7 +983,7 @@ tr:last-of-type td {
   color: white;
 }
 
-.cal-button {
+.cal-wrapper {
   background-color: hsl(185deg 92% 11%);
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
