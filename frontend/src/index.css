@@ -1005,16 +1005,6 @@ tr:last-of-type td {
   width: 8rem;
 }
 
-.calender {
-  color: white;
-}
-
-.cal-button {
-  background-color: hsl(185deg 92% 11%);
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
 .group-select-wrapper {
   margin-top: 2rem;
   margin-bottom: 3rem;
