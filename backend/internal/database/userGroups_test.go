@@ -42,20 +42,17 @@ func TestUserGroups(t *testing.T) {
 		t.Fatalf("Failed to insert test data: %v", err)
 	}
 
-	// Set up and run tests.
+	// Set up tests for GetUserGroups().
 
-	type args struct {
-		redmineUserId int
-	}
-	tests := []struct {
+	tests1 := []struct {
 		name string
-		args args
+		args struct{ redmineuserid int }
 		want []redmine.Group
 	}{
 		{
-			name: "Existing user with groups",
-			args: args{
-				redmineUserId: 1,
+			name: "existing user with groups",
+			args: struct{ redmineuserid int }{
+				redmineuserid: 1,
 			},
 			want: []redmine.Group{
 				{
@@ -69,25 +66,58 @@ func TestUserGroups(t *testing.T) {
 			},
 		},
 		{
-			name: "Non-existing user",
-			args: args{
-				redmineUserId: 0,
+			name: "non-existing user",
+			args: struct{ redmineuserid int }{
+				redmineuserid: 0,
 			},
 			want: nil,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := db.GetUserGroups(tt.args.redmineUserId)
+
+	// Set up tests for GetUsersInGroup().
+
+	tests2 := []struct {
+		name string
+		args struct{ redminegroupid int }
+		want []int
+	}{
+		{
+			name: "Get all users in group 1",
+			args: struct{ redminegroupid int }{
+				redminegroupid: 1,
+			},
+			want: []int{1, 2},
+		},
+	}
+
+	for _, tt1 := range tests1 {
+		t.Run(tt1.name, func(t *testing.T) {
+			got, err := db.GetUserGroups(tt1.args.redmineuserid)
 			if err != nil {
-				t.Errorf("Error in database API: %v", err)
+				t.Errorf("error in database api: %v", err)
 			}
-			if len(got) != len(tt.want) {
-				t.Errorf("Wrong length answer, %d != %d", len(got), len(tt.want))
+			if len(got) != len(tt1.want) {
+				t.Errorf("wrong length answer, %d != %d", len(got), len(tt1.want))
 			}
-			for i := range tt.want {
-				if tt.want[i].Id != got[i].Id || tt.want[i].Name != got[i].Name {
-					t.Errorf("Wrong data back, %v != %v", got[i], tt.want[i])
+			for i := range tt1.want {
+				if tt1.want[i].Id != got[i].Id || tt1.want[i].Name != got[i].Name {
+					t.Errorf("wrong data back, %v != %v", got[i], tt1.want[i])
+				}
+			}
+		})
+	}
+	for _, tt2 := range tests2 {
+		t.Run(tt2.name, func(t *testing.T) {
+			got, err := db.GetUsersInGroup(tt2.args.redminegroupid)
+			if err != nil {
+				t.Errorf("error in database api: %v", err)
+			}
+			if len(got) != len(tt2.want) {
+				t.Errorf("wrong length answer, %d != %d", len(got), len(tt2.want))
+			}
+			for i := range tt2.want {
+				if tt2.want[i] != got[i] {
+					t.Errorf("wrong data back, %v != %v", got[i], tt2.want[i])
 				}
 			}
 		})
