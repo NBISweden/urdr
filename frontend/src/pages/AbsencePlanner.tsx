@@ -158,11 +158,17 @@ export const AbsencePlanner = () => {
     return allRemoved;
   };
 
-  const onUpdateAbsenceRanges = async (oldEntryIds: number[]) => {
+  const onUpdateAbsenceRanges = async (
+    oldEntryIds: number[],
+    oldStartDate: Date,
+    oldEndDate: Date
+  ) => {
     const selection: { choice: boolean; startDate: Date; endDate: Date } =
       await selectDates({
         title: "Change your absence period",
         confirmButtonLabel: "Update",
+        startDate: oldStartDate,
+        endDate: oldEndDate,
       });
     if (!selection.choice) {
       return;
@@ -175,6 +181,19 @@ export const AbsencePlanner = () => {
             timeout: 10000,
             message:
               "Please fill in both the starting and end date of your absence",
+          },
+        ]);
+      } else if (
+        selection.startDate.getTime() &&
+        selection.endDate.getTime() &&
+        selection.endDate < selection.startDate
+      ) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message: "Invalid reporting period date ranges",
           },
         ]);
       } else {
@@ -754,7 +773,11 @@ export const AbsencePlanner = () => {
                       <button
                         onClick={() => {
                           toggleLoadingPage(true);
-                          onUpdateAbsenceRanges(element.entryIds);
+                          onUpdateAbsenceRanges(
+                            element.entryIds,
+                            element.startDate,
+                            element.endDate
+                          );
                           toggleLoadingPage(false);
                         }}
                         className="edit-range-button"

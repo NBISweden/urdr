@@ -74,6 +74,8 @@ export const EditPeriodDialogProvider = ({ children }) => {
     (forwarded) => {
       return new Promise((resolve) => {
         setState({ ...forwarded, isOpen: true });
+        setUpdatedAbsenceStartDate(forwarded.startDate);
+        setUpdatedAbsenceEndDate(forwarded.endDate);
         handlerFunction.current = (selection: {
           choice: boolean;
           startDate: Date;
@@ -87,25 +89,23 @@ export const EditPeriodDialogProvider = ({ children }) => {
     [setState]
   );
 
+  const onChoiceMade = (choice: boolean) => {
+    handlerFunction.current({
+      choice: choice,
+      startDate: updatedAbsenceStartDate,
+      endDate: updatedAbsenceEndDate,
+    });
+    setUpdatedAbsenceStartDate(undefined);
+    setUpdatedAbsenceEndDate(undefined);
+  };
+
   return (
     <EditPeriodDialog.Provider value={selectDates}>
       {children}
       <ModalDialog
         {...state}
-        onCancel={() =>
-          handlerFunction.current({
-            choice: false,
-            startDate: updatedAbsenceStartDate,
-            endDate: updatedAbsenceEndDate,
-          })
-        }
-        onConfirm={() =>
-          handlerFunction.current({
-            choice: true,
-            startDate: updatedAbsenceStartDate,
-            endDate: updatedAbsenceEndDate,
-          })
-        }
+        onCancel={() => onChoiceMade(false)}
+        onConfirm={() => onChoiceMade(true)}
       >
         {UpdateAbsenceRangesContainer()}
       </ModalDialog>
