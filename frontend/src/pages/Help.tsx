@@ -225,7 +225,7 @@ export const Help = () => {
           In the absence periods table you can visualise the periods you have
           reported between one month ago and one year later from the current
           day. You may also edit or delete these ranges by clicking on the
-          pencil or trash buttons respectively.
+          pencil or trash can buttons respectively.
         </p>
         <h2 className="help-subtitle">The yearly overview</h2>
         <p className="help-info">
