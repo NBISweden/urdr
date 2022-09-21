@@ -651,18 +651,21 @@ export const AbsencePlanner = () => {
     }
   };
 
-  const isDayEnabled = (date: Date) => {
-    return (
-      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
-    );
-  };
+  // This function can be used to grey out weekends and dates with entries in the date picker.
+  // It causes bad user experience though, invalid dates just disappear.
+  // We need to find a solution for better user feedback before enabling it again.
+  // const isDayEnabled = (date: Date) => {
+  //   return (
+  //     !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
+  //   );
+  // };
 
   const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
     <DatePicker
       id="from-date"
-      filterDate={isDayEnabled}
+      // filterDate={isDayEnabled} we need to improve user experience
       dateFormat={dateFormat}
       selected={startDate ? startDate : undefined}
       onChange={(date: Date) => setStartDate(date)}
@@ -685,7 +688,7 @@ export const AbsencePlanner = () => {
   const ToDatePicker = () => (
     <DatePicker
       id="to-date"
-      filterDate={isDayEnabled}
+      // filterDate={isDayEnabled} we need to improve user experience
       dateFormat={dateFormat}
       selected={endDate ? endDate : undefined}
       onChange={(date: Date) => setEndDate(date)}
