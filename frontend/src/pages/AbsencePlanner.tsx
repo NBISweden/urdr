@@ -668,7 +668,7 @@ export const AbsencePlanner = () => {
       onChange={(date: Date) => setStartDate(date)}
       showWeekNumbers
       minDate={new Date()}
-      maxDate={new Date("2030-01-01")}
+      maxDate={new Date(`January 1, ${new Date().getFullYear() + 10}`)}
       locale={sv}
       showYearDropdown
       todayButton="Idag"
@@ -677,6 +677,7 @@ export const AbsencePlanner = () => {
       endDate={endDate}
       monthsShown={2}
       className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
       strictParsing
     />
   );
@@ -690,7 +691,9 @@ export const AbsencePlanner = () => {
       onChange={(date: Date) => setEndDate(date)}
       showWeekNumbers
       minDate={startDate}
-      maxDate={new Date("2030-01-01")}
+      maxDate={
+        startDate && new Date(`January 1, ${startDate.getFullYear() + 10}`)
+      }
       locale={sv}
       showYearDropdown
       todayButton="Idag"
@@ -699,6 +702,7 @@ export const AbsencePlanner = () => {
       endDate={endDate}
       monthsShown={2}
       className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
       strictParsing
     />
   );
