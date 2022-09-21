@@ -82,11 +82,18 @@ func TestUserGroups(t *testing.T) {
 		want []int
 	}{
 		{
-			name: "Get all users in group 1",
+			name: "get all users in group 1",
 			args: struct{ redminegroupid int }{
 				redminegroupid: 1,
 			},
 			want: []int{1, 2},
+		},
+		{
+			name: "get all users in non-existing group",
+			args: struct{ redminegroupid int }{
+				redminegroupid: 0,
+			},
+			want: nil,
 		},
 	}
 
