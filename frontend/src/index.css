@@ -2,6 +2,19 @@
   box-sizing: border-box;
 }
 
+/* This class can be used to hide things visually 
+but still make them accessible for assistive technology*/
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
 /* INCLUDING FONT "LATO" LOCALLY */
 
 /* Lato Light */
@@ -993,11 +1006,11 @@ tr:last-of-type td {
   pointer-events: none;
 }
 
-.trash-button,
-.edit-range-button {
+.table-button {
   border: none;
   background: none;
   cursor: pointer;
+  margin-right: 0.5rem;
 }
 
 .apply-dates-button {

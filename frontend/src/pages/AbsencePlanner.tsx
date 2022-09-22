@@ -744,55 +744,56 @@ export const AbsencePlanner = () => {
           <div className="calendar-box">
             {tableData.length > 0 ? (
               <table>
-                {/*The empty heading tags make the top border go all the way out*/}
-                <tr>
-                  <th></th>
-                  <th></th>
-                  <th>Start date</th>
-                  <th>End date</th>
-                </tr>
-                {tableData.map((element, index) => {
-                  return (
-                    <tr key={index.toString()}>
-                      <td>
-                        <button
-                          onClick={() => {
-                            toggleLoadingPage(true);
-                            onUpdateAbsenceRanges(
-                              element.entryIds,
-                              new Date("2023-01-03"),
-                              new Date("2023-01-03")
-                            );
-                            toggleLoadingPage(false);
-                          }}
-                          className="edit-range-button"
-                        >
-                          <img
-                            src={pencil}
-                            className="table-icon"
-                            alt="pencil to edit"
-                          />
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => {
-                            onRemoveEntriesButton(element.entryIds);
-                          }}
-                          className="trash-button"
-                        >
-                          <img
-                            src={trash}
-                            className="table-icon"
-                            alt="trash icon to delete"
-                          />
-                        </button>
-                      </td>
-                      <td>{formatDate(element.startDate, dateFormat)}</td>
-                      <td>{formatDate(element.endDate, dateFormat)}</td>
-                    </tr>
-                  );
-                })}
+                <tbody>
+                  {/*The empty heading tags make the top border go all the way out*/}
+                  <tr>
+                    <th>
+                      <span className="visually-hidden">Buttons</span>
+                    </th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                  </tr>
+                  {tableData.map((element, index) => {
+                    return (
+                      <tr key={index.toString()}>
+                        <td>
+                          <button
+                            onClick={() => {
+                              toggleLoadingPage(true);
+                              onUpdateAbsenceRanges(
+                                element.entryIds,
+                                new Date("2023-01-03"),
+                                new Date("2023-01-03")
+                              );
+                              toggleLoadingPage(false);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={pencil}
+                              className="table-icon"
+                              alt="pencil to edit"
+                            />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onRemoveEntriesButton(element.entryIds);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={trash}
+                              className="table-icon"
+                              alt="trash icon to delete"
+                            />
+                          </button>
+                        </td>
+                        <td>{formatDate(element.startDate, dateFormat)}</td>
+                        <td>{formatDate(element.endDate, dateFormat)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
               </table>
             ) : (
               <> </>
