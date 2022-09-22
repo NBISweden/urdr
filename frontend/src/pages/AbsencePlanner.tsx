@@ -592,6 +592,26 @@ export const AbsencePlanner = () => {
             "Please fill in both the starting and end date of your absence",
         },
       ]);
+    } else if (startDate < new Date()) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "Please choose a start date that is not in the past.",
+        },
+      ]);
+    } else if (
+      endDate > new Date(`January 1, ${startDate.getFullYear() + 10}`)
+    ) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "You can't plan absence more than 10 years ahead.",
+        },
+      ]);
     } else if (
       startDate.getTime() &&
       endDate.getTime() &&
@@ -686,8 +706,6 @@ export const AbsencePlanner = () => {
         document.getElementById("toDate").focus();
       }}
       showWeekNumbers
-      minDate={new Date()}
-      maxDate={new Date(`January 1, ${new Date().getFullYear() + 10}`)}
       locale={sv}
       showYearDropdown
       todayButton="Idag"
@@ -712,10 +730,6 @@ export const AbsencePlanner = () => {
         document.getElementById("addAbsence").focus();
       }}
       showWeekNumbers
-      minDate={startDate}
-      maxDate={
-        startDate && new Date(`January 1, ${startDate.getFullYear() + 10}`)
-      }
       locale={sv}
       showYearDropdown
       todayButton="Idag"
