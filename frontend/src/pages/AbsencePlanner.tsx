@@ -651,9 +651,10 @@ export const AbsencePlanner = () => {
     }
   };
 
-  // This function can be used to grey out weekends and dates with entries in the date picker.
-  // It causes bad user experience though, invalid dates just disappear.
+  // This function can be used to grey out weekends and days with time entries in the date picker.
+  // It causes bad user experience though, invalid dates just disappear when users type input manually.
   // We need to find a solution for better user feedback before enabling it again.
+
   // const isDayEnabled = (date: Date) => {
   //   return (
   //     !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
@@ -664,11 +665,14 @@ export const AbsencePlanner = () => {
 
   const FromDatePicker = () => (
     <DatePicker
-      id="from-date"
+      id="fromDate"
       // filterDate={isDayEnabled} we need to improve user experience
       dateFormat={dateFormat}
       selected={startDate ? startDate : undefined}
-      onChange={(date: Date) => setStartDate(date)}
+      onChange={(date: Date) => {
+        setStartDate(date);
+        document.getElementById("toDate").focus();
+      }}
       showWeekNumbers
       minDate={new Date()}
       maxDate={new Date(`January 1, ${new Date().getFullYear() + 10}`)}
@@ -687,11 +691,14 @@ export const AbsencePlanner = () => {
 
   const ToDatePicker = () => (
     <DatePicker
-      id="to-date"
+      id="toDate"
       // filterDate={isDayEnabled} we need to improve user experience
       dateFormat={dateFormat}
       selected={endDate ? endDate : undefined}
-      onChange={(date: Date) => setEndDate(date)}
+      onChange={(date: Date) => {
+        setEndDate(date);
+        document.getElementById("addAbsence").focus();
+      }}
       showWeekNumbers
       minDate={startDate}
       maxDate={
@@ -802,7 +809,7 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence-row">
               <div className="date-box">
-                <label htmlFor="from-date" className="date-label">
+                <label htmlFor="fromDate" className="date-label">
                   Start date
                 </label>
                 <FromDatePicker />
@@ -815,7 +822,7 @@ export const AbsencePlanner = () => {
                 </div>
               </div>
               <div className="date-box">
-                <label htmlFor="to-date" className="date-label">
+                <label htmlFor="toDate" className="date-label">
                   End date
                 </label>
                 <ToDatePicker />
@@ -830,6 +837,7 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence">
               <button
+                id="addAbsence"
                 className="add-absence-button"
                 title="Apply selected dates"
                 onClick={() => validateDates()}
