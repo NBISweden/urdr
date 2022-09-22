@@ -2,8 +2,8 @@
   box-sizing: border-box;
 }
 
-/* This class can be used to hide things visually 
-but still make them accessible for assistive technology*/
+/* This class can be used to hide things visually
+but still make them accessible for assistive technology */
 .visually-hidden {
   position: absolute;
   overflow: hidden;
