@@ -1,5 +1,5 @@
 import "../index.css";
-import React, { useState, useRef } from "react";
+import React, { useState, forwardRef } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
 import {
@@ -30,6 +30,7 @@ import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { useConfirm } from "../components/ConfirmDialogProvider";
 import { useSelectDates } from "../components/EditPeriodDialogProvider";
+import calender from "../icons/calendar-week-white.svg";
 
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
@@ -557,7 +558,7 @@ export const AbsencePlanner = () => {
     const dates_interval: Interval = { start: frDate, end: toDate };
     const all_days = eachDayOfInterval(dates_interval);
     let reportable_days = all_days.slice();
-    reportable_days = reportable_days.filter((date) => isWeekday(date));
+    reportable_days = reportable_days.filter((date) => isDayEnabled(date));
     return reportable_days;
   };
 
@@ -591,6 +592,26 @@ export const AbsencePlanner = () => {
             "Please fill in both the starting and end date of your absence",
         },
       ]);
+    } else if (startDate < new Date()) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "Please choose a start date that is not in the past.",
+        },
+      ]);
+    } else if (
+      endDate > new Date(`January 1, ${startDate.getFullYear() + 10}`)
+    ) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "You can't plan absence more than 10 years ahead.",
+        },
+      ]);
     } else if (
       startDate.getTime() &&
       endDate.getTime() &&
@@ -612,6 +633,18 @@ export const AbsencePlanner = () => {
         return;
       }
       const reportable_days = getReportableDays(startDate, endDate);
+      if (reportable_days.length === 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Choose at least one day without any reported time that is not on a weekend.",
+          },
+        ]);
+        return;
+      }
       toggleLoadingPage(true);
       const allReported = await reportAbsenceTime(reportable_days);
       toggleLoadingPage(false);
@@ -650,6 +683,10 @@ export const AbsencePlanner = () => {
     }
   };
 
+  // This function can be used to grey out weekends and days with time entries in the date picker.
+  // It causes bad user experience though, invalid dates just disappear when users type input manually.
+  // We need to find a solution for better user feedback before enabling it again for that use case.
+
   const isDayEnabled = (date: Date) => {
     return (
       !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
@@ -659,47 +696,51 @@ export const AbsencePlanner = () => {
   const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
-    <div>
-      <DatePicker
-        filterDate={isDayEnabled}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={startDate ? startDate : undefined}
-        onChange={(date: Date) => setStartDate(date)}
-        showWeekNumbers
-        minDate={new Date()}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsStart
-        startDate={startDate}
-        endDate={endDate}
-        monthsShown={2}
-      />
-    </div>
+    <DatePicker
+      id="fromDate"
+      // filterDate={isDayEnabled} we need to improve user experience
+      dateFormat={dateFormat}
+      selected={startDate ? startDate : undefined}
+      onChange={(date: Date) => {
+        setStartDate(date);
+        document.getElementById("toDate").focus();
+      }}
+      showWeekNumbers
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsStart
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+      className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
+      strictParsing
+    />
   );
 
   const ToDatePicker = () => (
-    <div>
-      <DatePicker
-        filterDate={isDayEnabled}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={endDate ? endDate : undefined}
-        onChange={(date: Date) => setEndDate(date)}
-        showWeekNumbers
-        minDate={startDate}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsEnd
-        startDate={startDate}
-        endDate={endDate}
-        monthsShown={2}
-      />
-    </div>
+    <DatePicker
+      id="toDate"
+      // filterDate={isDayEnabled} we need to improve user experience
+      dateFormat={dateFormat}
+      selected={endDate ? endDate : undefined}
+      onChange={(date: Date) => {
+        setEndDate(date);
+        document.getElementById("addAbsence").focus();
+      }}
+      showWeekNumbers
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsEnd
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+      className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
+      strictParsing
+    />
   );
 
   return (
@@ -724,93 +765,117 @@ export const AbsencePlanner = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-        <div className="absence-plan-dates-wrapper">
-          <div className="absence-plan-container">
-            <label
-              htmlFor="absence-plan-picker"
-              className="absence-plan-picker-label"
-            >
-              From:
-            </label>
-            <FromDatePicker />
+        <h2 className="planned-absence-heading">Planned absence periods</h2>
+        <div className="planned-absence">
+          <div className="calendar-box">
+            {tableData.length > 0 ? (
+              <table>
+                <tbody>
+                  {/*The empty heading tags make the top border go all the way out*/}
+                  <tr>
+                    <th>
+                      <span className="visually-hidden">Buttons</span>
+                    </th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                  </tr>
+                  {tableData.map((element, index) => {
+                    return (
+                      <tr key={index.toString()}>
+                        <td>
+                          <button
+                            onClick={() => {
+                              toggleLoadingPage(true);
+                              onUpdateAbsenceRanges(
+                                element.entryIds,
+                                new Date("2023-01-03"),
+                                new Date("2023-01-03")
+                              );
+                              toggleLoadingPage(false);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={pencil}
+                              className="table-icon"
+                              alt="pencil to edit"
+                            />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onRemoveEntriesButton(element.entryIds);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={trash}
+                              className="table-icon"
+                              alt="trash icon to delete"
+                            />
+                          </button>
+                        </td>
+                        <td>{formatDate(element.startDate, dateFormat)}</td>
+                        <td>{formatDate(element.endDate, dateFormat)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <>
+                <p>You don't have any planned absence periods.</p>
+              </>
+            )}
           </div>
-          <div className="absence-plan-container">
-            <label
-              htmlFor="absence-plan-picker"
-              className="absence-plan-picker-label"
-            >
-              To:
-            </label>
-            <ToDatePicker />
-          </div>
-          <div className="absence-plan-container">
-            <button
-              type="button"
-              className="basic-button apply-dates-button"
-              title="Apply selected dates"
-              onClick={() => validateDates()}
-            >
-              Submit
-            </button>
+          <div className="add-absence-box">
+            <div className="add-absence-row">
+              <p>
+                To add an absence period, enter a start and end date. Urdr will
+                report eight hours of absence for each work day during that
+                period. You can only use this feature, if you haven't reported
+                any time during that period yet.
+              </p>
+            </div>
+            <div className="add-absence-row">
+              <div className="date-box">
+                <label htmlFor="fromDate" className="date-label">
+                  Start date
+                </label>
+                <FromDatePicker />
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
+                </div>
+              </div>
+              <div className="date-box">
+                <label htmlFor="toDate" className="date-label">
+                  End date
+                </label>
+                <ToDatePicker />
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="add-absence">
+              <button
+                id="addAbsence"
+                className="add-absence-button"
+                title="Apply selected dates"
+                onClick={() => validateDates()}
+              >
+                Add absence
+              </button>
+            </div>
           </div>
         </div>
-        {tableData.length > 0 ? (
-          <div className="table-wrapper">
-            <table>
-              {/*The empty heading tags make the top border go all the way out*/}
-              <tr>
-                <th>Start date</th>
-                <th>End date</th>
-                <th></th>
-                <th></th>
-              </tr>
-              {tableData.map((element, index) => {
-                return (
-                  <tr key={index.toString()}>
-                    <td>{formatDate(element.startDate, dateFormat)}</td>
-                    <td>{formatDate(element.endDate, dateFormat)}</td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          toggleLoadingPage(true);
-                          onUpdateAbsenceRanges(
-                            element.entryIds,
-                            element.startDate,
-                            element.endDate
-                          );
-                          toggleLoadingPage(false);
-                        }}
-                        className="edit-range-button"
-                      >
-                        <img
-                          src={pencil}
-                          className="table-icon"
-                          alt="pencil to edit"
-                        />
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => {
-                          onRemoveEntriesButton(element.entryIds);
-                        }}
-                        className="trash-button"
-                      >
-                        <img
-                          src={trash}
-                          className="table-icon"
-                          alt="trash icon to delete"
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </table>
-          </div>
-        ) : (
-          <> </>
-        )}
         <h4>Reported absence</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>

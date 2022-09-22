@@ -2,6 +2,19 @@
   box-sizing: border-box;
 }
 
+/* This class can be used to hide things visually
+but still make them accessible for assistive technology */
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
 /* INCLUDING FONT "LATO" LOCALLY */
 
 /* Lato Light */
@@ -111,6 +124,10 @@ Other button classes are defined further down together with other classes for th
 
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
+.react-datepicker {
+  width: min-content;
+}
+
 .react-datepicker__week .react-datepicker__day--selected {
   background-color: hsl(76deg 55% 53%);
 }
@@ -879,13 +896,72 @@ Other button classes are defined further down together with other classes for th
   margin: 3rem;
 }
 
-.table-wrapper {
-  padding: 1.5rem 0;
+.planned-absence {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem 0;
+}
+
+.calendar-box {
+  max-width: 50%;
+  flex-grow: 5;
+}
+
+.add-absence-box {
+  max-width: 40%;
+  flex-grow: 1;
+}
+
+.add-absence-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-box {
+  width: 45%;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .planned-absence,
+  .add-absence-row {
+    flex-direction: column;
+  }
+
+  .calendar-box,
+  .add-absence-box {
+    max-width: 100%;
+  }
+
+  .date-box {
+    width: 100%;
+  }
+}
+
+.planned-absence-heading {
+  padding-top: 2rem;
+  font-weight: 700;
+}
+
+.add-absence {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  padding: 2rem 0;
+}
+
+.add-absence-button {
+  background-color: hsl(288deg 46% 22%);
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.25rem 1rem;
 }
 
 table {
   border-collapse: collapse;
-  width: 70%;
+  width: 100%;
 }
 
 td {
@@ -920,11 +996,25 @@ tr:last-of-type td {
   width: 1.25rem;
 }
 
-.trash-button,
-.edit-range-button {
+.calender {
+  color: white;
+}
+
+.cal-wrapper {
+  background-color: hsl(185deg 92% 11%);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.table-button {
   border: none;
   background: none;
   cursor: pointer;
+  margin-right: 0.5rem;
 }
 
 .apply-dates-button {
