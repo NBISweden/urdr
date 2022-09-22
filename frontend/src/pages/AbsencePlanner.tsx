@@ -558,7 +558,7 @@ export const AbsencePlanner = () => {
     const dates_interval: Interval = { start: frDate, end: toDate };
     const all_days = eachDayOfInterval(dates_interval);
     let reportable_days = all_days.slice();
-    reportable_days = reportable_days.filter((date) => isWeekday(date));
+    reportable_days = reportable_days.filter((date) => isDayEnabled(date));
     return reportable_days;
   };
 
@@ -613,6 +613,18 @@ export const AbsencePlanner = () => {
         return;
       }
       const reportable_days = getReportableDays(startDate, endDate);
+      if (reportable_days.length === 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Choose at least one day without any reported time that is not on a weekend.",
+          },
+        ]);
+        return;
+      }
       toggleLoadingPage(true);
       const allReported = await reportAbsenceTime(reportable_days);
       toggleLoadingPage(false);
@@ -653,13 +665,13 @@ export const AbsencePlanner = () => {
 
   // This function can be used to grey out weekends and days with time entries in the date picker.
   // It causes bad user experience though, invalid dates just disappear when users type input manually.
-  // We need to find a solution for better user feedback before enabling it again.
+  // We need to find a solution for better user feedback before enabling it again for that use case.
 
-  // const isDayEnabled = (date: Date) => {
-  //   return (
-  //     !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
-  //   );
-  // };
+  const isDayEnabled = (date: Date) => {
+    return (
+      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
+    );
+  };
 
   const context = React.useContext(AuthContext);
 
