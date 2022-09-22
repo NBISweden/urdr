@@ -822,7 +822,9 @@ export const AbsencePlanner = () => {
                 </tbody>
               </table>
             ) : (
-              <> </>
+              <>
+                <p>You don't have any planned absence periods.</p>
+              </>
             )}
           </div>
           <div className="add-absence-box">
