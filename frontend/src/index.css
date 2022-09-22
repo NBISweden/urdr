@@ -922,7 +922,7 @@ Other button classes are defined further down together with other classes for th
   position: relative;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .planned-absence,
   .add-absence-row {
     flex-direction: column;
