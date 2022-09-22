@@ -25,7 +25,7 @@ import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
-import { Chart } from "react-google-charts";
+//import { Chart } from "react-google-charts";
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { useConfirm } from "../components/ConfirmDialogProvider";
@@ -524,7 +524,7 @@ export const AbsencePlanner = () => {
       toggleLoadingPage(false);
     };
     fetchTimeEntriesForUser();
-    fetchTimeEntriesFromGroups();
+    //fetchTimeEntriesFromGroups();
   }, [selectedGroup, reloadPage]);
 
   const getAbsenceTimeEntries = async (
@@ -874,6 +874,7 @@ export const AbsencePlanner = () => {
             </div>
           </div>
         </div>
+        {/*
         <h4>Reported absence</h4>
         <div className="group-select-wrapper">
           <span> Filter by group: </span>
@@ -912,6 +913,7 @@ export const AbsencePlanner = () => {
             <p>No absence entries were found</p>
           )}
         </div>
+        */}
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
