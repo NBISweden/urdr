@@ -688,9 +688,7 @@ export const AbsencePlanner = () => {
   // We need to find a solution for better user feedback before enabling it again for that use case.
 
   const isDayEnabled = (date: Date) => {
-    return (
-      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
-    );
+    return isWeekday(date);
   };
 
   const context = React.useContext(AuthContext);
@@ -788,8 +786,8 @@ export const AbsencePlanner = () => {
                               toggleLoadingPage(true);
                               onUpdateAbsenceRanges(
                                 element.entryIds,
-                                new Date("2023-01-03"),
-                                new Date("2023-01-03")
+                                element.startDate,
+                                element.endDate
                               );
                               toggleLoadingPage(false);
                             }}
