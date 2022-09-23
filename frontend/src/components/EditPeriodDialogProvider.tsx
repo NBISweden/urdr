@@ -27,7 +27,10 @@ export const EditPeriodDialogProvider = ({ children }) => {
   const UpdateAbsenceRangesContainer = (): JSX.Element => (
     <div>
       <p>Please enter below the new start and end date of your absence.</p>
-      <p>From</p>
+      <hr></hr>
+      <label htmlFor="fromDate" className="date-label">
+        Start date
+      </label>
       <DatePicker
         filterDate={isWeekday}
         dateFormat={dateFormat}
@@ -46,8 +49,12 @@ export const EditPeriodDialogProvider = ({ children }) => {
         startDate={updatedAbsenceStartDate}
         endDate={updatedAbsenceEndDate}
         monthsShown={1}
+        placeholderText="YYYY-MM-DD"
+        strictParsing
       />
-      <p>To</p>
+      <label htmlFor="toDate" className="date-label">
+        End date
+      </label>
       <DatePicker
         filterDate={isWeekday}
         dateFormat={dateFormat}
@@ -66,6 +73,8 @@ export const EditPeriodDialogProvider = ({ children }) => {
         startDate={updatedAbsenceStartDate}
         endDate={updatedAbsenceEndDate}
         monthsShown={1}
+        placeholderText="YYYY-MM-DD"
+        strictParsing
       />
     </div>
   );
