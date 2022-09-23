@@ -2,6 +2,19 @@
   box-sizing: border-box;
 }
 
+/* This class can be used to hide things visually
+but still make them accessible for assistive technology */
+.visually-hidden {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}
+
 /* INCLUDING FONT "LATO" LOCALLY */
 
 /* Lato Light */
@@ -111,6 +124,10 @@ Other button classes are defined further down together with other classes for th
 
 /* The following classes overwrite styling of the datepicker library */
 /* stylelint-disable selector-class-pattern */
+.react-datepicker {
+  width: min-content;
+}
+
 .react-datepicker__week .react-datepicker__day--selected {
   background-color: hsl(76deg 55% 53%);
 }
@@ -177,20 +194,6 @@ Other button classes are defined further down together with other classes for th
     position: relative;
     z-index: 0;
   }
-}
-
-.input-label {
-  margin-left: 0.4rem;
-  margin-top: 0.5rem;
-}
-
-.select-label {
-  margin-left: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.footer-field {
-  margin-left: 1rem;
 }
 
 .header-year {
@@ -362,9 +365,10 @@ Other button classes are defined further down together with other classes for th
 
 .footer-container {
   margin-top: 0.2rem;
-  padding: 0.5rem 1rem;
+  padding: 1rem;
   background-color: hsl(0deg 0% 97%);
   display: flex;
+  align-items: flex-end;
 }
 
 .favorites-container {
@@ -438,28 +442,28 @@ Other button classes are defined further down together with other classes for th
 }
 
 .save-button {
-  margin: 1rem 2rem 2rem;
   min-width: 10rem;
   padding: 1rem 1.5rem;
 }
 
 .save-changes {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
   justify-content: end;
-  text-align: end;
+  width: 25%;
+  margin-left: 2rem;
 }
 
-.plus-button {
-  width: 4.5rem;
+.add-button {
   background-color: hsl(288deg 46% 22%);
-  margin-left: 1rem;
+  padding: 0 1rem;
+  height: 2rem;
+  min-width: 6rem;
 }
 
-.plus-button:hover {
+.add-button:hover {
   background-color: hsl(276deg 46% 16%);
-}
-
-.plus-button img {
-  width: 1.8rem;
 }
 
 .star-icon {
@@ -497,24 +501,36 @@ Other button classes are defined further down together with other classes for th
   height: 2rem;
 }
 
+.quick-add-wrapper {
+  width: 75%;
+}
+
+.quick-add {
+  align-items: flex-end;
+  display: flex;
+}
+
 .quick-add-input {
-  padding: 0.5rem 0.75rem;
-  margin: 0 0 0 3.75rem;
+  width: 100%;
+  height: 2rem;
+}
+
+.quick-add label {
+  color: hsl(276deg 46% 16%);
+}
+
+.quick-add-input-wrapper {
+  position: relative;
+  width: 33%;
+  padding-right: 0.5rem;
 }
 
 .autocomplete-container {
   max-height: 10rem;
-  margin-left: -3.2em;
-  margin-top: 0.6em;
+  padding: 0;
   list-style-type: none;
   overflow-y: auto;
-  z-index: 1;
-}
-
-.autocomplete-item {
-  padding: 0 0 0 24px;
-  width: 100%;
-  box-sizing: border-box;
+  width: 66%;
 }
 
 .autocomplete-button {
@@ -522,7 +538,7 @@ Other button classes are defined further down together with other classes for th
   width: 100%;
   text-align: left;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
 }
 
 .autocomplete-button:focus {
@@ -535,6 +551,36 @@ Other button classes are defined further down together with other classes for th
   outline: none;
 }
 
+@media (max-width: 700px) {
+  .footer-container,
+  .quick-add {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .quick-add-wrapper {
+    width: 100%;
+  }
+
+  .quick-add-input-wrapper {
+    width: 100%;
+  }
+
+  .save-changes {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .add-button {
+    margin: 0.5rem 0 1rem;
+  }
+
+  .autocomplete-container {
+    width: 100%;
+  }
+}
+
 .invalid {
   border: 2px solid hsl(17deg 91% 31%);
 }
@@ -544,20 +590,21 @@ Other button classes are defined further down together with other classes for th
 }
 
 .validation-icon {
-  width: 3.5rem;
-  margin-left: -3.8rem;
+  position: absolute;
+  height: 2rem;
+  right: 1rem;
 }
 
-.hiden {
+.hidden {
   visibility: hidden;
 }
 
 /* The unsaved changes alert message box */
-.unsaved-alert-p {
+.unsaved-alert {
   color: hsl(26deg 91% 42%); /* Red */
-  margin-right: 2rem;
-  text-align: right;
   min-height: 2rem;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .comment-container {
@@ -778,12 +825,6 @@ Other button classes are defined further down together with other classes for th
   width: 0.7rem;
 }
 
-@media (max-width: 992px) {
-  .hidden {
-    visibility: hidden;
-  }
-}
-
 .row-focused {
   background-color: hsl(186deg 30% 94%);
 }
@@ -841,17 +882,139 @@ Other button classes are defined further down together with other classes for th
   overflow: hidden;
 }
 
-.vacation-plan-picker-label {
+.absence-plan-picker-label {
   margin: 0 0 0.1rem;
 }
 
-.vacation-plan-dates-wrapper {
+.absence-plan-dates-wrapper {
   display: flex;
   margin-right: 2rem;
+  align-items: center;
 }
 
-.vacation-plan-container {
+.absence-plan-container {
   margin: 3rem;
+}
+
+.planned-absence {
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem 0;
+}
+
+.calendar-box {
+  max-width: 50%;
+  flex-grow: 5;
+}
+
+.add-absence-box {
+  max-width: 40%;
+  flex-grow: 1;
+}
+
+.add-absence-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-box {
+  width: 45%;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .planned-absence,
+  .add-absence-row {
+    flex-direction: column;
+  }
+
+  .calendar-box,
+  .add-absence-box {
+    max-width: 100%;
+  }
+
+  .date-box {
+    width: 100%;
+  }
+}
+
+.planned-absence-heading {
+  padding-top: 2rem;
+  font-weight: 700;
+}
+
+.add-absence {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+  padding: 2rem 0;
+}
+
+.add-absence-button {
+  background-color: hsl(288deg 46% 22%);
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.25rem 1rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td {
+  border: none;
+  text-align: left;
+  padding: 8px;
+}
+
+th {
+  border-top: 1px solid hsl(0deg 0% 90%);
+  text-align: left;
+  padding: 8px;
+  background-color: hsl(185deg 92% 20%);
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: hsl(186deg 30% 94%);
+}
+
+tr:last-of-type td {
+  border-bottom: 1px solid hsl(0deg 0% 90%);
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.table-icon {
+  width: 1.25rem;
+}
+
+.calender {
+  color: white;
+}
+
+.cal-wrapper {
+  background-color: hsl(185deg 92% 11%);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.table-button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-right: 0.5rem;
 }
 
 .apply-dates-button {
@@ -862,4 +1025,74 @@ Other button classes are defined further down together with other classes for th
 .group-select-wrapper {
   margin-top: 2rem;
   margin-bottom: 3rem;
+}
+
+/* ModalDialog styles */
+
+.modal-overlay {
+  width: 100%;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: -0.2rem;
+  background-color: hsla(0, 0%, 0%, 0.5);
+  z-index: 1;
+}
+
+.modal-wrapper {
+  background-color: white;
+  color: hsl(185deg 92% 11%);
+  height: fit-content;
+  width: fit-content;
+  max-width: 90%;
+  margin: 0 auto;
+  position: absolute;
+  top: 25%;
+  left: 0;
+  right: 0;
+  border-radius: 4px;
+}
+
+.modal-title-wrapper {
+  background-color: hsl(70deg 55% 98%);
+  border-bottom: 1px solid hsl(76deg 55% 77%);
+  padding: 1.5rem 1.5rem 0.2rem;
+  border-radius: 4px 4px 0 0;
+}
+
+.modal-content-wrapper {
+  padding: 1rem 1.5rem;
+}
+
+.modal-content-wrapper p {
+  margin: 0;
+}
+
+.modal-buttons-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-radius: 0 0 4px 4px;
+}
+
+.modal-confirm-button {
+  background-color: hsl(185deg 92% 16%);
+  padding: 0.2rem 1rem;
+  margin: 0.25rem;
+}
+
+.modal-confirm-button:hover {
+  background-color: hsl(185deg 92% 11%);
+}
+
+.modal-cancel-button {
+  border: 2px solid hsl(187deg 29% 94%);
+  background-color: white;
+  color: hsl(185deg 92% 11%);
+  padding: 0.2rem 0.5rem;
+  margin: 0.25rem;
+}
+
+.modal-cancel-button:hover {
+  background-color: hsl(187deg 29% 94%);
 }

@@ -1,0 +1,925 @@
+import "../index.css";
+import React, { useState, forwardRef } from "react";
+import { AuthContext } from "../components/AuthProvider";
+import { Toast } from "../components/Toast";
+import {
+  ToastMsg,
+  TimeEntry,
+  IssueActivityPair,
+  FetchedTimeEntry,
+  Issue,
+  IdName,
+} from "../model";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import sv from "date-fns/locale/sv";
+import {
+  reportTime,
+  dateFormat,
+  isWeekday,
+  getTimeEntries,
+  getUsersInGroups,
+  getGroups,
+} from "../utils";
+import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
+import LoadingOverlay from "react-loading-overlay-ts";
+import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { HeaderUser } from "../components/HeaderUser";
+//import { Chart } from "react-google-charts";
+import trash from "../icons/trash.svg";
+import pencil from "../icons/pencil.svg";
+import { useConfirm } from "../components/ConfirmDialogProvider";
+import { useSelectDates } from "../components/EditPeriodDialogProvider";
+import calender from "../icons/calendar-week-white.svg";
+
+export const AbsencePlanner = () => {
+  const [startDate, setStartDate] = useState<Date>(undefined);
+  const [endDate, setEndDate] = useState<Date>(undefined);
+  const [toastList, setToastList] = useState<ToastMsg[]>([]);
+  const [absenceRows, setAbsenceRows] = useState<[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<{
+    id: number;
+    name: string;
+  }>(undefined);
+  const [redmineGroups, setRedmineGroups] = useState<[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [tableData, setTableData] = useState<
+    { startDate: Date; endDate: Date; userName: string; entryIds: number[] }[]
+  >([]);
+  const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [reportedDates, setReportedDates] = useState<string[]>([]);
+  const confirm: ({}) => any = useConfirm();
+  const selectDates: ({}) => any = useSelectDates();
+
+  let today = new Date();
+  const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
+  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
+
+  const timelineOptions = {
+    hAxis: {
+      minValue: absenceFrom,
+      maxValue: absenceTo,
+    },
+    avoidOverlappingGridLines: false,
+    colors: ["#BFD6D8"],
+    // This line makes the entire category's tooltip active.
+    focusTarget: "category",
+    // Use an HTML tooltip.
+    tooltip: { isHtml: true },
+    timeline: {
+      showRowLabels: true,
+      rowLabelStyle: {
+        fontName: "Lato",
+        fontSize: 17,
+      },
+      barLabelStyle: {
+        fontName: "Lato",
+        fontSize: 16,
+      },
+    },
+  };
+
+  const toggleLoadingPage = (state: boolean) => {
+    setIsLoading(state);
+  };
+
+  const handleCloseToast = (index: number) => {
+    const toasts = [...toastList];
+    toasts.splice(index, 1);
+    setToastList(toasts);
+    return;
+  };
+
+  const onAbsenceReportError = (error: any) => {
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: error.message,
+      },
+    ]);
+    return false;
+  };
+
+  const hasAlreadyReported = async (start_date: Date, end_date: Date) => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
+      start_date,
+      end_date,
+      context,
+      "me"
+    );
+    return myReportedEntries;
+  };
+
+  const getReportedEntryDates = async () => {
+    let myReportedEntries: FetchedTimeEntry[];
+    myReportedEntries = await getTimeEntries(
+      undefined,
+      absenceFrom,
+      absenceTo,
+      context,
+      "me"
+    );
+    let datesWithEntries: string[] = myReportedEntries.map(
+      (entry: FetchedTimeEntry) => {
+        return entry.spent_on;
+      }
+    );
+    let uniqueDates: string[] = datesWithEntries.filter((element, index) => {
+      return datesWithEntries.indexOf(element) === index;
+    });
+    return uniqueDates;
+  };
+
+  const onErrorRemovingEntries = (error: any) => {
+    setToastList([
+      ...toastList,
+      {
+        type: "warning",
+        timeout: 5000,
+        message: "Error deleting entries. " + error.message,
+      },
+    ]);
+    return false;
+  };
+
+  const removeTimeEntries = async (entryIds: number[]) => {
+    let allRemoved: boolean = true;
+    for await (let entryId of entryIds) {
+      let entry: TimeEntry = { id: entryId, hours: 0 };
+      const result = await reportTime(entry, onErrorRemovingEntries, context);
+      if (!result) {
+        allRemoved = false;
+      }
+    }
+    return allRemoved;
+  };
+
+  const onUpdateAbsenceRanges = async (
+    oldEntryIds: number[],
+    oldStartDate: Date,
+    oldEndDate: Date
+  ) => {
+    const selection: { choice: boolean; startDate: Date; endDate: Date } =
+      await selectDates({
+        title: "Change your absence period",
+        confirmButtonLabel: "Update",
+        startDate: oldStartDate,
+        endDate: oldEndDate,
+      });
+    if (!selection.choice) {
+      return;
+    } else {
+      if (!selection.startDate || !selection.endDate) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Please fill in both the starting and end date of your absence",
+          },
+        ]);
+      } else if (
+        selection.startDate.getTime() &&
+        selection.endDate.getTime() &&
+        selection.endDate < selection.startDate
+      ) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message: "Invalid reporting period date ranges",
+          },
+        ]);
+      } else {
+        const reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
+          selection.startDate,
+          selection.endDate
+        );
+        const filteredReportedEntries: FetchedTimeEntry[] =
+          reportedEntries.filter((entry: FetchedTimeEntry) => {
+            return !oldEntryIds.includes(entry.id);
+          });
+        if (filteredReportedEntries.length > 0) {
+          setToastList([
+            ...toastList,
+            {
+              type: "warning",
+              timeout: 8000,
+              message:
+                "The absence plan was not updated. Time has already been reported on this period",
+            },
+          ]);
+        } else {
+          const removedAll = await removeTimeEntries(oldEntryIds);
+          if (removedAll) {
+            const reportable_days = getReportableDays(
+              selection.startDate,
+              selection.endDate
+            );
+            const added = await reportAbsenceTime(reportable_days);
+            if (added) {
+              setToastList([
+                ...toastList,
+                {
+                  type: "info",
+                  timeout: 8000,
+                  message: "The absence period was successfully updated",
+                },
+              ]);
+            } else {
+              setToastList([
+                ...toastList,
+                {
+                  type: "warning",
+                  timeout: 8000,
+                  message:
+                    "Something went wrong! Your absence plan could not be updated",
+                },
+              ]);
+            }
+          }
+        }
+      }
+    }
+    setReloadPage(!reloadPage);
+  };
+
+  const onRemoveEntriesButton = async (entryIds: number[]) => {
+    // Open the dialog first, using the confirm function
+    const isConfirmed = await confirm({
+      title: "Deleting absence period",
+      content: "Do you really want to delete the whole absence period?",
+      confirmButtonLabel: "Yes",
+    });
+    // The confirm function will return a boolean indicating if the user aborts (false) or confirms (true)
+    if (!isConfirmed) {
+      return;
+    } else {
+      toggleLoadingPage(true);
+      const removed: boolean = await removeTimeEntries(entryIds);
+      if (removed) {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 8000,
+            message: "Absence period was successfully removed",
+          },
+        ]);
+      }
+      toggleLoadingPage(false);
+      setReloadPage(!reloadPage);
+      return;
+    }
+  };
+
+  const getAbsenceRanges = (entries: FetchedTimeEntry[]) => {
+    const absenceDates: {
+      dateRanges: { entryIds: number[]; dates: Date[] }[];
+      userName: string;
+    } = findConsecutiveDates(entries);
+    const absenceRanges: {
+      startDate: Date;
+      endDate: Date;
+      userName: string;
+      entryIds: number[];
+    }[] = absenceDates.dateRanges.map(
+      (range: { entryIds: number[]; dates: Date[] }) => {
+        if (range.dates.length === 1) {
+          let date = range.dates[range.dates.length - 1];
+          return {
+            startDate: date,
+            endDate: date,
+            userName: absenceDates.userName,
+            entryIds: range.entryIds,
+          };
+        } else if (range.dates.length > 1) {
+          let fromDate = range.dates[range.dates.length - 1];
+          let toDate = range.dates[0];
+          return {
+            startDate: fromDate,
+            endDate: toDate,
+            userName: absenceDates.userName,
+            entryIds: range.entryIds,
+          };
+        }
+      }
+    );
+    return absenceRanges;
+  };
+
+  const entryExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    entryId: number
+  ) => {
+    return entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.entryIds;
+      })
+      .flat()
+      .includes(entryId);
+  };
+
+  const dateExists = (
+    entryRanges: { entryIds: number[]; dates: Date[] }[],
+    targetDate: Date
+  ) => {
+    return entryRanges
+      .map((obj: { entryIds: number[]; dates: Date[] }) => {
+        return obj.dates;
+      })
+      .flat()
+      .find((date: Date) => date.getTime() === targetDate.getTime());
+  };
+
+  const areDatesConsecutive = (fDate: Date, tDate: Date) => {
+    let daysToNextReportableDay: number = fDate.getDay() === 5 ? 3 : 1;
+    return (
+      fDate.getTime() + 86400000 * daysToNextReportableDay - tDate.getTime() ===
+      0
+    );
+  };
+
+  const findConsecutiveDates = (entries: FetchedTimeEntry[]) => {
+    let rangesIndex: number = 0;
+    let userName: string | IdName = "";
+    const dateRanges: { entryIds: number[]; dates: Date[] }[] = entries.reduce(
+      (
+        entryRanges: { entryIds: number[]; dates: Date[] }[],
+        entry: FetchedTimeEntry,
+        index,
+        fetchedEntries: FetchedTimeEntry[]
+      ) => {
+        // Find out the last date we last appended to a range array
+        userName = entry.user.name ? entry.user.name : entry.user;
+
+        let lastInRange: Date = entryRanges[rangesIndex]
+          ? entryRanges[rangesIndex].dates.slice(-1).pop()
+          : undefined;
+        // Use the last appended date as toDate or first next iteration value (first)
+        const toDate = lastInRange ? lastInRange : new Date(entry.spent_on);
+        // Use next element in fetchedEntries as fromDate, and if it does not exist, use toDate
+        const fromDate = fetchedEntries[index + 1]
+          ? new Date(fetchedEntries[index + 1].spent_on)
+          : toDate;
+
+        let toEntryId: number = entry.id;
+        let fromEntryId: number = fetchedEntries[index + 1]
+          ? fetchedEntries[index + 1].id
+          : toEntryId;
+
+        // Initialise the entryRanges with the first entry date
+        if (index === 0) {
+          if (fetchedEntries.length > 1) {
+            if (areDatesConsecutive(fromDate, toDate)) {
+              entryRanges.push({
+                entryIds: [toEntryId, fromEntryId],
+                dates: [toDate, fromDate],
+              });
+            } else {
+              entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
+              if (!dateExists(entryRanges, fromDate)) {
+                entryRanges.push({
+                  entryIds: [fromEntryId],
+                  dates: [fromDate],
+                });
+                rangesIndex++;
+              } else {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
+          } else {
+            entryRanges.push({ entryIds: [toEntryId], dates: [toDate] });
+          }
+        } else {
+          // If it's friday, the next reportable day is 3 days away, otherwise 1 day
+          // If dates are consecutive ...
+
+          if (areDatesConsecutive(fromDate, toDate)) {
+            // And the date is not already present
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges[rangesIndex].dates.push(fromDate);
+              entryRanges[rangesIndex].entryIds.push(fromEntryId);
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
+          } else {
+            // Otherwise add a new range array, if the date does not already exist
+            if (!dateExists(entryRanges, fromDate)) {
+              entryRanges.push({ entryIds: [fromEntryId], dates: [fromDate] });
+              rangesIndex++;
+            } else if (dateExists(entryRanges, fromDate)) {
+              if (!entryExists(entryRanges, fromEntryId)) {
+                entryRanges[rangesIndex].entryIds.push(fromEntryId);
+              }
+            }
+          }
+        }
+
+        return entryRanges;
+      },
+      []
+    );
+    return { dateRanges: dateRanges, userName: userName };
+  };
+
+  React.useEffect(() => {
+    const fetchTimeEntriesFromGroups = async () => {
+      const users: { group_id: number; users: number[] } =
+        await getUsersInGroups(context);
+      const redmine_groups: [{ id: number; name: string }] = await getGroups(
+        context
+      );
+
+      setRedmineGroups(redmine_groups);
+
+      let groupId: number = selectedGroup
+        ? selectedGroup.id
+        : redmine_groups[0].id;
+
+      let all_group_users: number[] = users[groupId];
+      let group_users: number[] = [...new Set(all_group_users)];
+
+      if (!group_users) {
+        toggleLoadingPage(false);
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Your user does not belong to any group. Please contact our administrators",
+          },
+        ]);
+        return;
+      }
+
+      // So that loading times are shorter, we only take one
+      let sliced_users = group_users.slice(-1);
+
+      let absenceRows: [] = [];
+      absenceRows.push([
+        { type: "string", id: "User" },
+        { type: "string", role: "tooltip", p: { html: true } },
+        { type: "date", id: "Start" },
+        { type: "date", id: "End" },
+      ]);
+
+      for await (let user of sliced_users) {
+        let entries = await getAbsenceTimeEntries(
+          absenceFrom,
+          absenceTo,
+          user.toString()
+        );
+        const absenceRanges: {
+          startDate: Date;
+          endDate: Date;
+          userName: string;
+          entryIds: number[];
+        }[] = getAbsenceRanges(entries);
+
+        absenceRanges.map(
+          (range: { startDate: Date; endDate: Date; userName: string }) => {
+            range.group = groupId;
+          }
+        );
+
+        absenceRanges.map(
+          (range: {
+            startDate: Date;
+            endDate: Date;
+            userName: string;
+            group: string;
+          }) => {
+            absenceRows.push([
+              range.userName,
+              "test",
+              range.startDate,
+              range.endDate,
+            ]);
+          }
+        );
+      }
+
+      setAbsenceRows(absenceRows);
+    };
+
+    const fetchTimeEntriesForUser = async () => {
+      toggleLoadingPage(true);
+      let datesRep: string[] = await getReportedEntryDates();
+      setReportedDates(datesRep);
+      let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+
+      const data = getAbsenceRanges(entries);
+      setTableData(data);
+      toggleLoadingPage(false);
+    };
+    fetchTimeEntriesForUser();
+    //fetchTimeEntriesFromGroups();
+  }, [selectedGroup, reloadPage]);
+
+  const getAbsenceTimeEntries = async (
+    fromDate: Date,
+    toDate: Date,
+    user_id: string
+  ) => {
+    const issue: Issue = {
+      id: 3499,
+      subject: "NBIS General - Absence (Vacation/VAB/Other)",
+    };
+    const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
+    const absence_pair: IssueActivityPair = {
+      issue: issue,
+      activity: activity,
+      custom_name: "",
+      is_hidden: false,
+    };
+
+    const absenceTimeEntries = await getTimeEntries(
+      absence_pair,
+      fromDate,
+      toDate,
+      context,
+      user_id
+    );
+
+    return absenceTimeEntries;
+  };
+  const getReportableDays = (frDate: Date, toDate: Date): Date[] => {
+    const dates_interval: Interval = { start: frDate, end: toDate };
+    const all_days = eachDayOfInterval(dates_interval);
+    let reportable_days = all_days.slice();
+    reportable_days = reportable_days.filter((date) => isDayEnabled(date));
+    return reportable_days;
+  };
+
+  const reportAbsenceTime = async (reportable_days: Date[]) => {
+    let allReported: boolean = true;
+    for await (let absence_day of reportable_days) {
+      const time_entry: TimeEntry = {
+        issue_id: 3499,
+        activity_id: 19,
+        hours: 8,
+        comments: "Reported using the Urdr absence planner",
+        spent_on: formatDate(absence_day, dateFormat),
+      };
+      const saved = await reportTime(time_entry, onAbsenceReportError, context);
+
+      if (!saved) {
+        allReported = false;
+      }
+    }
+    return allReported;
+  };
+
+  const validateDates = async () => {
+    if (!startDate || !endDate) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message:
+            "Please fill in both the starting and end date of your absence",
+        },
+      ]);
+    } else if (startDate < new Date()) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "Please choose a start date that is not in the past.",
+        },
+      ]);
+    } else if (
+      endDate > new Date(`January 1, ${startDate.getFullYear() + 10}`)
+    ) {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "You can't plan absence more than 10 years ahead.",
+        },
+      ]);
+    } else if (
+      startDate.getTime() &&
+      endDate.getTime() &&
+      endDate >= startDate
+    ) {
+      let reportedEntries: FetchedTimeEntry[] = await hasAlreadyReported(
+        startDate,
+        endDate
+      );
+      if (reportedEntries.length > 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message: "Time has already been reported on this period",
+          },
+        ]);
+        return;
+      }
+      const reportable_days = getReportableDays(startDate, endDate);
+      if (reportable_days.length === 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Choose at least one day without any reported time that is not on a weekend.",
+          },
+        ]);
+        return;
+      }
+      toggleLoadingPage(true);
+      const allReported = await reportAbsenceTime(reportable_days);
+      toggleLoadingPage(false);
+      setStartDate(undefined);
+      setEndDate(undefined);
+      if (!allReported) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 10000,
+            message:
+              "Something went wrong! Your absence plan could not be submitted",
+          },
+        ]);
+      } else {
+        setToastList([
+          ...toastList,
+          {
+            type: "info",
+            timeout: 10000,
+            message: "Absence plan submitted!",
+          },
+        ]);
+      }
+      setReloadPage(!reloadPage);
+    } else {
+      setToastList([
+        ...toastList,
+        {
+          type: "warning",
+          timeout: 10000,
+          message: "Invalid reporting period date ranges",
+        },
+      ]);
+    }
+  };
+
+  // This function can be used to grey out weekends and days with time entries in the date picker.
+  // It causes bad user experience though, invalid dates just disappear when users type input manually.
+  // We need to find a solution for better user feedback before enabling it again for that use case.
+
+  const isDayEnabled = (date: Date) => {
+    return (
+      !reportedDates.includes(formatDate(date, dateFormat)) && isWeekday(date)
+    );
+  };
+
+  const context = React.useContext(AuthContext);
+
+  const FromDatePicker = () => (
+    <DatePicker
+      id="fromDate"
+      // filterDate={isDayEnabled} we need to improve user experience
+      dateFormat={dateFormat}
+      selected={startDate ? startDate : undefined}
+      onChange={(date: Date) => {
+        setStartDate(date);
+        document.getElementById("toDate").focus();
+      }}
+      showWeekNumbers
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsStart
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+      className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
+      strictParsing
+    />
+  );
+
+  const ToDatePicker = () => (
+    <DatePicker
+      id="toDate"
+      // filterDate={isDayEnabled} we need to improve user experience
+      dateFormat={dateFormat}
+      selected={endDate ? endDate : undefined}
+      onChange={(date: Date) => {
+        setEndDate(date);
+        document.getElementById("addAbsence").focus();
+      }}
+      showWeekNumbers
+      locale={sv}
+      showYearDropdown
+      todayButton="Idag"
+      selectsEnd
+      startDate={startDate}
+      endDate={endDate}
+      monthsShown={2}
+      className="form-control dateInput"
+      placeholderText="YYYY-MM-DD"
+      strictParsing
+    />
+  );
+
+  return (
+    <>
+      <LoadingOverlay
+        active={isLoading}
+        className={isLoading ? "loading-overlay" : ""}
+        spinner={
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={isLoading}
+            size={15}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          ></ClimbingBoxLoader>
+        }
+      ></LoadingOverlay>
+      <header className="page-header">
+        <h1 className="help-title">Absence reporting</h1>
+        <HeaderUser username={context.user ? context.user.login : ""} />
+      </header>
+      <main className="page-wrapper">
+        <h2 className="planned-absence-heading">Planned absence periods</h2>
+        <div className="planned-absence">
+          <div className="calendar-box">
+            {tableData.length > 0 ? (
+              <table>
+                <tbody>
+                  {/*The empty heading tags make the top border go all the way out*/}
+                  <tr>
+                    <th>
+                      <span className="visually-hidden">Buttons</span>
+                    </th>
+                    <th>Start date</th>
+                    <th>End date</th>
+                  </tr>
+                  {tableData.map((element, index) => {
+                    return (
+                      <tr key={index.toString()}>
+                        <td>
+                          <button
+                            onClick={() => {
+                              toggleLoadingPage(true);
+                              onUpdateAbsenceRanges(
+                                element.entryIds,
+                                new Date("2023-01-03"),
+                                new Date("2023-01-03")
+                              );
+                              toggleLoadingPage(false);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={pencil}
+                              className="table-icon"
+                              alt="pencil to edit"
+                            />
+                          </button>
+                          <button
+                            onClick={() => {
+                              onRemoveEntriesButton(element.entryIds);
+                            }}
+                            className="table-button"
+                          >
+                            <img
+                              src={trash}
+                              className="table-icon"
+                              alt="trash icon to delete"
+                            />
+                          </button>
+                        </td>
+                        <td>{formatDate(element.startDate, dateFormat)}</td>
+                        <td>{formatDate(element.endDate, dateFormat)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <>
+                <p>You don't have any planned absence periods.</p>
+              </>
+            )}
+          </div>
+          <div className="add-absence-box">
+            <div className="add-absence-row">
+              <p>
+                To add an absence period, enter a start and end date. Urdr will
+                report eight hours of absence for each work day during that
+                period. You can only use this feature, if you haven't reported
+                any time during that period yet.
+              </p>
+            </div>
+            <div className="add-absence-row">
+              <div className="date-box">
+                <label htmlFor="fromDate" className="date-label">
+                  Start date
+                </label>
+                <FromDatePicker />
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
+                </div>
+              </div>
+              <div className="date-box">
+                <label htmlFor="toDate" className="date-label">
+                  End date
+                </label>
+                <ToDatePicker />
+                <div className="btn cal-wrapper">
+                  <img
+                    src={calender}
+                    className="calender table-icon"
+                    alt="calender"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="add-absence">
+              <button
+                id="addAbsence"
+                className="add-absence-button"
+                title="Apply selected dates"
+                onClick={() => validateDates()}
+              >
+                Add absence
+              </button>
+            </div>
+          </div>
+        </div>
+        {/*
+        <h4>Reported absence</h4>
+        <div className="group-select-wrapper">
+          <span> Filter by group: </span>
+          <select
+            className="col-3 footer-field"
+            name="activity"
+            id="select-activity"
+            onChange={(e) => {
+              const groupId = e.target.value;
+              const group = redmineGroups.find((group) => {
+                return group.id == groupId;
+              });
+              setSelectedGroup(group);
+            }}
+          >
+            {redmineGroups &&
+              redmineGroups.map((group) => {
+                return (
+                  <option value={group.id} key={group.id}>
+                    {group.name}
+                  </option>
+                );
+              })}
+          </select>
+        </div>
+        <div>
+          {absenceRows.length > 1 ? (
+            <Chart
+              chartType="Timeline"
+              data={absenceRows}
+              width="100%"
+              height="400px"
+              options={timelineOptions}
+            />
+          ) : (
+            <p>No absence entries were found</p>
+          )}
+        </div>
+        */}
+        {toastList.length > 0 && (
+          <Toast onCloseToast={handleCloseToast} toastList={toastList} />
+        )}
+      </main>
+    </>
+  );
+};

@@ -3,12 +3,12 @@ module urdr-api
 go 1.17
 
 require (
-	github.com/gofiber/fiber/v2 v2.37.0
+	github.com/gofiber/fiber/v2 v2.37.1
 	github.com/gofiber/storage/sqlite3 v0.0.0-20220331080057-83339bc1564f
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/sirupsen/logrus v1.9.0
 	github.com/swaggo/fiber-swagger v1.3.0
-	github.com/swaggo/swag v1.8.5
+	github.com/swaggo/swag v1.8.6
 )
 
 require (
@@ -25,7 +25,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.39.0 // indirect
+	github.com/valyala/fasthttp v1.40.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect

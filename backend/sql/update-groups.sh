@@ -2,61 +2,75 @@
 
 # This script fetches data about the available Redmine groups and
 # updates the local Urdr database with the group information and the
-# users' group memberships.  Data is fetched using the Redmine REST API.
+# users' group memberships.  It does this by querying the Redmine
+# instance's PostgreSQL database and inserting the values directly into
+# the Urdr database.
 
 # Arguments:
 #
-# 1:	The redmine api key of an admin
-# 2:    The redmine api endpoint
-# 3:    The database.db file path
+# 1:  The pathname for the docker-compose.yml file for the ops-redmine
+#     repository.
+#
+# 2:  The pathname to the Urdr database file.  This file is assumed to
+#     have at least the schema loaded from "backend/sql/schema.sql".
 
-tmp_groups=$(mktemp)
-trap 'rm -rf -- "$tmp_groups"' EXIT
-
-api_key=$1
-redmine_url=$2
-database_path=$3
-
-if [ ! -f "$database_path" ] || [ "${database_path%.db}" = "$database_path" ]
-then
+if [ ! -f "$1" ] || [ "${1%.yml}" = "$1" ]; then
 	cat >&2 <<-'END_ERROR'
-	ERROR: The third argument is supposed to be the pathname to the
-	       Urdr backend SQLite3 database file.
+	ERROR: The first argument is supposed to be a the pathname to
+	       the ops-redmine repository's docker-compose.yml file.
 	END_ERROR
-	exit 1
+	err=1
 fi
 
-# Fetch basic group info.
+if [ ! -f "$2" ] || [ "${2%.db}" = "$2" ]; then
+	cat >&2 <<-'END_ERROR'
+	ERROR: The second argument is supposed to be the pathname to the
+	       Urdr backend SQLite3 database file.
+	END_ERROR
+	err=1
+fi
 
-curl --silent --header "X-Redmine-API-Key: $api_key" \
-	"$redmine_url/groups.json" >"$tmp_groups"
+[ "${err+set}" = set ] && exit 1
 
-# Import group IDs and their names into our "group" table.
-
-jq -r '.groups[] | [.id, .name] | @csv' "$tmp_groups" |
-sqlite3 "$database_path" \
-	"DELETE FROM group_info" \
-	'.separator ","' \
-	".import /dev/stdin group_info" \
-	'VACUUM'
-
-# Get users for each group.
-
-set --
-
-jq -r '.groups[].id' "$tmp_groups" |
+# Copy group info.
 {
-	while IFS= read -r group_id; do
-		set -- "$@" "$redmine_url/groups/$group_id.json?include=users"
-	done
+	docker-compose -f "$1" exec -T -- postgres \
+		psql -U redmine |
+	sqlite3 "$2" \
+		'DELETE FROM group_info' \
+		'.import /dev/stdin group_info' \
+		'VACUUM'
+} <<'END_COPY'
+COPY (
+	SELECT	id, lastname
+	FROM	users
+	WHERE	type = 'Group'
+	AND	lastname != 'Anonymous Watchers'
+)
+TO	STDOUT
+WITH	csv
+	DELIMITER '|'
+END_COPY
 
-	curl --silent --header "X-Redmine-API-Key: $api_key" "$@" |
-	jq -r '.group | .id as $gid | .users[] | [ .id, $gid ] | @csv' |
-	sqlite3 "$database_path" \
+# Copy group-user relations.
+{
+	docker-compose -f "$1" exec -T -- postgres \
+		psql -U redmine |
+	sqlite3 "$2" \
 		'DELETE FROM user_group' \
-		'.separator ","' \
 		'.import /dev/stdin user_group' \
 		'VACUUM'
-}
+} <<'END_COPY'
+COPY (
+	SELECT	u.id, g.id
+	FROM	users AS u
+	JOIN	groups_users AS gu ON (gu.user_id = u.id)
+	JOIN	users AS g ON (g.id = gu.group_id)
+	WHERE	g.lastname != 'Anonymous Watchers'
+)
+TO	STDOUT
+WITH	csv
+	DELIMITER '|'
+END_COPY
 
 echo 'Done.'

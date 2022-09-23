@@ -153,9 +153,9 @@ export const Help = () => {
         <p className="help-info">
           In order to add a new row, you first find an issue by using its id or
           it's subject, and then select an activity, which will be linked to the
-          issue. After selecting your desired issue and clicking on the plus
-          button, a new row will be appended to the bottom of the list of recent
-          rows.
+          issue. After selecting your desired issue and clicking on the "Add
+          row"-button, a new row will be appended to the bottom of the list of
+          recent rows.
         </p>
         <QuickAdd addIssueActivity={() => {}}></QuickAdd>
         <h2 className="help-subtitle">The sum row</h2>
@@ -208,6 +208,25 @@ export const Help = () => {
             onBlurRow={() => {}}
           />
         </div>
+        <h2 className="help-subtitle">Reporting absence</h2>
+        <p className="help-info">
+          The absence reporting page can help you with logging long absence
+          periods which can be tedious to log using the report page. Some common
+          use cases for this might be reporting your vacation, parental leave or
+          sickness absence.
+        </p>
+        <p className="help-info">
+          In order to report your absence, you only need to select a start date
+          and end date and press on the "Add absence" button. Note that you need
+          to select a period when no other time entries have already been
+          reported. Otherwise, you will be warned with an error message.
+        </p>
+        <p className="help-info">
+          In the absence periods table you can visualise the periods you have
+          reported between one month ago and one year later from the current
+          day. You may also edit or delete these ranges by clicking on the
+          pencil or trash can buttons respectively.
+        </p>
         <h2 className="help-subtitle">The yearly overview</h2>
         <p className="help-info">
           The purpose of the yearly overview is to show you what you have spent
