@@ -3,7 +3,7 @@ module urdr-api
 go 1.17
 
 require (
-	github.com/gofiber/fiber/v2 v2.37.1
+	github.com/gofiber/fiber/v2 v2.38.1
 	github.com/gofiber/storage/sqlite3 v0.0.0-20220331080057-83339bc1564f
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/sirupsen/logrus v1.9.0
