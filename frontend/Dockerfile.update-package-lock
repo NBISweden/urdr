@@ -1,4 +1,4 @@
-FROM node:19.0.1-slim
+FROM node:19.0.1-alpine3.16
 
 USER node
 
