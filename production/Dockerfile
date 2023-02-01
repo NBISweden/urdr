@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine3.16 as builder
+FROM golang:1.19-alpine as builder
 
 ENV GOPATH=$PWD
 
@@ -14,7 +14,7 @@ RUN apk --no-cache add \
 RUN go build -o ./urdr ./cmd && \
     echo "urdr:x:1001:1001:urdr:/:/sbin/nologin" > passwd
 
-FROM alpine:3.17
+FROM alpine
 
 WORKDIR /app
 
