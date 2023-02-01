@@ -7,8 +7,8 @@ WORKDIR /app
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk --no-cache add \
-        'curl=~7.83.1' \
-        'gcc=~11.2.1' \
+        'curl=~7' \
+        'gcc=~12' \
         'musl-dev=~1.2.3'; \
     rm -rf /var/cache/apk/*; \
     curl --silent --fail --location \
