@@ -14,7 +14,7 @@ RUN apk --no-cache add \
 RUN go build -o ./urdr ./cmd && \
     echo "urdr:x:1001:1001:urdr:/:/sbin/nologin" > passwd
 
-FROM alpine:3.17
+FROM alpine:3
 
 WORKDIR /app
 
