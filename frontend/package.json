@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.45",
-    "css-loader": "^6.7.2",
+    "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.0",
     "styles-loader": "^4.0.1",
     "ts-loader": "^9.4.2",
