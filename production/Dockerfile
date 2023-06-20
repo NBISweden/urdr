@@ -9,7 +9,7 @@ COPY ./ .
 
 RUN apk --no-cache add \
     'gcc=~12' \
-    'musl-dev=~1.2.4'; \
+    'musl-dev=~1.2'; \
 
 ENV GOPATH=$PWD
 ENV CGO_ENABLED=1
