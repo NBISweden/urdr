@@ -1,4 +1,4 @@
-FROM node:20.2.0-alpine3.16 as build
+FROM node:20.2.0-alpine as build
 
 USER node
 RUN mkdir /home/node/app
@@ -6,7 +6,7 @@ WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:20.2.0-alpine3.16 as bundler
+FROM node:20.2.0-alpine as bundler
 
 ARG PUBLIC_API_URL
 ENV PUBLIC_API_URL=${PUBLIC_API_URL}
