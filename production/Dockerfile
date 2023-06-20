@@ -3,6 +3,8 @@ FROM golang:1.20-alpine as builder
 RUN addgroup -S urdr && getent group urdr >/tmp/group
 RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
 
+WORKDIR /go
+
 COPY ./ .
 
 RUN apk --no-cache add \
@@ -19,7 +21,7 @@ FROM scratch
 WORKDIR /app
 
 COPY --from=builder /tmp/group /tmp/passwd /etc/
-COPY --from=builder --chown=urdr:urdr /go/urdr* /usr/bin/
+COPY --from=builder /go/urdr* /usr/bin/
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 
