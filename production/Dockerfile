@@ -1,25 +1,25 @@
-FROM golang:1.19-alpine as builder
+FROM golang:1.20-alpine as builder
 
-ENV GOPATH=$PWD
-
-WORKDIR /go
+RUN addgroup -S urdr && getent group urdr >/tmp/group
+RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
 
 COPY ./ .
 
 RUN apk --no-cache add \
-        'gcc=~11.2.1' \
-        'musl-dev=~1.2.3'; \
+    'gcc=~12' \
+    'musl-dev=~1.2.4'; \
     rm -rf /var/cache/apk/*
 
-RUN go build -o ./urdr ./cmd && \
-    echo "urdr:x:1001:1001:urdr:/:/sbin/nologin" > passwd
+ENV GOPATH=$PWD
+ENV CGO_ENABLED=1
+RUN go build -ldflags "-linkmode external -extldflags -static" -o ./urdr ./cmd
 
-FROM alpine:latest
+FROM scratch
 
 WORKDIR /app
 
-COPY --from=builder /go/passwd /etc/passwd
-COPY --from=builder /go/urdr* /usr/bin/
+COPY --from=builder /tmp/group /tmp/passwd /etc/
+COPY --from=builder --chown=urdr:urdr /go/urdr* /usr/bin/
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 
 
