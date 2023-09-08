@@ -36,7 +36,7 @@ export const QuickAdd = ({
 
   React.useEffect(() => {
     let endpoint = "/api/activities";
-    if (issue) endpoint += "?issue_id=" + issue.id;
+    if (issue) endpoint += "?project_id=" + (issue.project.id ? issue.project.id : "0") + "&issue_id=" + (issue.id ? issue.id : "0");
     let didCancel = false;
     const loadActivities = async () => {
       let result: { time_entry_activities: IdName[] } = await getApiEndpoint(
@@ -44,8 +44,8 @@ export const QuickAdd = ({
         context
       );
       if (!didCancel && result) {
-        setActivities(result.time_entry_activities);
-        setActivity(activity ? activity : result.time_entry_activities[0]);
+        setActivities(result.time_entry_activities ? result.time_entry_activities : []);
+        setActivity(activity ? activity : Array.isArray(result.time_entry_activities) ? result.time_entry_activities[0] : null);
       }
     };
 

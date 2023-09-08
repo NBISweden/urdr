@@ -24,6 +24,7 @@ export interface IssueActivityPair {
 export interface Issue {
   id: number;
   subject: string;
+  project: IdName;
 }
 
 export interface TimeEntry {

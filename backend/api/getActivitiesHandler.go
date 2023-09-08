@@ -6,29 +6,26 @@ import (
 	"sort"
 	"strconv"
 	"urdr-api/internal/config"
+	"urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 )
 
-type TimeEntryActivityResponse struct {
-	TimeEntryActivities []struct {
-		Id        int    `json:"id"`
-		Name      string `json:"name"`
-		IsDefault bool   `json:"is_default"`
-		Active    bool   `json:"active"`
-	} `json:"time_entry_activities"`
-}
-
 // getActivitiesHandler godoc
-// @Summary	(Mostly) a proxy for the "/enumerations/time_entry_activities.json" Redmine endpoint
+// @Summary	Get a list of activities from the Redmine projects endpoint
 // @Accept	json
 // @Produce	json
 // @Failure	401	{string}	error "Unauthorized"
 // @Failure	500	{string}	error "Internal Server Error"
 // @Router	/api/activities	[get]
-// @Param	session_id	query	string	false	"Issue ID"	default(0)
-func getActivitiesHandler(c *fiber.Ctx) error {
+// @Param	project_id	query	string	false	"Project ID"	default(0)
+// @Param	issue_id	query	string	false	"Issue ID"	default(0)
+func getProjectActivitiesHandler(c *fiber.Ctx) error {
+	redmineProjectId, err := strconv.Atoi(c.Query("project_id", "0"))
+	if err != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 	redmineIssueId, err := strconv.Atoi(c.Query("issue_id", "0"))
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
@@ -38,8 +35,16 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	redmineURL := fmt.Sprintf("%s/enumerations/time_entry_activities.json",
-		config.Config.Redmine.URL)
+	var redmineURL string
+
+	// If we don't have a real project ID, return an empty list of activities.
+	if redmineProjectId == 0 {
+		emptyListResponse := redmine.ProjectEntry{}
+		return c.JSON(emptyListResponse)
+	} else {
+		redmineURL = fmt.Sprintf("%s/projects/%d.json?include=time_entry_activities",
+			config.Config.Redmine.URL, redmineProjectId)
+	}
 
 	// Proxy the request to Redmine
 	if err := proxy.Do(c, redmineURL); err != nil {
@@ -48,7 +53,7 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 		return nil
 	}
 
-	activitiesResponse := TimeEntryActivityResponse{}
+	activitiesResponse := redmine.ProjectEntry{}
 
 	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
 		c.Response().Reset()
@@ -56,25 +61,19 @@ func getActivitiesHandler(c *fiber.Ctx) error {
 	}
 
 	// Sort the activities list alphabetically on the name.
-	sort.Slice(activitiesResponse.TimeEntryActivities, func(i, j int) bool {
-		return activitiesResponse.TimeEntryActivities[i].Name <
-			activitiesResponse.TimeEntryActivities[j].Name
+	sort.Slice(activitiesResponse.Project.TimeEntryActivities, func(i, j int) bool {
+		return activitiesResponse.Project.TimeEntryActivities[i].Name <
+			activitiesResponse.Project.TimeEntryActivities[j].Name
 	})
 
-	// Bypass filtering if we don't have a real issue ID.
-	if redmineIssueId == 0 {
-		// Return all activities.
-		return c.JSON(activitiesResponse)
-	}
+	filteredActivities := redmine.ProjectEntry{}
 
-	filteredActivities := TimeEntryActivityResponse{}
-
-	for _, activity := range activitiesResponse.TimeEntryActivities {
+	for _, activity := range activitiesResponse.Project.TimeEntryActivities {
 		if db.IsValidEntry(redmineIssueId, activity.Id) {
-			filteredActivities.TimeEntryActivities =
-				append(filteredActivities.TimeEntryActivities, activity)
+			filteredActivities.Project.TimeEntryActivities =
+				append(filteredActivities.Project.TimeEntryActivities, activity)
 		}
 	}
 
-	return c.JSON(filteredActivities)
+	return c.JSON(filteredActivities.Project)
 }

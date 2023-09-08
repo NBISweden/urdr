@@ -75,3 +75,10 @@ type Group struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
+type Project struct {
+	TimeEntryActivities []TimeEntryActivity `json:"time_entry_activities"`
+}
+
+type ProjectEntry struct {
+	Project Project `json:"project"`
+}
