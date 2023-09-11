@@ -43,7 +43,12 @@ module.exports = {
     historyApiFallback: true,
     static: './public',
     client: {
-      webSocketURL: 'ws://localhost:4567/ws'
+      webSocketURL: 'ws://localhost:4567/ws',
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: false
+      }
     }
   },
   plugins: [
