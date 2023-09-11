@@ -75,6 +75,8 @@ type Group struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
+// The Project type is only ever used for holding the activities that are valid for a given project.
+// Apart from that, Urdr mainly deals with Issues, not Projects.
 type Project struct {
 	TimeEntryActivities []TimeEntryActivity `json:"time_entry_activities"`
 }
