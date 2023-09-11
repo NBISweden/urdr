@@ -45,7 +45,7 @@ export const QuickAdd = ({
       );
       if (!didCancel && result) {
         setActivities(result.time_entry_activities ? result.time_entry_activities : []);
-        setActivity(activity ? activity : Array.isArray(result.time_entry_activities) ? result.time_entry_activities[0] : null);
+        setActivity(activity ? activity : (Array.isArray(result.time_entry_activities) && result.time_entry_activities.length > 0) ? result.time_entry_activities[0] : null);
       }
     };
 
