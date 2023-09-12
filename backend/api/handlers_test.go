@@ -102,18 +102,19 @@ func Test_Handlers(t *testing.T) {
 
 	createdEntry, _ := json.Marshal(entryResult)
 	fetchedEntries, _ := json.Marshal(entriesResult)
-
-	entryActs := redmine.TimeEntryActivitiesResult{
-		TimeEntryActivities: []redmine.TimeEntryActivity{
-			{
-				Id:        1,
-				Name:      "Test activity",
-				IsDefault: true,
+	projectEntry := redmine.ProjectEntry{
+		Project: redmine.Project{
+			TimeEntryActivities: []redmine.TimeEntryActivity{
+				{
+					Id:        1,
+					Name:      "test activity",
+					IsDefault: true,
+				},
 			},
 		},
 	}
 
-	entryActsResponse, _ := json.Marshal(entryActs)
+	projectActivities, _ := json.Marshal(projectEntry)
 
 	issueAct := []api.PriorityEntry{
 		{
@@ -179,8 +180,8 @@ func Test_Handlers(t *testing.T) {
 			}
 		case "/issues.json":
 			_, err = w.Write(issuesResponse)
-		case "/enumerations/time_entry_activities.json":
-			_, err = w.Write(entryActsResponse)
+		case "/projects/1.json":
+			_, err = w.Write(projectActivities)
 		default:
 			log.Debugf("%s.\n", endpoint)
 			_, err = w.Write(nil)
@@ -315,7 +316,7 @@ func Test_Handlers(t *testing.T) {
 		{
 			name:             "Entry activities",
 			method:           "GET",
-			endpoint:         "/api/activities",
+			endpoint:         "/api/activities?project_id=1&issue_id=1",
 			testRedmine:      fakeRedmine,
 			useSessionHeader: true,
 			statusCode:       fiber.StatusOK,
@@ -323,7 +324,7 @@ func Test_Handlers(t *testing.T) {
 		{
 			name:             "Entry activities 401",
 			method:           "GET",
-			endpoint:         "/api/activities",
+			endpoint:         "/api/activities?project_id=1&issue_id=1",
 			testRedmine:      fakeRedmine,
 			useSessionHeader: false,
 			statusCode:       fiber.StatusUnauthorized,
@@ -331,10 +332,18 @@ func Test_Handlers(t *testing.T) {
 		{
 			name:             "Entry activities 422",
 			method:           "GET",
-			endpoint:         "/api/activities",
+			endpoint:         "/api/activities?project_id=1&issue_id=1",
 			testRedmine:      badRedmine,
 			useSessionHeader: true,
 			statusCode:       fiber.StatusUnprocessableEntity,
+		},
+		{
+			name:             "Entry activities no params",
+			method:           "GET",
+			endpoint:         "/api/activities",
+			testRedmine:      badRedmine,
+			useSessionHeader: true,
+			statusCode:       fiber.StatusOK,
 		},
 		{
 			name:             "priority_entries POST",

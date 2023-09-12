@@ -62,7 +62,7 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 	// Now fetch the activities from Redmine and fill out the
 	// activity names.
 	c.Response().Reset()
-	if err := getActivitiesHandler(c); err != nil {
+	if err := getProjectActivitiesHandler(c); err != nil {
 		// There was some error in the handler.
 		return err
 	} else if c.Response().StatusCode() != fiber.StatusOK {
