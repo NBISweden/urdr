@@ -4,9 +4,14 @@ type user struct {
 	Login string `json:"login"`
 }
 
+type Project struct {
+	Id int `json:"id"`
+}
+
 type Issue struct {
-	Id      int    `json:"id"`
-	Subject string `json:"subject"`
+	Id      int     `json:"id"`
+	Subject string  `json:"subject"`
+	Project Project `json:"project"`
 }
 
 type IssueWithTitle struct {
