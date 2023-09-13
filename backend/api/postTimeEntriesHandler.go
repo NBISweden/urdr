@@ -73,8 +73,10 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		log.Errorf("proxy.Do() failed: %v\n", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+	log.Debugf("respose from redmine: %s", c.Response().Body())
 
 	if session, err := store.Get(c); err != nil {
+
 		return c.SendStatus(fiber.StatusInternalServerError)
 	} else {
 		// Extend the session's expiry time to a week.
