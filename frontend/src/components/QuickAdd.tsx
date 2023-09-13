@@ -126,6 +126,7 @@ export const QuickAdd = ({
       messages: "0",
       // projects: "0" produces weird results.
       open_issues: "1",
+      projects: "1",
     };
 
     const foundIssues: { issues: Issue[] } = await fetch(

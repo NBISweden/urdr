@@ -36,9 +36,10 @@ func issueSearchHandler(c *fiber.Ctx) error {
 
 	searchResponse := struct {
 		Results []struct {
-			Id    int    `json:"id"`
-			Type  string `json:"type"`
-			Title string `json:"title"`
+			Id      int     `json:"id"`
+			Type    string  `json:"type"`
+			Title   string  `json:"title"`
+			Project Project `json:"project"`
 		} `json:"results"`
 	}{}
 
@@ -73,6 +74,7 @@ func issueSearchHandler(c *fiber.Ctx) error {
 			issue := Issue{
 				Id:      issue.Id,
 				Subject: issuesResponse.Issues[0].Subject,
+				Project: issuesResponse.Issues[0].Project,
 			}
 			foundIssues = append(foundIssues, issue)
 		}
