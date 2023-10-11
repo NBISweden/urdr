@@ -32,9 +32,6 @@ services:
       context: ../frontend
       labels:
         - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
-      args:
-        - PUBLIC_API_URL=${PUBLIC_API_URL}
-        - PUBLIC_REDMINE_URL=${PUBLIC_REDMINE_URL}
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:

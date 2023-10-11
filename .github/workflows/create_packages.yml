@@ -1,50 +1,107 @@
 name: Create packages
 on:
-  pull_request:
+  push:
     branches:
-      - main
-    types:
-      - closed
-
+    - develop
+    - main
 
 jobs:
-  main:
-    if: github.event.pull_request.merged == true
+  tag:
+    name: generate tag
+    outputs:
+      part: ${{ steps.generate_tag.outputs.part }}
+      tag: ${{ steps.generate_tag.outputs.tag }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '1'
+    - name: Generate new tag
+      id: generate_tag
+      uses: anothrNick/github-tag-action@1.61.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: ${{ github.ref_name == 'develop' && 'patch' ||  'minor' }}
+        DRY_RUN: true
+
+  push_to_registry:
+    strategy:
+      matrix:
+        include:
+          - web_url: "https://urdr.nbis.se"
+            redmine_url: "https://projects.nbis.se"
+            env: "prod"
+          - web_url: "https://urdr-test.nbis.se"
+            redmine_url: "https://urdr-test-redmine.nbis.se"
+            env: "test"
+    needs: tag
+    if: needs.tag.outputs.part != ''
+    name: Push Docker image to Github Container registry
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
-      - name: Build and push images
-        working-directory: production
-        env:
-          DOCKER_BUILDKIT: 1
-          COMPOSE_DOCKER_CLI_BUILD: 1
-          GH_ACTOR: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_HEAD_REF: ${{ github.head_ref }}
-        run: |
-             echo "${GH_TOKEN}" | docker login ghcr.io -u "${GH_ACTOR}" --password-stdin
-             branch="${GH_HEAD_REF}"
+      - name: Log in to the Github Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-             for image in urdr urdr-web; do
-               docker pull "ghcr.io/nbisweden/$image:latest" || true
-               docker pull "ghcr.io/nbisweden/$image:$branch" || true
-             done
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/nbisweden/urdr
 
-             cat > urdr.env <<END
-             PUBLIC_API_URL="https://urdr.nbis.se"
-             PUBLIC_REDMINE_URL="https://projects.nbis.se"
-             END
+      - name: Build and push urdr
+        uses: docker/build-push-action@v3
+        with:
+          context: ./backend
+          file: ./production/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/nbisweden/urdr:${{ matrix.env == 'prod' && needs.tag.outputs.tag || format('{0}-test', needs.tag.outputs.tag) }}
+            ghcr.io/nbisweden/urdr:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            org.opencontainers.image.revision=${{ github.sha }}
 
-             TAG="$branch" docker-compose --env-file urdr.env build --build-arg BUILDKIT_INLINE_CACHE=1
+      - name: Build and push urdr-web
+        uses: docker/build-push-action@v3
+        with:
+          context: ./frontend
+          file: ./production/Dockerfile.nginx
+          build-args: |
+            PUBLIC_API_URL=${{ matrix.web_url }}
+            PUBLIC_REDMINE_URL=${{ matrix.redmine_url }}
+          push: true
+          tags: |
+            ghcr.io/nbisweden/urdr-web:${{ matrix.env == 'prod' && needs.tag.outputs.tag || format('{0}-test', needs.tag.outputs.tag) }}
+            ghcr.io/nbisweden/urdr-web:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+            org.opencontainers.image.revision=${{ github.sha }}
 
-             for image in urdr urdr-web; do
-               docker push "ghcr.io/nbisweden/$image:$branch"
-               docker tag "ghcr.io/nbisweden/$image:$branch" "ghcr.io/nbisweden/$image:latest"
-               docker push "ghcr.io/nbisweden/$image:latest"
-             done
+  publish_tag:
+    name: publish tag
+    needs: tag
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: '1'
+    - name: Push tag
+      id: push_tag
+      uses: anothrNick/github-tag-action@1.61.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CUSTOM_TAG: ${{ needs.tag.outputs.tag }}
