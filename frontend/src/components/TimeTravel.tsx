@@ -3,7 +3,6 @@ import React, { useState, forwardRef } from "react";
 import { getISOWeek, getISOWeekYear } from "date-fns";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import sv from "date-fns/locale/sv";
 import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
 import { useNavigate } from "react-router-dom";
@@ -104,9 +103,8 @@ export const TimeTravel = ({
         startDate={currentWeekArray[0]}
         endDate={currentWeekArray[4]}
         selectsRange
-        locale={sv}
         showYearDropdown
-        todayButton="Idag"
+        todayButton="Select today"
       />
       <button onClick={nextWeeksClickHandle} className="week-arrow-button">
         <img src={right} alt="switch to next week" className="week-arrow" />
