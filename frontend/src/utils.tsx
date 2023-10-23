@@ -1,16 +1,21 @@
 import.meta.hot;
-import React, {
-  useState,
-  useEffect,
-  ElementType,
-  MouseEventHandler,
-} from "react";
+import React, { useState, useEffect } from "react";
 import { TimeEntry } from "./model";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
 import { IssueActivityPair, FetchedTimeEntry } from "./model";
 
-import { format as formatDate } from "date-fns";
+import {
+  compareAsc,
+  differenceInDays,
+  eachDayOfInterval,
+  endOfWeek,
+  format as formatDate,
+  isBefore,
+  isWeekend,
+  isWithinInterval,
+  startOfWeek,
+} from "date-fns";
 
 export let headers = new Headers();
 headers.set("Accept", "application/json");
@@ -254,24 +259,61 @@ export const reportTime = async (
   return saved;
 };
 
-export const getUsersInGroups = async (context: any) => {
-  let users: { group_id: number; users: number[] } = await getApiEndpoint(
-    "/api/users_in_group",
-    context
-  );
-  return users;
-};
-
-export const getGroups = async (context: any) => {
-  let groups: [{ id: number; name: string }] = await getApiEndpoint(
-    "/api/groups",
-    context
-  );
-  return groups;
-};
-
 // Filter for weekdays. Return only Monday through Friday.
 export const isWeekday = (dt: Date) => {
   const day = dt.getDay();
   return day !== 0 && day !== 6;
+};
+
+export function areConsecutive(currentDate: Date, prevDate: Date): boolean {
+  const daysDifference = differenceInDays(currentDate, prevDate);
+  const weekendDifferenceDays: number = eachDayOfInterval({
+    start: prevDate,
+    end: currentDate,
+  }).filter((date) => isWeekend(date)).length;
+  const areConsecutiveExceptWeekend =
+    daysDifference === 3 && weekendDifferenceDays === 2;
+  const nextDate = addDays(prevDate, 1);
+  const areDirectlyConsecutive =
+    compareAsc(nextDate, currentDate) === 0 ||
+    compareAsc(nextDate, currentDate) === 1;
+  return areConsecutiveExceptWeekend || areDirectlyConsecutive;
+}
+
+export const getWeeksBetweenDates = (
+  startDate: Date,
+  endDate: Date
+): Date[][] => {
+  const weeks: Date[][] = [];
+
+  let currentWeekStart = startOfWeek(startDate);
+
+  while (isBefore(currentWeekStart, endDate)) {
+    const currentWeekEnd = endOfWeek(currentWeekStart);
+    const daysOfWeek = eachDayOfInterval({
+      start: currentWeekStart,
+      end: currentWeekEnd,
+    }).filter((day) =>
+      isWithinInterval(day, { start: startDate, end: endDate })
+    );
+
+    if (daysOfWeek.length > 0) {
+      weeks.push(daysOfWeek);
+    }
+
+    currentWeekStart = startOfWeek(new Date(currentWeekEnd.getTime() + 1));
+  }
+
+  return weeks;
+};
+
+export const getReportableWorkingDays = (
+  frDate: Date,
+  toDate: Date
+): Date[] => {
+  const dates_interval: Interval = { start: frDate, end: toDate };
+  const all_days = eachDayOfInterval(dates_interval);
+  let reportable_days = all_days.slice();
+  reportable_days = reportable_days.filter((date) => isWeekday(date));
+  return reportable_days;
 };
