@@ -18,14 +18,12 @@ import {
   dateFormat,
   isWeekday,
   getTimeEntries,
-  getUsersInGroups,
-  getGroups,
 } from "../utils";
 import { eachDayOfInterval, Interval, format as formatDate } from "date-fns";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
-import { Chart } from "react-google-charts";
+
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
 import { useConfirm } from "../components/ConfirmDialogProvider";
@@ -36,12 +34,6 @@ export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
-  const [absenceRows, setAbsenceRows] = useState<[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<{
-    id: number;
-    name: string;
-  }>(undefined);
-  const [redmineGroups, setRedmineGroups] = useState<[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<
@@ -55,30 +47,6 @@ export const AbsencePlanner = () => {
   let today = new Date();
   const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
   const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
-
-  const timelineOptions = {
-    hAxis: {
-      minValue: absenceFrom,
-      maxValue: absenceTo,
-    },
-    avoidOverlappingGridLines: false,
-    colors: ["#BFD6D8"],
-    // This line makes the entire category's tooltip active.
-    focusTarget: "category",
-    // Use an HTML tooltip.
-    tooltip: { isHtml: true },
-    timeline: {
-      showRowLabels: true,
-      rowLabelStyle: {
-        fontName: "Lato",
-        fontSize: 17,
-      },
-      barLabelStyle: {
-        fontName: "Lato",
-        fontSize: 16,
-      },
-    },
-  };
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -433,86 +401,6 @@ export const AbsencePlanner = () => {
   };
 
   React.useEffect(() => {
-    const fetchTimeEntriesFromGroups = async () => {
-      const users: { group_id: number; users: number[] } =
-        await getUsersInGroups(context);
-      const redmine_groups: [{ id: number; name: string }] = await getGroups(
-        context
-      );
-
-      setRedmineGroups(redmine_groups);
-
-      let groupId: number = selectedGroup
-        ? selectedGroup.id
-        : redmine_groups[0].id;
-
-      let all_group_users: number[] = users[groupId];
-      let group_users: number[] = [...new Set(all_group_users)];
-
-      if (!group_users) {
-        toggleLoadingPage(false);
-        setToastList([
-          ...toastList,
-          {
-            type: "warning",
-            timeout: 10000,
-            message:
-              "Your user does not belong to any group. Please contact our administrators",
-          },
-        ]);
-        return;
-      }
-
-      // So that loading times are shorter, we only take one
-      let sliced_users = group_users.slice(-1);
-
-      let absenceRows: [] = [];
-      absenceRows.push([
-        { type: "string", id: "User" },
-        { type: "string", role: "tooltip", p: { html: true } },
-        { type: "date", id: "Start" },
-        { type: "date", id: "End" },
-      ]);
-
-      for await (let user of sliced_users) {
-        let entries = await getAbsenceTimeEntries(
-          absenceFrom,
-          absenceTo,
-          user.toString()
-        );
-        const absenceRanges: {
-          startDate: Date;
-          endDate: Date;
-          userName: string;
-          entryIds: number[];
-        }[] = getAbsenceRanges(entries);
-
-        absenceRanges.map(
-          (range: { startDate: Date; endDate: Date; userName: string }) => {
-            range.group = groupId;
-          }
-        );
-
-        absenceRanges.map(
-          (range: {
-            startDate: Date;
-            endDate: Date;
-            userName: string;
-            group: string;
-          }) => {
-            absenceRows.push([
-              range.userName,
-              "test",
-              range.startDate,
-              range.endDate,
-            ]);
-          }
-        );
-      }
-
-      setAbsenceRows(absenceRows);
-    };
-
     const fetchTimeEntriesForUser = async () => {
       toggleLoadingPage(true);
       let datesRep: string[] = await getReportedEntryDates();
@@ -524,8 +412,7 @@ export const AbsencePlanner = () => {
       toggleLoadingPage(false);
     };
     fetchTimeEntriesForUser();
-    fetchTimeEntriesFromGroups();
-  }, [selectedGroup, reloadPage]);
+  }, [reloadPage]);
 
   const getAbsenceTimeEntries = async (
     fromDate: Date,
@@ -873,44 +760,6 @@ export const AbsencePlanner = () => {
               </button>
             </div>
           </div>
-        </div>
-        <h4>Reported absence</h4>
-        <div className="group-select-wrapper">
-          <span> Filter by group: </span>
-          <select
-            className="col-3 footer-field"
-            name="activity"
-            id="select-activity"
-            onChange={(e) => {
-              const groupId = e.target.value;
-              const group = redmineGroups.find((group) => {
-                return group.id == groupId;
-              });
-              setSelectedGroup(group);
-            }}
-          >
-            {redmineGroups &&
-              redmineGroups.map((group) => {
-                return (
-                  <option value={group.id} key={group.id}>
-                    {group.name}
-                  </option>
-                );
-              })}
-          </select>
-        </div>
-        <div>
-          {absenceRows.length > 1 ? (
-            <Chart
-              chartType="Timeline"
-              data={absenceRows}
-              width="100%"
-              height="400px"
-              options={timelineOptions}
-            />
-          ) : (
-            <p>No absence entries were found</p>
-          )}
         </div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
