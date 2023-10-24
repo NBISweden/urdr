@@ -192,7 +192,7 @@ export const AbsencePlanner = () => {
             type: "warning",
             timeout: 8000,
             message:
-              "The maximum amount of hours per week (40) has been exceeded in the selected period",
+              "The maximum amount of absence hours per week (40) has been exceeded in the selected period",
           },
         ]);
       } else {
