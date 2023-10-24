@@ -703,7 +703,7 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence-row">
               <div className="date-box">
-                <label htmlFor="fromDate">Start date</label>
+                <label htmlFor="fromDate">Start date&nbsp;</label>
                 <FromDatePicker />
                 <span className="btn cal-wrapper">
                   <img
@@ -714,7 +714,7 @@ export const AbsencePlanner = () => {
                 </span>
               </div>
               <div className="date-box">
-                <label htmlFor="toDate">End date</label>
+                <label htmlFor="toDate">End date&nbsp;</label>
                 <ToDatePicker />
                 <span className="btn cal-wrapper">
                   <img
@@ -727,7 +727,9 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence-row">
               <div>
-                <label htmlFor="reson-for-absence">Reason for absence</label>
+                <label htmlFor="reson-for-absence">
+                  Reason for absence&nbsp;
+                </label>
                 <AbsenceIssuesSelector
                   onChange={onSelectAbsenceIssue}
                   options={absenceIssueOptions}
