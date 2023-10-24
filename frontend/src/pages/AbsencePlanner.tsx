@@ -31,6 +31,7 @@ import {
   compareAsc,
   endOfWeek,
   startOfWeek,
+  isWeekend,
 } from "date-fns";
 import sv from "date-fns/locale/sv";
 import LoadingOverlay from "react-loading-overlay-ts";
@@ -500,12 +501,14 @@ export const AbsencePlanner = () => {
         },
         0
       );
-      const numberOfEntriesToReport = week.filter((day) =>
-        isWithinInterval(day, {
-          start: startDate,
-          end: endDate,
-        })
-      ).length;
+      const numberOfEntriesToReport = week
+        .filter((day) =>
+          isWithinInterval(day, {
+            start: startDate,
+            end: endDate,
+          })
+        )
+        .filter((day) => !isWeekend(day)).length;
       const expectedNewAmountOfHoursForWeek =
         reportedHours + extentOfAbsence * numberOfEntriesToReport;
 
@@ -513,7 +516,7 @@ export const AbsencePlanner = () => {
     });
 
     const hasWeekWith40PlusHours = numberOfReportedHoursPerWeek.some(
-      (hours) => hours >= 40
+      (hours) => hours > 40
     );
 
     return hasWeekWith40PlusHours;
