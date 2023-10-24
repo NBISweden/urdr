@@ -293,9 +293,7 @@ export const getWeeksBetweenDates = (
     const daysOfWeek = eachDayOfInterval({
       start: currentWeekStart,
       end: currentWeekEnd,
-    }).filter((day) =>
-      isWithinInterval(day, { start: startDate, end: endDate })
-    );
+    });
 
     if (daysOfWeek.length > 0) {
       weeks.push(daysOfWeek);
