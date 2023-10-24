@@ -30,6 +30,7 @@ import {
   parseISO,
   compareAsc,
 } from "date-fns";
+import sv from "date-fns/locale/sv";
 import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
@@ -563,7 +564,8 @@ export const AbsencePlanner = () => {
       }}
       showWeekNumbers
       showYearDropdown
-      todayButton="Select today"
+      todayButton="Idag"
+      locale={sv}
       selectsStart
       startDate={startDate}
       endDate={endDate}
@@ -585,7 +587,8 @@ export const AbsencePlanner = () => {
       }}
       showWeekNumbers
       showYearDropdown
-      todayButton="Select today"
+      todayButton="Idag"
+      locale={sv}
       selectsEnd
       startDate={startDate}
       endDate={endDate}

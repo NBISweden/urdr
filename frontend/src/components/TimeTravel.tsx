@@ -7,6 +7,7 @@ import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
 import { useNavigate } from "react-router-dom";
 import { isWeekday } from "../utils";
+import sv from "date-fns/locale/sv";
 
 /*
 TimeTravel
@@ -104,7 +105,8 @@ export const TimeTravel = ({
         endDate={currentWeekArray[4]}
         selectsRange
         showYearDropdown
-        todayButton="Select today"
+        todayButton="Idag"
+        locale={sv}
       />
       <button onClick={nextWeeksClickHandle} className="week-arrow-button">
         <img src={right} alt="switch to next week" className="week-arrow" />

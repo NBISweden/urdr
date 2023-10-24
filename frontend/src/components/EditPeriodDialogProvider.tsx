@@ -42,7 +42,7 @@ export const EditPeriodDialogProvider = ({ children }) => {
           showWeekNumbers
           locale={sv}
           showYearDropdown
-          todayButton="Select today"
+          todayButton="Idag"
           selectsStart
           startDate={updatedAbsenceStartDate}
           endDate={updatedAbsenceEndDate}
@@ -65,7 +65,7 @@ export const EditPeriodDialogProvider = ({ children }) => {
           showWeekNumbers
           locale={sv}
           showYearDropdown
-          todayButton="Select today"
+          todayButton="Idag"
           selectsEnd
           startDate={updatedAbsenceStartDate}
           endDate={updatedAbsenceEndDate}
