@@ -52,6 +52,7 @@ export const absenceIssueOptions: { id: number; subject: string }[] = [
   { id: 6993, subject: "Sick leave" },
   { id: 6994, subject: "VAB" },
   { id: 6995, subject: "Vacation" },
+  { id: 6997, subject: "Other absence" },
 ];
 
 export const AbsencePlanner = () => {
