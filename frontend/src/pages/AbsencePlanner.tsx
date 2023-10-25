@@ -176,11 +176,11 @@ export const AbsencePlanner = () => {
       ]);
     } else {
       const reportedEntries: FetchedTimeEntry[] = await getReportedEntries(
-        selection.startDate,
-        selection.endDate
+        startOfWeek(selection.startDate),
+        endOfWeek(selection.endDate)
       );
       const timeEntriesExcludingSelectedAbsenceRange = reportedEntries.filter(
-        (entry) => entry.issue.id !== issueId
+        (entry) => !oldEntryIds.includes(entry.issue.id)
       );
 
       if (
