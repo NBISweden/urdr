@@ -180,7 +180,7 @@ export const AbsencePlanner = () => {
         endOfWeek(selection.endDate)
       );
       const timeEntriesExcludingSelectedAbsenceRange = reportedEntries.filter(
-        (entry) => !oldEntryIds.includes(entry.issue.id)
+        (entry: FetchedTimeEntry) => !oldEntryIds.includes(entry.id)
       );
 
       if (
