@@ -328,7 +328,10 @@ export const AbsencePlanner = () => {
       let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
 
       const data = getAbsenceRanges(entries);
-      setTableData(data);
+      const sortedData = data.sort((a, b) =>
+        compareAsc(a.startDate, b.startDate)
+      );
+      setTableData(sortedData);
       toggleLoadingPage(false);
     };
     fetchTimeEntriesForUser();
