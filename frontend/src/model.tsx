@@ -28,7 +28,7 @@ export interface Issue {
 }
 
 export interface TimeEntry {
-  id: number;
+  id?: number;
   issue_id?: number;
   activity_id?: number;
   hours: number;
@@ -48,6 +48,14 @@ export interface FetchedTimeEntry {
   created_on: string;
   updated_on: string;
   group?: string;
+}
+
+export interface AbsenceInterval {
+  startDate: Date;
+  endDate: Date;
+  entryIds: number[];
+  extent: number;
+  issueId: number;
 }
 
 type ToastType = "success" | "warning" | "info";

@@ -26,14 +26,22 @@ export const ConfirmDialogProvider = ({ children }) => {
     [setState]
   );
 
+  const onConfirm = () => {
+    if (handlerFunction.current) {
+      handlerFunction.current(true);
+    }
+  };
+
+  const onCancel = () => {
+    if (handlerFunction.current) {
+      handlerFunction.current(false);
+    }
+  };
+
   return (
     <ConfirmDialog.Provider value={confirm}>
       {children}
-      <ModalDialog
-        {...state}
-        onCancel={() => handlerFunction.current(false)}
-        onConfirm={() => handlerFunction.current(true)}
-      />
+      <ModalDialog {...state} onCancel={onCancel} onConfirm={onConfirm} />
     </ConfirmDialog.Provider>
   );
 };
