@@ -31,7 +31,6 @@ type Activity struct {
 type Entry struct {
 	Issue    Issue    `json:"issue"`
 	Activity Activity `json:"activity"`
-	Project  Project  `json:"project"`
 }
 
 type PriorityEntry struct {

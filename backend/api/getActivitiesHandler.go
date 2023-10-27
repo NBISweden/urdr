@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 	"urdr-api/internal/config"
@@ -31,8 +30,6 @@ func getProjectActivitiesHandler(c *fiber.Ctx) error {
 	if err != nil {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
-
-	log.Printf("Project ID: %d, Issue ID: %d", redmineProjectId, redmineIssueId)
 
 	if ok, err := prepareRedmineRequest(c); !ok {
 		return err
