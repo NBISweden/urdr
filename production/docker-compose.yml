@@ -21,8 +21,6 @@ services:
     restart: always
     env_file:
       - ./urdr.env
-    networks:
-      - redmine_net
 
   nginx:
     image: ghcr.io/nbisweden/urdr-web:${TAG:-latest}
@@ -40,12 +38,6 @@ services:
     ports:
       - 4567:80
     restart: always
-    networks:
-      - redmine_net
 
 volumes:
   exclude: null
-
-networks:
-  redmine_net:
-    external: true
