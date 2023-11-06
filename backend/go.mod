@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/gofiber/fiber/v2 v2.49.2
 	github.com/gofiber/storage/sqlite3 v1.3.7
-	github.com/mattn/go-sqlite3 v1.14.17
+	github.com/mattn/go-sqlite3 v1.14.18
 	github.com/sirupsen/logrus v1.9.0
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.1
