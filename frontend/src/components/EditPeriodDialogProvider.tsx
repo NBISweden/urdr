@@ -28,54 +28,53 @@ export const EditPeriodDialogProvider = ({ children }) => {
     <div>
       <p>Please enter below the new start and end date of your absence.</p>
       <hr></hr>
-      <label htmlFor="fromDate" className="date-label">
-        Start date
-      </label>
-      <DatePicker
-        filterDate={isWeekday}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={updatedAbsenceStartDate ? updatedAbsenceStartDate : undefined}
-        onChange={(date: Date) => {
-          setUpdatedAbsenceStartDate(date);
-        }}
-        showWeekNumbers
-        minDate={new Date()}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsStart
-        startDate={updatedAbsenceStartDate}
-        endDate={updatedAbsenceEndDate}
-        monthsShown={1}
-        placeholderText="YYYY-MM-DD"
-        strictParsing
-      />
-      <label htmlFor="toDate" className="date-label">
-        End date
-      </label>
-      <DatePicker
-        filterDate={isWeekday}
-        dateFormat={dateFormat}
-        isClearable={true}
-        selected={updatedAbsenceEndDate ? updatedAbsenceEndDate : undefined}
-        onChange={(date: Date) => {
-          setUpdatedAbsenceEndDate(date);
-        }}
-        showWeekNumbers
-        minDate={updatedAbsenceStartDate}
-        maxDate={new Date("2030-01-01")}
-        locale={sv}
-        showYearDropdown
-        todayButton="Idag"
-        selectsEnd
-        startDate={updatedAbsenceStartDate}
-        endDate={updatedAbsenceEndDate}
-        monthsShown={1}
-        placeholderText="YYYY-MM-DD"
-        strictParsing
-      />
+      <label htmlFor="fromDate">Start date</label>
+      <div>
+        <DatePicker
+          filterDate={isWeekday}
+          dateFormat={dateFormat}
+          selected={
+            updatedAbsenceStartDate ? updatedAbsenceStartDate : undefined
+          }
+          onChange={(date: Date) => {
+            setUpdatedAbsenceStartDate(date);
+          }}
+          showWeekNumbers
+          locale={sv}
+          showYearDropdown
+          todayButton="Idag"
+          selectsStart
+          startDate={updatedAbsenceStartDate}
+          endDate={updatedAbsenceEndDate}
+          monthsShown={1}
+          className="form-control dateInput"
+          placeholderText="YYYY-MM-DD"
+          strictParsing
+        />
+      </div>
+      <label htmlFor="toDate">End date</label>
+
+      <div>
+        <DatePicker
+          filterDate={isWeekday}
+          dateFormat={dateFormat}
+          selected={updatedAbsenceEndDate ? updatedAbsenceEndDate : undefined}
+          onChange={(date: Date) => {
+            setUpdatedAbsenceEndDate(date);
+          }}
+          showWeekNumbers
+          locale={sv}
+          showYearDropdown
+          todayButton="Idag"
+          selectsEnd
+          startDate={updatedAbsenceStartDate}
+          endDate={updatedAbsenceEndDate}
+          monthsShown={1}
+          className="form-control dateInput"
+          placeholderText="YYYY-MM-DD"
+          strictParsing
+        />
+      </div>
     </div>
   );
 
@@ -99,13 +98,15 @@ export const EditPeriodDialogProvider = ({ children }) => {
   );
 
   const onChoiceMade = (choice: boolean) => {
-    handlerFunction.current({
-      choice: choice,
-      startDate: updatedAbsenceStartDate,
-      endDate: updatedAbsenceEndDate,
-    });
-    setUpdatedAbsenceStartDate(undefined);
-    setUpdatedAbsenceEndDate(undefined);
+    if (handlerFunction.current) {
+      handlerFunction.current({
+        choice: choice,
+        startDate: updatedAbsenceStartDate,
+        endDate: updatedAbsenceEndDate,
+      });
+      setUpdatedAbsenceStartDate(undefined);
+      setUpdatedAbsenceEndDate(undefined);
+    }
   };
 
   return (
