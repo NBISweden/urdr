@@ -1,4 +1,4 @@
-FROM node:20.3.0-alpine as build
+FROM node:21.6.0-alpine as build
 
 USER node
 RUN mkdir /home/node/app
