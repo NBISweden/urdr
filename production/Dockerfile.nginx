@@ -21,7 +21,7 @@ COPY --chown=node:node /. /home/node/app/
 COPY --from=build --chown=node:node /home/node/node_modules/ /home/node/app/node_modules/
 RUN npm run build
 
-FROM nginx:1.25.3-alpine
+FROM nginx:1.26-alpine
 
 RUN mkdir -p /app/dist
 COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist
