@@ -97,11 +97,11 @@ Other button classes are defined further down together with other classes for th
 
 .header-wrapper {
   width: 100vw;
-  height: 10rem;
+  padding: 1rem 3rem 3rem;
   line-height: 10rem;
-  margin-bottom: 3rem;
   background-color: hsl(76deg 55% 53%);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
@@ -110,6 +110,10 @@ Other button classes are defined further down together with other classes for th
   .header-wrapper {
     width: 200vw;
   }
+}
+
+.header-wrapper img {
+  display: block;
 }
 
 .header-heading {
