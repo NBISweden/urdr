@@ -8,7 +8,7 @@ WORKDIR /go
 COPY ./ .
 
 RUN apk --no-cache add \
-    'gcc=~12' \
+    'gcc=~13' \
     'musl-dev=~1.2'
 
 ENV GOPATH=$PWD

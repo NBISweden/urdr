@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine3.18
+FROM golang:1.20-alpine
 
 ENV XDG_CACHE_HOME='/tmp/.cache'
 
@@ -8,7 +8,7 @@ SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk --no-cache add \
     'curl=~8' \
-    'gcc=~12' \
+    'gcc=~13' \
     'musl-dev=~1.2'; \
     curl --silent --fail --location \
     'https://raw.githubusercontent.com/cosmtrek/air/v1.44.0/install.sh' | \
