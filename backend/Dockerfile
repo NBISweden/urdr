@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine
+FROM golang:1.23-alpine3.20
 
 ENV XDG_CACHE_HOME='/tmp/.cache'
 
