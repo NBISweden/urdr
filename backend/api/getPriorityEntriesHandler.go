@@ -90,7 +90,7 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 func getProjectIdForIssue(c *fiber.Ctx, issueId int) (int, error) {
 	c.Response().Reset()
 	c.Request().URI().SetQueryString(
-		fmt.Sprintf("issue_id=%d,status_id=*", issueId))
+		fmt.Sprintf("issue_id=%d&status_id=*", issueId))
 
 	if err := getIssuesHandler(c); err != nil {
 	} else if c.Response().StatusCode() != fiber.StatusOK {
