@@ -470,6 +470,10 @@ Other button classes are defined further down together with other classes for th
   width: 1.7rem;
 }
 
+.info-icon {
+  width: 1.3rem;
+}
+
 .hide-icon {
   width: 2rem;
   margin-top: 0.5rem;

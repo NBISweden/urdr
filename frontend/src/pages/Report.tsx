@@ -37,6 +37,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import info from "../icons/info-circle-fill.svg";
 import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
@@ -832,10 +833,14 @@ export const Report = () => {
                 </div>
               </div>
             </div>
-            <p>Current Branch: {gitBranch}</p>
-            <p>Commit Hash: {gitHash}</p>
           </section>
           <BarChart loading={isLoading}></BarChart>
+          <section className="recent-container ">
+            <div>
+              <img src={info} className="info-icon" alt={"information icon"} />{" "}
+              Release from {gitBranch} ({gitHash})
+            </div>
+          </section>
         </main>
         <div className="footer">
           <section className="footer-container">
