@@ -1,71 +1,79 @@
-const path = require('path')
-const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+const { execSync } = require("child_process");
+
+const gitBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
+const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 module.exports = {
-  mode: 'development',
+  mode: "development",
   entry: {
-    index: './src/index.tsx'
+    index: "./src/index.tsx",
   },
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/i,
-        loader: 'ts-loader',
-        exclude: ['/node_modules/'],
+        loader: "ts-loader",
+        exclude: ["/node_modules/"],
         options: {
-          transpileOnly: true
-        }
+          transpileOnly: true,
+        },
       },
       {
         test: /\.(woff|woff2|png|svg|html)$/i,
-        type: 'asset'
+        type: "asset",
       },
       {
         test: /\.(css)$/i,
-        use: ['style-loader', 'css-loader']
+        use: ["style-loader", "css-loader"],
       },
       {
-        test: /\.hbs$/, loader: 'handlebars-loader'
-      }
-    ]
+        test: /\.hbs$/,
+        loader: "handlebars-loader",
+      },
+    ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.jsx', '.js', '...']
+    extensions: [".tsx", ".ts", ".jsx", ".js", "..."],
   },
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   devServer: {
     open: true,
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     port: 4242,
     compress: true,
-    allowedHosts: 'all',
+    allowedHosts: "all",
     historyApiFallback: true,
-    static: './public',
+    static: "./public",
     client: {
-      webSocketURL: 'ws://localhost:4567/ws',
+      webSocketURL: "ws://localhost:4567/ws",
       overlay: {
         errors: true,
         warnings: false,
-        runtimeErrors: false
-      }
-    }
+        runtimeErrors: false,
+      },
+    },
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.PUBLIC_API_URL': JSON.stringify(process.env.PUBLIC_API_URL),
-      'process.env.PUBLIC_REDMINE_URL': JSON.stringify(
+      "process.env.PUBLIC_API_URL": JSON.stringify(process.env.PUBLIC_API_URL),
+      "process.env.PUBLIC_REDMINE_URL": JSON.stringify(
         process.env.PUBLIC_REDMINE_URL
-      )
+      ),
+      "process.env.GIT_BRANCH": JSON.stringify(gitBranch),
+      "process.env.GIT_HASH": JSON.stringify(gitHash),
     }),
     new HtmlWebpackPlugin({
-      filename: 'index.html',
-      publicPath: '/',
-      template: './src/template.hbs'
-    })
+      filename: "index.html",
+      publicPath: "/",
+      template: "./src/template.hbs",
+    }),
   ],
   output: {
-    filename: './js/index.js',
-    path: path.resolve(__dirname, './public')
-  }
-}
+    filename: "./js/index.js",
+    path: path.resolve(__dirname, "./public"),
+  },
+};

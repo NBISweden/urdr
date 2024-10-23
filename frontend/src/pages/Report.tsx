@@ -64,6 +64,8 @@ export const Report = () => {
   const [isLoading, setIsLoading] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
+  const gitBranch = process.env.GIT_BRANCH;
+  const gitHash = process.env.GIT_HASH;
 
   // Effect only run on first render to check if the user has entered
   // a valid year and week in URL.
@@ -830,6 +832,8 @@ export const Report = () => {
                 </div>
               </div>
             </div>
+            <p>Current Branch: {gitBranch}</p>
+            <p>Commit Hash: {gitHash}</p>
           </section>
           <BarChart loading={isLoading}></BarChart>
         </main>
