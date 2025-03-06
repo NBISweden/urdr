@@ -58,6 +58,7 @@ func postTimeEntriesHandler(c *fiber.Ctx) error {
 		} else {
 			// Delete time entry.
 			method = fiber.MethodDelete
+			c.Request().SetBody([]byte{})
 		}
 	}
 
