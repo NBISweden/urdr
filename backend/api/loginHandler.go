@@ -16,7 +16,7 @@ import (
 // @Security	BasicAuth
 // @Accept	json
 // @Produce	json
-// @Success	200	{object}	user
+// @Success	200	{object}	api.loginHandler.login
 // @Failure	401	{string}	error "Unauthorized"
 // @Failure	422	{string}	error "Unprocessable Entity"
 // @Failure	500	{string}	error "Internal Server Error"
@@ -64,9 +64,12 @@ func loginHandler(c *fiber.Ctx) error {
 
 	log.Debugf("Logged in user %s", loginResponse.User.Login)
 
-	return c.JSON(struct {
+	// The local "login" struct is used to return the login name to the client.
+	type login struct {
 		Login string `json:"login"`
-	}{
+	}
+
+	return c.JSON(login{
 		Login: loginResponse.User.Login,
 	})
 }
