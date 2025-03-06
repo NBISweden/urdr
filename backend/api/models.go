@@ -14,11 +14,6 @@ type Issue struct {
 	Project Project `json:"project"`
 }
 
-type IssueWithTitle struct {
-	Id    int    `json:"id"`
-	Title string `json:"title"`
-}
-
 type IssuesResponse struct {
 	Issues []Issue `json:"issues"`
 }
@@ -38,8 +33,4 @@ type PriorityEntry struct {
 	Activity   Activity `json:"activity"`
 	CustomName string   `json:"custom_name"`
 	IsHidden   bool     `json:"is_hidden"`
-}
-
-type IssueSearchResponse struct {
-	Results []IssueWithTitle `json:"results"`
 }
