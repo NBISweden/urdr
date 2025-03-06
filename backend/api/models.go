@@ -1,9 +1,5 @@
 package api
 
-type user struct {
-	Login string `json:"login"`
-}
-
 type Project struct {
 	Id int `json:"id"`
 }

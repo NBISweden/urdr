@@ -64,7 +64,9 @@ func loginHandler(c *fiber.Ctx) error {
 
 	log.Debugf("Logged in user %s", loginResponse.User.Login)
 
-	return c.JSON(user{
+	return c.JSON(struct {
+		Login string `json:"login"`
+	}{
 		Login: loginResponse.User.Login,
 	})
 }
