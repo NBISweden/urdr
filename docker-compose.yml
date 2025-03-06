@@ -32,6 +32,7 @@ services:
     volumes:
       - ./frontend:/home/node/app/
       - exclude:/home/node/app/node_modules
+      - .git:/home/node/app/.git
 
   nginx:
     image: nginx:1.25.1-alpine

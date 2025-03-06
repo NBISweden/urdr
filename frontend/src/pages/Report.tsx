@@ -37,6 +37,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import info from "../icons/info-circle-fill.svg";
 import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
@@ -64,6 +65,8 @@ export const Report = () => {
   const [isLoading, setIsLoading] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
+  const gitBranch = process.env.GIT_BRANCH;
+  const gitHash = process.env.GIT_HASH;
 
   // Effect only run on first render to check if the user has entered
   // a valid year and week in URL.
@@ -832,6 +835,12 @@ export const Report = () => {
             </div>
           </section>
           <BarChart loading={isLoading}></BarChart>
+          <section className="recent-container ">
+            <div>
+              <img src={info} className="info-icon" alt={"information icon"} />{" "}
+              Release from {gitBranch} ({gitHash})
+            </div>
+          </section>
         </main>
         <div className="footer">
           <section className="footer-container">
