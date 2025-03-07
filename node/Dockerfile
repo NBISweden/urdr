@@ -15,6 +15,7 @@ USER node
 WORKDIR /home/node
 COPY --chown=node:node /frontend/package.json /frontend/package-lock.json ./
 RUN npm ci
+RUN git config --global --add safe.directory /home/node/app
 
 ENV PATH=/home/node/node_modules/.bin:$PATH
 
