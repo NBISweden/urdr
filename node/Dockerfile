@@ -7,7 +7,7 @@ RUN mkdir /home/node/app
 USER root
 
 # Install git with root privileges
-RUN apk update && apk add --no-cache git>=2.40
+RUN apk update && apk add --no-cache git=~2.40
 
 # Switch back to the node user
 USER node
