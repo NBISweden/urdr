@@ -61,7 +61,7 @@ export const Report = () => {
   );
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
 
@@ -141,9 +141,13 @@ export const Report = () => {
 
   // If recentIssues has changed, do this...
   React.useEffect(() => {
+    if (recentIssues.length === 0) {
+      return;
+    }
     let didCancel = false;
 
     const getRowData = async () => {
+      toggleLoadingPage(true);
       const priorityIssues: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
         context
@@ -164,15 +168,16 @@ export const Report = () => {
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
           const hidden = priorityIssues.filter((issue) => issue.is_hidden);
-          getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
+          await getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
           setHidden(hidden);
         }
       } else if (!didCancel) {
-        getAllEntries(issues);
+        await getAllEntries(issues);
         setFilteredRecents(issues);
-      }
+        }
+      toggleLoadingPage(false);
     };
     getRowData();
     return () => {
