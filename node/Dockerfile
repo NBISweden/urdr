@@ -7,7 +7,7 @@ RUN mkdir /home/node/app
 USER root
 
 # Install git with root privileges
-RUN apk update && apk add --no-cache git=2.40.0-r0
+RUN apk update && apk add --no-cache git=~2.40
 
 # Switch back to the node user
 USER node
@@ -15,6 +15,7 @@ USER node
 WORKDIR /home/node
 COPY --chown=node:node /frontend/package.json /frontend/package-lock.json ./
 RUN npm ci
+RUN git config --global --add safe.directory /home/node/app
 
 ENV PATH=/home/node/node_modules/.bin:$PATH
 
