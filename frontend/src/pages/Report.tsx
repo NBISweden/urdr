@@ -176,7 +176,7 @@ export const Report = () => {
       } else if (!didCancel) {
         await getAllEntries(issues);
         setFilteredRecents(issues);
-        }
+      }
       toggleLoadingPage(false);
     };
     getRowData();
