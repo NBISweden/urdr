@@ -6,7 +6,7 @@ import { Help } from "./pages/Help";
 import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { getISOWeek } from "date-fns";
+import { getISOWeek, getISOWeekYear } from "date-fns";
 import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
 import { EditPeriodDialogProvider } from "./components/EditPeriodDialogProvider";
 
@@ -16,7 +16,7 @@ import { EditPeriodDialogProvider } from "./components/EditPeriodDialogProvider"
 // If none of these apply, redirect to /report/year/week using
 // current year and week and replace the history element.
 export const App = () => {
-  const currentYear: number = new Date().getFullYear();
+  const currentYear: number = getISOWeekYear(new Date());
   const currentWeek: number = getISOWeek(new Date());
 
   return (
