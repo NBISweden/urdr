@@ -108,23 +108,11 @@ export const Report = () => {
     setIsLoading(state);
   };
 
-  // Retrieve time entries for given rows
-  const getAllEntries = async () => {
-    let allEntries = [];
-    const entries = await getTimeEntries(
-      undefined,
-      currentWeekArray[0],
-      currentWeekArray[4],
-      context,
-      "me"
-    );
-    allEntries.push(...entries);
-    setTimeEntries(allEntries);
-
-    if (allEntries.length > 0) {
+  React.useEffect(() => {
+    if (timeEntries.length > 0) {
       setShowTotalHours(true);
     }
-  };
+  }, [timeEntries]);
 
   // If weekTravelDay changes, do this...
   React.useEffect(() => {
@@ -159,7 +147,14 @@ export const Report = () => {
         context
       );
       const issues = [...recentIssues];
-      await getAllEntries();
+      const entries = await getTimeEntries(
+        undefined,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context,
+        "me"
+      );
+      setTimeEntries(entries);
       if (!!priorityIssues) {
         let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
@@ -422,7 +417,14 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    await getAllEntries();
+    const entries = await getTimeEntries(
+      undefined,
+      currentWeekArray[0],
+      currentWeekArray[4],
+      context,
+      "me"
+    );
+    setTimeEntries(entries);
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
