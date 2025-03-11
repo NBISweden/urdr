@@ -34,7 +34,7 @@ export const Row = ({
   onToggleFav: (topic: IssueActivityPair) => void;
   onFavNameUpdate: (topic: IssueActivityPair, custom_name: string) => void;
   onFavNameSave: () => void;
-  getRowSum: (pair: IssueActivityPair) => number;
+  getRowSum: (pair: IssueActivityPair) => string;
   onToggleHide?: (topic: IssueActivityPair) => void;
   isFav?: boolean;
   isHidden?: boolean;

@@ -63,6 +63,7 @@ export const Report = () => {
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showTotalHours, setShowTotalHours] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
   const gitBranch = process.env.GIT_BRANCH;
@@ -119,6 +120,10 @@ export const Report = () => {
     );
     allEntries.push(...entries);
     setTimeEntries(allEntries);
+
+    if (allEntries.length > 0) {
+      setShowTotalHours(true);
+    }
   };
 
   // If weekTravelDay changes, do this...
@@ -444,6 +449,7 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+    setShowTotalHours(false);
   };
 
   const addIssueActivityHandler = async (pair: IssueActivityPair) => {
@@ -587,12 +593,13 @@ export const Report = () => {
     return count;
   };
 
-  const getRowSum = (pair: IssueActivityPair) => {
+  const getRowSum = (pair: IssueActivityPair): string => {
+    if (!showTotalHours) return "";
     const sum = findRowHours(pair).reduce(
       (previousValue, currentValue) => previousValue + currentValue,
       0
     );
-    return sum;
+    return sum.toString();
   };
 
   // Removes an IssueActivityPair object from an array of these objects.
@@ -793,7 +800,7 @@ export const Report = () => {
                         type="text"
                         id={dateStr}
                         className="cell"
-                        value={getTotalHours(dateStr)}
+                        value={showTotalHours ? getTotalHours(dateStr) : ""}
                         readOnly
                         tabIndex={-1}
                       />
@@ -806,7 +813,7 @@ export const Report = () => {
                     aria-label="total of hours spent during the week"
                     type="text"
                     className="cell"
-                    value={getTotalHoursWeek()}
+                    value={showTotalHours ? getTotalHoursWeek() : ""}
                     readOnly
                     tabIndex={-1}
                   />
