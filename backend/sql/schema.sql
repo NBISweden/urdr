@@ -140,3 +140,20 @@ CREATE TABLE user_group (
 		REFERENCES group_info (redmine_group_id)
 		ON DELETE CASCADE
 );
+
+-- Migrations.
+--
+-- The "migrations" table is used to keep track of the schema version.
+-- Here, we create the table and initialise it with the migrations that
+-- have already been applied (above).
+
+DROP TABLE IF EXISTS migrations;
+CREATE TABLE migrations (
+	name TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE (name) ON CONFLICT ROLLBACK
+);
+
+INSERT INTO migrations(name) VALUES
+	('20250312-a'),
+	('20250312-b');
