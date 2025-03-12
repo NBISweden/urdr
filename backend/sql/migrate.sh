@@ -3,7 +3,6 @@
 # This script applies all avilable migrations to the database
 # given in the first argument.
 
-myname=$(basename "$0")
 mydir=$(dirname "$0")
 
 database=$1
