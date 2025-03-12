@@ -108,25 +108,11 @@ export const Report = () => {
     setIsLoading(state);
   };
 
-  // Retrieve time entries for given rows
-  const getAllEntries = async (rows: IssueActivityPair[]) => {
-    let allEntries = [];
-    for await (let row of rows) {
-      const entries = await getTimeEntries(
-        row,
-        currentWeekArray[0],
-        currentWeekArray[4],
-        context,
-        "me"
-      );
-      allEntries.push(...entries);
-    }
-    setTimeEntries(allEntries);
-
-    if (allEntries.length > 0) {
+  React.useEffect(() => {
+    if (timeEntries.length > 0) {
       setShowTotalHours(true);
     }
-  };
+  }, [timeEntries]);
 
   // If weekTravelDay changes, do this...
   React.useEffect(() => {
@@ -161,6 +147,14 @@ export const Report = () => {
         context
       );
       const issues = [...recentIssues];
+      const entries = await getTimeEntries(
+        undefined,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context,
+        "me"
+      );
+      setTimeEntries(entries);
       if (!!priorityIssues) {
         let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
@@ -176,13 +170,11 @@ export const Report = () => {
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
           const hidden = priorityIssues.filter((issue) => issue.is_hidden);
-          await getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
           setHidden(hidden);
         }
       } else if (!didCancel) {
-        await getAllEntries(issues);
         setFilteredRecents(issues);
       }
       toggleLoadingPage(false);
@@ -425,7 +417,14 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
+    const entries = await getTimeEntries(
+      undefined,
+      currentWeekArray[0],
+      currentWeekArray[4],
+      context,
+      "me"
+    );
+    setTimeEntries(entries);
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
