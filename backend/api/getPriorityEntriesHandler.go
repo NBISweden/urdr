@@ -47,9 +47,14 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 		entry := Entry{
 			Issue: Issue{
 				Id: dbPriorityEntry.RedmineIssueId,
+				Subject: dbPriorityEntry.RedmineIssueSubject,
+				Project: Project{
+					Id: dbPriorityEntry.RedmineProjectId,
+				},
 			},
 			Activity: Activity{
 				Id: dbPriorityEntry.RedmineActivityId,
+				Name: dbPriorityEntry.RedmineActivityName,
 			},
 		}
 
@@ -63,6 +68,13 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 
 	var priorityEntries []PriorityEntry
 
+        // If we're dealing with a priority entry that has no activity
+        // name, because it was added before the activity name was
+        // stored in the database, we need to fetch the activity name
+        // from Redmine.  We also need to update the database with the
+        // activity name.
+	doUpdateDb := false
+
 	for i, dbPriorityEntry := range dbPriorityEntries {
 		priorityEntry := PriorityEntry{
 			Issue:      entries[i].Issue,
@@ -70,18 +82,40 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 			CustomName: dbPriorityEntry.Name,
 			IsHidden:   dbPriorityEntry.IsHidden,
 		}
-		projectId, err := getProjectIdForIssue(c, priorityEntry.Issue.Id)
-		if err != nil {
-			return err
-		}
 
-		activityName, err := getActivityNameForIssue(c, priorityEntry.Issue.Id, projectId, priorityEntry.Activity.Id)
-		if err != nil {
-			return err
+		activityName := priorityEntry.Activity.Name
+		if activityName == "" {
+                        // The activity was stored in the database
+                        // without a name.  Fetch the activity name from
+                        // Redmine.  To do this, we may also need to
+                        // fetch the project ID for the issue.
+
+			projectId := priorityEntry.Issue.Project.Id
+			if projectId == 0 {
+				projectId, err = getProjectIdForIssue(c, priorityEntry.Issue.Id)
+				if err != nil {
+					return err
+				}
+			}
+			dbPriorityEntries[i].RedmineProjectId = projectId
+
+			activityName, err = getActivityNameForIssue(c, priorityEntry.Issue.Id, projectId, priorityEntry.Activity.Id)
+			if err != nil {
+				return err
+			}
+			dbPriorityEntries[i].RedmineActivityName = activityName
+			priorityEntry.Activity.Name = activityName
+
+			doUpdateDb = true
 		}
-		priorityEntry.Activity.Name = activityName
 
 		priorityEntries = append(priorityEntries, priorityEntry)
+	}
+
+	if doUpdateDb {
+		if err := db.SetAllUserPriorityEntries(userId.(int), dbPriorityEntries); err != nil {
+			return err
+		}
 	}
 
 	return c.JSON(priorityEntries)
