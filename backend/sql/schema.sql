@@ -74,11 +74,11 @@ CREATE TABLE user_setting (
 DROP TABLE IF EXISTS priority_entry;
 CREATE TABLE priority_entry (
 	redmine_user_id INTEGER NOT NULL,
-	redmine_project_id INTEGER NOT NULL,
+	redmine_project_id INTEGER NOT NULL DEFAULT 0,
 	redmine_issue_id INTEGER NOT NULL,
-	redmine_issue_subject TEXT,
+	redmine_issue_subject TEXT NOT NULL DEFAULT "",
 	redmine_activity_id INTEGER NOT NULL,
-	redmine_activity_name TEXT,
+	redmine_activity_name TEXT NOT NULL DEFAULT "",
 	name TEXT,
 	is_hidden BOOLEAN,
 	priority INTEGER NOT NULL,
