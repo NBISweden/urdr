@@ -76,6 +76,18 @@ docker-compose build
 docker-compose up
 ```
 
+## Database migrations
+
+The Urdr service has a local database.  The schema of this database is
+defined in `backend/sql/schema.sql`.  If the schema is updated, the
+database must be migrated to the new schema (unless the database instead
+is recreated from scratch).  This is done by running the `migrate.sh`
+script in the `backend/sql` directory.
+
+```command
+backend/sql/migrate.sh backend/database.db
+```
+
 ## Tests
 
 There are tests for each part of the backend API, which can be tested by the following command:
