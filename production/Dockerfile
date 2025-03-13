@@ -8,11 +8,12 @@ WORKDIR /go
 COPY ./ .
 
 RUN apk --no-cache add \
-    'gcc=~14' \
-    'musl-dev=~1.2'
+    clang=~19 \
+    musl-dev=~1.2
 
 ENV GOPATH=$PWD
 ENV CGO_ENABLED=1
+ENV CC=clang
 RUN go build -ldflags "-linkmode external -extldflags -static" -o ./urdr ./cmd
 
 FROM scratch

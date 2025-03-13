@@ -9,6 +9,7 @@ services:
     volumes:
       - ./backend/:/app
       - ./urdr.env:/app/urdr.env
+      - cache:/tmp/.cache
     container_name: urdr
     expose:
       - "8080"
@@ -56,3 +57,4 @@ services:
 
 volumes:
   exclude: null
+  cache:
