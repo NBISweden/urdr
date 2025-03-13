@@ -17,6 +17,11 @@ services:
     restart: always
     env_file:
       - ./urdr.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/swagger/"]
+      interval: 10s
+      timeout: 3s
+      retries: 60  # 10s * 60 = 10 minutes
 
   node-urdr:
     container_name: node-urdr
@@ -24,6 +29,9 @@ services:
       - ./urdr.env
     environment:
       - NODE_OPTIONS="--max-old-space-size=2048"
+    depends_on:
+      urdr:
+        condition: service_healthy
 
     build:
       context: ./
@@ -40,6 +48,11 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - 4567:80
+    depends_on:
+      urdr:
+        condition: service_healthy
+      node-urdr:
+        condition: service_started
 
 volumes:
   exclude: null
