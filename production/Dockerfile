@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine3.20 AS builder
+FROM golang:1.23-alpine3.21 AS builder
 
 RUN addgroup -S urdr && getent group urdr >/tmp/group
 RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
@@ -8,7 +8,7 @@ WORKDIR /go
 COPY ./ .
 
 RUN apk --no-cache add \
-    'gcc=~13' \
+    'gcc=~14' \
     'musl-dev=~1.2'
 
 ENV GOPATH=$PWD

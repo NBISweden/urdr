@@ -1,4 +1,4 @@
-FROM node:20.6.1-alpine as build
+FROM node:20.6.1-alpine AS build
 
 USER root
 RUN apk update && apk add --no-cache git=~2.40
