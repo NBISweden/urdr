@@ -2,15 +2,19 @@ package database
 
 import "fmt"
 
-// The PriorityEntry type is a simple struct that encapsulates ai
-// "priority entry", i.e. a Redmine issue ID and a Redmine activity ID
+// The PriorityEntry type is a simple struct that encapsulates a
+// "priority entry", i.e. a Redmine issue ID and subject with its
+// corresponding Redmine project ID, and a Redmine activity ID and name
 // together with a custom name to which a user has assigned the meaning
 // "favorite" or "hidden" using the UI.
 type PriorityEntry struct {
-	RedmineIssueId    int
-	RedmineActivityId int
-	Name              string
-	IsHidden          bool
+	RedmineProjectId    int
+	RedmineIssueId      int
+	RedmineIssueSubject string
+	RedmineActivityId   int
+	RedmineActivityName string
+	Name                string
+	IsHidden            bool
 }
 
 // GetAllUserPrioityEntries() returns a list of priority entries for
@@ -18,8 +22,11 @@ type PriorityEntry struct {
 func (db *Database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry, error) {
 	selectStmt := `
 		SELECT
+			redmine_project_id,
 			redmine_issue_id,
+			redmine_issue_subject,
 			redmine_activity_id,
+			redmine_activity_name,
 			name,
 			is_hidden
 		FROM	priority_entry
@@ -43,8 +50,11 @@ func (db *Database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry
 	for rows.Next() {
 		var priorityEntry PriorityEntry
 
-		if err := rows.Scan(&priorityEntry.RedmineIssueId,
+		if err := rows.Scan(&priorityEntry.RedmineProjectId,
+			&priorityEntry.RedmineIssueId,
+			&priorityEntry.RedmineIssueSubject,
 			&priorityEntry.RedmineActivityId,
+			&priorityEntry.RedmineActivityName,
 			&priorityEntry.Name,
 			&priorityEntry.IsHidden); err != nil {
 			return nil, fmt.Errorf("sql.Scan() failed: %w", err)
@@ -59,8 +69,8 @@ func (db *Database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry
 	return priorityEntries, nil
 }
 
-// SetAllUserPriorityEntries() replaces all stored priority entries for the given
-// user by the ones provided in the list to this function.
+// SetAllUserPriorityEntries() replaces all stored priority entries for
+// the given user by the ones provided in the list to this function.
 func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []PriorityEntry) error {
 	tx, err := db.handle().Begin()
 	if err != nil {
@@ -95,12 +105,15 @@ func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []Pri
 	insertStmt := `
 		INSERT INTO priority_entry (
 			redmine_user_id, 
+			redmine_project_id,
 			redmine_issue_id,
+			redmine_issue_subject,
 			redmine_activity_id,
+			redmine_activity_name,
 			name,
 			is_hidden,
 			priority )
-		VALUES (?, ?, ?, ?, ?, ?)`
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	stmt, err = tx.Prepare(insertStmt)
 	if err != nil {
@@ -110,8 +123,11 @@ func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []Pri
 
 	for priority, priorityEntry := range favorites {
 		if _, err := stmt.Exec(redmineUserId,
+			priorityEntry.RedmineProjectId,
 			priorityEntry.RedmineIssueId,
+			priorityEntry.RedmineIssueSubject,
 			priorityEntry.RedmineActivityId,
+			priorityEntry.RedmineActivityName,
 			priorityEntry.Name,
 			priorityEntry.IsHidden,
 			priority); err != nil {

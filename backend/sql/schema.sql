@@ -1,6 +1,6 @@
 -- The relational database schema for Urdr, storing the data that is not
 -- kept by Redmine by default but that we need to be persistent between
--- sessions.
+-- sessions.  We also store some data here for efficiency reasons.
 --
 -- We assume that this file is used to initialize a SQLite database.
 -- The Go code does thes automatically, but you may also do so from the
@@ -64,12 +64,21 @@ CREATE TABLE user_setting (
 -- a hidden entry.  We also store a sorting priority, which determines
 -- the relative positioning in the user interface (it's essentially a
 -- sorting key).
+--
+-- For reasons of efficiency, we additionally store the Redmine project
+-- ID and name, the Redmine issue subject, and the Redmine activity
+-- name.  This is not strictly necessary, but it makes it easier to
+-- display the data in the user interface without having to query the
+-- Redmine API for each entry.
 
 DROP TABLE IF EXISTS priority_entry;
 CREATE TABLE priority_entry (
 	redmine_user_id INTEGER NOT NULL,
+	redmine_project_id INTEGER NOT NULL DEFAULT 0,
 	redmine_issue_id INTEGER NOT NULL,
+	redmine_issue_subject TEXT NOT NULL DEFAULT "",
 	redmine_activity_id INTEGER NOT NULL,
+	redmine_activity_name TEXT NOT NULL DEFAULT "",
 	name TEXT,
 	is_hidden BOOLEAN,
 	priority INTEGER NOT NULL,
@@ -131,3 +140,20 @@ CREATE TABLE user_group (
 		REFERENCES group_info (redmine_group_id)
 		ON DELETE CASCADE
 );
+
+-- Migrations.
+--
+-- The "migrations" table is used to keep track of the schema version.
+-- Here, we create the table and initialise it with the migrations that
+-- have already been applied (above).
+
+DROP TABLE IF EXISTS migrations;
+CREATE TABLE migrations (
+	name TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE (name) ON CONFLICT ROLLBACK
+);
+
+INSERT INTO migrations(name) VALUES
+	('20250312-a'),
+	('20250312-b');
