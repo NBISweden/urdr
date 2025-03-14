@@ -1,4 +1,4 @@
-FROM golang:1.23.6-alpine3.21
+FROM golang:1.24-alpine
 
 ENV XDG_CACHE_HOME='/tmp/.cache'
 ENV CC='/usr/lib/ccache/bin/clang'
