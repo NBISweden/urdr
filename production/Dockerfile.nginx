@@ -1,15 +1,17 @@
 FROM node:20.6.1-alpine AS build
 
-USER root
-RUN apk update && apk add --no-cache git=~2.40
-
 USER node
+
+ARG GIT_BRANCH
+ARG GIT_HASH
+
+ENV GIT_BRANCH=$GIT_BRANCH
+ENV GIT_HASH=$GIT_HASH
+
 RUN mkdir /home/node/app
 WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
-COPY --chown=node:node .git ./.git
 RUN npm ci
-RUN git config --global --add safe.directory /home/node/app
 
 FROM node:20.6.1-alpine as bundler
 
