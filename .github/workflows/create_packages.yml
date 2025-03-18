@@ -7,7 +7,10 @@ on:
       - main
       - testing-github-actions
 
-jobs: tag: name: generate tag outputs:
+jobs:
+  tag:
+    name: generate tag
+    outputs:
       part: ${{ steps.generate_tag.outputs.part }}
       tag: ${{ steps.generate_tag.outputs.tag }}
     runs-on: ubuntu-latest
