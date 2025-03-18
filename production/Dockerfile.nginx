@@ -8,12 +8,14 @@ ARG GIT_HASH
 ENV GIT_BRANCH=$GIT_BRANCH
 ENV GIT_HASH=$GIT_HASH
 
+RUN printf 'Building for "%s" ("%s")\n' "$GIT_BRANCH" "$GIT_HASH"
+
 RUN mkdir /home/node/app
 WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:20.6.1-alpine as bundler
+FROM node:20.6.1-alpine AS bundler
 
 ARG PUBLIC_API_URL
 ENV PUBLIC_API_URL=${PUBLIC_API_URL}
