@@ -1,10 +1,13 @@
+---
+
 name: Create packages
-on:
+
+"on":
   push:
     branches:
-    - develop
-    - main
-    - testing-github-actions
+      - develop
+      - main
+      - testing-github-actions
 
 jobs:
   tag:
@@ -14,17 +17,20 @@ jobs:
       tag: ${{ steps.generate_tag.outputs.tag }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: '1'
-    - name: Generate new tag
-      id: generate_tag
-      uses: anothrNick/github-tag-action@1.61.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        WITH_V: true
-        DEFAULT_BUMP: ${{ github.ref_name == 'develop' && 'patch' ||  'minor' }}
-        DRY_RUN: true
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '1'
+      - name: Generate new tag
+        id: generate_tag
+        uses: anothrNick/github-tag-action@1.61.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: |
+            ${{
+              github.ref_name == 'develop' && 'patch' ||  'minor'
+            }}
+          DRY_RUN: true
 
   push_to_registry:
     strategy:
@@ -77,10 +83,15 @@ jobs:
           file: ./production/Dockerfile
           push: true
           tags: |
-            ghcr.io/nbisweden/urdr:${{ matrix.env == 'prod' && needs.tag.outputs.tag || format('{0}-test', needs.tag.outputs.tag) }}
+            ghcr.io/nbisweden/urdr:${{
+              matrix.env == 'prod' && needs.tag.outputs.tag ||
+              format('{0}-test', needs.tag.outputs.tag)
+            }}
             ghcr.io/nbisweden/urdr:latest
           labels: |
-            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.source=${{
+              github.event.repository.clone_url
+            }}
             org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             org.opencontainers.image.revision=${{ github.sha }}
 
@@ -96,10 +107,15 @@ jobs:
             GIT_HASH=${{ env.GIT_HASH }}
           push: true
           tags: |
-            ghcr.io/nbisweden/urdr-web:${{ matrix.env == 'prod' && needs.tag.outputs.tag || format('{0}-test', needs.tag.outputs.tag) }}
+            ghcr.io/nbisweden/urdr-web:${{
+              matrix.env == 'prod' && needs.tag.outputs.tag ||
+              format('{0}-test', needs.tag.outputs.tag)
+            }}
             ghcr.io/nbisweden/urdr-web:latest
           labels: |
-            org.opencontainers.image.source=${{ github.event.repository.clone_url }}
+            org.opencontainers.image.source=${{
+              github.event.repository.clone_url
+            }}
             org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
             org.opencontainers.image.revision=${{ github.sha }}
 
@@ -108,12 +124,12 @@ jobs:
     needs: [push_to_registry, tag]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: '1'
-    - name: Push tag
-      id: push_tag
-      uses: anothrNick/github-tag-action@1.61.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CUSTOM_TAG: ${{ needs.tag.outputs.tag }}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '1'
+      - name: Push tag
+        id: push_tag
+        uses: anothrNick/github-tag-action@1.61.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_TAG: ${{ needs.tag.outputs.tag }}

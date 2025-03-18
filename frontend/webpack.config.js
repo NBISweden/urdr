@@ -2,10 +2,8 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-const { execSync } = require('child_process')
-
-const gitBranch = process.env.GIT_BRANCH;
-const gitHash = process.env.GIT_HASH;
+const gitBranch = process.env.GIT_BRANCH
+const gitHash = process.env.GIT_HASH
 
 module.exports = {
   mode: 'development',
