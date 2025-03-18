@@ -58,8 +58,8 @@ jobs:
         run: |
            GIT_BRANCH=${GITHUB_REF#refs/heads/}
            GIT_HASH=$(printf '%s\n' "$GITHUB_SHA" | cut -c -7)
-           printf 'GIT_BRANCH=%s\n' "$GIT_BRANCH" >> $GITHUB_ENV
-           printf 'GIT_HASH=%s\n' "$GITHUB_HASH" >> $GITHUB_ENV
+           printf 'GIT_BRANCH=%s\n' "$GIT_BRANCH" >>"$GITHUB_ENV"
+           printf 'GIT_HASH=%s\n' "$GIT_HASH" >>"$GITHUB_ENV"
 
       - name: Log in to the Github Container registry
         uses: docker/login-action@v3

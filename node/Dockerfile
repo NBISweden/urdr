@@ -1,6 +1,6 @@
 FROM node:20.3.0-alpine AS build
 
-RUN apk add --no-cache git>=2.47
+RUN apk add --no-cache git~2
 COPY .git /tmp/.git
 
 ARG GIT_BRANCH
@@ -20,10 +20,10 @@ if [ -z "$GIT_HASH" ]; then
 else
 	printf 'export GIT_HASH="%s"\n' "$GIT_HASH"
 fi >>/home/node/git.env
-END
 
-RUN rm -r /tmp/.git
-RUN apk del git
+rm -r /tmp/.git
+apk del git
+END
 
 USER node
 RUN mkdir /home/node/app
