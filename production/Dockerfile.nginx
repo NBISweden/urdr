@@ -1,12 +1,19 @@
-FROM node:20.2.0-alpine as build
+FROM node:20.6.1-alpine AS build
 
 USER node
+
+ARG GIT_BRANCH
+ARG GIT_HASH
+
+ENV GIT_BRANCH=$GIT_BRANCH
+ENV GIT_HASH=$GIT_HASH
+
 RUN mkdir /home/node/app
 WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:20.2.0-alpine as bundler
+FROM node:20.6.1-alpine AS bundler
 
 ARG PUBLIC_API_URL
 ENV PUBLIC_API_URL=${PUBLIC_API_URL}
@@ -21,7 +28,7 @@ COPY --chown=node:node /. /home/node/app/
 COPY --from=build --chown=node:node /home/node/node_modules/ /home/node/app/node_modules/
 RUN npm run build
 
-FROM nginx:1.25.1-alpine
+FROM nginx:1.27.4-alpine
 
 RUN mkdir -p /app/dist
 COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist

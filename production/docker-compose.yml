@@ -1,5 +1,4 @@
 ---
-version: "3"
 
 services:
 
@@ -21,8 +20,6 @@ services:
     restart: always
     env_file:
       - ./urdr.env
-    networks:
-      - redmine_net
 
   nginx:
     image: ghcr.io/nbisweden/urdr-web:${TAG:-latest}
@@ -32,20 +29,11 @@ services:
       context: ../frontend
       labels:
         - org.opencontainers.image.source="https://github.com/NBISweden/urdr"
-      args:
-        - PUBLIC_API_URL=${PUBLIC_API_URL}
-        - PUBLIC_REDMINE_URL=${PUBLIC_REDMINE_URL}
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - 4567:80
     restart: always
-    networks:
-      - redmine_net
 
 volumes:
   exclude: null
-
-networks:
-  redmine_net:
-    external: true

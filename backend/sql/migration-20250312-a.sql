@@ -1,0 +1,14 @@
+-- Migration: 20250312-a
+-- Adds the "migrations" table.
+
+BEGIN TRANSACTION;
+
+CREATE TABLE IF NOT EXISTS migrations (
+	name TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	UNIQUE (name) ON CONFLICT ROLLBACK
+);
+
+INSERT INTO migrations(name) VALUES ('20250312-a');
+
+COMMIT;

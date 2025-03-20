@@ -37,6 +37,7 @@ import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
 import down from "../icons/caret-down-fill.svg";
+import info from "../icons/info-circle-fill.svg";
 import { BarChart } from "../components/BarChart";
 
 const beforeUnloadHandler = (event) => {
@@ -61,9 +62,12 @@ export const Report = () => {
   );
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
   const [showHidden, setShowHidden] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showTotalHours, setShowTotalHours] = useState(false);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
+  const gitBranch = process.env.GIT_BRANCH;
+  const gitHash = process.env.GIT_HASH;
 
   // Effect only run on first render to check if the user has entered
   // a valid year and week in URL.
@@ -104,21 +108,11 @@ export const Report = () => {
     setIsLoading(state);
   };
 
-  // Retrieve time entries for given rows
-  const getAllEntries = async (rows: IssueActivityPair[]) => {
-    let allEntries = [];
-    for await (let row of rows) {
-      const entries = await getTimeEntries(
-        row,
-        currentWeekArray[0],
-        currentWeekArray[4],
-        context,
-        "me"
-      );
-      allEntries.push(...entries);
+  React.useEffect(() => {
+    if (timeEntries.length > 0) {
+      setShowTotalHours(true);
     }
-    setTimeEntries(allEntries);
-  };
+  }, [timeEntries]);
 
   // If weekTravelDay changes, do this...
   React.useEffect(() => {
@@ -141,14 +135,26 @@ export const Report = () => {
 
   // If recentIssues has changed, do this...
   React.useEffect(() => {
+    if (recentIssues.length === 0) {
+      return;
+    }
     let didCancel = false;
 
     const getRowData = async () => {
+      toggleLoadingPage(true);
       const priorityIssues: IssueActivityPair[] = await getApiEndpoint(
         "/api/priority_entries",
         context
       );
       const issues = [...recentIssues];
+      const entries = await getTimeEntries(
+        undefined,
+        currentWeekArray[0],
+        currentWeekArray[4],
+        context,
+        "me"
+      );
+      setTimeEntries(entries);
       if (!!priorityIssues) {
         let nonPrioIssues: IssueActivityPair[] = [];
         issues.forEach((issue) => {
@@ -164,15 +170,14 @@ export const Report = () => {
         if (!didCancel) {
           const favorites = priorityIssues.filter((issue) => !issue.is_hidden);
           const hidden = priorityIssues.filter((issue) => issue.is_hidden);
-          getAllEntries([...favorites, ...hidden, ...nonPrioIssues]);
           setFilteredRecents(nonPrioIssues);
           setFavorites(favorites);
           setHidden(hidden);
         }
       } else if (!didCancel) {
-        getAllEntries(issues);
         setFilteredRecents(issues);
       }
+      toggleLoadingPage(false);
     };
     getRowData();
     return () => {
@@ -412,7 +417,14 @@ export const Report = () => {
         unsavedEntries.push(entry);
       }
     }
-    await getAllEntries([...favorites, ...hidden, ...filteredRecents]);
+    const entries = await getTimeEntries(
+      undefined,
+      currentWeekArray[0],
+      currentWeekArray[4],
+      context,
+      "me"
+    );
+    setTimeEntries(entries);
     setNewTimeEntries(unsavedEntries);
     toggleLoadingPage(false);
     if (unsavedEntries.length === 0) {
@@ -439,6 +451,7 @@ export const Report = () => {
   const handleWeekTravel = (newDay: Date) => {
     setWeekTravelDay(newDay);
     setCurrentWeekArray(getFullWeek(newDay));
+    setShowTotalHours(false);
   };
 
   const addIssueActivityHandler = async (pair: IssueActivityPair) => {
@@ -582,12 +595,13 @@ export const Report = () => {
     return count;
   };
 
-  const getRowSum = (pair: IssueActivityPair) => {
+  const getRowSum = (pair: IssueActivityPair): string => {
+    if (!showTotalHours) return "";
     const sum = findRowHours(pair).reduce(
       (previousValue, currentValue) => previousValue + currentValue,
       0
     );
-    return sum;
+    return sum.toString();
   };
 
   // Removes an IssueActivityPair object from an array of these objects.
@@ -788,7 +802,7 @@ export const Report = () => {
                         type="text"
                         id={dateStr}
                         className="cell"
-                        value={getTotalHours(dateStr)}
+                        value={showTotalHours ? getTotalHours(dateStr) : ""}
                         readOnly
                         tabIndex={-1}
                       />
@@ -801,7 +815,7 @@ export const Report = () => {
                     aria-label="total of hours spent during the week"
                     type="text"
                     className="cell"
-                    value={getTotalHoursWeek()}
+                    value={showTotalHours ? getTotalHoursWeek() : ""}
                     readOnly
                     tabIndex={-1}
                   />
@@ -832,6 +846,12 @@ export const Report = () => {
             </div>
           </section>
           <BarChart loading={isLoading}></BarChart>
+          <section className="recent-container ">
+            <div>
+              <img src={info} className="info-icon" alt={"information icon"} />{" "}
+              Release from {gitBranch} ({gitHash})
+            </div>
+          </section>
         </main>
         <div className="footer">
           <section className="footer-container">

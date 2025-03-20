@@ -133,8 +133,18 @@ func Test_Handlers(t *testing.T) {
 
 	issueActsResp, _ := json.Marshal(issueAct)
 
-	issueSearchResponse := api.IssueSearchResponse{
-		Results: []api.IssueWithTitle{
+	// The SearchResult type consists of "Id" and "Title" fields.
+	// The SearchResults type consists of "Results" array of SearchResult fields.
+	type SearchResult struct {
+		Id    int    `json:"id"`
+		Title string `json:"title"`
+	}
+	type SearchResults struct {
+		Results []SearchResult `json:"results"`
+	}
+
+	issueSearchResults := SearchResults{
+		Results: []SearchResult{
 			{
 				Id:    1,
 				Title: "test issue",
@@ -142,7 +152,7 @@ func Test_Handlers(t *testing.T) {
 		},
 	}
 
-	searchResponse, _ := json.Marshal(issueSearchResponse)
+	searchResponse, _ := json.Marshal(issueSearchResults)
 	var err error
 
 	// Create a fake Redmine server to which redmine requests will be forwarded

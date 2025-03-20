@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine as builder
+FROM golang:1.24-alpine AS builder
 
 RUN addgroup -S urdr && getent group urdr >/tmp/group
 RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
@@ -8,11 +8,12 @@ WORKDIR /go
 COPY ./ .
 
 RUN apk --no-cache add \
-    'gcc=~12' \
-    'musl-dev=~1.2'
+    clang=~19 \
+    musl-dev=~1.2
 
 ENV GOPATH=$PWD
 ENV CGO_ENABLED=1
+ENV CC=clang
 RUN go build -ldflags "-linkmode external -extldflags -static" -o ./urdr ./cmd
 
 FROM scratch

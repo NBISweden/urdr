@@ -46,10 +46,13 @@ func postPriorityEntriesHandler(c *fiber.Ctx) error {
 
 	for _, priorityEntry := range query {
 		dbPriorityEntry := database.PriorityEntry{
-			RedmineIssueId:    priorityEntry.Issue.Id,
-			RedmineActivityId: priorityEntry.Activity.Id,
-			Name:              priorityEntry.CustomName,
-			IsHidden:          priorityEntry.IsHidden,
+			RedmineProjectId:    priorityEntry.Issue.Project.Id,
+			RedmineIssueId:      priorityEntry.Issue.Id,
+			RedmineIssueSubject: priorityEntry.Issue.Subject,
+			RedmineActivityId:   priorityEntry.Activity.Id,
+			RedmineActivityName: priorityEntry.Activity.Name,
+			Name:                priorityEntry.CustomName,
+			IsHidden:            priorityEntry.IsHidden,
 		}
 
 		dbPriorityEntries = append(dbPriorityEntries, dbPriorityEntry)

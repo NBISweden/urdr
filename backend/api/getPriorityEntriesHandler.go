@@ -2,6 +2,8 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
+	"urdr-api/internal/redmine"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
@@ -45,9 +47,14 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 		entry := Entry{
 			Issue: Issue{
 				Id: dbPriorityEntry.RedmineIssueId,
+				Subject: dbPriorityEntry.RedmineIssueSubject,
+				Project: Project{
+					Id: dbPriorityEntry.RedmineProjectId,
+				},
 			},
 			Activity: Activity{
 				Id: dbPriorityEntry.RedmineActivityId,
+				Name: dbPriorityEntry.RedmineActivityName,
 			},
 		}
 
@@ -59,30 +66,14 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Now fetch the activities from Redmine and fill out the
-	// activity names.
-	c.Response().Reset()
-	if err := getProjectActivitiesHandler(c); err != nil {
-		// There was some error in the handler.
-		return err
-	} else if c.Response().StatusCode() != fiber.StatusOK {
-		// There was some error sent to us from Redmine.
-		return nil
-	}
-
-	activitiesResponse := struct {
-		Activities []struct {
-			Id   int    `json:"id"`
-			Name string `json:"name"`
-		} `json:"time_entry_activities"`
-	}{}
-
-	if err := json.Unmarshal(c.Response().Body(), &activitiesResponse); err != nil {
-		c.Response().Reset()
-		return c.SendStatus(fiber.StatusUnprocessableEntity)
-	}
-
 	var priorityEntries []PriorityEntry
+
+        // If we're dealing with a priority entry that has no activity
+        // name, because it was added before the activity name was
+        // stored in the database, we need to fetch the activity name
+        // from Redmine.  We also need to update the database with the
+        // activity name.
+	doUpdateDb := false
 
 	for i, dbPriorityEntry := range dbPriorityEntries {
 		priorityEntry := PriorityEntry{
@@ -91,15 +82,93 @@ func getPriorityEntriesHandler(c *fiber.Ctx) error {
 			CustomName: dbPriorityEntry.Name,
 			IsHidden:   dbPriorityEntry.IsHidden,
 		}
-		for _, activity := range activitiesResponse.Activities {
-			if activity.Id == priorityEntry.Activity.Id {
-				priorityEntry.Activity.Name = activity.Name
-				break
+
+		activityName := priorityEntry.Activity.Name
+		if activityName == "" {
+                        // The activity was stored in the database
+                        // without a name.  Fetch the activity name from
+                        // Redmine.  To do this, we may also need to
+                        // fetch the project ID for the issue.
+
+			projectId := priorityEntry.Issue.Project.Id
+			if projectId == 0 {
+				projectId, err = getProjectIdForIssue(c, priorityEntry.Issue.Id)
+				if err != nil {
+					return err
+				}
 			}
+			dbPriorityEntries[i].RedmineProjectId = projectId
+
+			activityName, err = getActivityNameForIssue(c, priorityEntry.Issue.Id, projectId, priorityEntry.Activity.Id)
+			if err != nil {
+				return err
+			}
+			dbPriorityEntries[i].RedmineActivityName = activityName
+			priorityEntry.Activity.Name = activityName
+
+			doUpdateDb = true
 		}
 
 		priorityEntries = append(priorityEntries, priorityEntry)
 	}
 
+	if doUpdateDb {
+		if err := db.SetAllUserPriorityEntries(userId.(int), dbPriorityEntries); err != nil {
+			return err
+		}
+	}
+
 	return c.JSON(priorityEntries)
+}
+
+func getProjectIdForIssue(c *fiber.Ctx, issueId int) (int, error) {
+	c.Response().Reset()
+	c.Request().URI().SetQueryString(
+		fmt.Sprintf("issue_id=%d&status_id=*", issueId))
+
+	if err := getIssuesHandler(c); err != nil {
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		return 0, nil
+	}
+	issuesResponse := struct {
+		Issues []Issue `json:"issues"`
+	}{}
+	if err := json.Unmarshal(c.Response().Body(), &issuesResponse); err != nil {
+		c.Response().Reset()
+		return 0, err
+	}
+
+	projectId := issuesResponse.Issues[0].Project.Id
+	return projectId, nil
+
+}
+
+func getActivityNameForIssue(c *fiber.Ctx, issueId int, projectId int, activityId int) (string, error) {
+	c.Response().Reset()
+	c.Context().URI().SetQueryString(fmt.Sprintf("project_id=%d&issue_id=%d", projectId, issueId))
+	if err := getProjectActivitiesHandler(c); err != nil {
+		log.Errorf("Error getProjectActivitiesHandler %v", err)
+		return "", err
+	} else if c.Response().StatusCode() != fiber.StatusOK {
+		log.Errorf("Error StatCode %v", err)
+		return "", err
+	}
+
+	projectEntryResponse := redmine.Project{}
+
+	if err := json.Unmarshal(c.Response().Body(), &projectEntryResponse); err != nil {
+		c.Response().Reset()
+		log.Errorf("Error Unmarshal projectEntryResponse %v", err)
+		return "", err
+	}
+
+	activityName := ""
+	for _, activity := range projectEntryResponse.TimeEntryActivities {
+		if activity.Id == activityId {
+			activityName = activity.Name
+			break
+		}
+	}
+
+	return activityName, nil
 }

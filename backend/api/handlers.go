@@ -46,10 +46,14 @@ func fetchIssueSubjects(c *fiber.Ctx, entries []Entry) (bool, error) {
 
 	for _, entry := range entries {
 		issueId := entry.Issue.Id
-		if !seenIssueIds[issueId] {
+		if !seenIssueIds[issueId] && entry.Issue.Subject == "" {
 			seenIssueIds[issueId] = true
 			issueIds = append(issueIds, fmt.Sprintf("%d", issueId))
 		}
+	}
+
+	if len(issueIds) == 0 {
+		return true, nil
 	}
 
 	// Do a request to the Redmine "/issues.json" endpoint to get

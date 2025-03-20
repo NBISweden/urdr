@@ -2,6 +2,9 @@ const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const gitBranch = process.env.GIT_BRANCH
+const gitHash = process.env.GIT_HASH
+
 module.exports = {
   mode: 'development',
   entry: {
@@ -26,7 +29,8 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.hbs$/, loader: 'handlebars-loader'
+        test: /\.hbs$/,
+        loader: 'handlebars-loader'
       }
     ]
   },
@@ -56,7 +60,9 @@ module.exports = {
       'process.env.PUBLIC_API_URL': JSON.stringify(process.env.PUBLIC_API_URL),
       'process.env.PUBLIC_REDMINE_URL': JSON.stringify(
         process.env.PUBLIC_REDMINE_URL
-      )
+      ),
+      'process.env.GIT_BRANCH': JSON.stringify(gitBranch),
+      'process.env.GIT_HASH': JSON.stringify(gitHash)
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
