@@ -74,8 +74,8 @@ module.exports = {
       'process.env.PUBLIC_REDMINE_URL': JSON.stringify(
         process.env.PUBLIC_REDMINE_URL
       ),
-    'process.env.GIT_BRANCH': JSON.stringify(gitBranch),
-    'process.env.GIT_HASH': JSON.stringify(gitHash)
+      'process.env.GIT_BRANCH': JSON.stringify(gitBranch),
+      'process.env.GIT_HASH': JSON.stringify(gitHash)
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
