@@ -2,18 +2,18 @@ FROM node:20.6.1-alpine AS build
 
 USER node
 
-ARG GIT_BRANCH
-ARG GIT_HASH
-
-ENV GIT_BRANCH=$GIT_BRANCH
-ENV GIT_HASH=$GIT_HASH
-
 RUN mkdir /home/node/app
 WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
 FROM node:20.6.1-alpine AS bundler
+
+ARG GIT_BRANCH
+ENV GIT_BRANCH=$GIT_BRANCH
+
+ARG GIT_HASH
+ENV GIT_HASH=$GIT_HASH
 
 ARG PUBLIC_API_URL
 ENV PUBLIC_API_URL=${PUBLIC_API_URL}
