@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      backend-dependencies:
+      backend-gomod:
         patterns:
           - "*"
       
