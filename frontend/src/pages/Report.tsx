@@ -1,5 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DndContext, closestCorners } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import {
   format as formatDate,
   getISOWeek,
@@ -13,6 +17,7 @@ import { HeaderRow } from "../components/HeaderRow";
 import { QuickAdd } from "../components/QuickAdd";
 import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
+import { Draggable } from "../components/Draggable";
 import {
   IssueActivityPair,
   TimeEntry,
@@ -495,20 +500,25 @@ export const Report = () => {
     }
   };
 
-  const onDragEnd = (result) => {
-    if (!result.destination) {
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over) {
       return;
     }
-    const startIndex = result.source.index;
-    const endIndex = result.destination.index;
-    if (startIndex === endIndex) {
-      return;
+    if (active.id !== over.id) {
+      const startIndex = favorites.findIndex(
+        (fav) => `${fav.issue.id}${fav.activity.id}` === active.id
+      );
+      const endIndex = favorites.findIndex(
+        (fav) => `${fav.issue.id}${fav.activity.id}` === over.id
+      );
+      if (startIndex !== endIndex) {
+        const favs = [...favorites];
+        favs.splice(endIndex, 0, favs.splice(startIndex, 1)[0]);
+        setFavorites(favs);
+        saveFavorites(favs);
+      }
     }
-    const favs = [...favorites];
-    const [moved] = favs.splice(startIndex, 1);
-    favs.splice(endIndex, 0, moved);
-    setFavorites(favs);
-    saveFavorites(favs);
     return;
   };
 
@@ -677,54 +687,43 @@ export const Report = () => {
           }}
         >
           {favorites && favorites.length > 0 && (
-            <DragDropContext onDragEnd={onDragEnd}>
-              <section className="favorites-container">
-                <HeaderRow days={currentWeekArray} />
-                <Droppable droppableId="favorites">
-                  {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                      {favorites &&
-                        favorites.map((fav, index) => {
-                          const rowEntries = findRowEntries(
-                            fav,
-                            currentWeekArray
-                          );
-                          return (
-                            <Draggable
-                              draggableId={`${fav.issue.id}${fav.activity.id}`}
-                              index={index}
-                              key={`${fav.issue.id}${fav.activity.id}-drag`}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <Row
-                                    key={`${fav.issue.id}${fav.activity.id}`}
-                                    topic={fav}
-                                    onCellUpdate={handleCellUpdate}
-                                    onToggleFav={handleToggleFav}
-                                    onFavNameUpdate={handleFavNameUpdate}
-                                    onFavNameSave={handleFavNameSave}
-                                    days={currentWeekArray}
-                                    rowHours={findRowHours(fav)}
-                                    rowEntries={rowEntries}
-                                    getRowSum={getRowSum}
-                                    isFav={true}
-                                  />
-                                </div>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </section>
-            </DragDropContext>
+            <DndContext
+              onDragEnd={handleDragEnd}
+              collisionDetection={closestCorners}
+            >
+              <SortableContext
+                items={favorites}
+                strategy={verticalListSortingStrategy}
+              >
+                <section className="favorites-container">
+                  <HeaderRow days={currentWeekArray} />
+                  {favorites &&
+                    favorites.map((fav, index) => {
+                      const rowEntries = findRowEntries(fav, currentWeekArray);
+                      return (
+                        <Draggable
+                          id={`${fav.issue.id}${fav.activity.id}`}
+                          key={`${fav.issue.id}${fav.activity.id}-drag`}
+                        >
+                          <Row
+                            key={`${fav.issue.id}${fav.activity.id}`}
+                            topic={fav}
+                            onCellUpdate={handleCellUpdate}
+                            onToggleFav={handleToggleFav}
+                            onFavNameUpdate={handleFavNameUpdate}
+                            onFavNameSave={handleFavNameSave}
+                            days={currentWeekArray}
+                            rowHours={findRowHours(fav)}
+                            rowEntries={rowEntries}
+                            getRowSum={getRowSum}
+                            isFav={true}
+                          />
+                        </Draggable>
+                      );
+                    })}
+                </section>
+              </SortableContext>
+            </DndContext>
           )}
           <section className="recent-container">
             {favorites.length == 0 && (
