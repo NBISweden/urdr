@@ -103,6 +103,7 @@ export const Cell = ({
           onBlur={() => onBlurRow()}
           className="cell"
           defaultValue={hours === 0 ? "" : hours}
+          data-no-dnd="true"
         />
         {hours > 0 && (
           <button
@@ -112,6 +113,7 @@ export const Cell = ({
             title="Toggle comment area"
             onFocus={() => onFocusRow()}
             onClick={() => onCommentButtonClick()}
+            data-no-dnd="true"
           ></button>
         )}
         {showCommentArea && (
@@ -129,6 +131,7 @@ export const Cell = ({
               onFocus={() => onFocusRow()}
               onBlur={() => onBlurArea()}
               defaultValue={areaComments !== null ? areaComments : comments}
+              data-no-dnd="true"
             />
             <button
               className="close-btn"

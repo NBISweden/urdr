@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { DndContext, closestCorners } from "@dnd-kit/core";
+import {
+  DndContext,
+  closestCorners,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -18,6 +26,7 @@ import { QuickAdd } from "../components/QuickAdd";
 import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
 import { Draggable } from "../components/Draggable";
+import { CustomMouseSensor } from "../components/CustomMouseSensor";
 import {
   IssueActivityPair,
   TimeEntry,
@@ -69,6 +78,7 @@ export const Report = () => {
   const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTotalHours, setShowTotalHours] = useState(false);
+  const [draggedFav, setDraggedFav] = useState(null);
   const context = React.useContext(AuthContext);
   const urlparams = useParams();
   const gitBranch = process.env.GIT_BRANCH;
@@ -500,7 +510,15 @@ export const Report = () => {
     }
   };
 
-  const handleDragEnd = (event) => {
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const activeFav = favorites.find(
+      (fav) => `${fav.issue.id}${fav.activity.id}` === active.id
+    );
+    setDraggedFav(activeFav);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) {
       return;
@@ -521,6 +539,10 @@ export const Report = () => {
     }
     return;
   };
+
+  const customPointerSensor = useSensor(CustomMouseSensor);
+
+  const sensors = useSensors(customPointerSensor);
 
   /*
   Returns an array with five numbers representing the number of hours 
@@ -689,21 +711,25 @@ export const Report = () => {
           {favorites && favorites.length > 0 && (
             <DndContext
               onDragEnd={handleDragEnd}
+              onDragStart={handleDragStart}
               collisionDetection={closestCorners}
+              sensors={sensors}
             >
               <SortableContext
-                items={favorites}
+                items={favorites.map(
+                  (fav) => `${fav.issue.id}${fav.activity.id}`
+                )}
                 strategy={verticalListSortingStrategy}
               >
                 <section className="favorites-container">
                   <HeaderRow days={currentWeekArray} />
                   {favorites &&
-                    favorites.map((fav, index) => {
+                    favorites.map((fav) => {
                       const rowEntries = findRowEntries(fav, currentWeekArray);
                       return (
                         <Draggable
                           id={`${fav.issue.id}${fav.activity.id}`}
-                          key={`${fav.issue.id}${fav.activity.id}-drag`}
+                          key={`${fav.issue.id}${fav.activity.id}`}
                         >
                           <Row
                             key={`${fav.issue.id}${fav.activity.id}`}
@@ -723,6 +749,31 @@ export const Report = () => {
                     })}
                 </section>
               </SortableContext>
+              <DragOverlay>
+                {draggedFav ? (
+                  <Draggable
+                    id={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                    children={
+                      <Row
+                        key={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                        topic={draggedFav}
+                        onCellUpdate={handleCellUpdate}
+                        onToggleFav={handleToggleFav}
+                        onFavNameUpdate={handleFavNameUpdate}
+                        onFavNameSave={handleFavNameSave}
+                        days={currentWeekArray}
+                        rowHours={findRowHours(draggedFav)}
+                        rowEntries={findRowEntries(
+                          draggedFav,
+                          currentWeekArray
+                        )}
+                        getRowSum={getRowSum}
+                        isFav={true}
+                      />
+                    }
+                  />
+                ) : null}
+              </DragOverlay>
             </DndContext>
           )}
           <section className="recent-container">
