@@ -1,4 +1,4 @@
-FROM node:20.3.0-alpine AS build
+FROM node:20.19.0-alpine AS build
 
 RUN apk add --no-cache git=~2
 COPY .git /tmp/.git
