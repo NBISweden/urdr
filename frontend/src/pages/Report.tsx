@@ -124,10 +124,12 @@ export const Report = () => {
   };
 
   React.useEffect(() => {
-    if (timeEntries.length > 0) {
+    if (timeEntries.length > 0 || newTimeEntries.length > 0) {
       setShowTotalHours(true);
+    } else {
+      setShowTotalHours(false);
     }
-  }, [timeEntries]);
+  }, [timeEntries, newTimeEntries]);
 
   // If weekTravelDay changes, do this...
   React.useEffect(() => {
