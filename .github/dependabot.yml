@@ -4,28 +4,52 @@ updates:
     directory: "backend/"
     schedule:
       interval: "monthly"
+    groups:
+      backend-gomod:
+        patterns:
+          - "*"
       
   - package-ecosystem: "npm"
     directory: "frontend/"
     schedule:
       interval: "monthly"
+    groups:
+      frontend-npm:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "frontend/"
     schedule:
       interval: "monthly"
+    groups:
+      frontend-docker:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "backend/"
     schedule:
       interval: "monthly"
+    groups:
+      backend-docker:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "production/"
     schedule:
       interval: "monthly"
+    groups:
+      production-docker:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
     directory: "node/"
     schedule:
       interval: "monthly"
+    groups:
+      node-docker:
+        patterns:
+          - "*"

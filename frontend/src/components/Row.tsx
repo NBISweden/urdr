@@ -88,6 +88,7 @@ export const Row = ({
           <button
             type="button"
             className="star-button"
+            data-no-dnd="true"
             onClick={() => onToggleFav(topic)}
             title={isFav ? "Remove from favorites" : "Make favorite"}
           >
@@ -104,6 +105,7 @@ export const Row = ({
             <p className="issue-label-text">
               <a
                 href={`${PUBLIC_REDMINE_URL}` + `/issues/${topic.issue.id}`}
+                data-no-dnd="true"
               >{`# ${topic.issue.id}`}</a>
             </p>
             {isFav ? (
@@ -132,6 +134,7 @@ export const Row = ({
                     onFavNameUpdate(topic, ev.target.value);
                   }}
                   maxLength={100}
+                  data-no-dnd="true"
                 />
               </Tooltip>
             ) : (
