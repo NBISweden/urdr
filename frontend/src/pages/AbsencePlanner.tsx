@@ -19,6 +19,7 @@ import {
   getReportableWorkingDays,
   areConsecutive,
   getWeeksBetweenDates,
+  getApiEndpoint,
 } from "../utils";
 import {
   format as formatDate,
@@ -69,6 +70,9 @@ export const AbsencePlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [groups, setGroups] = useState<string[]>([]);
+  const [users, setUsers] = useState<string[]>([]);
+  const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
 
@@ -322,19 +326,36 @@ export const AbsencePlanner = () => {
     return intervals;
   }
 
-  React.useEffect(() => {
-    const fetchTimeEntriesForUser = async () => {
-      toggleLoadingPage(true);
-      let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+  const getGroups = async () => {
+    toggleLoadingPage(true);
+    let groups = await getApiEndpoint("/api/groups", context);
+    setGroups(groups);
+    toggleLoadingPage(false);
+  };
 
-      const data = getAbsenceRanges(entries);
-      const sortedData = data.sort((a, b) =>
-        compareAsc(a.startDate, b.startDate)
-      );
-      setTableData(sortedData);
-      toggleLoadingPage(false);
-    };
+  const getGroupUsers = async () => {
+    toggleLoadingPage(true);
+    let users = await getApiEndpoint("/api/users_in_group", context);
+    setUsers(users);
+    toggleLoadingPage(false);
+  };
+
+  const fetchTimeEntriesForUser = async () => {
+    toggleLoadingPage(true);
+    let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+
+    const data = getAbsenceRanges(entries);
+    const sortedData = data.sort((a, b) =>
+      compareAsc(a.startDate, b.startDate)
+    );
+    setTableData(sortedData);
+    toggleLoadingPage(false);
+  };
+
+  React.useEffect(() => {
     fetchTimeEntriesForUser();
+    getGroups();
+    getGroupUsers();
   }, [reloadPage]);
 
   const getAbsenceTimeEntries = async (
@@ -563,8 +584,6 @@ export const AbsencePlanner = () => {
     });
     setSelectedIssue(selectedIssue);
   };
-
-  const context = React.useContext(AuthContext);
 
   const FromDatePicker = () => (
     <DatePicker
