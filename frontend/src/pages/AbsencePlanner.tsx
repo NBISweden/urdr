@@ -335,7 +335,7 @@ export const AbsencePlanner = () => {
 
   const getGroupUsers = async () => {
     toggleLoadingPage(true);
-    let users = await getApiEndpoint("/api/users_in_group", context);
+    let users = await getApiEndpoint("/api/users_in_groups", context);
     setUsers(users);
     toggleLoadingPage(false);
   };
