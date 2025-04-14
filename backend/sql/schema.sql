@@ -118,8 +118,8 @@ CREATE TABLE invalid_entry (
 -- storing this information in its database (although we combine their
 -- "firstname" and "lastname" fields into one).
 
-DROP TABLE IF EXISTS entity_info;
-CREATE TABLE entity_info (
+DROP TABLE IF EXISTS user_group_info;
+CREATE TABLE user_group_info (
 	redmine_id INTEGER PRIMARY KEY,
 	redmine_name TEXT NOT NULL,
 	redmine_type TEXT CHECK (redmine_type IN ('User', 'Group'))
@@ -139,10 +139,10 @@ CREATE TABLE user_group (
 		ON CONFLICT REPLACE,
 
 	FOREIGN KEY (redmine_user_id)
-		REFERENCES entity_info (redmine_id)
+		REFERENCES user_group_info (redmine_id)
 		ON DELETE CASCADE,
 	FOREIGN KEY (redmine_group_id)
-		REFERENCES entity_info (redmine_id)
+		REFERENCES user_group_info (redmine_id)
 		ON DELETE CASCADE
 );
 

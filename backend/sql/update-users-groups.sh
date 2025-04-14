@@ -37,8 +37,8 @@ fi
 	docker-compose -f "$1" exec -T -- postgres \
 		psql -U redmine |
 	sqlite3 "$2" \
-		"DELETE FROM entity_info WHERE redmine_type = 'User'" \
-		'.import /dev/stdin entity_info' \
+		"DELETE FROM user_group_info WHERE redmine_type = 'User'" \
+		'.import /dev/stdin user_group_info' \
 		'VACUUM'
 } <<'END_COPY'
 COPY (
@@ -57,8 +57,8 @@ END_COPY
 	docker-compose -f "$1" exec -T -- postgres \
 		psql -U redmine |
 	sqlite3 "$2" \
-		"DELETE FROM entity_info WHERE redmine_type = 'Group'" \
-		'.import /dev/stdin entity_info' \
+		"DELETE FROM user_group_info WHERE redmine_type = 'Group'" \
+		'.import /dev/stdin user_group_info' \
 		'VACUUM'
 } <<'END_COPY'
 COPY (
