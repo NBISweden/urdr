@@ -109,18 +109,20 @@ CREATE TABLE invalid_entry (
 		ON CONFLICT REPLACE
 );
 
--- Groups.
+-- Users and Groups.
 --
--- A table to store Redmine group data.  A group in this sense is a
--- Redmine group ID and the group's name.
+-- A table to store Redmine user and group data. A group in this sense
+-- is a Redmine group ID and the group's name, and a user is a Redmine
+-- user ID and the user's full name. The "redmine_type" field will
+-- tell what type of record it is.  This mimics the way Redmine is
+-- storing this information in its database (although we combine their
+-- "firstname" and "lastname" fields into one).
 
-DROP TABLE IF EXISTS group_info;
-CREATE TABLE group_info (
-	redmine_group_id INTEGER PRIMARY KEY,
-	redmine_group_name TEXT NOT NULL,
-
-	UNIQUE (redmine_group_name)
-		ON CONFLICT ROLLBACK
+DROP TABLE IF EXISTS entity_info;
+CREATE TABLE entity_info (
+	redmine_id INTEGER PRIMARY KEY,
+	redmine_name TEXT NOT NULL,
+	redmine_type TEXT CHECK (redmine_type IN ('User', 'Group'))
 );
 
 -- User group mapping.
@@ -136,8 +138,11 @@ CREATE TABLE user_group (
 	UNIQUE (redmine_user_id, redmine_group_id)
 		ON CONFLICT REPLACE,
 
+	FOREIGN KEY (redmine_user_id)
+		REFERENCES entity_info (redmine_id)
+		ON DELETE CASCADE,
 	FOREIGN KEY (redmine_group_id)
-		REFERENCES group_info (redmine_group_id)
+		REFERENCES entity_info (redmine_id)
 		ON DELETE CASCADE
 );
 
@@ -156,4 +161,5 @@ CREATE TABLE migrations (
 
 INSERT INTO migrations(name) VALUES
 	('20250312-a'),
-	('20250312-b');
+	('20250312-b'),
+	('20250414-a');
