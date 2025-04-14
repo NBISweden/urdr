@@ -18,18 +18,23 @@ func TestUserGroups(t *testing.T) {
 	// Insert test data.
 	insertStmt := `
 	-- Two test groups; IDs 1 and 2.
-	INSERT INTO group_info (redmine_group_id, redmine_group_name)
+	INSERT INTO entity_info (redmine_id, redmine_name, redmine_type)
 	VALUES
-		(1,'Test group 1'),
-		(2,'Test group 2');
+		(1,'Test group 1','Group'),
+		(2,'Test group 2','Group');
 
 	-- Three test users; User 1 and 2 are members of
 	-- the first two groups, while user 3 is only part of
 	-- the second group.
+	INSERT INTO entity_info (redmine_id, redmine_name, redmine_type)
+	VALUES
+		(3, 'User 1', 'User'),
+		(4, 'User 2', 'User'),
+		(5, 'User 3', 'User');
 	INSERT INTO user_group (redmine_user_id, redmine_group_id)
 	VALUES
-		(1, 1), (2, 1),
-		(1, 2), (2, 2), (3, 2);
+		(3, 1), (4, 1),
+		(3, 2), (4, 2), (5, 2);
 	`
 	if handle, err := sql.Open("sqlite3",
 		fmt.Sprintf("%s?%s&%s",
@@ -52,7 +57,7 @@ func TestUserGroups(t *testing.T) {
 		{
 			name: "existing user with groups",
 			args: struct{ redmineuserid int }{
-				redmineuserid: 1,
+				redmineuserid: 3,
 			},
 			want: []redmine.Group{
 				{
@@ -86,7 +91,7 @@ func TestUserGroups(t *testing.T) {
 			args: struct{ redminegroupid int }{
 				redminegroupid: 1,
 			},
-			want: []int{1, 2},
+			want: []int{3, 4},
 		},
 		{
 			name: "get all users in non-existing group",
