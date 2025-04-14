@@ -46,7 +46,7 @@ COPY (
 		CONCAT(firstname, ' ', lastname) AS redmine_name,
 		type AS redmine_type
 	FROM	users
-	WHERE	type = 'User'
+	WHERE	type = 'User' AND status = 1
 )
 TO	STDOUT
 WITH	csv
