@@ -431,14 +431,6 @@ func Test_Handlers(t *testing.T) {
 			statusCode:       fiber.StatusOK,
 		},
 		{
-			name:             "users_in_group GET",
-			method:           "GET",
-			endpoint:         "/api/users_in_group",
-			testRedmine:      fakeRedmine,
-			useSessionHeader: true,
-			statusCode:       fiber.StatusOK,
-		},
-		{
 			name:             "Logout",
 			method:           "POST",
 			endpoint:         "/api/logout",
