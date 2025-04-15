@@ -46,9 +46,11 @@ func getUserGroupsHandler(c *fiber.Ctx) error {
 		}
 		groupUsers = append(groupUsers, struct {
 			Id    int         `json:"id"`
+			Name  string      `json:"name"`
 			Users interface{} `json:"users"`
 		}{
 			Id:    group.Id,
+			Name:  group.Name,
 			Users: users,
 		})
 	}

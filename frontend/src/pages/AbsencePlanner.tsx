@@ -333,13 +333,6 @@ export const AbsencePlanner = () => {
     toggleLoadingPage(false);
   };
 
-  const getGroupUsers = async () => {
-    toggleLoadingPage(true);
-    let users = await getApiEndpoint("/api/users_in_groups", context);
-    setUsers(users);
-    toggleLoadingPage(false);
-  };
-
   const fetchTimeEntriesForUser = async () => {
     toggleLoadingPage(true);
     let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
