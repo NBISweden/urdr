@@ -5,7 +5,6 @@ name: Create packages
 "on":
   push:
     branches:
-      - develop
       - main
       - testing-github-actions
 
