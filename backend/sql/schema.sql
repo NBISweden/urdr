@@ -21,38 +21,20 @@ PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
 
 -- Settings.
--- A "setting" is a "name" and a "value".  The "name" is the name of
--- the setting, for example "tab" for specifying the wanted movement
--- when pressing the tab key.  The "value" is the default value of the
--- setting, for example "horizontal" for the "tab" setting.  A setting
--- without a default value has the value NULL.
-
-DROP TABLE IF EXISTS setting;
-CREATE TABLE setting (
-	setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT NOT NULL,
-	value TEXT,	-- A default value, if applicable.
-
-	UNIQUE (name)
-		ON CONFLICT ROLLBACK
-);
-
--- User settings.
--- A table connecting users with sets of settings.
+--
+-- A table for storing user settings.  A setting is a "name" and a
+-- corresponding "value", for example "favourite_colour" and "red".
+-- Each setting is associated with a user via the "redmine_user_id".
 
 DROP TABLE IF EXISTS user_setting;
 CREATE TABLE user_setting (
 	redmine_user_id INTEGER NOT NULL,
-	setting_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
 	value TEXT,	-- The user's preferred value
 			-- for this setting.
 
-	UNIQUE (redmine_user_id, setting_id)
-		ON CONFLICT REPLACE,
-
-	FOREIGN KEY (setting_id)
-		REFERENCES setting (setting_id)
-		ON DELETE CASCADE
+	UNIQUE (redmine_user_id, name)
+		ON CONFLICT REPLACE
 );
 
 -- Priority entries.
