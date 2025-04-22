@@ -773,6 +773,30 @@ export const AbsencePlanner = () => {
             </div>
           </div>
         </div>
+        <h2>Group information</h2>
+        <h3>You are member of these groups:</h3>
+        <div>
+          {groups &&
+            groups.map((group) => (
+              <p key={group.id} style={{ margin: "0 0 0 20px" }}>
+                {group.name}
+              </p>
+            ))}
+        </div>
+        <h3>They do have the following users:</h3>
+        <div>
+          {groups &&
+            groups.map((group) => (
+              <React.Fragment key={group.id}>
+                <h4>{group.name}:</h4>
+                {group.users.map((user) => (
+                  <p key={user.id} style={{ margin: "0 0 0 20px" }}>
+                    {user.name}
+                  </p>
+                ))}
+              </React.Fragment>
+            ))}
+        </div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
