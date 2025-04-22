@@ -63,7 +63,6 @@ func Setup() *fiber.App {
 	app.Get("/api/recent_issues", recentIssuesHandler)
 
 	app.Get("/api/time_entries", getTimeEntriesHandler)
-
 	app.Post("/api/time_entries", postTimeEntriesHandler)
 
 	app.Get("/api/issues", getIssuesHandler)
@@ -71,7 +70,6 @@ func Setup() *fiber.App {
 	app.Get("/api/activities", getProjectActivitiesHandler)
 
 	app.Get("/api/priority_entries", getPriorityEntriesHandler)
-
 	app.Post("/api/priority_entries", postPriorityEntriesHandler)
 
 	app.Post("/api/search", issueSearchHandler)
