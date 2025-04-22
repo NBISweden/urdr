@@ -14,7 +14,7 @@ import (
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
 // @Router       /api/settings [get]
-// @Param	key query string true "Key to get settings for"
+// @Param	name query string true "Key to get settings for"
 func getSettingsHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)
 	if err != nil {
@@ -28,15 +28,15 @@ func getSettingsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	key := c.Query("key")
-	value, err := db.GetUserSetting(userID.(int), key)
+	name := c.Query("name")
+	value, err := db.GetUserSetting(userID.(int), name)
 	if err != nil {
 		log.Errorf("Failed to get user settings: %v", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	return c.JSON(fiber.Map{
-		"key":   key,
+		"name":  name,
 		"value": value,
 	})
 }

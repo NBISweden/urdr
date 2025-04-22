@@ -14,7 +14,7 @@ import (
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
 // @Router       /api/settings [get]
-// @Param	key query string true "Key to store value for"
+// @Param	name query string true "Key to store value for"
 // @Param	value query string true "Value to store for key"
 func postSettingsHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)
@@ -29,10 +29,10 @@ func postSettingsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	key := c.Query("key")
+	name := c.Query("name")
 	value := c.Query("value")
 
-	err = db.SetUserSetting(userID.(int), key, value)
+	err = db.SetUserSetting(userID.(int), name, value)
 	if err != nil {
 		log.Errorf("Failed to set user setting: %v", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
