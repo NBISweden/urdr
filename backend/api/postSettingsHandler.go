@@ -9,11 +9,10 @@ import (
 // @Summary      Post user-specific settings
 // @Description  Post user-specific settings to local database
 // @Accept      json
-// @Produce     json
 // @Success      204 {string} string "No Content"
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
-// @Router       /api/settings [get]
+// @Router       /api/settings [post]
 // @Param	name query string true "Key to store value for"
 // @Param	value query string true "Value to store for key"
 func postSettingsHandler(c *fiber.Ctx) error {

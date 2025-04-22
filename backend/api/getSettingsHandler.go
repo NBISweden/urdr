@@ -10,10 +10,10 @@ import (
 // @Description  Get user-specific settings from local database
 // @Accept      json
 // @Produce     json
-// @Success      200 {string} string
+// @Success      200 {object} {"name": "string", "value": "string"}
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
-// @Router       /api/settings [get]
+// @Router       /api/setting [get]
 // @Param	name query string true "Key to get settings for"
 func getSettingsHandler(c *fiber.Ctx) error {
 	session, err := store.Get(c)

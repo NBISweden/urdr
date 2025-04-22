@@ -42,6 +42,6 @@ func TestSetting(t *testing.T) {
 	}
 	if settingValue != want2 {
 		t.Fatalf("GetUserSetting() returned %q, expected %q",
-			settingValue, want1)
+			settingValue, want2)
 	}
 }
