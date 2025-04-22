@@ -10,7 +10,7 @@ import (
 // @Description  Get user-specific settings from local database
 // @Accept      json
 // @Produce     json
-// @Success      200 {object} {"name": "string", "value": "string"}
+// @Success      200 {object} api.getSettingsHandler.settingResponse "User setting"
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
 // @Router       /api/setting [get]
@@ -35,8 +35,12 @@ func getSettingsHandler(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.JSON(fiber.Map{
-		"name":  name,
-		"value": value,
+	type settingResponse struct {
+		Name  string `json:"name"`
+		Value string `json:"value"`
+	}
+	return c.JSON(settingResponse{
+		Name:  name,
+		Value: value,
 	})
 }

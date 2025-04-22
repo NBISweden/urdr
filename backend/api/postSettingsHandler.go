@@ -12,7 +12,7 @@ import (
 // @Success      204 {string} string "No Content"
 // @Failure      401 {string} error "Unauthorized"
 // @Failure      500 {string} error "Internal Server Error"
-// @Router       /api/settings [post]
+// @Router       /api/setting [post]
 // @Param	name query string true "Key to store value for"
 // @Param	value query string true "Value to store for key"
 func postSettingsHandler(c *fiber.Ctx) error {
