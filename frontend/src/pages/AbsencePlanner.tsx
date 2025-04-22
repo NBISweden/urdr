@@ -9,6 +9,7 @@ import {
   FetchedTimeEntry,
   IdName,
   AbsenceInterval,
+  Group,
 } from "../model";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -70,8 +71,7 @@ export const AbsencePlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
-  const [groups, setGroups] = useState<string[]>([]);
-  const [users, setUsers] = useState<string[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
@@ -328,7 +328,7 @@ export const AbsencePlanner = () => {
 
   const getGroups = async () => {
     toggleLoadingPage(true);
-    let groups = await getApiEndpoint("/api/groups", context);
+    let groups: Group[] = await getApiEndpoint("/api/groups", context);
     setGroups(groups);
     toggleLoadingPage(false);
   };
@@ -348,7 +348,6 @@ export const AbsencePlanner = () => {
   React.useEffect(() => {
     fetchTimeEntriesForUser();
     getGroups();
-    getGroupUsers();
   }, [reloadPage]);
 
   const getAbsenceTimeEntries = async (
