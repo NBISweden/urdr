@@ -76,9 +76,7 @@ func Setup() *fiber.App {
 
 	app.Post("/api/search", issueSearchHandler)
 
-	app.Get("/api/users_in_group", getUserGroupsHandler)
-
-	app.Get("/api/groups", getGroupsHandler)
+	app.Get("/api/groups", getUserGroupsHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {

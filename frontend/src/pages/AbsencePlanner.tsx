@@ -9,6 +9,7 @@ import {
   FetchedTimeEntry,
   IdName,
   AbsenceInterval,
+  Group,
 } from "../model";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -19,6 +20,7 @@ import {
   getReportableWorkingDays,
   areConsecutive,
   getWeeksBetweenDates,
+  getApiEndpoint,
 } from "../utils";
 import {
   format as formatDate,
@@ -69,6 +71,8 @@ export const AbsencePlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
 
@@ -322,19 +326,28 @@ export const AbsencePlanner = () => {
     return intervals;
   }
 
-  React.useEffect(() => {
-    const fetchTimeEntriesForUser = async () => {
-      toggleLoadingPage(true);
-      let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+  const getGroups = async () => {
+    toggleLoadingPage(true);
+    let groups: Group[] = await getApiEndpoint("/api/groups", context);
+    setGroups(groups);
+    toggleLoadingPage(false);
+  };
 
-      const data = getAbsenceRanges(entries);
-      const sortedData = data.sort((a, b) =>
-        compareAsc(a.startDate, b.startDate)
-      );
-      setTableData(sortedData);
-      toggleLoadingPage(false);
-    };
+  const fetchTimeEntriesForUser = async () => {
+    toggleLoadingPage(true);
+    let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+
+    const data = getAbsenceRanges(entries);
+    const sortedData = data.sort((a, b) =>
+      compareAsc(a.startDate, b.startDate)
+    );
+    setTableData(sortedData);
+    toggleLoadingPage(false);
+  };
+
+  React.useEffect(() => {
     fetchTimeEntriesForUser();
+    getGroups();
   }, [reloadPage]);
 
   const getAbsenceTimeEntries = async (
@@ -564,8 +577,6 @@ export const AbsencePlanner = () => {
     setSelectedIssue(selectedIssue);
   };
 
-  const context = React.useContext(AuthContext);
-
   const FromDatePicker = () => (
     <DatePicker
       id="fromDate"
@@ -761,6 +772,30 @@ export const AbsencePlanner = () => {
               </button>
             </div>
           </div>
+        </div>
+        <h2>Group information</h2>
+        <h3>You are member of these groups:</h3>
+        <div>
+          {groups &&
+            groups.map((group) => (
+              <p key={group.id} style={{ margin: "0 0 0 20px" }}>
+                {group.name}
+              </p>
+            ))}
+        </div>
+        <h3>They do have the following users:</h3>
+        <div>
+          {groups &&
+            groups.map((group) => (
+              <React.Fragment key={group.id}>
+                <h4>{group.name}:</h4>
+                {group.users.map((user) => (
+                  <p key={user.id} style={{ margin: "0 0 0 20px" }}>
+                    {user.name}
+                  </p>
+                ))}
+              </React.Fragment>
+            ))}
         </div>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
