@@ -54,6 +54,10 @@ func (db *Database) GetUserSetting(redmineUserId int, settingName string) (strin
 // given setting, the new value replaces the old value.
 // If the value is an empty string, the user-specific value is deleted.
 func (db *Database) SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
+	if settingName == "" {
+		return fmt.Errorf("settingName is empty")
+	}
+
 	if settingValue == "" {
                 // If the value is an empty string, delete the
                 // user-specific setting.
