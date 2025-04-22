@@ -27,6 +27,7 @@ import { Toast } from "../components/Toast";
 import { HeaderUser } from "../components/HeaderUser";
 import { Draggable } from "../components/Draggable";
 import { CustomMouseSensor } from "../components/CustomMouseSensor";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 import {
   IssueActivityPair,
   TimeEntry,
@@ -46,7 +47,6 @@ import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
 import { useParams } from "react-router-dom";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
-import LoadingOverlay from "react-loading-overlay-ts";
 import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";
@@ -672,21 +672,19 @@ export const Report = () => {
   // Main content
   return (
     <>
-      <LoadingOverlay
-        active={isLoading}
-        className={isLoading ? "loading-overlay" : ""}
-        spinner={
+      {isLoading && (
+        <LoadingOverlay>
           <ClimbingBoxLoader
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
-            size={15}
+            size={17}
             width={4}
             height={6}
             radius={4}
             margin={4}
-          ></ClimbingBoxLoader>
-        }
-      >
+          />
+        </LoadingOverlay>
+      )}
         <header className="usr-header">
           <h1 className="header-year">
             {getISOWeekYear(weekTravelDay).toString()}
@@ -932,7 +930,6 @@ export const Report = () => {
             </div>
           </section>
         </div>
-      </LoadingOverlay>
     </>
   );
 };

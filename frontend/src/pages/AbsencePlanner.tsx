@@ -36,9 +36,9 @@ import {
   isWeekend,
 } from "date-fns";
 import sv from "date-fns/locale/sv";
-import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
@@ -625,21 +625,19 @@ export const AbsencePlanner = () => {
 
   return (
     <>
-      <LoadingOverlay
-        active={isLoading}
-        className={isLoading ? "loading-overlay" : ""}
-        spinner={
+      {isLoading && (
+        <LoadingOverlay>
           <ClimbingBoxLoader
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
-            size={15}
+            size={17}
             width={4}
             height={6}
             radius={4}
             margin={4}
-          ></ClimbingBoxLoader>
-        }
-      ></LoadingOverlay>
+          />
+        </LoadingOverlay>
+      )}
       <header className="page-header">
         <h1 className="help-title">Absence reporting</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
