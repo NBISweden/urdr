@@ -52,7 +52,17 @@ func (db *Database) GetUserSetting(redmineUserId int, settingName string) (strin
 // SetUserSetting() assigns the user-specific value for a particular
 // setting.  If there is already a user-specific value stored for the
 // given setting, the new value replaces the old value.
+// If the value is an empty string, the user-specific value is deleted.
 func (db *Database) SetUserSetting(redmineUserId int, settingName string, settingValue string) error {
+	if settingValue == "" {
+                // If the value is an empty string, delete the
+                // user-specific setting.
+		if err := db.DeleteUserSetting(redmineUserId, settingName); err != nil {
+			return fmt.Errorf("DeleteUserSetting() failed: %w", err)
+		}
+		return nil
+	}
+
 	insertStmt := `
 		INSERT INTO user_setting (redmine_user_id, name, value)
 		VALUES (?, ?, ?)`
