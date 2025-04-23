@@ -19,34 +19,7 @@ updates:
           - "*"
 
   - package-ecosystem: "docker"
-    directory: "frontend/"
-    schedule:
-      interval: "monthly"
-    groups:
-      all-docker:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "docker"
-    directory: "backend/"
-    schedule:
-      interval: "monthly"
-    groups:
-      all-docker:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "docker"
-    directory: "production/"
-    schedule:
-      interval: "monthly"
-    groups:
-      all-docker:
-        patterns:
-          - "*"
-
-  - package-ecosystem: "docker"
-    directory: "node/"
+    directory: "/"
     schedule:
       interval: "monthly"
     groups:
