@@ -23,7 +23,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      frontend-docker:
+      all-docker:
         patterns:
           - "*"
 
@@ -32,7 +32,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      backend-docker:
+      all-docker:
         patterns:
           - "*"
 
@@ -41,7 +41,7 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      production-docker:
+      all-docker:
         patterns:
           - "*"
 
@@ -50,6 +50,6 @@ updates:
     schedule:
       interval: "monthly"
     groups:
-      node-docker:
+      all-docker:
         patterns:
           - "*"
