@@ -284,7 +284,7 @@ export const AbsencePlanner = () => {
     for (const validIssueId of validIssueIds) {
       let currentInterval: AbsenceInterval | null = null;
       const filteredEntries = sortedEntries.filter(
-        (entry) => entry.issue.id === validIssueId
+        (entry) => entry.issue.id === validIssueId && entry.hours === 8
       );
       for (let i = 0; i < filteredEntries.length; i++) {
         const entry = filteredEntries[i];
@@ -298,7 +298,9 @@ export const AbsencePlanner = () => {
               currentInterval.endDate = currentDate;
               currentInterval.entryIds.push(entry.id);
             } else {
-              intervals.push(currentInterval);
+              currentInterval.endDate >= today
+                ? intervals.push(currentInterval)
+                : null;
               currentInterval = {
                 startDate: currentDate,
                 endDate: currentDate,
@@ -318,11 +320,14 @@ export const AbsencePlanner = () => {
           }
         }
       }
-      if (currentInterval && intervals.indexOf(currentInterval) === -1) {
+      if (
+        currentInterval &&
+        intervals.indexOf(currentInterval) === -1 &&
+        currentInterval.endDate >= today
+      ) {
         intervals.push(currentInterval);
       }
     }
-
     return intervals;
   }
 
