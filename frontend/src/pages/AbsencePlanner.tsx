@@ -77,8 +77,10 @@ export const AbsencePlanner = () => {
   const selectDates: ({}) => any = useSelectDates();
 
   const today = startOfDay(new Date());
-  const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
-  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
+  const absenceFrom: Date = new Date(
+    new Date().setMonth(today.getMonth() - 24)
+  );
+  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 24));
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
