@@ -2,7 +2,7 @@ import "../index.css";
 import React, { useState } from "react";
 import { AuthContext } from "../components/AuthProvider";
 import { getTimeEntries } from "../utils";
-import { FetchedTimeEntry } from "model";
+import { FetchedTimeEntry } from "./model";
 import { PieChart } from "react-minimal-pie-chart";
 import { Data } from "react-minimal-pie-chart/types/commonTypes";
 
