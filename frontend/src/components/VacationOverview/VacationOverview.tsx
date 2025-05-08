@@ -17,15 +17,15 @@ export const VacationOverview = () => {
         const nbisGroup = groups.find((group) => group.name === "NBIS staff");
 
         if (nbisGroup) {
-            setSelectedGroup(nbisGroup.name);
+            setSelectedGroup(nbisGroup.id);
         } else if (groups.length > 0) {
-            setSelectedGroup(groups[0].name);
+            setSelectedGroup(groups[0].id);
         }
     };
     const [groups, setGroups] = useState<Group[]>([]);
     const [vacationData, setVacationData] = useState<{ [userId: string]: number[] }>({});
-    let [selectedGroup, setSelectedGroup]= useState<string | null>(null);
-    const selectedGroupData = groups.find((group) => group.name === selectedGroup)
+    let [selectedGroup, setSelectedGroup]= useState<number | null>(null);
+    const selectedGroupData = groups.find((group) => group.id === selectedGroup)
     const weeks = useMemo(() => generateWeeks(), []);
     const monthGroups = useMemo(() => groupWeeksByMonth(weeks), [weeks]);
 

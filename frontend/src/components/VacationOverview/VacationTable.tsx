@@ -12,7 +12,7 @@ type Props = {
 export const VacationTable: React.FC<Props>  = ({group, weeks, monthGroups, vacationData}) => {
     return (
         <div className="table-wrapper">
-            <table className="vacation-table" >
+            <table className="vacation-table table-responsive" >
                 <thead>
                 {/* Months */}
                 <tr>
@@ -36,7 +36,7 @@ export const VacationTable: React.FC<Props>  = ({group, weeks, monthGroups, vaca
                 </tr>
                 </thead>
                 <tbody>
-                {group && group.users.map((user) => (
+                {group && group.users.sort((a, b) => a.name.localeCompare(b.name)).map((user) => (
                     <tr key={user.id}>
                         <td className="user-name">{user.name}</td>
                         {weeks.map((week) => {
