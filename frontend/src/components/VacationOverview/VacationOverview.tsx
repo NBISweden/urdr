@@ -2,7 +2,7 @@ import "../../index.css";
 import React, { useState, useMemo, useContext, useEffect } from "react";
 import { VacationTable } from "./VacationTable";
 import { AuthContext } from "../AuthProvider";
-import { Group } from "../../model";
+import { Group, UserSetting } from "../../model";
 import { getApiEndpoint } from "../../utils";
 import { fetchVacationData, generateWeeks, groupWeeksByMonth} from './utils';
 import { GroupSelect } from "./GroupSelect";
@@ -16,15 +16,43 @@ export const VacationOverview = () => {
 
     const getGroups = async () => {
         const groups: Group[] = await getApiEndpoint("/api/groups", context);
-        setGroups(groups);
+        if (!groups) {
+            return [];
+        }
+        return groups;  
+    };
 
-        const nbisGroup = groups.find((group) => group.name === "NBIS staff");
-        if (nbisGroup) {
-            setSelectedGroup(nbisGroup.id);
-        } else if (groups.length > 0) {
-            setSelectedGroup(groups[0].id);
+    const getGroupSetting = async () => {
+        const groupSettingArray: UserSetting[] = await getApiEndpoint("/api/setting?name=group", context);
+        const groupSettingObject = groupSettingArray.find((setting) => setting.name === "group");
+        const { value } = groupSettingObject || {};
+        const groupId = Number(value);
+        if (isNaN(groupId)) {
+            return;
+        } else {
+            return groupId;
         }
     };
+
+    useEffect(() => {
+        const fetchGroupData = async () => {
+            const groups = await getGroups();
+            setGroups(groups);
+            const groupId = await getGroupSetting();
+            if (groups.length > 0) {
+                const group = groups.find((group) => group.id === groupId);
+                const nbisgroup = groups.find((group) => group.name === "NBIS staff");
+                if (group) {
+                    setSelectedGroup(group.id);
+                } else if (nbisgroup) {
+                    setSelectedGroup(nbisgroup.id);
+                } else {
+                    setSelectedGroup(groups[0].id);
+                }
+            }
+        };
+        fetchGroupData();
+    }, [context]);
 
     const selectedGroupData = groups.find((group) => group.id === selectedGroup)
     const weeks = useMemo(() => generateWeeks(), []);
@@ -41,10 +69,6 @@ export const VacationOverview = () => {
 
         loadVacationData();
     }, [selectedGroupData, context]);
-
-    useEffect(() => {
-        getGroups();
-    }, []);
 
     return (
         <div className="vacation-overview">
