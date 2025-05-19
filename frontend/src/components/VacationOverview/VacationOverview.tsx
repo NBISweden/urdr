@@ -3,7 +3,7 @@ import React, { useState, useMemo, useContext, useEffect } from "react";
 import { VacationTable } from "./VacationTable";
 import { AuthContext } from "../AuthProvider";
 import { Group, UserSetting } from "../../model";
-import { getApiEndpoint } from "../../utils";
+import { getApiEndpoint, PUBLIC_API_URL } from "../../utils";
 import { fetchVacationData, generateWeeks, groupWeeksByMonth} from './utils';
 import { GroupSelect } from "./GroupSelect";
 
@@ -11,6 +11,7 @@ export const VacationOverview = () => {
     const [groups, setGroups] = useState<Group[]>([]);
     const [vacationData, setVacationData] = useState<{ [userId: string]: number[] }>({});
     const [selectedGroup, setSelectedGroup]= useState<number | null>(null);
+    const [savedGroup, setSavedGroup] = useState<number | null>(null);
 
     const context = useContext(AuthContext);
 
@@ -22,37 +23,80 @@ export const VacationOverview = () => {
         return groups;  
     };
 
-    const getGroupSetting = async () => {
+    const getSavedGroup = async () => {
         const groupSettingArray: UserSetting[] = await getApiEndpoint("/api/setting?name=group", context);
         const groupSettingObject = groupSettingArray.find((setting) => setting.name === "group");
         const { value } = groupSettingObject || {};
         const groupId = Number(value);
         if (isNaN(groupId)) {
             return;
-        } else {
-            return groupId;
         }
+        return groupId;
     };
+
+    const selectGroup = (groups: Group[], savedGroupId: number | null) => {
+        let selectedGroup = null;
+
+        if (groups.length > 0) {
+            const savedGroup = groups.find((group) => group.id === savedGroupId);
+            const nbisgroup = groups.find((group) => group.name === "NBIS staff");
+            if (savedGroup) {
+                selectedGroup = savedGroup.id;
+            } else if (nbisgroup) {
+                selectedGroup = nbisgroup.id;
+            } else {
+                selectedGroup = groups[0].id;
+            }
+        }
+        return selectedGroup;
+    };
+
+    const saveSettings = async (
+      settings: { name: string; value: string }[],
+      context: any
+    ) => {
+      const url = new URL(`${PUBLIC_API_URL}/api/setting`);
+      url.search = new URLSearchParams({
+        name: settings[0].name,
+        value: settings[0].value,
+      }).toString();
+      const headers = new Headers({
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      });
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: headers,
+        });
+
+        if (res.ok) {
+          return true;
+        } else if (res.status === 401) {
+          context.setUser(null);
+        } else {
+          throw new Error("There was an error accessing the settings endpoint");
+        }
+      } catch (error) {
+        console.error(error);
+        return false;
+      }
+    }
 
     useEffect(() => {
         const fetchGroupData = async () => {
             const groups = await getGroups();
             setGroups(groups);
-            const groupId = await getGroupSetting();
-            if (groups.length > 0) {
-                const group = groups.find((group) => group.id === groupId);
-                const nbisgroup = groups.find((group) => group.name === "NBIS staff");
-                if (group) {
-                    setSelectedGroup(group.id);
-                } else if (nbisgroup) {
-                    setSelectedGroup(nbisgroup.id);
-                } else {
-                    setSelectedGroup(groups[0].id);
-                }
-            }
+
+            const groupId = await getSavedGroup();
+            setSavedGroup(groupId);
+
+            const selectedGroup = selectGroup(groups, groupId);
+            setSelectedGroup(selectedGroup);
         };
         fetchGroupData();
-    }, [context]);
+    }, []);
 
     const selectedGroupData = groups.find((group) => group.id === selectedGroup)
     const weeks = useMemo(() => generateWeeks(), []);
@@ -69,6 +113,30 @@ export const VacationOverview = () => {
 
         loadVacationData();
     }, [selectedGroupData, context]);
+
+    useEffect(() => {
+        if (savedGroup === selectedGroup) return;
+
+        const settings = [
+            {
+                name: "group",
+                value: selectedGroup ? selectedGroup.toString() : "",
+            },
+        ];
+        saveSettings(settings, context)
+            .then((result) => {
+                if (result) {
+                    setSavedGroup(selectedGroup);
+                } else {
+                    console.log("Failed to save group");
+                }
+            }
+            )
+            .catch((error) => {
+                console.error("Error saving group:", error);
+            }
+        );
+    }, [savedGroup, selectedGroup]);
 
     return (
         <div className="vacation-overview">
