@@ -71,3 +71,9 @@ export interface Group {
   name: string;
   users: IdName[];
 }
+
+export interface UserSetting {
+  id: number;
+  name: string;
+  value: string;
+}
