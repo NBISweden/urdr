@@ -1,8 +1,5 @@
-import "../../index.css";
+import "../index.css";
 import React, { useState, useMemo, useContext, useEffect } from "react";
-import { VacationTable } from "./VacationTable";
-import { AuthContext } from "../AuthProvider";
-import { Group } from "../../model";
 import {
   getGroups,
   getSavedGroup,
@@ -11,8 +8,12 @@ import {
   fetchVacationData,
   generateWeeks,
   groupWeeksByMonth,
-} from "./utils";
-import { GroupSelect } from "./GroupSelect";
+} from "../components/VacationOverview/utils";
+import { GroupSelect } from "../components/VacationOverview/GroupSelect";
+import {VacationTable} from "../components/VacationOverview/VacationTable";
+import {AuthContext} from "../components/AuthProvider";
+import {Group} from "../model";
+import {HeaderUser} from "../components/HeaderUser";
 
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -77,24 +78,36 @@ export const VacationOverview = () => {
   }, [savedGroup, selectedGroup]);
 
   return (
-    <div className="vacation-overview">
-      {groups.length === 0 ? (
-        <p>Du tillhör inga grupper ännu.</p>
-      ) : (
-        <>
-          <GroupSelect
-            groups={groups}
-            selectedGroup={selectedGroup}
-            onChange={setSelectedGroup}
-          />
-          <VacationTable
-            group={selectedGroupData}
-            weeks={weeks}
-            monthGroups={monthGroups}
-            vacationData={vacationData}
-          />
-        </>
-      )}
-    </div>
+      <>
+        <header className="page-header">
+          <h1 className="help-title">
+            Vacation Overview
+            <span className="badge bg-warning beta-label">BETA</span>
+          </h1>
+          <HeaderUser username={context.user ? context.user.login : ""} />
+        </header>
+        <main className="page-wrapper">
+          <div className="vacation-overview">
+            {groups.length === 0 ? (
+                <p>Du tillhör inga grupper ännu.</p>
+            ) : (
+                <>
+                  <GroupSelect
+                      groups={groups}
+                      selectedGroup={selectedGroup}
+                      onChange={setSelectedGroup}
+                  />
+                  <VacationTable
+                      group={selectedGroupData}
+                      weeks={weeks}
+                      monthGroups={monthGroups}
+                      vacationData={vacationData}
+                  />
+                </>
+            )}
+          </div>
+        </main>
+      </>
+
   );
 };

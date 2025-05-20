@@ -48,7 +48,6 @@ import { useSelectDates } from "../components/EditPeriodDialogProvider";
 import calender from "../icons/calendar-week-white.svg";
 
 import AbsenceIssuesSelector from "../components/AbsencePlanner/AbsenceIssuesSelector";
-import {VacationOverview} from "../components/VacationOverview/VacationOverview";
 
 export const absenceIssueOptions: { id: number; subject: string }[] = [
   { id: 6992, subject: "Parental leave" },
@@ -779,7 +778,6 @@ export const AbsencePlanner = () => {
             </div>
           </div>
         </div>
-        <VacationOverview/>
         {toastList.length > 0 && (
           <Toast onCloseToast={handleCloseToast} toastList={toastList} />
         )}
