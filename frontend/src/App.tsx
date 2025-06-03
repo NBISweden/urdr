@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { getISOWeek, getISOWeekYear } from "date-fns";
 import { ConfirmDialogProvider } from "./components/ConfirmDialogProvider";
 import { EditPeriodDialogProvider } from "./components/EditPeriodDialogProvider";
+import {VacationOverview} from "./pages/VacationOverview";
 
 // Route calls
 // Order of routes is critical.
@@ -61,6 +62,14 @@ export const App = () => {
                       </ProtectedRoute>
                     }
                   />
+                    <Route
+                        path="/vacation"
+                        element={
+                            <ProtectedRoute>
+                                <VacationOverview />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Routes>
               </ConfirmDialogProvider>
             </EditPeriodDialogProvider>
