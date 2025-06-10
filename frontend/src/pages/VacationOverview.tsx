@@ -14,6 +14,8 @@ import {VacationTable} from "../components/VacationOverview/VacationTable";
 import {AuthContext} from "../components/AuthProvider";
 import {Group} from "../model";
 import {HeaderUser} from "../components/HeaderUser";
+import { ClimbingBoxLoader } from "react-spinners";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -22,6 +24,7 @@ export const VacationOverview = () => {
   }>({});
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
+  const [loadingVacationData, setLoadingVacationData] = useState<boolean>(false);
 
   const context = useContext(AuthContext);
 
@@ -47,9 +50,11 @@ export const VacationOverview = () => {
     if (!selectedGroupData) return;
 
     const loadVacationData = async () => {
+      setLoadingVacationData(true);
       const userIds = selectedGroupData.users.map((user) => ({ id: user.id }));
       const data = await fetchVacationData(userIds, weeks, context);
       setVacationData(data);
+      setLoadingVacationData(false);
     };
 
     loadVacationData();
@@ -79,6 +84,19 @@ export const VacationOverview = () => {
 
   return (
     <>
+      {loadingVacationData && (
+        <LoadingOverlay>
+          <ClimbingBoxLoader
+            color="hsl(76deg 55% 53%)"
+            loading={loadingVacationData}
+            size={17}
+            width={4}
+            height={6}
+            radius={4}
+            margin={4}
+          />
+        </LoadingOverlay>
+      )}
       <header className="page-header">
         <h1 className="help-title">
           Vacation Overview
