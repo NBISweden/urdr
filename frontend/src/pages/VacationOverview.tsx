@@ -10,10 +10,10 @@ import {
   groupWeeksByMonth,
 } from "../components/VacationOverview/utils";
 import { GroupSelect } from "../components/VacationOverview/GroupSelect";
-import {VacationTable} from "../components/VacationOverview/VacationTable";
-import {AuthContext} from "../components/AuthProvider";
-import {Group} from "../model";
-import {HeaderUser} from "../components/HeaderUser";
+import { VacationTable } from "../components/VacationOverview/VacationTable";
+import { AuthContext } from "../components/AuthProvider";
+import { Group } from "../model";
+import { HeaderUser } from "../components/HeaderUser";
 import { ClimbingBoxLoader } from "react-spinners";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 
@@ -24,7 +24,8 @@ export const VacationOverview = () => {
   }>({});
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
-  const [loadingVacationData, setLoadingVacationData] = useState<boolean>(false);
+  const [loadingVacationData, setLoadingVacationData] =
+    useState<boolean>(false);
 
   const context = useContext(AuthContext);
 
@@ -105,25 +106,24 @@ export const VacationOverview = () => {
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
       <main className="page-wrapper">
-          {groups.length === 0 ? (
-              <p>Du tillhör inga grupper ännu.</p>
-          ) : (
-              <>
-                <GroupSelect
-                    groups={groups}
-                    selectedGroup={selectedGroup}
-                    onChange={setSelectedGroup}
-                />
-                <VacationTable
-                    group={selectedGroupData}
-                    weeks={weeks}
-                    monthGroups={monthGroups}
-                    vacationData={vacationData}
-                />
-              </>
-          )}
+        {groups.length === 0 ? (
+          <p>Du tillhör inga grupper ännu.</p>
+        ) : (
+          <>
+            <GroupSelect
+              groups={groups}
+              selectedGroup={selectedGroup}
+              onChange={setSelectedGroup}
+            />
+            <VacationTable
+              group={selectedGroupData}
+              weeks={weeks}
+              monthGroups={monthGroups}
+              vacationData={vacationData}
+            />
+          </>
+        )}
       </main>
     </>
-
   );
 };
