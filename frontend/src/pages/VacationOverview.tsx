@@ -52,10 +52,15 @@ export const VacationOverview = () => {
 
     const loadVacationData = async () => {
       setLoadingVacationData(true);
-      const userIds = selectedGroupData.users.map((user) => ({ id: user.id }));
-      const data = await fetchVacationData(userIds, weeks, context);
-      setVacationData(data);
-      setLoadingVacationData(false);
+      try {
+        const userIds = selectedGroupData.users.map((user) => ({ id: user.id }));
+        const data = await fetchVacationData(userIds, weeks, context);
+        setVacationData(data);
+      } catch (error) {
+        console.error("Error fetching vacation data:", error);
+      } finally {
+        setLoadingVacationData(false);
+      }
     };
 
     loadVacationData();
