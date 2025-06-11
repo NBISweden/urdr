@@ -65,3 +65,15 @@ export interface ToastMsg {
   timeout: number;
   message: string;
 }
+
+export interface Group {
+  id: number;
+  name: string;
+  users: IdName[];
+}
+
+export interface UserSetting {
+  id: number;
+  name: string;
+  value: string;
+}

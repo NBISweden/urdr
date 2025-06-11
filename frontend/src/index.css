@@ -749,10 +749,14 @@ Other button classes are defined further down together with other classes for th
 }
 
 .loading-overlay {
-  height: 100vh;
   position: fixed;
+  height: 100vh;
+  width: 100vw;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 101;
-  overflow: hidden;
 }
 
 .help-wrapper {
@@ -971,18 +975,69 @@ Other button classes are defined further down together with other classes for th
   padding: 0.25rem 1rem;
 }
 
-table {
+.vacation-table {
+  width: 75%;
+}
+
+.vacation-table td {
+  border: 1px solid hsl(0deg 0% 75%);
+  padding: 0.25rem;
+}
+
+.vacation-table th {
+  border-bottom: 0.125rem solid hsl(0deg 0% 35%);
+}
+
+.vacation-table .user-name {
+  max-width: 11.25rem;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.vacation-table .week-header {
+  width: 4rem;
+  min-width: 4rem;
+  max-width: 4rem;
+  text-align: center;
+  padding: 0.5rem;
+  vertical-align: middle;
+}
+
+.vacation-table .vacation-cell {
+  background-color: hsl(0deg 0% 65%);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0.75rem auto;
+}
+
+.group-select-wrapper {
+  padding: 1rem 0;
+
+  label {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  select {
+    padding: 0.25rem;
+  }
+}
+
+.calendar-table {
   border-collapse: collapse;
   width: 100%;
 }
 
-td {
+.calendar-table td {
   border: none;
   text-align: left;
   padding: 8px;
 }
 
-th {
+.calendar-table th {
   border-top: 1px solid hsl(0deg 0% 90%);
   text-align: left;
   padding: 8px;
@@ -990,11 +1045,11 @@ th {
   color: white;
 }
 
-tr:nth-child(even) {
+.calendar-table tr:nth-child(even) {
   background-color: hsl(186deg 30% 94%);
 }
 
-tr:last-of-type td {
+.calendar-table tr:last-of-type td {
   border-bottom: 1px solid hsl(0deg 0% 90%);
 }
 
@@ -1032,11 +1087,6 @@ tr:last-of-type td {
 .apply-dates-button {
   height: 3rem;
   width: 8rem;
-}
-
-.group-select-wrapper {
-  margin-top: 2rem;
-  margin-bottom: 3rem;
 }
 
 /* ModalDialog styles */
@@ -1107,4 +1157,12 @@ tr:last-of-type td {
 
 .modal-cancel-button:hover {
   background-color: hsl(187deg 29% 94%);
+}
+
+.beta-label {
+  position: relative;
+  top: -0.6rem;
+  font-size: 0.6rem;
+  color: hsl(0deg 0% 35%);
+  margin-left: 0.4rem;
 }

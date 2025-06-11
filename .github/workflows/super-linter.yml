@@ -21,6 +21,8 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_GO: false
           VALIDATE_SQLFLUFF: false
+          VALIDATE_TYPESCRIPT_STANDARD: false
+          VALIDATE_ESLINT: true
           DEFAULT_BRANCH: develop
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_EXCLUDE: bootstrap\.min\.css(\.map)?|backend/docs/(docs\.go|swagger\.(json|yaml))$

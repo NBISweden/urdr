@@ -57,7 +57,7 @@ system, these scripts may be invoked like so:
 
 ```shell
 ./backend/sql/update-invalid_entry.sh "$REDMINE_REPO"/docker-compose.yml backend/database.db
-./backend/sql/update-groups.sh        "$REDMINE_REPO"/docker-compose.yml backend/database.db
+./backend/sql/update-users-groups.sh  "$REDMINE_REPO"/docker-compose.yml backend/database.db
 ```
 
 ... where `"$REDMINE_REPO"` is some path to the cloned `ops-redmine`

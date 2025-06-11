@@ -8,7 +8,7 @@ WORKDIR /go
 COPY ./ .
 
 RUN apk --no-cache add \
-    clang=~19 \
+    clang=~20 \
     musl-dev=~1.2
 
 ENV GOPATH=$PWD

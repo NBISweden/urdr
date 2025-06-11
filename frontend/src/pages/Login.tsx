@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Buffer } from "buffer";
 import { LoginHeader } from "../components/LoginHeader";
 import { LoginError } from "../components/LoginError";
 import "../index.css";

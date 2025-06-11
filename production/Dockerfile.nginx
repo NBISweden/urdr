@@ -1,4 +1,4 @@
-FROM node:20.6.1-alpine AS build
+FROM node:24.0.2-alpine AS build
 
 USER node
 
@@ -7,7 +7,7 @@ WORKDIR /home/node
 COPY --chown=node:node ./package.json ./package-lock.json ./
 RUN npm ci
 
-FROM node:20.6.1-alpine AS bundler
+FROM node:24.0.2-alpine AS bundler
 
 ARG GIT_BRANCH
 ENV GIT_BRANCH=$GIT_BRANCH
@@ -28,7 +28,7 @@ COPY --chown=node:node /. /home/node/app/
 COPY --from=build --chown=node:node /home/node/node_modules/ /home/node/app/node_modules/
 RUN npm run build
 
-FROM nginx:1.27.4-alpine
+FROM nginx:1.28.0-alpine
 
 RUN mkdir -p /app/dist
 COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist

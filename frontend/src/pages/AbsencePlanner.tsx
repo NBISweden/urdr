@@ -9,6 +9,7 @@ import {
   FetchedTimeEntry,
   IdName,
   AbsenceInterval,
+  Group,
 } from "../model";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -19,6 +20,7 @@ import {
   getReportableWorkingDays,
   areConsecutive,
   getWeeksBetweenDates,
+  getApiEndpoint,
 } from "../utils";
 import {
   format as formatDate,
@@ -34,9 +36,9 @@ import {
   isWeekend,
 } from "date-fns";
 import sv from "date-fns/locale/sv";
-import LoadingOverlay from "react-loading-overlay-ts";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
@@ -69,12 +71,16 @@ export const AbsencePlanner = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
 
   const today = startOfDay(new Date());
-  const absenceFrom: Date = new Date(new Date().setMonth(today.getMonth() - 1));
-  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 12));
+  const absenceFrom: Date = new Date(
+    new Date().setMonth(today.getMonth() - 24)
+  );
+  const absenceTo: Date = new Date(new Date().setMonth(today.getMonth() + 24));
 
   const toggleLoadingPage = (state: boolean) => {
     setIsLoading(state);
@@ -280,7 +286,7 @@ export const AbsencePlanner = () => {
     for (const validIssueId of validIssueIds) {
       let currentInterval: AbsenceInterval | null = null;
       const filteredEntries = sortedEntries.filter(
-        (entry) => entry.issue.id === validIssueId
+        (entry) => entry.issue.id === validIssueId && entry.hours === 8
       );
       for (let i = 0; i < filteredEntries.length; i++) {
         const entry = filteredEntries[i];
@@ -294,7 +300,9 @@ export const AbsencePlanner = () => {
               currentInterval.endDate = currentDate;
               currentInterval.entryIds.push(entry.id);
             } else {
-              intervals.push(currentInterval);
+              currentInterval.endDate >= today
+                ? intervals.push(currentInterval)
+                : null;
               currentInterval = {
                 startDate: currentDate,
                 endDate: currentDate,
@@ -314,27 +322,39 @@ export const AbsencePlanner = () => {
           }
         }
       }
-      if (currentInterval && intervals.indexOf(currentInterval) === -1) {
+      if (
+        currentInterval &&
+        intervals.indexOf(currentInterval) === -1 &&
+        currentInterval.endDate >= today
+      ) {
         intervals.push(currentInterval);
       }
     }
-
     return intervals;
   }
 
-  React.useEffect(() => {
-    const fetchTimeEntriesForUser = async () => {
-      toggleLoadingPage(true);
-      let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+  const getGroups = async () => {
+    toggleLoadingPage(true);
+    let groups: Group[] = await getApiEndpoint("/api/groups", context);
+    setGroups(groups);
+    toggleLoadingPage(false);
+  };
 
-      const data = getAbsenceRanges(entries);
-      const sortedData = data.sort((a, b) =>
-        compareAsc(a.startDate, b.startDate)
-      );
-      setTableData(sortedData);
-      toggleLoadingPage(false);
-    };
+  const fetchTimeEntriesForUser = async () => {
+    toggleLoadingPage(true);
+    let entries = await getAbsenceTimeEntries(absenceFrom, absenceTo, "me");
+
+    const data = getAbsenceRanges(entries);
+    const sortedData = data.sort((a, b) =>
+      compareAsc(a.startDate, b.startDate)
+    );
+    setTableData(sortedData);
+    toggleLoadingPage(false);
+  };
+
+  React.useEffect(() => {
     fetchTimeEntriesForUser();
+    getGroups();
   }, [reloadPage]);
 
   const getAbsenceTimeEntries = async (
@@ -564,8 +584,6 @@ export const AbsencePlanner = () => {
     setSelectedIssue(selectedIssue);
   };
 
-  const context = React.useContext(AuthContext);
-
   const FromDatePicker = () => (
     <DatePicker
       id="fromDate"
@@ -614,21 +632,19 @@ export const AbsencePlanner = () => {
 
   return (
     <>
-      <LoadingOverlay
-        active={isLoading}
-        className={isLoading ? "loading-overlay" : ""}
-        spinner={
+      {isLoading && (
+        <LoadingOverlay>
           <ClimbingBoxLoader
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
-            size={15}
+            size={17}
             width={4}
             height={6}
             radius={4}
             margin={4}
-          ></ClimbingBoxLoader>
-        }
-      ></LoadingOverlay>
+          />
+        </LoadingOverlay>
+      )}
       <header className="page-header">
         <h1 className="help-title">Absence reporting</h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
@@ -638,7 +654,7 @@ export const AbsencePlanner = () => {
         <div className="planned-absence">
           <div className="calendar-box">
             {tableData.length > 0 ? (
-              <table>
+              <table className="calendar-table">
                 <tbody>
                   {/*The empty heading tags make the top border go all the way out*/}
                   <tr>

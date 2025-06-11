@@ -21,38 +21,20 @@ PRAGMA auto_vacuum = FULL;
 PRAGMA foreign_keys = ON;
 
 -- Settings.
--- A "setting" is a "name" and a "value".  The "name" is the name of
--- the setting, for example "tab" for specifying the wanted movement
--- when pressing the tab key.  The "value" is the default value of the
--- setting, for example "horizontal" for the "tab" setting.  A setting
--- without a default value has the value NULL.
-
-DROP TABLE IF EXISTS setting;
-CREATE TABLE setting (
-	setting_id INTEGER PRIMARY KEY AUTOINCREMENT,
-	name TEXT NOT NULL,
-	value TEXT,	-- A default value, if applicable.
-
-	UNIQUE (name)
-		ON CONFLICT ROLLBACK
-);
-
--- User settings.
--- A table connecting users with sets of settings.
+--
+-- A table for storing user settings.  A setting is a "name" and a
+-- corresponding "value", for example "favourite_colour" and "red".
+-- Each setting is associated with a user via the "redmine_user_id".
 
 DROP TABLE IF EXISTS user_setting;
 CREATE TABLE user_setting (
 	redmine_user_id INTEGER NOT NULL,
-	setting_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
 	value TEXT,	-- The user's preferred value
 			-- for this setting.
 
-	UNIQUE (redmine_user_id, setting_id)
-		ON CONFLICT REPLACE,
-
-	FOREIGN KEY (setting_id)
-		REFERENCES setting (setting_id)
-		ON DELETE CASCADE
+	UNIQUE (redmine_user_id, name)
+		ON CONFLICT REPLACE
 );
 
 -- Priority entries.
@@ -109,18 +91,20 @@ CREATE TABLE invalid_entry (
 		ON CONFLICT REPLACE
 );
 
--- Groups.
+-- Users and Groups.
 --
--- A table to store Redmine group data.  A group in this sense is a
--- Redmine group ID and the group's name.
+-- A table to store Redmine user and group data. A group in this sense
+-- is a Redmine group ID and the group's name, and a user is a Redmine
+-- user ID and the user's full name. The "redmine_type" field will
+-- tell what type of record it is.  This mimics the way Redmine is
+-- storing this information in its database (although we combine their
+-- "firstname" and "lastname" fields into one).
 
-DROP TABLE IF EXISTS group_info;
-CREATE TABLE group_info (
-	redmine_group_id INTEGER PRIMARY KEY,
-	redmine_group_name TEXT NOT NULL,
-
-	UNIQUE (redmine_group_name)
-		ON CONFLICT ROLLBACK
+DROP TABLE IF EXISTS user_group_info;
+CREATE TABLE user_group_info (
+	redmine_id INTEGER PRIMARY KEY,
+	redmine_name TEXT NOT NULL,
+	redmine_type TEXT CHECK (redmine_type IN ('User', 'Group'))
 );
 
 -- User group mapping.
@@ -136,8 +120,11 @@ CREATE TABLE user_group (
 	UNIQUE (redmine_user_id, redmine_group_id)
 		ON CONFLICT REPLACE,
 
+	FOREIGN KEY (redmine_user_id)
+		REFERENCES user_group_info (redmine_id)
+		ON DELETE CASCADE,
 	FOREIGN KEY (redmine_group_id)
-		REFERENCES group_info (redmine_group_id)
+		REFERENCES user_group_info (redmine_id)
 		ON DELETE CASCADE
 );
 
@@ -156,4 +143,6 @@ CREATE TABLE migrations (
 
 INSERT INTO migrations(name) VALUES
 	('20250312-a'),
-	('20250312-b');
+	('20250312-b'),
+	('20250414-a'),
+	('20250422-a');

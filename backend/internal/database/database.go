@@ -58,7 +58,6 @@ func New(databasePath string) (*Database, error) {
 		// initialize the database.
 		files := []string{
 			"sql/schema.sql",
-			"sql/setting-defaults.sql",
 		}
 
 		for i := range files {

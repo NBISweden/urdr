@@ -23,6 +23,10 @@ export const HeaderUser = ({ username }: { username: string }) => {
       <a className="nav-item" href="/absence">
         Absence
       </a>
+      <a className="nav-item" href="/vacation">
+          Vacation Overview
+          <span className="badge bg-warning beta-label">BETA</span>
+      </a>
       <button type="button" className="nav-item" onClick={logout}>
         Log out
       </button>

@@ -1,55 +1,44 @@
 version: 2
 updates:
-  - package-ecosystem: "gomod"
-    directory: "backend/"
-    schedule:
-      interval: "monthly"
-    groups:
-      backend-gomod:
-        patterns:
-          - "*"
-      
   - package-ecosystem: "npm"
     directory: "frontend/"
     schedule:
       interval: "monthly"
     groups:
-      frontend-npm:
+      all-npm:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "gomod"
+    directory: "backend"
+    schedule:
+      interval: "monthly"
+    groups:
+      all-go:
         patterns:
           - "*"
 
   - package-ecosystem: "docker"
-    directory: "frontend/"
+    directory: "/"
     schedule:
       interval: "monthly"
-    groups:
-      frontend-docker:
-        patterns:
-          - "*"
 
   - package-ecosystem: "docker"
-    directory: "backend/"
+    directory: "backend"
     schedule:
       interval: "monthly"
-    groups:
-      backend-docker:
-        patterns:
-          - "*"
 
   - package-ecosystem: "docker"
-    directory: "production/"
+    directory: "frontend"
     schedule:
       interval: "monthly"
-    groups:
-      production-docker:
-        patterns:
-          - "*"
 
   - package-ecosystem: "docker"
-    directory: "node/"
+    directory: "node"
     schedule:
       interval: "monthly"
-    groups:
-      node-docker:
-        patterns:
-          - "*"
+
+  - package-ecosystem: "docker"
+    directory: "production"
+    schedule:
+      interval: "monthly"

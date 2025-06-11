@@ -63,7 +63,6 @@ func Setup() *fiber.App {
 	app.Get("/api/recent_issues", recentIssuesHandler)
 
 	app.Get("/api/time_entries", getTimeEntriesHandler)
-
 	app.Post("/api/time_entries", postTimeEntriesHandler)
 
 	app.Get("/api/issues", getIssuesHandler)
@@ -71,14 +70,14 @@ func Setup() *fiber.App {
 	app.Get("/api/activities", getProjectActivitiesHandler)
 
 	app.Get("/api/priority_entries", getPriorityEntriesHandler)
-
 	app.Post("/api/priority_entries", postPriorityEntriesHandler)
 
 	app.Post("/api/search", issueSearchHandler)
 
-	app.Get("/api/users_in_group", getUserGroupsHandler)
+	app.Get("/api/groups", getUserGroupsHandler)
 
-	app.Get("/api/groups", getGroupsHandler)
+	app.Get("/api/setting", getSettingsHandler)
+	app.Post("/api/setting", postSettingsHandler)
 
 	// 404 Handler
 	app.Use(func(c *fiber.Ctx) error {

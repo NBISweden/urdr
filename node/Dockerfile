@@ -1,6 +1,5 @@
-FROM node:20.3.0-alpine AS build
+FROM node:24.0.2-alpine AS build
 
-RUN apk add --no-cache git=~2
 COPY .git /tmp/.git
 
 ARG GIT_BRANCH
@@ -10,6 +9,7 @@ ENV GIT_BRANCH=$GIT_BRANCH
 ENV GIT_HASH=$GIT_HASH
 
 RUN <<END
+apk add --no-cache git=~2
 if [ -z "$GIT_BRANCH" ]; then
 	printf 'export GIT_BRANCH="%s"\n' "$(git -C /tmp/.git rev-parse --abbrev-ref HEAD)"
 else
