@@ -9,10 +9,10 @@ SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
 RUN apk --no-cache add \
     curl=~8 \
-    clang=~19 \
-    clang-ccache=~19 \
+    clang=~20 \
+    clang-ccache=~20 \
     musl-dev=~1.2 \
-    ccache=~4.10
+    ccache=~4
 
 RUN go install github.com/air-verse/air@v1.61.7
 

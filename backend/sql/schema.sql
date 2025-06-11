@@ -144,4 +144,5 @@ CREATE TABLE migrations (
 INSERT INTO migrations(name) VALUES
 	('20250312-a'),
 	('20250312-b'),
-	('20250414-a');
+	('20250414-a'),
+	('20250422-a');

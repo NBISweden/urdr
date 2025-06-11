@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This script fetches data about the available Redmine users and groups
 # and updates the local Urdr database with the group information and
@@ -31,6 +31,14 @@ if [ ! -f "$2" ] || [ "${2%.db}" = "$2" ]; then
 fi
 
 [ "${err+set}" = set ] && exit 1
+
+docker-compose () {
+	if command -p docker-compose >/dev/null 2>&1; then
+		command docker-compose "$@"
+	else
+		command docker compose "$@"
+	fi
+}
 
 # Copy user info.
 {
