@@ -78,15 +78,17 @@ export const saveSettings = async (
   }
 };
 
-export const fetchVacationData = async (
+export const fetchAbsenceData = async (
+  absenceIssue: IdName,
   users: { id: number }[],
   weeks: { monday: Date }[],
   context: any
 ): Promise<{ [userId: string]: number[] }> => {
-  const allUserVacation: { [userId: string]: number[] } = {};
+  const allUserAbsence: { [userId: string]: number[] } = {};
 
   const promises = users.map(async (user) => {
-    const timeEntries = await getVacationTimeEntries(
+    const timeEntries = await getAbsenceTimeEntries(
+      absenceIssue,
       weeks[0].monday,
       addDays(weeks[weeks.length - 1].monday, 4),
       user.id.toString(),
@@ -97,6 +99,11 @@ export const fetchVacationData = async (
       const userWeeks = new Set<number>();
 
       for (const entry of timeEntries) {
+        // Filter out parental leave entries that are not exactly 8 hours
+        if (absenceIssue.id === 6992 && entry.hours !== 8) {
+          continue;
+        }
+        
         const entryDate = new Date(entry.spent_on);
         const entryWeek = getISOWeek(entryDate);
         userWeeks.add(entryWeek);
@@ -111,90 +118,23 @@ export const fetchVacationData = async (
   const results = await Promise.all(promises);
 
   results.forEach((result) => {
-    allUserVacation[result.userId] = result.weeks;
+    allUserAbsence[result.userId] = result.weeks;
   });
 
-  return allUserVacation;
+  return allUserAbsence;
 };
 
-const getVacationTimeEntries = async (
+const getAbsenceTimeEntries = async (
+  absenceIssue: IdName,
   fromDate: Date,
   toDate: Date,
   user_id: string,
   context: any
 ) => {
-  const vacationIssue: IdName = { id: 6995, name: "Vacation" };
   const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
 
   const absence_pair: IssueActivityPair = {
-    issue: vacationIssue,
-    activity,
-    custom_name: "",
-    is_hidden: false,
-  };
-
-  const entries = await getTimeEntries(
-    absence_pair,
-    fromDate,
-    toDate,
-    context,
-    user_id
-  );
-  return entries || [];
-};
-
-export const fetchParentalLeaveData = async (
-  users: { id: number }[],
-  weeks: { monday: Date }[],
-  context: any
-): Promise<{ [userId: string]: number[] }> => {
-  const allUserParentalLeave: { [userId: string]: number[] } = {};
-
-  const promises = users.map(async (user) => {
-    const timeEntries = await getParentalLeaveTimeEntries(
-      weeks[0].monday,
-      addDays(weeks[weeks.length - 1].monday, 4),
-      user.id.toString(),
-      context
-    );
-
-    if (timeEntries) {
-      const userWeeks = new Set<number>();
-
-      for (const entry of timeEntries) {
-        // filter out days with 8 hours reported
-        if (entry.hours !== 8) continue; 
-
-        const entryDate = new Date(entry.spent_on);
-        const entryWeek = getISOWeek(entryDate);
-        userWeeks.add(entryWeek);
-      }
-
-      return { userId: user.id, weeks: Array.from(userWeeks) };
-    }
-
-    return { userId: user.id, weeks: [] };
-  });
-
-  const results = await Promise.all(promises);
-
-  results.forEach((result) => {
-    allUserParentalLeave[result.userId] = result.weeks;
-  });
-  return allUserParentalLeave;
-};
-
-const getParentalLeaveTimeEntries = async (
-  fromDate: Date,
-  toDate: Date,
-  user_id: string,
-  context: any
-) => {
-  const parentalLeaveIssue: IdName = { id: 6992, name: "Parental Leave" };
-  const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
-
-  const absence_pair: IssueActivityPair = {
-    issue: parentalLeaveIssue,
+    issue: absenceIssue,
     activity,
     custom_name: "",
     is_hidden: false,

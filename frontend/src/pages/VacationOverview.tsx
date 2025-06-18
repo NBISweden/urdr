@@ -5,8 +5,7 @@ import {
   getSavedGroup,
   selectGroup,
   saveSettings,
-  fetchVacationData,
-  fetchParentalLeaveData,
+  fetchAbsenceData,
   generateWeeks,
   groupWeeksByMonth,
 } from "../components/VacationOverview/utils";
@@ -54,15 +53,30 @@ export const VacationOverview = () => {
     const loadAbsenceData = async () => {
       setLoadingVacationData(true);
       try {
-        const userIds = selectedGroupData.users.map((user) => ({ id: user.id }));
-        const vacationData = await fetchVacationData(userIds, weeks, context);
-        const parentalLeaveData = await fetchParentalLeaveData(userIds, weeks, context);
+        const userIds = selectedGroupData.users.map((user) => ({
+          id: user.id,
+        }));
+        const vacationData = await fetchAbsenceData(
+          { id: 6995, name: "Vacation" },
+          userIds,
+          weeks,
+          context
+        );
+        const parentalLeaveData = await fetchAbsenceData(
+          { id: 6992, name: "Parental Leave" },
+          userIds,
+          weeks,
+          context
+        );
+
         // Merge parental data into vacation data under absenceData
         const absenceData = { ...vacationData };
 
         for (const userId in parentalLeaveData) {
           if (absenceData[userId]) {
-            absenceData[userId] = absenceData[userId].concat(parentalLeaveData[userId]);
+            absenceData[userId] = absenceData[userId].concat(
+              parentalLeaveData[userId]
+            );
           } else {
             absenceData[userId] = parentalLeaveData[userId];
           }
