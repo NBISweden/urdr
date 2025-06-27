@@ -78,15 +78,17 @@ export const saveSettings = async (
   }
 };
 
-export const fetchVacationData = async (
+export const fetchAbsenceData = async (
+  absenceIssue: IdName,
   users: { id: number }[],
   weeks: { monday: Date }[],
   context: any
 ): Promise<{ [userId: string]: number[] }> => {
-  const allUserVacation: { [userId: string]: number[] } = {};
+  const allUserAbsence: { [userId: string]: number[] } = {};
 
   const promises = users.map(async (user) => {
-    const timeEntries = await getVacationTimeEntries(
+    const timeEntries = await getAbsenceTimeEntries(
+      absenceIssue,
       weeks[0].monday,
       addDays(weeks[weeks.length - 1].monday, 4),
       user.id.toString(),
@@ -97,6 +99,11 @@ export const fetchVacationData = async (
       const userWeeks = new Set<number>();
 
       for (const entry of timeEntries) {
+        // Filter out parental leave entries that are not exactly 8 hours
+        if (absenceIssue.id === 6992 && entry.hours !== 8) {
+          continue;
+        }
+        
         const entryDate = new Date(entry.spent_on);
         const entryWeek = getISOWeek(entryDate);
         userWeeks.add(entryWeek);
@@ -111,23 +118,23 @@ export const fetchVacationData = async (
   const results = await Promise.all(promises);
 
   results.forEach((result) => {
-    allUserVacation[result.userId] = result.weeks;
+    allUserAbsence[result.userId] = result.weeks;
   });
 
-  return allUserVacation;
+  return allUserAbsence;
 };
 
-const getVacationTimeEntries = async (
+const getAbsenceTimeEntries = async (
+  absenceIssue: IdName,
   fromDate: Date,
   toDate: Date,
   user_id: string,
   context: any
 ) => {
-  const vacationIssue: IdName = { id: 6995, name: "Vacation" };
   const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
 
   const absence_pair: IssueActivityPair = {
-    issue: vacationIssue,
+    issue: absenceIssue,
     activity,
     custom_name: "",
     is_hidden: false,
@@ -140,7 +147,6 @@ const getVacationTimeEntries = async (
     context,
     user_id
   );
-
   return entries || [];
 };
 
@@ -168,6 +174,7 @@ export const generateWeeks = (numWeeks: number = 13): WeekInfo[] => {
 
   return weeks;
 };
+
 export const groupWeeksByMonth = (weeks: WeekInfo[]): MonthGroup[] => {
   const monthMap: { [month: string]: MonthGroup } = {};
 
