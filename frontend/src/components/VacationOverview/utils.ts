@@ -150,9 +150,9 @@ const getAbsenceTimeEntries = async (
   return entries || [];
 };
 
-export const generateWeeks = (numWeeks: number = 13): WeekInfo[] => {
+export const generateWeeks = (numWeeks: number = 14): WeekInfo[] => {
   const today = new Date();
-  const currentMonday = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
+  const currentMonday = startOfWeek(today, { weekStartsOn: 1 });
 
   const weeks: WeekInfo[] = [];
 
