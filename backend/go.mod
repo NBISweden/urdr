@@ -5,12 +5,12 @@ go 1.24
 toolchain go1.24.1
 
 require (
-	github.com/gofiber/fiber/v2 v2.52.8
+	github.com/gofiber/fiber/v2 v2.52.9
 	github.com/gofiber/storage/sqlite3 v1.3.8
-	github.com/mattn/go-sqlite3 v1.14.28
+	github.com/mattn/go-sqlite3 v1.14.30
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/fiber-swagger v1.3.0
-	github.com/swaggo/swag v1.16.4
+	github.com/swaggo/swag v1.16.6
 )
 
 require (
@@ -35,6 +35,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
