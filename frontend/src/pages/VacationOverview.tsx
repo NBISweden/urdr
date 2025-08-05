@@ -26,7 +26,8 @@ export const VacationOverview = () => {
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
   const [loadingVacationData, setLoadingVacationData] =
     useState<boolean>(false);
-
+  const today = new Date();
+  const [startDate, setStartDate] = useState<Date>(today);
   const context = useContext(AuthContext);
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export const VacationOverview = () => {
   }, []);
 
   const selectedGroupData = groups.find((group) => group.id === selectedGroup);
-  const weeks = useMemo(() => generateWeeks(), []);
+  const weeks = useMemo(() => generateWeeks(14, startDate), [startDate]);
   const monthGroups = useMemo(() => groupWeeksByMonth(weeks), [weeks]);
 
   useEffect(() => {
