@@ -2,6 +2,11 @@
   box-sizing: border-box;
 }
 
+:root {
+  --vacation-color: hsl(186deg, 30%, 60%);
+  --parental-color: hsl(291deg, 13%, 81%);
+}
+
 /* This class can be used to hide things visually
 but still make them accessible for assistive technology */
 .visually-hidden {
@@ -981,7 +986,10 @@ Other button classes are defined further down together with other classes for th
 
 .vacation-table td {
   border: 1px solid hsl(0deg 0% 75%);
-  padding: 0.25rem;
+  padding: 0;
+  min-height: 2rem;
+  height: 2rem;
+  position: relative;
 }
 
 .vacation-table th {
@@ -1003,8 +1011,60 @@ Other button classes are defined further down together with other classes for th
   vertical-align: middle;
 }
 
-.vacation-table .vacation-cell {
-  background-color: hsl(0deg 0% 65%);
+.week-day-cell {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.day-part {
+  flex: 1;
+  height: 100%;
+  border-left: 1px solid hsl(0deg 0% 90%);
+}
+
+.day-part:first-child {
+  border-left: none;
+}
+
+.day-part.vacation {
+  background-color: var(--vacation-color);
+}
+
+.day-part.parental {
+  background-color: var(--parental-color);
+}
+
+.legend {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.legend-color {
+  width: 3rem;
+  height: 0.8rem;
+  border-radius: 0.25rem;
+}
+
+.legend-color.vacation {
+  background-color: var(--vacation-color);
+}
+
+.legend-color.parental {
+  background-color: var(--parental-color);
 }
 
 .table-wrapper {

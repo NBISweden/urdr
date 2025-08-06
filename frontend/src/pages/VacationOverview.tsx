@@ -20,7 +20,7 @@ import { LoadingOverlay } from "../components/LoadingOverlay";
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [vacationData, setVacationData] = useState<{
-    [userId: string]: number[];
+    [userId: string]: { [date: string]: "vacation" | "parental" };
   }>({});
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
@@ -70,17 +70,26 @@ export const VacationOverview = () => {
         );
 
         // Merge parental data into vacation data under absenceData
-        const absenceData = { ...vacationData };
+        const absenceData: { [userId: string]: { [date: string]: "vacation" | "parental" } } = {};
+
+        for (const userId in vacationData) {
+          absenceData[userId] = { ...vacationData[userId] };
+        }
 
         for (const userId in parentalLeaveData) {
-          if (absenceData[userId]) {
-            absenceData[userId] = absenceData[userId].concat(
-              parentalLeaveData[userId]
-            );
-          } else {
-            absenceData[userId] = parentalLeaveData[userId];
+          if (!absenceData[userId]) absenceData[userId] = {};
+
+          for (const date in parentalLeaveData[userId]) {
+            if (!absenceData[userId][date]) {
+              absenceData[userId][date] = parentalLeaveData[userId][date];
+            } else {
+              console.warn(
+                  `User ${userId} has multiples types of leave on ${date}. Keeping: ${absenceData[userId][date]}, ignoring: ${parentalLeaveData[userId][date]}`
+              );
+            }
           }
         }
+
         setVacationData(absenceData);
       } catch (error) {
         console.error("Error fetching vacation data:", error);
