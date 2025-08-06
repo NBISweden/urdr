@@ -44,6 +44,11 @@ export const VacationOverview = () => {
     fetchGroupData();
   }, []);
 
+  const handleStartDateChange = (newDate: Date) => {
+    setStartDate(newDate);
+    return;
+  };
+
   const selectedGroupData = groups.find((group) => group.id === selectedGroup);
   const weeks = useMemo(() => generateWeeks(14, startDate), [startDate]);
   const monthGroups = useMemo(() => groupWeeksByMonth(weeks), [weeks]);
@@ -152,6 +157,8 @@ export const VacationOverview = () => {
               weeks={weeks}
               monthGroups={monthGroups}
               vacationData={vacationData}
+              startDate={startDate}
+              onStartDateChange={handleStartDateChange}
             />
           </>
         )}

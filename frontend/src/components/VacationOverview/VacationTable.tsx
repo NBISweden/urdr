@@ -7,6 +7,8 @@ type Props = {
   weeks: WeekInfo[];
   monthGroups: MonthGroup[];
   vacationData: { [userId: string]: number[] };
+  startDate: Date;
+  onStartDateChange: (newDate: Date) => void;
 };
 
 export const VacationTable: React.FC<Props> = ({
@@ -14,7 +16,23 @@ export const VacationTable: React.FC<Props> = ({
   weeks,
   monthGroups,
   vacationData,
+  startDate,
+  onStartDateChange,
 }) => {
+  const handleWeekBack = () => {
+    const newDate = new Date(startDate.getTime());
+    newDate.setDate(newDate.getDate() - 7);
+    onStartDateChange(newDate);
+    return;
+  };
+
+  const handleWeekForward = () => {
+    const newDate = new Date(startDate.getTime());
+    newDate.setDate(newDate.getDate() + 7);
+    onStartDateChange(newDate);
+    return;
+  };
+
   return (
     <div className="table-wrapper">
       <table className="vacation-table table-responsive">
@@ -31,13 +49,18 @@ export const VacationTable: React.FC<Props> = ({
 
           {/* Weeks */}
           <tr>
-            <th></th>
+            <th>
+              <button onClick={handleWeekBack}>back</button>
+            </th>
             {weeks.map((week) => (
               <th key={week.week} className="week-header">
                 <div> {week.week} </div>
                 <div>{week.dateRange}</div>
               </th>
             ))}
+            <th>
+              <button onClick={handleWeekForward}>forward</button>
+            </th>
           </tr>
         </thead>
         <tbody>
