@@ -1,6 +1,8 @@
 import React from "react";
 import { Group } from "../../model";
 import { MonthGroup, WeekInfo } from "./types";
+import left from "../../icons/caret-left-fill.svg";
+import right from "../../icons/caret-right-fill.svg";
 
 type Props = {
   group?: Group;
@@ -50,7 +52,13 @@ export const VacationTable: React.FC<Props> = ({
           {/* Weeks */}
           <tr>
             <th>
-              <button onClick={handleWeekBack}>back</button>
+              <button onClick={handleWeekBack}>
+                <img
+                  src={left}
+                  alt="show one week earlier"
+                  className="week-arrow"
+                />
+              </button>
             </th>
             {weeks.map((week) => (
               <th key={week.week} className="week-header">
@@ -58,8 +66,14 @@ export const VacationTable: React.FC<Props> = ({
                 <div>{week.dateRange}</div>
               </th>
             ))}
-            <th>
-              <button onClick={handleWeekForward}>forward</button>
+            <th className="right-header">
+              <button onClick={handleWeekForward}>
+                <img
+                  src={right}
+                  alt="show one week later"
+                  className="week-arrow"
+                />
+              </button>
             </th>
           </tr>
         </thead>
