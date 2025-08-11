@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24.6-alpine AS builder
 
 RUN addgroup -S urdr && getent group urdr >/tmp/group
 RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
