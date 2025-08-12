@@ -1,6 +1,6 @@
 import React from "react";
 import { Group } from "../../model";
-import { MonthGroup, WeekInfo } from "./types";
+import { ArrowDirection, MonthGroup, WeekInfo } from "./types";
 import left from "../../icons/caret-left-fill.svg";
 import right from "../../icons/caret-right-fill.svg";
 
@@ -10,7 +10,7 @@ type Props = {
   monthGroups: MonthGroup[];
   vacationData: { [userId: string]: number[] };
   startDate: Date;
-  onStartDateChange: (newDate: Date) => void;
+  onStartDateChange: (newDate: Date, direction: ArrowDirection) => void;
 };
 
 export const VacationTable: React.FC<Props> = ({
@@ -24,14 +24,14 @@ export const VacationTable: React.FC<Props> = ({
   const handleWeekBack = () => {
     const newDate = new Date(startDate.getTime());
     newDate.setDate(newDate.getDate() - 7);
-    onStartDateChange(newDate);
+    onStartDateChange(newDate, "back");
     return;
   };
 
   const handleWeekForward = () => {
     const newDate = new Date(startDate.getTime());
     newDate.setDate(newDate.getDate() + 7);
-    onStartDateChange(newDate);
+    onStartDateChange(newDate, "forward");
     return;
   };
 
