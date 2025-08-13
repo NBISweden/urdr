@@ -56,18 +56,21 @@ export const VacationOverview = () => {
         const userIds = selectedGroupData.users.map((user) => ({
           id: user.id,
         }));
-        const vacationData = await fetchAbsenceData(
-          { id: 6995, name: "Vacation" },
-          userIds,
-          weeks,
-          context
-        );
-        const parentalLeaveData = await fetchAbsenceData(
-          { id: 6992, name: "Parental Leave" },
-          userIds,
-          weeks,
-          context
-        );
+
+        const [vacationData, parentalLeaveData] = await Promise.all([
+          fetchAbsenceData(
+            { id: 6995, name: "Vacation" },
+            userIds,
+            weeks,
+            context
+          ),
+          fetchAbsenceData(
+            { id: 6992, name: "Parental Leave" },
+            userIds,
+            weeks,
+            context
+          ),
+        ]);
 
         // Merge parental data into vacation data under absenceData
         const absenceData: { [userId: string]: { [date: string]: "vacation" | "parental" } } = {};
