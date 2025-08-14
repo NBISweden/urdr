@@ -996,6 +996,19 @@ Other button classes are defined further down together with other classes for th
   border-bottom: 0.125rem solid hsl(0deg 0% 35%);
 }
 
+.vacation-table button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  float: right;
+  padding: 0;
+}
+
+.vacation-table .right-header {
+  width: 0;
+  border: none;
+}
+
 .vacation-table .user-name {
   max-width: 11.25rem;
   word-wrap: break-word;

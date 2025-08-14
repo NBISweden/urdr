@@ -1,13 +1,17 @@
 import React from "react";
 import { Group } from "../../model";
-import { MonthGroup, WeekInfo } from "./types";
 import { format, addDays } from "date-fns";
+import { ArrowDirection, MonthGroup, WeekInfo } from "./types";
+import left from "../../icons/caret-left-fill.svg";
+import right from "../../icons/caret-right-fill.svg";
 
 type Props = {
   group?: Group;
   weeks: WeekInfo[];
   monthGroups: MonthGroup[];
   vacationData: { [userId: string]: { [date: string]: "vacation" | "parental" }  };
+  startDate: Date;
+  onStartDateChange: (newDate: Date, direction: ArrowDirection) => void;
 };
 
 export const VacationTable: React.FC<Props> = ({
@@ -15,7 +19,23 @@ export const VacationTable: React.FC<Props> = ({
   weeks,
   monthGroups,
   vacationData,
+  startDate,
+  onStartDateChange,
 }) => {
+  const handleWeekBack = () => {
+    const newDate = new Date(startDate.getTime());
+    newDate.setDate(newDate.getDate() - 7);
+    onStartDateChange(newDate, "back");
+    return;
+  };
+
+  const handleWeekForward = () => {
+    const newDate = new Date(startDate.getTime());
+    newDate.setDate(newDate.getDate() + 7);
+    onStartDateChange(newDate, "forward");
+    return;
+  };
+
   return (
     <div className="table-wrapper">
       <div className="legend">
@@ -42,13 +62,30 @@ export const VacationTable: React.FC<Props> = ({
 
           {/* Weeks */}
           <tr>
-            <th></th>
+            <th>
+              <button onClick={handleWeekBack}>
+                <img
+                  src={left}
+                  alt="show one week earlier"
+                  className="week-arrow"
+                />
+              </button>
+            </th>
             {weeks.map((week) => (
               <th key={week.week} className="week-header">
                 <div> {week.week} </div>
                 <div>{week.dateRange}</div>
               </th>
             ))}
+            <th className="right-header">
+              <button onClick={handleWeekForward}>
+                <img
+                  src={right}
+                  alt="show one week later"
+                  className="week-arrow"
+                />
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
