@@ -59,13 +59,13 @@ export const VacationOverview = () => {
       fetchAbsenceData(
           { id: 6995, name: "Vacation" },
           userIds,
-          weeks,
+          timespan,
           context
       ),
       fetchAbsenceData(
           { id: 6992, name: "Parental Leave" },
           userIds,
-          weeks,
+          timespan,
           context
       ),
     ]);
