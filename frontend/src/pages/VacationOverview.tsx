@@ -22,7 +22,7 @@ import { ArrowDirection, WeekInfo } from "../components/VacationOverview/types";
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [vacationData, setVacationData] = useState<{
-    [userId: string]: number[];
+    [userId: string]: { [date: string]: "vacation" | "parental" };
   }>({});
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
@@ -55,31 +55,40 @@ export const VacationOverview = () => {
     const userIds = selectedGroupData.users.map((user) => ({
       id: user.id,
     }));
-    const newVacationData = await fetchAbsenceData(
-      { id: 6995, name: "Vacation" },
-      userIds,
-      timespan,
-      context
-    );
-    const parentalLeaveData = await fetchAbsenceData(
-      { id: 6992, name: "Parental Leave" },
-      userIds,
-      timespan,
-      context
-    );
+    const [vacationData, parentalLeaveData] = await Promise.all([
+      fetchAbsenceData(
+          { id: 6995, name: "Vacation" },
+          userIds,
+          timespan,
+          context
+      ),
+      fetchAbsenceData(
+          { id: 6992, name: "Parental Leave" },
+          userIds,
+          timespan,
+          context
+      ),
+    ]);
 
-    const absenceData = { ...newVacationData };
+    const absenceData: { [userId: string]: { [date: string]: "vacation" | "parental" } } = {};
 
-    for (const userId in parentalLeaveData) {
-      if (absenceData[userId]) {
-        absenceData[userId] = absenceData[userId].concat(
-          parentalLeaveData[userId]
-        );
-      } else {
-        absenceData[userId] = parentalLeaveData[userId];
-      }
+    for (const userId in vacationData) {
+      absenceData[userId] = { ...vacationData[userId] };
     }
 
+    for (const userId in parentalLeaveData) {
+      if (!absenceData[userId]) absenceData[userId] = {};
+
+      for (const date in parentalLeaveData[userId]) {
+        if (!absenceData[userId][date]) {
+          absenceData[userId][date] = parentalLeaveData[userId][date];
+        } else {
+          console.warn(
+              `User ${userId} has multiples types of leave on ${date}. Keeping: ${absenceData[userId][date]}, ignoring: ${parentalLeaveData[userId][date]}`
+          );
+        }
+      }
+    }
     return absenceData;
   };
 
@@ -153,19 +162,14 @@ export const VacationOverview = () => {
     try {
       const absenceData = await getAbsenceData(week);
 
-      const existingData = { ...vacationData };
-
-      for (const userId in absenceData) {
-        if (existingData[userId]) {
-          existingData[userId] = existingData[userId].concat(
-            absenceData[userId]
-          );
-        } else {
-          existingData[userId] = absenceData[userId];
+      setVacationData((prev) => {
+        const next: { [userId: string]: { [date: string]: "vacation" | "parental" } } = { ...prev };
+        for (const userId in absenceData) {
+          next[userId] = { ...(next[userId] ?? {}), ...absenceData[userId] };
         }
-      }
+        return next;
+      });
 
-      setVacationData(existingData);
       let updatedFetchedWeeks = fetchedWeeks;
       fetchedWeeks.push(getISOWeek(monday));
       setFetchedWeeks(updatedFetchedWeeks);

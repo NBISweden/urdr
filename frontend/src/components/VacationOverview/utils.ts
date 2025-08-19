@@ -83,8 +83,8 @@ export const fetchAbsenceData = async (
   users: { id: number }[],
   weeks: { monday: Date }[],
   context: any
-): Promise<{ [userId: string]: number[] }> => {
-  const allUserAbsence: { [userId: string]: number[] } = {};
+): Promise<{ [userId: string]: { [date: string]: "vacation" | "parental" } }> => {
+  const allUserAbsence: { [userId: string]:{ [date: string]: "vacation" | "parental" } } = {};
 
   const promises = users.map(async (user) => {
     const timeEntries = await getAbsenceTimeEntries(
@@ -94,31 +94,27 @@ export const fetchAbsenceData = async (
       user.id.toString(),
       context
     );
+    const userAbsence: { [date: string]: "vacation" | "parental" } = {};
 
     if (timeEntries) {
-      const userWeeks = new Set<number>();
-
       for (const entry of timeEntries) {
         // Filter out parental leave entries that are not exactly 8 hours
         if (absenceIssue.id === 6992 && entry.hours !== 8) {
           continue;
         }
 
-        const entryDate = new Date(entry.spent_on);
-        const entryWeek = getISOWeek(entryDate);
-        userWeeks.add(entryWeek);
+        const dateStr = format(new Date(entry.spent_on), "yyyy-MM-dd");
+        userAbsence[dateStr] = absenceIssue.id === 6992 ? "parental" : "vacation";
       }
-
-      return { userId: user.id, weeks: Array.from(userWeeks) };
     }
 
-    return { userId: user.id, weeks: [] };
+    return { userId: user.id, absence: userAbsence  };
   });
 
   const results = await Promise.all(promises);
 
   results.forEach((result) => {
-    allUserAbsence[result.userId] = result.weeks;
+    allUserAbsence[result.userId] = result.absence;
   });
 
   return allUserAbsence;
