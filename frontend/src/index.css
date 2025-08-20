@@ -5,6 +5,7 @@
 :root {
   --vacation-color: hsl(186deg, 30%, 60%);
   --parental-color: hsl(291deg, 13%, 81%);
+  --highlight-today-color: hsl(186deg, 30%, 73%);
 }
 
 /* This class can be used to hide things visually
@@ -364,6 +365,20 @@ Other button classes are defined further down together with other classes for th
 .cell-container {
   display: flex;
   align-items: center;
+}
+
+.cell-today {
+  background-color: var(--highlight-today-color);
+  border-radius: 0.25rem;
+}
+
+.date-cell {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.time-sheet-cell {
+ border: 0.25rem solid var(--highlight-today-color) ;
 }
 
 .recent-container {
