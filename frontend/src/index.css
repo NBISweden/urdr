@@ -378,7 +378,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .time-sheet-cell {
- border: 0.25rem solid var(--highlight-today-color) ;
+  border: 0.25rem solid var(--highlight-today-color);
 }
 
 .recent-container {

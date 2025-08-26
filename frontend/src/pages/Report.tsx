@@ -668,7 +668,6 @@ export const Report = () => {
   if (context.user === null) return <></>;
 
   const issueInputRef = useRef(null);
-  const today= new Date()
 
   // Main content
   return (
