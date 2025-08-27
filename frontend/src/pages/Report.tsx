@@ -14,10 +14,10 @@ import {
 } from "@dnd-kit/sortable";
 import {
   format as formatDate,
-  getISOWeek,
   getISOWeekYear,
   setISOWeek,
   isPast,
+  isToday,
   addDays,
 } from "date-fns";
 import { Row } from "../components/Row";
@@ -851,7 +851,7 @@ export const Report = () => {
                         aria-label={`total of hours spent during the day ${dateStr}`}
                         type="text"
                         id={dateStr}
-                        className="cell"
+                        className={isToday(date) ? "cell time-sheet-cell" : "cell"}
                         value={showTotalHours ? getTotalHours(dateStr) : ""}
                         readOnly
                         tabIndex={-1}
