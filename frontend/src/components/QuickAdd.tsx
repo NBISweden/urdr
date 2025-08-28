@@ -32,6 +32,8 @@ export const QuickAdd = ({
   const isNumber = (s: string) => {
     return Number.isInteger(Number(s));
   };
+  const escapeUnderscore = (s: string) =>
+      s.replace(/(^|[^\\])_/g, '$1\\_');
 
   React.useEffect(() => {
     let endpoint = "/api/activities";
@@ -71,8 +73,9 @@ export const QuickAdd = ({
             const endpoint = `/api/issues?status_id=*&issue_id=${search.text}`;
             res = await getApiEndpoint(endpoint, context);
           } else {
-            res = await searchIssues(search.text);
-            byWabi = await searchIssuesByWabi(search.text)
+            const searchQuery = escapeUnderscore(search.text);
+            res = await searchIssues(searchQuery);
+            byWabi = await searchIssuesByWabi(searchQuery);
           }
 
           const map = new Map<number, Issue>();
@@ -120,8 +123,8 @@ export const QuickAdd = ({
 
   const WABI_CUSTOM_FIELD_ID = 30;
 
-  const searchIssuesByWabi = async (query: string) => {
-    const encoded = encodeURIComponent("~" + query);
+  const searchIssuesByWabi = async (searchQuery: string) => {
+    const encoded = encodeURIComponent("~" + searchQuery);
     const endpoint = `/api/issues?status_id=*&limit=5&cf_${WABI_CUSTOM_FIELD_ID}=${encoded}`;
     return await getApiEndpoint(endpoint, context) as { issues: Issue[] };
   };
