@@ -3,6 +3,7 @@
   "rules": {
     "color-function-notation": null,
     "hue-degree-notation": null,
-    "alpha-value-notation": null
+    "alpha-value-notation": null,
+    "shorthand-property-no-redundant-values": null
   }
 }
