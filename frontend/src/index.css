@@ -1177,6 +1177,48 @@ Other button classes are defined further down together with other classes for th
   width: 8rem;
 }
 
+/* NOT FOUND */
+
+/* Wrapper with same styles as login-wrapper */
+.not-found-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: hsl(70deg 55% 98%);
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .not-found-wrapper {
+    width: 200vw;
+  }
+}
+
+.not-found-section {
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.not-found-heading {
+  font-size: 2rem;
+}
+
+.not-found-message {
+  font-size: 1.125rem;
+  color: hsl(0deg 0% 35%);
+  margin: 0 0 2rem 0;
+}
+
+.not-found-button {
+  background-color: hsl(288deg 46% 22%);
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.5rem 1rem;
+}
+
 /* ModalDialog styles */
 
 .modal-overlay {
