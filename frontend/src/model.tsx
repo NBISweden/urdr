@@ -25,7 +25,14 @@ export interface Issue {
   id: number;
   subject: string;
   project: IdName;
+  custom_fields?: CustomField[];
 }
+
+export type CustomField = {
+  id: number;
+  name: string;
+  value: string | null;
+};
 
 export interface TimeEntry {
   id?: number;
