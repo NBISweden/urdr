@@ -1,7 +1,6 @@
 import React, { useState, useRef } from "react";
 import { IdName, Issue, IssueActivityPair, ToastMsg } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
-import plus from "../icons/plus.svg";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
 import { AuthContext } from "../components/AuthProvider";
@@ -65,6 +64,7 @@ export const QuickAdd = ({
         }
         if (debouncedSearch && search.text) {
           let res: { issues: Issue[] };
+          let byWabi: { issues: Issue[] } = { issues: [] };
           let candidateIssues: Issue[];
 
           if (isNumber(search.text)) {
@@ -72,18 +72,25 @@ export const QuickAdd = ({
             res = await getApiEndpoint(endpoint, context);
           } else {
             res = await searchIssues(search.text);
+            byWabi = await searchIssuesByWabi(search.text)
           }
-          if (!didCancel && res.issues) {
-            if (res.issues.length > 0) {
-              if (res.issues.length === 1) {
-                let foundIssue = res.issues[0];
+
+          const map = new Map<number, Issue>();
+          for (const issue of res.issues || []) map.set(issue.id, issue);
+          for (const issue of byWabi.issues || []) map.set(issue.id, issue);
+          const combined = Array.from(map.values());
+
+          if (!didCancel && combined) {
+            if (combined.length > 0) {
+              if (combined.length === 1) {
+                let foundIssue = combined[0];
                 candidateIssues = [foundIssue];
                 //allow for valid issue id autoselection
                 if (isNumber(search.text)) {
                   setIssue(foundIssue);
                 }
               } else {
-                candidateIssues = res.issues;
+                candidateIssues = combined;
               }
               setSearch({ text: undefined, suggestions: candidateIssues });
               setIsAutoCompleteVisible(true);
@@ -109,6 +116,14 @@ export const QuickAdd = ({
     let element = issueInputRef.current;
     element.value = selection.id.toString();
     setIsAutoCompleteVisible(false);
+  };
+
+  const WABI_CUSTOM_FIELD_ID = 30;
+
+  const searchIssuesByWabi = async (query: string) => {
+    const encoded = encodeURIComponent("~" + query);
+    const endpoint = `/api/issues?status_id=*&limit=5&cf_${WABI_CUSTOM_FIELD_ID}=${encoded}`;
+    return await getApiEndpoint(endpoint, context) as { issues: Issue[] };
   };
 
   const searchIssues = async (searchQuery: string) => {
@@ -322,6 +337,10 @@ export const QuickAdd = ({
                 className="autocomplete-button"
               >
                 #{item.id} - {item.subject}
+                {(() => {
+                  const wabi = item.custom_fields?.find(cf => cf.name === "WABI ID")?.value;
+                  return wabi ? ` (WABI: ${wabi})` : "";
+                })()}
               </button>
             </li>
           ))}
