@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { Group } from "../../model";
 import { format, addDays } from "date-fns";
 import { ArrowDirection, MonthGroup, WeekInfo } from "./types";
@@ -47,6 +47,8 @@ export const VacationTable: React.FC<Props> = ({
           <span className="legend-label">Parental Leave</span>
           <span className="legend-color parental"></span>
         </div>
+      </div>
+      <div>
       </div>
       <table className="vacation-table table-responsive">
         <thead>

@@ -1102,16 +1102,36 @@ Other button classes are defined further down together with other classes for th
 }
 
 .group-select-wrapper {
+  display: flex;
+  flex-direction: column;
   padding: 1rem 0;
+}
 
-  label {
-    display: block;
+.group-select-wrapper label {
     margin-bottom: 0.25rem;
   }
 
-  select {
+.group-select-wrapper select {
     padding: 0.25rem;
   }
+
+.top-overview-container {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.week-picker-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.week-picker-wrapper label {
+  margin-bottom: 0.25rem;
+}
+
+.week-picker-wrapper select {
+  padding: 0.25rem;
 }
 
 .calendar-table {

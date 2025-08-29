@@ -18,6 +18,7 @@ import { HeaderUser } from "../components/HeaderUser";
 import { ClimbingBoxLoader } from "react-spinners";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { ArrowDirection, WeekInfo } from "../components/VacationOverview/types";
+import {WeekPicker} from "../components/WeekPicker";
 
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -153,6 +154,10 @@ export const VacationOverview = () => {
     return;
   };
 
+  const handleWeekChange =(newDate: Date) => {
+    setStartDate(newDate)
+  }
+
   const extendVacationData = async (monday: Date) => {
     if (fetchedWeeks.includes(getISOWeek(monday))) {
       return;
@@ -207,11 +212,19 @@ export const VacationOverview = () => {
           <p>Du tillhör inga grupper ännu.</p>
         ) : (
           <>
-            <GroupSelect
-              groups={groups}
-              selectedGroup={selectedGroup}
-              onChange={setSelectedGroup}
-            />
+            <div className="top-overview-container">
+              <GroupSelect
+                  groups={groups}
+                  selectedGroup={selectedGroup}
+                  onChange={setSelectedGroup}
+              />
+              <WeekPicker
+                  startDate={startDate}
+                  onWeekDateChange={handleWeekChange}
+                  labelText={"Select starting week:"}
+              />
+            </div>
+
             <VacationTable
               group={selectedGroupData}
               weeks={weeks}
