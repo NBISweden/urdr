@@ -9,7 +9,7 @@ export const NotFound = () => {
   return (
     <main className="not-found-wrapper">
       <header className="header-wrapper">
-        <img src="mstile-70x70.png" alt="Urdr icon" />
+        <img src="/mstile-70x70.png" alt="Urdr icon" />
         <h1 className="header-heading">urdr</h1>
       </header>
       <section className="not-found-section">
