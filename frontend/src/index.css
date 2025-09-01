@@ -1108,12 +1108,12 @@ Other button classes are defined further down together with other classes for th
 }
 
 .group-select-wrapper label {
-    margin-bottom: 0.25rem;
-  }
+  margin-bottom: 0.25rem;
+}
 
 .group-select-wrapper select {
-    padding: 0.25rem;
-  }
+  padding: 0.25rem;
+}
 
 .top-overview-container {
   display: flex;
