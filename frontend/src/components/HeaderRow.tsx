@@ -11,7 +11,7 @@ export const HeaderRow = ({ days }: { days: Date[] }) => {
   const breakpoint = 1267;
 
   return (
-    <div className="row">
+    <div className="header-row row">
       {days.map((day, index) => (
         <p
           key={day.getTime()}
@@ -24,7 +24,7 @@ export const HeaderRow = ({ days }: { days: Date[] }) => {
             : getShortCustomDateString(day)}
         </p>
       ))}
-      <div className="col-1">
+      <div className="col-1 date-cell">
         <h2>Total</h2>
       </div>
     </div>

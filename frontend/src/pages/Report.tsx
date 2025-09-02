@@ -708,108 +708,108 @@ export const Report = () => {
             }
           }}
         >
-          {favorites && favorites.length > 0 && (
-            <DndContext
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-              collisionDetection={closestCorners}
-              sensors={sensors}
-            >
-              <SortableContext
-                items={favorites.map(
-                  (fav) => `${fav.issue.id}${fav.activity.id}`
-                )}
-                strategy={verticalListSortingStrategy}
-              >
-                <section className="favorites-container">
-                  <HeaderRow days={currentWeekArray} />
-                  {favorites &&
-                    favorites.map((fav) => {
-                      const rowEntries = findRowEntries(fav, currentWeekArray);
-                      return (
+          <section className="time-sheet-container">
+            <HeaderRow days={currentWeekArray} />
+            {favorites && favorites.length > 0 && (
+                <DndContext
+                    onDragEnd={handleDragEnd}
+                    onDragStart={handleDragStart}
+                    collisionDetection={closestCorners}
+                    sensors={sensors}
+                >
+                  <SortableContext
+                      items={favorites.map(
+                          (fav) => `${fav.issue.id}${fav.activity.id}`
+                      )}
+                      strategy={verticalListSortingStrategy}
+                  >
+                    <section className="favorites-container">
+                      {favorites &&
+                          favorites.map((fav) => {
+                            const rowEntries = findRowEntries(fav, currentWeekArray);
+                            return (
+                                <Draggable
+                                    id={`${fav.issue.id}${fav.activity.id}`}
+                                    key={`${fav.issue.id}${fav.activity.id}`}
+                                >
+                                  <Row
+                                      key={`${fav.issue.id}${fav.activity.id}`}
+                                      topic={fav}
+                                      onCellUpdate={handleCellUpdate}
+                                      onToggleFav={handleToggleFav}
+                                      onFavNameUpdate={handleFavNameUpdate}
+                                      onFavNameSave={handleFavNameSave}
+                                      days={currentWeekArray}
+                                      rowHours={findRowHours(fav)}
+                                      rowEntries={rowEntries}
+                                      getRowSum={getRowSum}
+                                      isFav={true}
+                                  />
+                                </Draggable>
+                            );
+                          })}
+                    </section>
+                  </SortableContext>
+                  <DragOverlay>
+                    {draggedFav ? (
                         <Draggable
-                          id={`${fav.issue.id}${fav.activity.id}`}
-                          key={`${fav.issue.id}${fav.activity.id}`}
-                        >
-                          <Row
-                            key={`${fav.issue.id}${fav.activity.id}`}
-                            topic={fav}
+                            id={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                            children={
+                              <Row
+                                  key={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                                  topic={draggedFav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  onFavNameUpdate={handleFavNameUpdate}
+                                  onFavNameSave={handleFavNameSave}
+                                  days={currentWeekArray}
+                                  rowHours={findRowHours(draggedFav)}
+                                  rowEntries={findRowEntries(
+                                      draggedFav,
+                                      currentWeekArray
+                                  )}
+                                  getRowSum={getRowSum}
+                                  isFav={true}
+                              />
+                            }
+                        />
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
+            )}
+            <section className="recent-container">
+              {filteredRecents &&
+                  filteredRecents.map((recentIssue) => {
+                    const rowEntries = findRowEntries(
+                        recentIssue,
+                        currentWeekArray
+                    );
+                    return (
+                        <Row
+                            key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                            topic={recentIssue}
                             onCellUpdate={handleCellUpdate}
                             onToggleFav={handleToggleFav}
                             onFavNameUpdate={handleFavNameUpdate}
                             onFavNameSave={handleFavNameSave}
+                            onToggleHide={toggleHide}
                             days={currentWeekArray}
-                            rowHours={findRowHours(fav)}
+                            rowHours={findRowHours(recentIssue)}
                             rowEntries={rowEntries}
                             getRowSum={getRowSum}
-                            isFav={true}
-                          />
-                        </Draggable>
-                      );
-                    })}
-                </section>
-              </SortableContext>
-              <DragOverlay>
-                {draggedFav ? (
-                  <Draggable
-                    id={`${draggedFav.issue.id}${draggedFav.activity.id}`}
-                    children={
-                      <Row
-                        key={`${draggedFav.issue.id}${draggedFav.activity.id}`}
-                        topic={draggedFav}
-                        onCellUpdate={handleCellUpdate}
-                        onToggleFav={handleToggleFav}
-                        onFavNameUpdate={handleFavNameUpdate}
-                        onFavNameSave={handleFavNameSave}
-                        days={currentWeekArray}
-                        rowHours={findRowHours(draggedFav)}
-                        rowEntries={findRowEntries(
-                          draggedFav,
-                          currentWeekArray
-                        )}
-                        getRowSum={getRowSum}
-                        isFav={true}
-                      />
-                    }
-                  />
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          )}
-          <section className="recent-container">
-            {favorites.length == 0 && (
-              <HeaderRow days={currentWeekArray}></HeaderRow>
-            )}
-            {filteredRecents &&
-              filteredRecents.map((recentIssue) => {
-                const rowEntries = findRowEntries(
-                  recentIssue,
-                  currentWeekArray
-                );
-                return (
-                  <Row
-                    key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                    topic={recentIssue}
-                    onCellUpdate={handleCellUpdate}
-                    onToggleFav={handleToggleFav}
-                    onFavNameUpdate={handleFavNameUpdate}
-                    onFavNameSave={handleFavNameSave}
-                    onToggleHide={toggleHide}
-                    days={currentWeekArray}
-                    rowHours={findRowHours(recentIssue)}
-                    rowEntries={rowEntries}
-                    getRowSum={getRowSum}
-                  />
-                );
-              })}
-            <button
-              onClick={() => setShowHidden(!showHidden)}
-              className="basic-button hide-button"
-            >
-              {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
-              <img src={showHidden ? up : down} alt="" />
-            </button>
+                        />
+                    );
+                  })}
+              <button
+                  onClick={() => setShowHidden(!showHidden)}
+                  className="basic-button hide-button"
+              >
+                {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
+                <img src={showHidden ? up : down} alt="" />
+              </button>
+            </section>
           </section>
+
           {showHidden && (
             <section className="recent-container">
               {hidden &&
