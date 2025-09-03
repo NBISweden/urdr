@@ -6,7 +6,7 @@
   --vacation-color: hsl(186deg, 30%, 60%);
   --parental-color: hsl(291deg, 13%, 81%);
   --highlight-today-color: hsl(186deg, 30%, 73%);
-  --very_light_gray-background: hsl(0deg 0% 97%);
+  --very-light-gray-background: hsl(0deg 0% 97%);
   --header-height: 80px;
   --total-row-padding: 60px;
 }
@@ -385,7 +385,7 @@ Other button classes are defined further down together with other classes for th
 }
 
 .time-sheet-container {
-  background-color: var(--very_light_gray-background);
+  background-color: var(--very-light-gray-background);
 }
 
 .recent-container {
@@ -871,13 +871,13 @@ Other button classes are defined further down together with other classes for th
 .header-row {
   position: sticky;
   top: var(--header-height);
-  background-color: var(--very_light_gray-background);
+  background-color: var(--very-light-gray-background);
   padding-top: 0.75rem;
   z-index: 1;
 }
 
 .total-row {
-  background-color: var(--very_light_gray-background);
+  background-color: var(--very-light-gray-background);
   bottom: 2rem;
   margin-bottom: 2rem;
   position: sticky;
