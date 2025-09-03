@@ -35,7 +35,7 @@ import {
   startOfWeek,
   isWeekend,
 } from "date-fns";
-import sv from "date-fns/locale/sv";
+import enGB from "date-fns/locale/en-GB";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
@@ -595,8 +595,8 @@ export const AbsencePlanner = () => {
       }}
       showWeekNumbers
       showYearDropdown
-      todayButton="Idag"
-      locale={sv}
+      todayButton="Today"
+      locale={enGB}
       selectsStart
       startDate={startDate}
       endDate={endDate}
@@ -618,8 +618,8 @@ export const AbsencePlanner = () => {
       }}
       showWeekNumbers
       showYearDropdown
-      todayButton="Idag"
-      locale={sv}
+      todayButton="Today"
+      locale={enGB}
       selectsEnd
       startDate={startDate}
       endDate={endDate}
