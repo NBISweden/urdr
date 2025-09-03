@@ -40,12 +40,12 @@ export const VacationTable: React.FC<Props> = ({
     <div className="table-wrapper">
       <div className="legend">
         <div className="legend-item">
-          <span className="legend-label">Vacation</span>
           <span className="legend-color vacation"></span>
+          <span className="legend-label">Vacation</span>
         </div>
         <div className="legend-item">
-          <span className="legend-label">Parental Leave</span>
           <span className="legend-color parental"></span>
+          <span className="legend-label">Parental Leave</span>
         </div>
       </div>
       <div>
