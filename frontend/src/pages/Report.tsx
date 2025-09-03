@@ -808,92 +808,89 @@ export const Report = () => {
                 <img src={showHidden ? up : down} alt="" />
               </button>
             </section>
-          </section>
-
-          {showHidden && (
-            <section className="recent-container">
-              {hidden &&
-                hidden.map((hiddenIssue) => {
-                  const rowEntries = findRowEntries(
-                    hiddenIssue,
-                    currentWeekArray
-                  );
-                  return (
-                    <Row
-                      key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
-                      topic={hiddenIssue}
-                      onCellUpdate={handleCellUpdate}
-                      onToggleFav={handleToggleFav}
-                      onFavNameUpdate={handleFavNameUpdate}
-                      onFavNameSave={handleFavNameSave}
-                      onToggleHide={toggleHide}
-                      days={currentWeekArray}
-                      rowHours={findRowHours(hiddenIssue)}
-                      rowEntries={rowEntries}
-                      getRowSum={getRowSum}
-                      isHidden={true}
-                    />
-                  );
-                })}
-            </section>
-          )}
-          <section className="recent-container ">
-            <div className="row">
-              <div className="col-6">
-                <h2>Total</h2>
-              </div>
-              {currentWeekArray &&
-                currentWeekArray.map((date) => {
-                  const dateStr = formatDate(date, dateFormat);
-                  return (
-                    <div key={dateStr} className="col-1 cell-container">
-                      <input
-                        aria-label={`total of hours spent during the day ${dateStr}`}
+            {showHidden && (
+                <section className="recent-container">
+                  {hidden &&
+                      hidden.map((hiddenIssue) => {
+                        const rowEntries = findRowEntries(
+                            hiddenIssue,
+                            currentWeekArray
+                        );
+                        return (
+                            <Row
+                                key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
+                                topic={hiddenIssue}
+                                onCellUpdate={handleCellUpdate}
+                                onToggleFav={handleToggleFav}
+                                onFavNameUpdate={handleFavNameUpdate}
+                                onFavNameSave={handleFavNameSave}
+                                onToggleHide={toggleHide}
+                                days={currentWeekArray}
+                                rowHours={findRowHours(hiddenIssue)}
+                                rowEntries={rowEntries}
+                                getRowSum={getRowSum}
+                                isHidden={true}
+                            />
+                        );
+                      })}
+                </section>
+            )}
+            <div className="total-row row">
+                <div className="col-6">
+                  <h2>Total</h2>
+                </div>
+                {currentWeekArray &&
+                    currentWeekArray.map((date) => {
+                      const dateStr = formatDate(date, dateFormat);
+                      return (
+                          <div key={dateStr} className="col-1 cell-container">
+                            <input
+                                aria-label={`total of hours spent during the day ${dateStr}`}
+                                type="text"
+                                id={dateStr}
+                                className={isToday(date) ? "cell time-sheet-cell" : "cell"}
+                                value={showTotalHours ? getTotalHours(dateStr) : ""}
+                                readOnly
+                                tabIndex={-1}
+                            />
+                          </div>
+                      );
+                    })}
+                <div className="col-1 cell-container">
+                  <div className="comment-container">
+                    <input
+                        aria-label="total of hours spent during the week"
                         type="text"
-                        id={dateStr}
-                        className={isToday(date) ? "cell time-sheet-cell" : "cell"}
-                        value={showTotalHours ? getTotalHours(dateStr) : ""}
+                        className="cell"
+                        value={showTotalHours ? getTotalHoursWeek() : ""}
                         readOnly
                         tabIndex={-1}
-                      />
-                    </div>
-                  );
-                })}
-              <div className="col-1 cell-container">
-                <div className="comment-container">
-                  <input
-                    aria-label="total of hours spent during the week"
-                    type="text"
-                    className="cell"
-                    value={showTotalHours ? getTotalHoursWeek() : ""}
-                    readOnly
-                    tabIndex={-1}
-                  />
-                  {/* Only show warnings for weeks that have passed. 
-                    It must be at least Saturday. */}
-                  {isPast(addDays(currentWeekArray[4], 1)) && (
-                    <img
-                      src={getTotalHoursWeek() === 40 ? check : warning}
-                      alt={
-                        getTotalHoursWeek() === 40
-                          ? "check: 40 hours logged this week"
-                          : "warning: less or more than 40 hours logged this week"
-                      }
-                      className={
-                        getTotalHoursWeek() === 40
-                          ? "feedback-check"
-                          : "feedback-warning"
-                      }
-                      title={
-                        getTotalHoursWeek() === 40
-                          ? "40 hours logged"
-                          : "less or more than 40 hours logged"
-                      }
                     />
-                  )}
+                    {/* Only show warnings for weeks that have passed.
+                    It must be at least Saturday. */}
+                    {isPast(addDays(currentWeekArray[4], 1)) && (
+                        <img
+                            src={getTotalHoursWeek() === 40 ? check : warning}
+                            alt={
+                              getTotalHoursWeek() === 40
+                                  ? "check: 40 hours logged this week"
+                                  : "warning: less or more than 40 hours logged this week"
+                            }
+                            className={
+                              getTotalHoursWeek() === 40
+                                  ? "feedback-check"
+                                  : "feedback-warning"
+                            }
+                            title={
+                              getTotalHoursWeek() === 40
+                                  ? "40 hours logged"
+                                  : "less or more than 40 hours logged"
+                            }
+                        />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
           </section>
           <BarChart loading={isLoading}></BarChart>
           <section className="recent-container ">

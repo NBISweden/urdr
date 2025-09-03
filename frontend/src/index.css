@@ -8,6 +8,7 @@
   --highlight-today-color: hsl(186deg, 30%, 73%);
   --very_light_gray-background: hsl(0deg 0% 97%);
   --header-height: 80px;
+  --total-row-padding: 60px;
 }
 
 /* This class can be used to hide things visually
@@ -873,6 +874,16 @@ Other button classes are defined further down together with other classes for th
   background-color: var(--very_light_gray-background);
   padding-top: 0.75rem;
   z-index: 1;
+}
+
+.total-row {
+  background-color: var(--very_light_gray-background);
+  bottom: 2rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  padding: 1rem 1.5rem var(--total-row-padding);
+  margin-top: 0.2rem;
+  z-index: 2;
 }
 
 .hide-button {
