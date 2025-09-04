@@ -6,6 +6,9 @@
   --vacation-color: hsl(186deg, 30%, 60%);
   --parental-color: hsl(291deg, 13%, 81%);
   --highlight-today-color: hsl(186deg, 30%, 73%);
+  --very-light-gray-background: hsl(0deg 0% 97%);
+  --header-height: 80px;
+  --total-row-padding: 60px;
 }
 
 /* This class can be used to hide things visually
@@ -167,7 +170,7 @@ Other button classes are defined further down together with other classes for th
   left: 0;
   top: 0;
   width: 100%;
-  height: 80px;
+  height: var(--header-height);
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -381,6 +384,10 @@ Other button classes are defined further down together with other classes for th
   border: 0.25rem solid var(--highlight-today-color);
 }
 
+.time-sheet-container {
+  background-color: var(--very-light-gray-background);
+}
+
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 1rem 1.5rem;
@@ -397,7 +404,7 @@ Other button classes are defined further down together with other classes for th
 
 .favorites-container {
   background-color: hsl(0deg 0% 97%);
-  padding: 2.5rem 1.5rem 1rem;
+  padding: 1rem 1.5rem 1rem;
 }
 
 .issue-label {
@@ -859,6 +866,24 @@ Other button classes are defined further down together with other classes for th
 
 .row-focused {
   background-color: hsl(186deg 30% 94%);
+}
+
+.header-row {
+  position: sticky;
+  top: var(--header-height);
+  background-color: var(--very-light-gray-background);
+  padding-top: 0.75rem;
+  z-index: 1;
+}
+
+.total-row {
+  background-color: var(--very-light-gray-background);
+  bottom: 2rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  padding: 1rem 1.5rem var(--total-row-padding);
+  margin-top: 0.2rem;
+  z-index: 2;
 }
 
 .hide-button {
