@@ -1,6 +1,6 @@
 import "../index.css";
 import React, { useState, useMemo, useContext, useEffect } from "react";
-import { getISOWeek, startOfWeek } from "date-fns";
+import { getISOWeek, startOfWeek} from "date-fns";
 import {
   getGroups,
   getSavedGroup,
@@ -150,13 +150,9 @@ export const VacationOverview = () => {
         { weekStartsOn: 1 }
       );
     }
-    extendVacationData(newMonday);
+    void extendVacationData(newMonday);
     return;
   };
-
-  const handleWeekChange =(newDate: Date) => {
-    setStartDate(newDate)
-  }
 
   const extendVacationData = async (monday: Date) => {
     if (fetchedWeeks.includes(getISOWeek(monday))) {
@@ -180,6 +176,31 @@ export const VacationOverview = () => {
       setFetchedWeeks(updatedFetchedWeeks);
     } catch (error) {
       console.error("Error fetching absence data: ", error);
+    } finally {
+      setLoadingVacationData(false);
+    }
+  };
+
+  const handleWeekChange =(newDate: Date) => {
+    setStartDate(newDate);
+    void fetchFullWindow(newDate);
+  }
+
+  const fetchFullWindow = async (anchorDate: Date) => {
+    setLoadingVacationData(true);
+    try {
+      const weeksRange = generateWeeks(14, anchorDate);
+      const absenceData = await getAbsenceData(weeksRange);
+
+      setVacationData(absenceData);
+
+      setFetchedWeeks(prev => {
+        const next = new Set(prev);
+        weeksRange.forEach(w => next.add(w.week));
+        return Array.from(next);
+      });
+    } catch (error) {
+      console.error("Error fetching vacation data:", error);
     } finally {
       setLoadingVacationData(false);
     }
