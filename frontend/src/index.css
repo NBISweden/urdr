@@ -2,6 +2,15 @@
   box-sizing: border-box;
 }
 
+:root {
+  --vacation-color: hsl(186deg, 30%, 60%);
+  --parental-color: hsl(291deg, 13%, 81%);
+  --highlight-today-color: hsl(186deg, 30%, 73%);
+  --very-light-gray-background: hsl(0deg 0% 97%);
+  --header-height: 80px;
+  --total-row-padding: 60px;
+}
+
 /* This class can be used to hide things visually
 but still make them accessible for assistive technology */
 .visually-hidden {
@@ -161,7 +170,7 @@ Other button classes are defined further down together with other classes for th
   left: 0;
   top: 0;
   width: 100%;
-  height: 80px;
+  height: var(--header-height);
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -224,7 +233,7 @@ Other button classes are defined further down together with other classes for th
   align-items: center;
   justify-content: center;
   padding: 0.3rem 1rem;
-  margin: 1.3rem 0;
+  margin: 1.3rem 0 1.3rem 0;
 }
 
 .week-button svg {
@@ -361,6 +370,24 @@ Other button classes are defined further down together with other classes for th
   align-items: center;
 }
 
+.cell-today {
+  background-color: var(--highlight-today-color);
+  border-radius: 0.25rem;
+}
+
+.date-cell {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.time-sheet-cell {
+  border: 0.25rem solid var(--highlight-today-color);
+}
+
+.time-sheet-container {
+  background-color: var(--very-light-gray-background);
+}
+
 .recent-container {
   background-color: hsl(0deg 0% 97%);
   padding: 1rem 1.5rem;
@@ -377,7 +404,7 @@ Other button classes are defined further down together with other classes for th
 
 .favorites-container {
   background-color: hsl(0deg 0% 97%);
-  padding: 2.5rem 1.5rem 1rem;
+  padding: 1rem 1.5rem 1rem;
 }
 
 .issue-label {
@@ -841,6 +868,24 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(186deg 30% 94%);
 }
 
+.header-row {
+  position: sticky;
+  top: var(--header-height);
+  background-color: var(--very-light-gray-background);
+  padding-top: 0.75rem;
+  z-index: 1;
+}
+
+.total-row {
+  background-color: var(--very-light-gray-background);
+  bottom: 2rem;
+  margin-bottom: 2rem;
+  position: sticky;
+  padding: 1rem 1.5rem var(--total-row-padding);
+  margin-top: 0.2rem;
+  z-index: 2;
+}
+
 .hide-button {
   color: hsl(288deg 46% 22%);
   background-color: hsl(291deg 13% 90%);
@@ -981,11 +1026,27 @@ Other button classes are defined further down together with other classes for th
 
 .vacation-table td {
   border: 1px solid hsl(0deg 0% 75%);
-  padding: 0.25rem;
+  padding: 0;
+  min-height: 2rem;
+  height: 2rem;
+  position: relative;
 }
 
 .vacation-table th {
   border-bottom: 0.125rem solid hsl(0deg 0% 35%);
+}
+
+.vacation-table button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  float: right;
+  padding: 0;
+}
+
+.vacation-table .right-header {
+  width: 0;
+  border: none;
 }
 
 .vacation-table .user-name {
@@ -1003,8 +1064,60 @@ Other button classes are defined further down together with other classes for th
   vertical-align: middle;
 }
 
-.vacation-table .vacation-cell {
-  background-color: hsl(0deg 0% 65%);
+.week-day-cell {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.day-part {
+  flex: 1;
+  height: 100%;
+  border-left: 1px solid hsl(0deg 0% 90%);
+}
+
+.day-part:first-child {
+  border-left: none;
+}
+
+.day-part.vacation {
+  background-color: var(--vacation-color);
+}
+
+.day-part.parental {
+  background-color: var(--parental-color);
+}
+
+.legend {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-label {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.legend-color {
+  width: 3rem;
+  height: 0.8rem;
+  border-radius: 0.25rem;
+}
+
+.legend-color.vacation {
+  background-color: var(--vacation-color);
+}
+
+.legend-color.parental {
+  background-color: var(--parental-color);
 }
 
 .table-wrapper {
@@ -1014,16 +1127,36 @@ Other button classes are defined further down together with other classes for th
 }
 
 .group-select-wrapper {
+  display: flex;
+  flex-direction: column;
   padding: 1rem 0;
+}
 
-  label {
-    display: block;
-    margin-bottom: 0.25rem;
-  }
+.group-select-wrapper label {
+  margin-bottom: 0.25rem;
+}
 
-  select {
-    padding: 0.25rem;
-  }
+.group-select-wrapper select {
+  padding: 0.25rem;
+}
+
+.top-overview-container {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.week-picker-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.week-picker-wrapper label {
+  margin-bottom: 0.25rem;
+}
+
+.week-picker-wrapper select {
+  padding: 0.25rem;
 }
 
 .calendar-table {
@@ -1087,6 +1220,48 @@ Other button classes are defined further down together with other classes for th
 .apply-dates-button {
   height: 3rem;
   width: 8rem;
+}
+
+/* NOT FOUND */
+
+/* Wrapper with same styles as login-wrapper */
+.not-found-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: hsl(70deg 55% 98%);
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .not-found-wrapper {
+    width: 200vw;
+  }
+}
+
+.not-found-section {
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.not-found-heading {
+  font-size: 2rem;
+}
+
+.not-found-message {
+  font-size: 1.125rem;
+  color: hsl(0deg 0% 35%);
+  margin: 0 0 2rem 0;
+}
+
+.not-found-button {
+  background-color: hsl(288deg 46% 22%);
+  color: white;
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.5rem 1rem;
 }
 
 /* ModalDialog styles */

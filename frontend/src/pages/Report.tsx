@@ -14,10 +14,10 @@ import {
 } from "@dnd-kit/sortable";
 import {
   format as formatDate,
-  getISOWeek,
   getISOWeekYear,
   setISOWeek,
   isPast,
+  isToday,
   addDays,
 } from "date-fns";
 import { Row } from "../components/Row";
@@ -708,192 +708,189 @@ export const Report = () => {
             }
           }}
         >
-          {favorites && favorites.length > 0 && (
-            <DndContext
-              onDragEnd={handleDragEnd}
-              onDragStart={handleDragStart}
-              collisionDetection={closestCorners}
-              sensors={sensors}
-            >
-              <SortableContext
-                items={favorites.map(
-                  (fav) => `${fav.issue.id}${fav.activity.id}`
-                )}
-                strategy={verticalListSortingStrategy}
-              >
-                <section className="favorites-container">
-                  <HeaderRow days={currentWeekArray} />
-                  {favorites &&
-                    favorites.map((fav) => {
-                      const rowEntries = findRowEntries(fav, currentWeekArray);
-                      return (
+          <section className="time-sheet-container">
+            <HeaderRow days={currentWeekArray} />
+            {favorites && favorites.length > 0 && (
+                <DndContext
+                    onDragEnd={handleDragEnd}
+                    onDragStart={handleDragStart}
+                    collisionDetection={closestCorners}
+                    sensors={sensors}
+                >
+                  <SortableContext
+                      items={favorites.map(
+                          (fav) => `${fav.issue.id}${fav.activity.id}`
+                      )}
+                      strategy={verticalListSortingStrategy}
+                  >
+                    <section className="favorites-container">
+                      {favorites &&
+                          favorites.map((fav) => {
+                            const rowEntries = findRowEntries(fav, currentWeekArray);
+                            return (
+                                <Draggable
+                                    id={`${fav.issue.id}${fav.activity.id}`}
+                                    key={`${fav.issue.id}${fav.activity.id}`}
+                                >
+                                  <Row
+                                      key={`${fav.issue.id}${fav.activity.id}`}
+                                      topic={fav}
+                                      onCellUpdate={handleCellUpdate}
+                                      onToggleFav={handleToggleFav}
+                                      onFavNameUpdate={handleFavNameUpdate}
+                                      onFavNameSave={handleFavNameSave}
+                                      days={currentWeekArray}
+                                      rowHours={findRowHours(fav)}
+                                      rowEntries={rowEntries}
+                                      getRowSum={getRowSum}
+                                      isFav={true}
+                                  />
+                                </Draggable>
+                            );
+                          })}
+                    </section>
+                  </SortableContext>
+                  <DragOverlay>
+                    {draggedFav ? (
                         <Draggable
-                          id={`${fav.issue.id}${fav.activity.id}`}
-                          key={`${fav.issue.id}${fav.activity.id}`}
-                        >
-                          <Row
-                            key={`${fav.issue.id}${fav.activity.id}`}
-                            topic={fav}
+                            id={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                            children={
+                              <Row
+                                  key={`${draggedFav.issue.id}${draggedFav.activity.id}`}
+                                  topic={draggedFav}
+                                  onCellUpdate={handleCellUpdate}
+                                  onToggleFav={handleToggleFav}
+                                  onFavNameUpdate={handleFavNameUpdate}
+                                  onFavNameSave={handleFavNameSave}
+                                  days={currentWeekArray}
+                                  rowHours={findRowHours(draggedFav)}
+                                  rowEntries={findRowEntries(
+                                      draggedFav,
+                                      currentWeekArray
+                                  )}
+                                  getRowSum={getRowSum}
+                                  isFav={true}
+                              />
+                            }
+                        />
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
+            )}
+            <section className="recent-container">
+              {filteredRecents &&
+                  filteredRecents.map((recentIssue) => {
+                    const rowEntries = findRowEntries(
+                        recentIssue,
+                        currentWeekArray
+                    );
+                    return (
+                        <Row
+                            key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
+                            topic={recentIssue}
                             onCellUpdate={handleCellUpdate}
                             onToggleFav={handleToggleFav}
                             onFavNameUpdate={handleFavNameUpdate}
                             onFavNameSave={handleFavNameSave}
+                            onToggleHide={toggleHide}
                             days={currentWeekArray}
-                            rowHours={findRowHours(fav)}
+                            rowHours={findRowHours(recentIssue)}
                             rowEntries={rowEntries}
                             getRowSum={getRowSum}
-                            isFav={true}
-                          />
-                        </Draggable>
+                        />
+                    );
+                  })}
+              <button
+                  onClick={() => setShowHidden(!showHidden)}
+                  className="basic-button hide-button"
+              >
+                {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
+                <img src={showHidden ? up : down} alt="" />
+              </button>
+            </section>
+            {showHidden && (
+                <section className="recent-container">
+                  {hidden &&
+                      hidden.map((hiddenIssue) => {
+                        const rowEntries = findRowEntries(
+                            hiddenIssue,
+                            currentWeekArray
+                        );
+                        return (
+                            <Row
+                                key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
+                                topic={hiddenIssue}
+                                onCellUpdate={handleCellUpdate}
+                                onToggleFav={handleToggleFav}
+                                onFavNameUpdate={handleFavNameUpdate}
+                                onFavNameSave={handleFavNameSave}
+                                onToggleHide={toggleHide}
+                                days={currentWeekArray}
+                                rowHours={findRowHours(hiddenIssue)}
+                                rowEntries={rowEntries}
+                                getRowSum={getRowSum}
+                                isHidden={true}
+                            />
+                        );
+                      })}
+                </section>
+            )}
+            <div className="total-row row">
+                <div className="col-6">
+                  <h2>Total</h2>
+                </div>
+                {currentWeekArray &&
+                    currentWeekArray.map((date) => {
+                      const dateStr = formatDate(date, dateFormat);
+                      return (
+                          <div key={dateStr} className="col-1 cell-container">
+                            <input
+                                aria-label={`total of hours spent during the day ${dateStr}`}
+                                type="text"
+                                id={dateStr}
+                                className={isToday(date) ? "cell time-sheet-cell" : "cell"}
+                                value={showTotalHours ? getTotalHours(dateStr) : ""}
+                                readOnly
+                                tabIndex={-1}
+                            />
+                          </div>
                       );
                     })}
-                </section>
-              </SortableContext>
-              <DragOverlay>
-                {draggedFav ? (
-                  <Draggable
-                    id={`${draggedFav.issue.id}${draggedFav.activity.id}`}
-                    children={
-                      <Row
-                        key={`${draggedFav.issue.id}${draggedFav.activity.id}`}
-                        topic={draggedFav}
-                        onCellUpdate={handleCellUpdate}
-                        onToggleFav={handleToggleFav}
-                        onFavNameUpdate={handleFavNameUpdate}
-                        onFavNameSave={handleFavNameSave}
-                        days={currentWeekArray}
-                        rowHours={findRowHours(draggedFav)}
-                        rowEntries={findRowEntries(
-                          draggedFav,
-                          currentWeekArray
-                        )}
-                        getRowSum={getRowSum}
-                        isFav={true}
-                      />
-                    }
-                  />
-                ) : null}
-              </DragOverlay>
-            </DndContext>
-          )}
-          <section className="recent-container">
-            {favorites.length == 0 && (
-              <HeaderRow days={currentWeekArray}></HeaderRow>
-            )}
-            {filteredRecents &&
-              filteredRecents.map((recentIssue) => {
-                const rowEntries = findRowEntries(
-                  recentIssue,
-                  currentWeekArray
-                );
-                return (
-                  <Row
-                    key={`${recentIssue.issue.id}${recentIssue.activity.id}`}
-                    topic={recentIssue}
-                    onCellUpdate={handleCellUpdate}
-                    onToggleFav={handleToggleFav}
-                    onFavNameUpdate={handleFavNameUpdate}
-                    onFavNameSave={handleFavNameSave}
-                    onToggleHide={toggleHide}
-                    days={currentWeekArray}
-                    rowHours={findRowHours(recentIssue)}
-                    rowEntries={rowEntries}
-                    getRowSum={getRowSum}
-                  />
-                );
-              })}
-            <button
-              onClick={() => setShowHidden(!showHidden)}
-              className="basic-button hide-button"
-            >
-              {showHidden ? "Collapse hidden rows" : "Show hidden rows"}
-              <img src={showHidden ? up : down} alt="" />
-            </button>
-          </section>
-          {showHidden && (
-            <section className="recent-container">
-              {hidden &&
-                hidden.map((hiddenIssue) => {
-                  const rowEntries = findRowEntries(
-                    hiddenIssue,
-                    currentWeekArray
-                  );
-                  return (
-                    <Row
-                      key={`${hiddenIssue.issue.id}${hiddenIssue.activity.id}`}
-                      topic={hiddenIssue}
-                      onCellUpdate={handleCellUpdate}
-                      onToggleFav={handleToggleFav}
-                      onFavNameUpdate={handleFavNameUpdate}
-                      onFavNameSave={handleFavNameSave}
-                      onToggleHide={toggleHide}
-                      days={currentWeekArray}
-                      rowHours={findRowHours(hiddenIssue)}
-                      rowEntries={rowEntries}
-                      getRowSum={getRowSum}
-                      isHidden={true}
-                    />
-                  );
-                })}
-            </section>
-          )}
-          <section className="recent-container ">
-            <div className="row">
-              <div className="col-6">
-                <h2>Total</h2>
-              </div>
-              {currentWeekArray &&
-                currentWeekArray.map((date) => {
-                  const dateStr = formatDate(date, dateFormat);
-                  return (
-                    <div key={dateStr} className="col-1 cell-container">
-                      <input
-                        aria-label={`total of hours spent during the day ${dateStr}`}
+                <div className="col-1 cell-container">
+                  <div className="comment-container">
+                    <input
+                        aria-label="total of hours spent during the week"
                         type="text"
-                        id={dateStr}
                         className="cell"
-                        value={showTotalHours ? getTotalHours(dateStr) : ""}
+                        value={showTotalHours ? getTotalHoursWeek() : ""}
                         readOnly
                         tabIndex={-1}
-                      />
-                    </div>
-                  );
-                })}
-              <div className="col-1 cell-container">
-                <div className="comment-container">
-                  <input
-                    aria-label="total of hours spent during the week"
-                    type="text"
-                    className="cell"
-                    value={showTotalHours ? getTotalHoursWeek() : ""}
-                    readOnly
-                    tabIndex={-1}
-                  />
-                  {/* Only show warnings for weeks that have passed. 
-                    It must be at least Saturday. */}
-                  {isPast(addDays(currentWeekArray[4], 1)) && (
-                    <img
-                      src={getTotalHoursWeek() === 40 ? check : warning}
-                      alt={
-                        getTotalHoursWeek() === 40
-                          ? "check: 40 hours logged this week"
-                          : "warning: less or more than 40 hours logged this week"
-                      }
-                      className={
-                        getTotalHoursWeek() === 40
-                          ? "feedback-check"
-                          : "feedback-warning"
-                      }
-                      title={
-                        getTotalHoursWeek() === 40
-                          ? "40 hours logged"
-                          : "less or more than 40 hours logged"
-                      }
                     />
-                  )}
+                    {/* Only show warnings for weeks that have passed.
+                    It must be at least Saturday. */}
+                    {isPast(addDays(currentWeekArray[4], 1)) && (
+                        <img
+                            src={getTotalHoursWeek() === 40 ? check : warning}
+                            alt={
+                              getTotalHoursWeek() === 40
+                                  ? "check: 40 hours logged this week"
+                                  : "warning: less or more than 40 hours logged this week"
+                            }
+                            className={
+                              getTotalHoursWeek() === 40
+                                  ? "feedback-check"
+                                  : "feedback-warning"
+                            }
+                            title={
+                              getTotalHoursWeek() === 40
+                                  ? "40 hours logged"
+                                  : "less or more than 40 hours logged"
+                            }
+                        />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
           </section>
           <BarChart loading={isLoading}></BarChart>
           <section className="recent-container ">

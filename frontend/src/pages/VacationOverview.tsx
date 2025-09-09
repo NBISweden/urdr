@@ -1,5 +1,6 @@
 import "../index.css";
 import React, { useState, useMemo, useContext, useEffect } from "react";
+import { getISOWeek, startOfWeek} from "date-fns";
 import {
   getGroups,
   getSavedGroup,
@@ -16,17 +17,21 @@ import { Group } from "../model";
 import { HeaderUser } from "../components/HeaderUser";
 import { ClimbingBoxLoader } from "react-spinners";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { ArrowDirection, WeekInfo } from "../components/VacationOverview/types";
+import {WeekPicker} from "../components/WeekPicker";
 
 export const VacationOverview = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [vacationData, setVacationData] = useState<{
-    [userId: string]: number[];
+    [userId: string]: { [date: string]: "vacation" | "parental" };
   }>({});
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [savedGroup, setSavedGroup] = useState<number | null>(null);
   const [loadingVacationData, setLoadingVacationData] =
     useState<boolean>(false);
-
+  const today = new Date();
+  const [startDate, setStartDate] = useState<Date>(today);
+  const [fetchedWeeks, setFetchedWeeks] = useState<number[]>([]);
   const context = useContext(AuthContext);
 
   useEffect(() => {
@@ -44,8 +49,49 @@ export const VacationOverview = () => {
   }, []);
 
   const selectedGroupData = groups.find((group) => group.id === selectedGroup);
-  const weeks = useMemo(() => generateWeeks(), []);
+  const weeks = useMemo(() => generateWeeks(14, startDate), [startDate]);
   const monthGroups = useMemo(() => groupWeeksByMonth(weeks), [weeks]);
+
+  const getAbsenceData = async (timespan: WeekInfo[]) => {
+    const userIds = selectedGroupData.users.map((user) => ({
+      id: user.id,
+    }));
+    const [vacationData, parentalLeaveData] = await Promise.all([
+      fetchAbsenceData(
+          { id: 6995, name: "Vacation" },
+          userIds,
+          timespan,
+          context
+      ),
+      fetchAbsenceData(
+          { id: 6992, name: "Parental Leave" },
+          userIds,
+          timespan,
+          context
+      ),
+    ]);
+
+    const absenceData: { [userId: string]: { [date: string]: "vacation" | "parental" } } = {};
+
+    for (const userId in vacationData) {
+      absenceData[userId] = { ...vacationData[userId] };
+    }
+
+    for (const userId in parentalLeaveData) {
+      if (!absenceData[userId]) absenceData[userId] = {};
+
+      for (const date in parentalLeaveData[userId]) {
+        if (!absenceData[userId][date]) {
+          absenceData[userId][date] = parentalLeaveData[userId][date];
+        } else {
+          console.warn(
+              `User ${userId} has multiples types of leave on ${date}. Keeping: ${absenceData[userId][date]}, ignoring: ${parentalLeaveData[userId][date]}`
+          );
+        }
+      }
+    }
+    return absenceData;
+  };
 
   useEffect(() => {
     if (!selectedGroupData) return;
@@ -53,35 +99,13 @@ export const VacationOverview = () => {
     const loadAbsenceData = async () => {
       setLoadingVacationData(true);
       try {
-        const userIds = selectedGroupData.users.map((user) => ({
-          id: user.id,
-        }));
-        const vacationData = await fetchAbsenceData(
-          { id: 6995, name: "Vacation" },
-          userIds,
-          weeks,
-          context
-        );
-        const parentalLeaveData = await fetchAbsenceData(
-          { id: 6992, name: "Parental Leave" },
-          userIds,
-          weeks,
-          context
-        );
-
-        // Merge parental data into vacation data under absenceData
-        const absenceData = { ...vacationData };
-
-        for (const userId in parentalLeaveData) {
-          if (absenceData[userId]) {
-            absenceData[userId] = absenceData[userId].concat(
-              parentalLeaveData[userId]
-            );
-          } else {
-            absenceData[userId] = parentalLeaveData[userId];
-          }
-        }
+        const absenceData = await getAbsenceData(weeks);
         setVacationData(absenceData);
+        let updatedFetchedWeeks = fetchedWeeks;
+        weeks.map((week) => {
+          updatedFetchedWeeks.push(week.week);
+        });
+        setFetchedWeeks(updatedFetchedWeeks);
       } catch (error) {
         console.error("Error fetching vacation data:", error);
       } finally {
@@ -114,6 +138,74 @@ export const VacationOverview = () => {
       });
   }, [savedGroup, selectedGroup]);
 
+  const handleStartDateChange = (newDate: Date, direction: ArrowDirection) => {
+    setStartDate(newDate);
+    let newMonday: Date;
+    if (direction == "back") {
+      newMonday = startOfWeek(newDate, { weekStartsOn: 1 });
+    } else if (direction == "forward") {
+      newMonday = startOfWeek(
+        // we want to fetch data for the new week at the end of the displayed 14 weeks
+        new Date(newDate.getTime() + 13 * 7 * 24 * 60 * 60 * 1000),
+        { weekStartsOn: 1 }
+      );
+    }
+    void extendVacationData(newMonday);
+    return;
+  };
+
+  const extendVacationData = async (monday: Date) => {
+    if (fetchedWeeks.includes(getISOWeek(monday))) {
+      return;
+    }
+    setLoadingVacationData(true);
+    const week = generateWeeks(1, monday);
+    try {
+      const absenceData = await getAbsenceData(week);
+
+      setVacationData((prev) => {
+        const next: { [userId: string]: { [date: string]: "vacation" | "parental" } } = { ...prev };
+        for (const userId in absenceData) {
+          next[userId] = { ...(next[userId] ?? {}), ...absenceData[userId] };
+        }
+        return next;
+      });
+
+      let updatedFetchedWeeks = fetchedWeeks;
+      fetchedWeeks.push(getISOWeek(monday));
+      setFetchedWeeks(updatedFetchedWeeks);
+    } catch (error) {
+      console.error("Error fetching absence data: ", error);
+    } finally {
+      setLoadingVacationData(false);
+    }
+  };
+
+  const handleWeekChange =(newDate: Date) => {
+    setStartDate(newDate);
+    void fetchFullWindow(newDate);
+  }
+
+  const fetchFullWindow = async (anchorDate: Date) => {
+    setLoadingVacationData(true);
+    try {
+      const weeksRange = generateWeeks(14, anchorDate);
+      const absenceData = await getAbsenceData(weeksRange);
+
+      setVacationData(absenceData);
+
+      setFetchedWeeks(prev => {
+        const next = new Set(prev);
+        weeksRange.forEach(w => next.add(w.week));
+        return Array.from(next);
+      });
+    } catch (error) {
+      console.error("Error fetching vacation data:", error);
+    } finally {
+      setLoadingVacationData(false);
+    }
+  };
+
   return (
     <>
       {loadingVacationData && (
@@ -141,16 +233,26 @@ export const VacationOverview = () => {
           <p>Du tillhör inga grupper ännu.</p>
         ) : (
           <>
-            <GroupSelect
-              groups={groups}
-              selectedGroup={selectedGroup}
-              onChange={setSelectedGroup}
-            />
+            <div className="top-overview-container">
+              <GroupSelect
+                  groups={groups}
+                  selectedGroup={selectedGroup}
+                  onChange={setSelectedGroup}
+              />
+              <WeekPicker
+                  startDate={startDate}
+                  onWeekDateChange={handleWeekChange}
+                  labelText={"Select starting week:"}
+              />
+            </div>
+
             <VacationTable
               group={selectedGroupData}
               weeks={weeks}
               monthGroups={monthGroups}
               vacationData={vacationData}
+              startDate={startDate}
+              onStartDateChange={handleStartDateChange}
             />
           </>
         )}

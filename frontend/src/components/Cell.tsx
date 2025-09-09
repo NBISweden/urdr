@@ -3,6 +3,7 @@ import { IssueActivityPair, TimeEntry } from "../model";
 import { format as formatDate } from "date-fns";
 import { dateFormat } from "../utils";
 import x from "../icons/x.svg";
+import { isToday } from "date-fns";
 
 export const Cell = ({
   topic,
@@ -73,11 +74,12 @@ export const Cell = ({
       spent_on: formatDate(date, dateFormat),
     });
   };
-  // Make sure that the the comment area is not visible and the row is no longer highlighted
+  // Make sure that the comment area is not visible and the row is no longer highlighted
   const onBlurArea = () => {
     setShowCommentArea(false);
     onBlurRow();
   };
+
   return (
     <div className="col-1 cell-container">
       <label
@@ -101,7 +103,7 @@ export const Cell = ({
           onKeyUp={(ev) => onDeleteCellEntry(ev)}
           onFocus={() => onFocusRow()}
           onBlur={() => onBlurRow()}
-          className="cell"
+          className={isToday(date) ? "cell time-sheet-cell" : "cell"}
           defaultValue={hours === 0 ? "" : hours}
           data-no-dnd="true"
         />
