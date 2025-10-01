@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/gofiber/fiber/v2 v2.52.9
 	github.com/gofiber/storage/sqlite3 v1.3.8
-	github.com/mattn/go-sqlite3 v1.14.30
+	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.6
