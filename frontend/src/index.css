@@ -1033,7 +1033,11 @@ Other button classes are defined further down together with other classes for th
 }
 
 .vacation-table th {
-  border-bottom: 0.125rem solid hsl(0deg 0% 35%);
+  box-shadow: 0 1px 0 0 hsl(0deg 0% 35%); /* looks like a border but stays during scroll */
+  position: sticky;
+  top: 0;
+  background-color: hsl(0deg 0% 97%);
+  z-index: 2;
 }
 
 .vacation-table button {
@@ -1046,7 +1050,12 @@ Other button classes are defined further down together with other classes for th
 
 .vacation-table .right-header {
   width: 0;
-  border: none;
+  box-shadow: none;
+  top: 1.7rem;
+}
+
+.vacation-table .left-header {
+  top: 1.7rem;
 }
 
 .vacation-table .user-name {
@@ -1062,6 +1071,7 @@ Other button classes are defined further down together with other classes for th
   text-align: center;
   padding: 0.5rem;
   vertical-align: middle;
+  top: 1.7rem;
 }
 
 .week-day-cell {
@@ -1092,6 +1102,7 @@ Other button classes are defined further down together with other classes for th
   display: flex;
   gap: 2rem;
   margin-bottom: 1rem;
+  margin-top: 0.75rem;
   align-items: center;
 }
 
@@ -1124,6 +1135,8 @@ Other button classes are defined further down together with other classes for th
   overflow-x: auto;
   max-width: 100%;
   margin: 0.75rem auto;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 .group-select-wrapper {
