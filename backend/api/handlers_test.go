@@ -197,14 +197,14 @@ func Test_Handlers(t *testing.T) {
 			_, err = w.Write(nil)
 		}
 	}))
-	defer fakeRedmine.Close()
+	defer func() { _ = fakeRedmine.Close() }()
 
 	// Fake redmine server which sends bad responses
 	badRedmine := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(fiber.StatusUnprocessableEntity)
 		_, err = w.Write(nil)
 	}))
-	defer badRedmine.Close()
+	defer func() { _ = badRedmine.Close() }()
 
 	if err != nil {
 		t.Fatalf("Error: %v", err)

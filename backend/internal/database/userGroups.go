@@ -20,13 +20,13 @@ func (db *Database) GetUserGroups(redmine_user_id int) ([]redmine.IdName, error)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	rows, err := stmt.Query(redmine_user_id)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var groups []redmine.IdName
 
@@ -61,13 +61,13 @@ func (db *Database) GetUsersInGroup(redmine_group_id int) ([]redmine.IdName, err
 	if err != nil {
 		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	rows, err := stmt.Query(redmine_group_id)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var users []redmine.IdName
 

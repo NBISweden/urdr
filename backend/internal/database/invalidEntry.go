@@ -33,13 +33,13 @@ func (db *Database) loadAllInvalidEntries() error {
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	rows, err := stmt.Query()
 	if err != nil {
 		return fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	invalidActivities = make(map[int][]int)
 	alwaysInvalidActivities = make(map[int]bool)

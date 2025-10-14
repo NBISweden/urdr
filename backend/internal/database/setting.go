@@ -19,13 +19,13 @@ func (db *Database) GetUserSetting(redmineUserId int, settingName string) (strin
 	if err != nil {
 		return "", fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	rows, err := stmt.Query(redmineUserId, settingName)
 	if err != nil {
 		return "", fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	userSettingFound := false
 	var userSettingValue sql.NullString
@@ -75,7 +75,7 @@ func (db *Database) SetUserSetting(redmineUserId int, settingName string, settin
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	if _, err := stmt.Exec(redmineUserId, settingName, settingValue); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
@@ -96,7 +96,7 @@ func (db *Database) DeleteUserSetting(redmineUserId int, settingName string) err
 	if err != nil {
 		return fmt.Errorf("sql.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	if _, err := stmt.Exec(redmineUserId, settingName); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
