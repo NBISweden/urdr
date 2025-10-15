@@ -168,7 +168,8 @@ func Test_Handlers(t *testing.T) {
 		case "/my/account.json":
 			_, err = w.Write(userResponse)
 		case "/time_entries.json":
-			if r.Method == "POST" {
+			switch r.Method {
+			case "POST":
 				bodyBytes, err := io.ReadAll(r.Body)
 				if err != nil {
 					w.WriteHeader(fiber.StatusUnprocessableEntity)
@@ -182,10 +183,10 @@ func Test_Handlers(t *testing.T) {
 				if err != nil {
 					log.Fatalf("%v", err)
 				}
-			} else if r.Method == "GET" {
+			case "GET":
 				w.WriteHeader(fiber.StatusOK)
 				_, err = w.Write(fetchedEntries)
-			} else {
+			default:
 				_, err = w.Write(nil)
 			}
 		case "/issues.json":

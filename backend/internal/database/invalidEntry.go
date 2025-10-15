@@ -29,17 +29,11 @@ func (db *Database) loadAllInvalidEntries() error {
 		ORDER BY
 			redmine_issue_id, redmine_activity_id`
 
-	stmt, err := db.handle().Prepare(selectStmt)
-	if err != nil {
-		return fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query()
+	rows, err := db.handle().Query(selectStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	invalidActivities = make(map[int][]int)
 	alwaysInvalidActivities = make(map[int]bool)
