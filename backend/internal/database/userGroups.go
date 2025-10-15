@@ -16,13 +16,7 @@ func (db *Database) GetUserGroups(redmine_user_id int) ([]redmine.IdName, error)
 		JOIN 	user_group_info ON user_group_info.redmine_id = user_group.redmine_group_id
 		WHERE	user_group_info.redmine_type = 'Group' AND user_group.redmine_user_id = ?`
 
-	stmt, err := db.handle().Prepare(selectStmt)
-	if err != nil {
-		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer func() { _ = stmt.Close() }()
-
-	rows, err := stmt.Query(redmine_user_id)
+	rows, err := db.handle().Query(selectStmt, redmine_user_id)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
@@ -57,13 +51,7 @@ func (db *Database) GetUsersInGroup(redmine_group_id int) ([]redmine.IdName, err
 		JOIN	user_group_info ON user_group_info.redmine_id = user_group.redmine_user_id
 		WHERE	user_group_info.redmine_type = 'User' AND user_group.redmine_group_id = ?`
 
-	stmt, err := db.handle().Prepare(selectStmt)
-	if err != nil {
-		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer func() { _ = stmt.Close() }()
-
-	rows, err := stmt.Query(redmine_group_id)
+	rows, err := db.handle().Query(selectStmt, redmine_group_id)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
