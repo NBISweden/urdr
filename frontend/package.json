@@ -32,10 +32,10 @@
     "date-fns": "^4.1.0",
     "handlebars-loader": "^1.7.3",
     "react": "^19.2.0",
-    "react-datepicker": "^8.7.0",
+    "react-datepicker": "^8.8.0",
     "react-dom": "^19.2.0",
-    "react-minimal-pie-chart": "^9.1.1",
-    "react-router-dom": "^7.9.4",
+    "react-minimal-pie-chart": "^9.1.2",
+    "react-router-dom": "^7.9.5",
     "react-spinners": "^0.17.0"
   }
 }
