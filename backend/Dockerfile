@@ -7,10 +7,11 @@ WORKDIR /app
 
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 
+# hadolint ignore=DL3018
 RUN apk --no-cache add \
     curl=~8 \
-    clang=~20 \
-    clang-ccache=~20 \
+    clang \
+    clang-ccache \
     musl-dev=~1.2 \
     ccache=~4
 
