@@ -224,7 +224,6 @@ export const VacationOverview = () => {
       <header className="page-header">
         <h1 className="help-title">
           Vacation Overview
-          <span className="badge bg-warning beta-label">BETA</span>
         </h1>
         <HeaderUser username={context.user ? context.user.login : ""} />
       </header>
