@@ -39,22 +39,35 @@ func TestMain(m *testing.M) {
 		log.Fatalf("os.Chdir() failed: %v", err)
 	}
 
-	test_db_path := "./testdata/database.db"
-	_ = os.Remove(test_db_path)
-	test_sessiondb_path := "./testdata/session.db"
-	_ = os.Remove(test_sessiondb_path)
+	// Put the test DB in a writable temp dir
+	// (avoids read-only repo checkout issues in CI).
+	tmpDir, err := os.MkdirTemp("", "urdr-handlertest-*")
+	if err != nil {
+		log.Fatalf("os.MkdirTemp() failed: %v", err)
+	}
+	defer func() { _ = os.RemoveAll(tmpDir) }()
+
+	testDbPath := tmpDir + "/test_database.db"
+	_ = os.Remove(testDbPath)
+	testSessionDbPath := tmpDir + "/test_session.db"
+	_ = os.Remove(testSessionDbPath)
 
 	err = config.Setup()
 	if err != nil {
+		_ = os.RemoveAll(tmpDir)
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
 
-	config.Config.Database.Path = test_db_path
-	config.Config.App.SessionDBPath = test_sessiondb_path
+	config.Config.Database.Path = testDbPath
+	config.Config.App.SessionDBPath = testSessionDbPath
 
 	app = api.Setup()
 
-	os.Exit(m.Run())
+	code := m.Run()
+
+	_ = os.RemoveAll(tmpDir)
+
+	os.Exit(code)
 }
 
 func Test_Handlers(t *testing.T) {

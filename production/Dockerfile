@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS builder
+FROM golang:1.26-alpine AS builder
 
 RUN addgroup -S urdr && getent group urdr >/tmp/group
 RUN adduser -S urdr && getent passwd urdr >/tmp/passwd
@@ -7,8 +7,9 @@ WORKDIR /go
 
 COPY ./ .
 
+# hadolint ignore=DL3018
 RUN apk --no-cache add \
-    clang=~20 \
+    clang \
     musl-dev=~1.2
 
 ENV GOPATH=$PWD

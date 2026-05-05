@@ -1,8 +1,8 @@
 module urdr-api
 
-go 1.25
+go 1.26
 
-toolchain go1.25.2
+toolchain go1.26.2
 
 require (
 	github.com/gofiber/fiber/v2 v2.52.9

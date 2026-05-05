@@ -15,14 +15,27 @@ func TestMain(m *testing.M) {
 		log.Fatalf("os.Chdir() failed: %v", err)
 	}
 
-	test_db_path := "./testdata/database.db"
-	_ = os.Remove(test_db_path)
+	// Put the test DB in a writable temp dir
+	// (avoids read-only repo checkout issues in CI).
+	tmpDir, err := os.MkdirTemp("", "urdr-dbtest-*")
+	if err != nil {
+		log.Fatalf("os.MkdirTemp() failed: %v", err)
+	}
+	defer func() { _ = os.RemoveAll(tmpDir) }() // Clean up temp dir on exit
+
+	testDBPath := tmpDir + "/database.db"
+	_ = os.Remove(testDBPath) // Just in case it already exists
 
 	err = config.Setup()
 	if err != nil {
+		_ = os.RemoveAll(tmpDir)
 		log.Fatalf("config.Setup() failed: %v", err)
 	}
 
-	config.Config.Database.Path = test_db_path
-	os.Exit(m.Run())
+	config.Config.Database.Path = testDBPath
+	code := m.Run()
+
+	_ = os.RemoveAll(tmpDir)
+
+	os.Exit(code)
 }
