@@ -1347,10 +1347,3 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(187deg 29% 94%);
 }
 
-.beta-label {
-  position: relative;
-  top: -0.6rem;
-  font-size: 0.6rem;
-  color: hsl(0deg 0% 35%);
-  margin-left: 0.4rem;
-}
