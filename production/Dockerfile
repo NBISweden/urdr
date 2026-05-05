@@ -7,8 +7,9 @@ WORKDIR /go
 
 COPY ./ .
 
+# hadolint ignore=DL3018
 RUN apk --no-cache add \
-    clang=~20 \
+    clang \
     musl-dev=~1.2
 
 ENV GOPATH=$PWD
