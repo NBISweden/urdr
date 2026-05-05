@@ -15,6 +15,6 @@ RUN apk --no-cache add \
     musl-dev=~1.2 \
     ccache=~4
 
-RUN go install github.com/air-verse/air@v1.61.7
+RUN go install github.com/air-verse/air@v1.65.1
 
 CMD ["air"]
