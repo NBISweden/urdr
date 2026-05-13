@@ -156,6 +156,12 @@ Other button classes are defined further down together with other classes for th
 .react-datepicker__day.react-datepicker__day--keyboard-selected {
   background-color: hsl(76deg 55% 63%);
 }
+
+.week-picker-wrapper .react-datepicker-popper {
+  position: absolute !important;
+  z-index: 9999 !important;
+}
+
 /* stylelint-enable selector-class-pattern */
 
 .usr-header,
