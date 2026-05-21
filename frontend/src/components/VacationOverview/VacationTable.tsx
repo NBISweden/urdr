@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Group } from "../../model";
 import { format, addDays } from "date-fns";
 import { ArrowDirection, MonthGroup, WeekInfo } from "./types";
@@ -9,7 +9,9 @@ type Props = {
   group?: Group;
   weeks: WeekInfo[];
   monthGroups: MonthGroup[];
-  vacationData: { [userId: string]: { [date: string]: "vacation" | "parental" }  };
+  vacationData: {
+    [userId: string]: { [date: string]: "vacation" | "parental" };
+  };
   startDate: Date;
   onStartDateChange: (newDate: Date, direction: ArrowDirection) => void;
 };
@@ -37,7 +39,7 @@ export const VacationTable: React.FC<Props> = ({
   };
 
   return (
-    <div className="table-wrapper">
+    <>
       <div className="legend">
         <div className="legend-item">
           <span className="legend-color vacation"></span>
@@ -48,56 +50,56 @@ export const VacationTable: React.FC<Props> = ({
           <span className="legend-label">Parental Leave</span>
         </div>
       </div>
-      <div>
-      </div>
-      <table className="vacation-table table-responsive">
-        <thead>
-          {/* Months */}
-          <tr>
-            <th></th>
-            {monthGroups.map((month) => (
-              <th key={month.name} colSpan={month.colSpan}>
-                {month.name}
-              </th>
-            ))}
-          </tr>
+      <div className="table-wrapper">
+        <div></div>
+        <table className="vacation-table table-responsive">
+          <thead>
+            {/* Months */}
+            <tr>
+              <th></th>
+              {monthGroups.map((month) => (
+                <th key={month.name} colSpan={month.colSpan}>
+                  {month.name}
+                </th>
+              ))}
+            </tr>
 
-          {/* Weeks */}
-          <tr>
-            <th>
-              <button onClick={handleWeekBack}>
-                <img
-                  src={left}
-                  alt="show one week earlier"
-                  className="week-arrow"
-                />
-              </button>
-            </th>
-            {weeks.map((week) => (
-              <th key={week.week} className="week-header">
-                <div> {week.week} </div>
-                <div>{week.dateRange}</div>
+            {/* Weeks */}
+            <tr>
+              <th className="left-header">
+                <button onClick={handleWeekBack}>
+                  <img
+                    src={left}
+                    alt="show one week earlier"
+                    className="week-arrow"
+                  />
+                </button>
               </th>
-            ))}
-            <th className="right-header">
-              <button onClick={handleWeekForward}>
-                <img
-                  src={right}
-                  alt="show one week later"
-                  className="week-arrow"
-                />
-              </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {group &&
-            group.users
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((user) => (
-                <tr key={user.id}>
-                  <td className="user-name">{user.name}</td>
-                  {weeks.map((week) => (
+              {weeks.map((week) => (
+                <th key={week.week} className="week-header">
+                  <div> {week.week} </div>
+                  <div>{week.dateRange}</div>
+                </th>
+              ))}
+              <th className="right-header">
+                <button onClick={handleWeekForward}>
+                  <img
+                    src={right}
+                    alt="show one week later"
+                    className="week-arrow"
+                  />
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {group &&
+              group.users
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((user) => (
+                  <tr key={user.id}>
+                    <td className="user-name">{user.name}</td>
+                    {weeks.map((week) => (
                       <td key={week.week}>
                         <div className="week-day-cell">
                           {Array.from({ length: 5 }).map((_, i) => {
@@ -105,23 +107,31 @@ export const VacationTable: React.FC<Props> = ({
                             const dayStr = format(day, "yyyy-MM-dd");
                             const absenceType = vacationData[user.id]?.[dayStr];
                             return (
-                                <div
-                                    key={i}
-                                    className={`day-part ${absenceType === "vacation" ? "vacation" : ""} ${
-                                        absenceType === "parental" ? "parental" : ""
-                                    }`}
-                                    title={`${dayStr}\n${absenceType === "vacation" ? "Vacation" 
-                                        : absenceType === "parental" ? "Parental Leave" : ""}`}
-                                />
+                              <div
+                                key={i}
+                                className={`day-part ${
+                                  absenceType === "vacation" ? "vacation" : ""
+                                } ${
+                                  absenceType === "parental" ? "parental" : ""
+                                }`}
+                                title={`${dayStr}\n${
+                                  absenceType === "vacation"
+                                    ? "Vacation"
+                                    : absenceType === "parental"
+                                    ? "Parental Leave"
+                                    : ""
+                                }`}
+                              />
                             );
                           })}
                         </div>
                       </td>
-                  ))}
-                </tr>
-              ))}
-        </tbody>
-      </table>
-    </div>
+                    ))}
+                  </tr>
+                ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };

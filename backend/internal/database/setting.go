@@ -15,17 +15,11 @@ func (db *Database) GetUserSetting(redmineUserId int, settingName string) (strin
 		WHERE	redmine_user_id = ?
 		AND	name = ?`
 
-	stmt, err := db.handle().Prepare(selectStmt)
-	if err != nil {
-		return "", fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(redmineUserId, settingName)
+	rows, err := db.handle().Query(selectStmt, redmineUserId, settingName)
 	if err != nil {
 		return "", fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	userSettingFound := false
 	var userSettingValue sql.NullString
@@ -71,13 +65,7 @@ func (db *Database) SetUserSetting(redmineUserId int, settingName string, settin
 		INSERT INTO user_setting (redmine_user_id, name, value)
 		VALUES (?, ?, ?)`
 
-	stmt, err := db.handle().Prepare(insertStmt)
-	if err != nil {
-		return fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	if _, err := stmt.Exec(redmineUserId, settingName, settingValue); err != nil {
+	if _, err := db.handle().Exec(insertStmt, redmineUserId, settingName, settingValue); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -92,13 +80,7 @@ func (db *Database) DeleteUserSetting(redmineUserId int, settingName string) err
 		WHERE	redmine_user_id = ?
 		AND	name = ?`
 
-	stmt, err := db.handle().Prepare(deleteStmt)
-	if err != nil {
-		return fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	if _, err := stmt.Exec(redmineUserId, settingName); err != nil {
+	if _, err := db.handle().Exec(deleteStmt, redmineUserId, settingName); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 

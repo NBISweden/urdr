@@ -33,17 +33,11 @@ func (db *Database) GetAllUserPrioityEntries(redmineUserId int) ([]PriorityEntry
 		WHERE	redmine_user_id = ?
 		ORDER BY	priority`
 
-	stmt, err := db.handle().Prepare(selectStmt)
-	if err != nil {
-		return nil, fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(redmineUserId)
+	rows, err := db.handle().Query(selectStmt, redmineUserId)
 	if err != nil {
 		return nil, fmt.Errorf("sql.Query() failed: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var priorityEntries []PriorityEntry
 
@@ -92,13 +86,7 @@ func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []Pri
 		DELETE FROM priority_entry
 		WHERE	redmine_user_id = ?`
 
-	stmt, err := tx.Prepare(deleteStmt)
-	if err != nil {
-		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	if _, err := stmt.Exec(redmineUserId); err != nil {
+	if _, err := db.handle().Exec(deleteStmt, redmineUserId); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
@@ -115,11 +103,11 @@ func (db *Database) SetAllUserPriorityEntries(redmineUserId int, favorites []Pri
 			priority )
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-	stmt, err = tx.Prepare(insertStmt)
+	stmt, err := tx.Prepare(insertStmt)
 	if err != nil {
 		return fmt.Errorf("sql.Tx.Prepare() failed: %w", err)
 	}
-	defer stmt.Close()
+	defer func() { _ = stmt.Close() }()
 
 	for priority, priorityEntry := range favorites {
 		if _, err := stmt.Exec(redmineUserId,
@@ -150,13 +138,7 @@ func (db *Database) DeleteAllUserPriorityEntries(redmineUserId int) error {
 		DELETE FROM priority_entry
 		WHERE	redmine_user_id = ?`
 
-	stmt, err := db.handle().Prepare(deleteStmt)
-	if err != nil {
-		return fmt.Errorf("sql.Prepare() failed: %w", err)
-	}
-	defer stmt.Close()
-
-	if _, err := stmt.Exec(redmineUserId); err != nil {
+	if _, err := db.handle().Exec(deleteStmt, redmineUserId); err != nil {
 		return fmt.Errorf("sql.Exec() failed: %w", err)
 	}
 
