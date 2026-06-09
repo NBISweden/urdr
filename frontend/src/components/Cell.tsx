@@ -74,6 +74,63 @@ export const Cell = ({
       spent_on: formatDate(date, dateFormat),
     });
   };
+  // Navigate between the day input cells with the arrow keys.
+  // Left/Right move to the adjacent day within the same row (clamped at the
+  // row edges), Up/Down to the same day in the previous/next row. Left/Right
+  // only jump cells when the text caret is already at the edge, so they keep
+  // working inside the input otherwise.
+  const onCellKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Leave normal input semantics intact when a modifier is held, e.g.
+    // Shift+Arrow to extend selection or Ctrl/Meta+Arrow to jump by word.
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const arrows = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+    if (arrows.indexOf(e.key) === -1) return;
+
+    const input = e.currentTarget;
+    if (e.key === "ArrowLeft" && input.selectionStart !== 0) return;
+    if (e.key === "ArrowRight" && input.selectionStart !== input.value.length)
+      return;
+
+    // Exclude the read-only weekly Total row (.total-row) so navigation skips
+    // it. Hidden rows are only in the DOM when expanded, so they're naturally
+    // navigable when shown and absent when collapsed.
+    const cells = Array.from(
+      document.querySelectorAll<HTMLInputElement>(
+        ".row:not(.total-row) .comment-container input.cell"
+      )
+    );
+    const numCols = input
+      .closest(".row")
+      ?.querySelectorAll(".comment-container input.cell").length;
+    if (!numCols) return;
+
+    const index = cells.indexOf(input);
+    if (index === -1) return;
+    const col = index % numCols;
+
+    // Left/Right stay within the current row (clamp at the edges); Up/Down move
+    // within the same column to the adjacent row.
+    let targetIndex: number;
+    if (e.key === "ArrowLeft") {
+      if (col === 0) return;
+      targetIndex = index - 1;
+    } else if (e.key === "ArrowRight") {
+      if (col === numCols - 1) return;
+      targetIndex = index + 1;
+    } else if (e.key === "ArrowUp") {
+      targetIndex = index - numCols;
+    } else {
+      targetIndex = index + numCols;
+    }
+
+    const target = cells[targetIndex];
+    if (target) {
+      e.preventDefault();
+      target.focus();
+      target.select();
+    }
+  };
+
   // Make sure that the comment area is not visible and the row is no longer highlighted
   const onBlurArea = () => {
     setShowCommentArea(false);
@@ -100,6 +157,7 @@ export const Cell = ({
             "yyyy-MM-dd"
           )}`}
           onChange={(ev) => onCellChange(ev)}
+          onKeyDown={(ev) => onCellKeyDown(ev)}
           onKeyUp={(ev) => onDeleteCellEntry(ev)}
           onFocus={() => onFocusRow()}
           onBlur={() => onBlurRow()}
