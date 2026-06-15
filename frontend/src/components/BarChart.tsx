@@ -116,6 +116,13 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
                 className="bar-chart-section"
               >
                 <Tooltip
+                  position={
+                    index === 0
+                      ? "top-start"
+                      : index === Object.keys(spentTime).length - 1
+                      ? "top-end"
+                      : "top"
+                  }
                   content={
                     <>
                       <p>{spentTime[key].name}</p>

@@ -446,19 +446,49 @@ Other button classes are defined further down together with other classes for th
   border-radius: 6px;
   padding: 0.5em;
   position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .tooltip-box::after {
   content: "";
   position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+.tooltip-box-top {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip-box-top::after {
   top: 100%;
   left: 50%;
   margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
+  border-color: hsl(0deg 0% 0%) transparent transparent transparent;
+}
+
+.tooltip-box-top-start {
+  bottom: 125%;
+  left: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box-top-start::after {
+  top: 100%;
+  left: 8px;
+  border-color: hsl(0deg 0% 0%) transparent transparent transparent;
+}
+
+.tooltip-box-top-end {
+  bottom: 125%;
+  right: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box-top-end::after {
+  top: 100%;
+  right: 8px;
   border-color: hsl(0deg 0% 0%) transparent transparent transparent;
 }
 
@@ -931,7 +961,6 @@ Other button classes are defined further down together with other classes for th
 
 .bar-chart-section {
   height: 100%;
-  padding-left: 0.3rem;
 }
 
 .bar-chart-section p {
@@ -942,6 +971,7 @@ Other button classes are defined further down together with other classes for th
 
 .bar-chart-label {
   width: 100%;
+  padding-left: 0.3rem;
   overflow: hidden;
 }
 
