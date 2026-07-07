@@ -832,7 +832,7 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(0deg 0% 97%);
   padding: 0 3rem 3rem;
   position: relative;
-  height: 650vh;
+  min-height: 100vh;
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -1071,7 +1071,7 @@ Other button classes are defined further down together with other classes for th
 .vacation-table th {
   box-shadow: 0 1px 0 0 hsl(0deg 0% 35%); /* looks like a border but stays during scroll */
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   background-color: hsl(0deg 0% 97%);
   z-index: 2;
 }
@@ -1087,11 +1087,11 @@ Other button classes are defined further down together with other classes for th
 .vacation-table .right-header {
   width: 0;
   box-shadow: none;
-  top: 1.7rem;
+  top: calc(var(--header-height) + 1.7rem);
 }
 
 .vacation-table .left-header {
-  top: 1.7rem;
+  top: calc(var(--header-height) + 1.7rem);
 }
 
 .vacation-table .user-name {
@@ -1101,13 +1101,13 @@ Other button classes are defined further down together with other classes for th
 }
 
 .vacation-table .week-header {
+  top: calc(var(--header-height) + 1.7rem);
   width: 4rem;
   min-width: 4rem;
   max-width: 4rem;
   text-align: center;
   padding: 0.5rem;
   vertical-align: middle;
-  top: 1.7rem;
 }
 
 .week-day-cell {
@@ -1168,11 +1168,8 @@ Other button classes are defined further down together with other classes for th
 }
 
 .table-wrapper {
-  overflow-x: auto;
   max-width: 100%;
   margin: 0.75rem auto;
-  overflow-y: auto;
-  max-height: 80vh;
 }
 
 .group-select-wrapper {
