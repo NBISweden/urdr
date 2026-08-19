@@ -1,4 +1,4 @@
-FROM node:26.0.0-alpine AS build
+FROM node:26.7.0-alpine AS build
 
 COPY .git /tmp/.git
 
