@@ -39,6 +39,7 @@ import enGB from "date-fns/locale/en-GB";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { NumberInput } from "../components/NumberInput";
 
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
@@ -66,7 +67,7 @@ export const AbsencePlanner = () => {
     id: number;
     subject: string;
   }>(absenceIssueOptions[0]);
-  const extentOfAbsence = 8;
+  const [extentOfAbsence, setExtentOfAbsence] = useState(8);
 
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
@@ -75,6 +76,7 @@ export const AbsencePlanner = () => {
   const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
+
 
   const today = startOfDay(new Date());
   const absenceFrom: Date = new Date(
@@ -756,13 +758,26 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence-row">
               <div>
-                <label htmlFor="reson-for-absence">
+                <label htmlFor="reason-for-absence">
                   Reason for absence&nbsp;
                 </label>
                 <AbsenceIssuesSelector
+                  id="reason-for-absence"
                   onChange={onSelectAbsenceIssue}
                   options={absenceIssueOptions}
                   defaultOption={absenceIssueOptions[0].id}
+                />
+              </div>
+              <div>
+                <label htmlFor="extent-of-absence">
+                  Extent of absence&nbsp;
+                </label>
+                <NumberInput
+                  id="extent-of-absence"
+                  min={0}
+                  max={8}
+                  onChange={setExtentOfAbsence}
+                  value={extentOfAbsence}
                 />
               </div>
             </div>
