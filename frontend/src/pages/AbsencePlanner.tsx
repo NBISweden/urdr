@@ -543,14 +543,22 @@ export const AbsencePlanner = () => {
         endOfWeek(endDate)
       );
 
+      const reportableDays = getReportableWorkingDays(startDate, endDate);
+      const duplicateEntries = reportedEntries.filter(
+        entry => reportableDays.some(date => (
+          entry.spent_on === formatDate(date, dateFormat) &&
+          entry.issue.id === selectedIssue.id
+        ))
+      );
+
       const tooManyHoursToReport = hasReportedMoreThan40HoursPerWeek(
         reportedEntries,
         startDate,
         endDate
       );
-      if (!tooManyHoursToReport) {
+      if (!tooManyHoursToReport && duplicateEntries.length === 0) {
         await reportAbsence();
-      } else {
+      } else if (tooManyHoursToReport) {
         setToastList([
           ...toastList,
           {
@@ -558,6 +566,16 @@ export const AbsencePlanner = () => {
             timeout: 8000,
             message:
               "The maximum amount of hours per week (40) has been exceeded in the selected period",
+          },
+        ]);
+      } else if (duplicateEntries.length > 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 8000,
+            message:
+              "There already exists entries for the given abscence reason for the some of the days in the selected period.",
           },
         ]);
       }
