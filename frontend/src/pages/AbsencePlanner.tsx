@@ -58,6 +58,28 @@ export const absenceIssueOptions: { id: number; subject: string }[] = [
   { id: 6997, subject: "Other absence" },
 ];
 
+function groupEntries<T>(entries: T[], keyFunc: (e: T) => string): {[x: string]: T[]} {
+  return entries.reduce<{[x: string]: T[]}>((acc, entry) => {
+    const key = keyFunc(entry)
+    acc[key] = acc[key] || [];
+    acc[key].push(entry);
+    return acc;
+  }, {})
+}
+
+function segmentDateBlocks<T extends {spent_on: Date}>(sortedEntries: T[]): T[][] {
+  return sortedEntries.reduce<T[][]>((acc, entry) => {
+    const lastSegment = acc[acc.length - 1];
+    const lastEntry = lastSegment[lastSegment.length - 1];
+    if (!lastEntry || areConsecutive(lastEntry.spent_on, entry.spent_on)) {
+      lastSegment.push(entry)
+    } else {
+      acc.push([entry])
+    }
+    return acc;
+  }, [[]]);
+}
+
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
@@ -275,64 +297,28 @@ export const AbsencePlanner = () => {
   };
 
   function getAbsenceRanges(entries: FetchedTimeEntry[]): AbsenceInterval[] {
-    const sortedEntries = entries.map((entry) => ({
+    const validIssueIds = absenceIssueOptions.map((i) => i.id);
+    const sortedEntries = entries.filter((entry) => validIssueIds.indexOf(entry.issue.id) != -1).map((entry) => ({
       ...entry,
       spent_on: parseISO(entry.spent_on),
+      group_key: `${entry.issue.id}:${entry.hours}`
     }));
 
     sortedEntries.sort((a, b) => compareAsc(a.spent_on, b.spent_on));
 
-    const intervals: AbsenceInterval[] = [];
-    const validIssueIds = absenceIssueOptions.map((i) => i.id);
-
-    for (const validIssueId of validIssueIds) {
-      let currentInterval: AbsenceInterval | null = null;
-      const filteredEntries = sortedEntries.filter(
-        (entry) => entry.issue.id === validIssueId && entry.hours === 8
-      );
-      for (let i = 0; i < filteredEntries.length; i++) {
-        const entry = filteredEntries[i];
-
-        if (entry.issue.id === validIssueId) {
-          if (currentInterval) {
-            const prevDate = filteredEntries[i - 1].spent_on;
-            const currentDate = entry.spent_on;
-
-            if (areConsecutive(currentDate, prevDate)) {
-              currentInterval.endDate = currentDate;
-              currentInterval.entryIds.push(entry.id);
-            } else {
-              currentInterval.endDate >= today
-                ? intervals.push(currentInterval)
-                : null;
-              currentInterval = {
-                startDate: currentDate,
-                endDate: currentDate,
-                entryIds: [entry.id],
-                issueId: entry.issue.id,
-                extent: entry.hours,
-              };
-            }
-          } else {
-            currentInterval = {
-              startDate: entry.spent_on,
-              endDate: entry.spent_on,
-              entryIds: [entry.id],
-              issueId: entry.issue.id,
-              extent: entry.hours,
-            };
-          }
+    const groupedEntries = groupEntries(sortedEntries, (e) => e.group_key);
+    const groupIntervals = Object.keys(groupedEntries).flatMap<AbsenceInterval>((key) => {
+      return segmentDateBlocks(groupedEntries[key]).map<AbsenceInterval>(segment => (
+        {
+          startDate: segment[0].spent_on,
+          endDate: segment[segment.length - 1].spent_on,
+          entryIds: segment.map(e => e.id),
+          issueId: segment[0].issue.id,
+          extent: segment[0].hours,
         }
-      }
-      if (
-        currentInterval &&
-        intervals.indexOf(currentInterval) === -1 &&
-        currentInterval.endDate >= today
-      ) {
-        intervals.push(currentInterval);
-      }
-    }
-    return intervals;
+      ))
+    }).filter(interval => interval.endDate >= today)
+    return groupIntervals;
   }
 
   const getGroups = async () => {
@@ -666,6 +652,7 @@ export const AbsencePlanner = () => {
                     <th>Start</th>
                     <th>End</th>
                     <th>Reason </th>
+                    <th>Extent</th>
                   </tr>
                   {tableData.map((element, index) => {
                     return (
@@ -712,6 +699,7 @@ export const AbsencePlanner = () => {
                             )?.subject
                           }
                         </td>
+                        <td>{element.extent}</td>
                       </tr>
                     );
                   })}
