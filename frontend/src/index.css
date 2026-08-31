@@ -1097,8 +1097,26 @@ Other button classes are defined further down together with other classes for th
 
 .vacation-table .user-name {
   max-width: 11.25rem;
-  word-wrap: break-word;
-  white-space: normal;
+  white-space: nowrap;
+}
+
+.vacation-table .user-name .capped-hoverable-text {
+  position: relative;
+  display: block;
+  min-width: 100%;
+  padding: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: rgba(255, 255, 255, 0);
+  transition: background-color 0.2s;
+}
+
+.vacation-table .user-name:hover .capped-hoverable-text {
+  z-index: 1;
+  display: inline-block;
+  overflow: visible;
+  text-overflow: unset;
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .vacation-table .week-header {
