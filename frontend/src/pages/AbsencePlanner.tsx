@@ -39,6 +39,7 @@ import enGB from "date-fns/locale/en-GB";
 import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
+import { NumberInput } from "../components/NumberInput";
 
 import trash from "../icons/trash.svg";
 import pencil from "../icons/pencil.svg";
@@ -57,6 +58,28 @@ export const absenceIssueOptions: { id: number; subject: string }[] = [
   { id: 6997, subject: "Other absence" },
 ];
 
+function groupEntries<T>(entries: T[], keyFunc: (e: T) => string): {[x: string]: T[]} {
+  return entries.reduce<{[x: string]: T[]}>((acc, entry) => {
+    const key = keyFunc(entry)
+    acc[key] = acc[key] || [];
+    acc[key].push(entry);
+    return acc;
+  }, {})
+}
+
+function segmentDateBlocks<T extends {spent_on: Date}>(sortedEntries: T[]): T[][] {
+  return sortedEntries.reduce<T[][]>((acc, entry) => {
+    const lastSegment = acc[acc.length - 1];
+    const lastEntry = lastSegment[lastSegment.length - 1];
+    if (!lastEntry || areConsecutive(lastEntry.spent_on, entry.spent_on)) {
+      lastSegment.push(entry)
+    } else {
+      acc.push([entry])
+    }
+    return acc;
+  }, [[]]);
+}
+
 export const AbsencePlanner = () => {
   const [startDate, setStartDate] = useState<Date>(undefined);
   const [endDate, setEndDate] = useState<Date>(undefined);
@@ -66,7 +89,7 @@ export const AbsencePlanner = () => {
     id: number;
     subject: string;
   }>(absenceIssueOptions[0]);
-  const extentOfAbsence = 8;
+  const [extentOfAbsence, setExtentOfAbsence] = useState(8);
 
   const [isLoading, setIsLoading] = useState(false);
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
@@ -75,6 +98,7 @@ export const AbsencePlanner = () => {
   const context = React.useContext(AuthContext);
   const confirm: ({}) => any = useConfirm();
   const selectDates: ({}) => any = useSelectDates();
+
 
   const today = startOfDay(new Date());
   const absenceFrom: Date = new Date(
@@ -273,64 +297,28 @@ export const AbsencePlanner = () => {
   };
 
   function getAbsenceRanges(entries: FetchedTimeEntry[]): AbsenceInterval[] {
-    const sortedEntries = entries.map((entry) => ({
+    const validIssueIds = absenceIssueOptions.map((i) => i.id);
+    const sortedEntries = entries.filter((entry) => validIssueIds.indexOf(entry.issue.id) != -1).map((entry) => ({
       ...entry,
       spent_on: parseISO(entry.spent_on),
+      group_key: `${entry.issue.id}:${entry.hours}`
     }));
 
     sortedEntries.sort((a, b) => compareAsc(a.spent_on, b.spent_on));
 
-    const intervals: AbsenceInterval[] = [];
-    const validIssueIds = absenceIssueOptions.map((i) => i.id);
-
-    for (const validIssueId of validIssueIds) {
-      let currentInterval: AbsenceInterval | null = null;
-      const filteredEntries = sortedEntries.filter(
-        (entry) => entry.issue.id === validIssueId && entry.hours === 8
-      );
-      for (let i = 0; i < filteredEntries.length; i++) {
-        const entry = filteredEntries[i];
-
-        if (entry.issue.id === validIssueId) {
-          if (currentInterval) {
-            const prevDate = filteredEntries[i - 1].spent_on;
-            const currentDate = entry.spent_on;
-
-            if (areConsecutive(currentDate, prevDate)) {
-              currentInterval.endDate = currentDate;
-              currentInterval.entryIds.push(entry.id);
-            } else {
-              currentInterval.endDate >= today
-                ? intervals.push(currentInterval)
-                : null;
-              currentInterval = {
-                startDate: currentDate,
-                endDate: currentDate,
-                entryIds: [entry.id],
-                issueId: entry.issue.id,
-                extent: entry.hours,
-              };
-            }
-          } else {
-            currentInterval = {
-              startDate: entry.spent_on,
-              endDate: entry.spent_on,
-              entryIds: [entry.id],
-              issueId: entry.issue.id,
-              extent: entry.hours,
-            };
-          }
+    const groupedEntries = groupEntries(sortedEntries, (e) => e.group_key);
+    const groupIntervals = Object.keys(groupedEntries).flatMap<AbsenceInterval>((key) => {
+      return segmentDateBlocks(groupedEntries[key]).map<AbsenceInterval>(segment => (
+        {
+          startDate: segment[0].spent_on,
+          endDate: segment[segment.length - 1].spent_on,
+          entryIds: segment.map(e => e.id),
+          issueId: segment[0].issue.id,
+          extent: segment[0].hours,
         }
-      }
-      if (
-        currentInterval &&
-        intervals.indexOf(currentInterval) === -1 &&
-        currentInterval.endDate >= today
-      ) {
-        intervals.push(currentInterval);
-      }
-    }
-    return intervals;
+      ))
+    }).filter(interval => interval.endDate >= today)
+    return groupIntervals;
   }
 
   const getGroups = async () => {
@@ -555,14 +543,22 @@ export const AbsencePlanner = () => {
         endOfWeek(endDate)
       );
 
+      const reportableDays = getReportableWorkingDays(startDate, endDate);
+      const duplicateEntries = reportedEntries.filter(
+        entry => reportableDays.some(date => (
+          entry.spent_on === formatDate(date, dateFormat) &&
+          entry.issue.id === selectedIssue.id
+        ))
+      );
+
       const tooManyHoursToReport = hasReportedMoreThan40HoursPerWeek(
         reportedEntries,
         startDate,
         endDate
       );
-      if (!tooManyHoursToReport) {
+      if (!tooManyHoursToReport && duplicateEntries.length === 0) {
         await reportAbsence();
-      } else {
+      } else if (tooManyHoursToReport) {
         setToastList([
           ...toastList,
           {
@@ -570,6 +566,16 @@ export const AbsencePlanner = () => {
             timeout: 8000,
             message:
               "The maximum amount of hours per week (40) has been exceeded in the selected period",
+          },
+        ]);
+      } else if (duplicateEntries.length > 0) {
+        setToastList([
+          ...toastList,
+          {
+            type: "warning",
+            timeout: 8000,
+            message:
+              "There already exists entries for the given abscence reason for the some of the days in the selected period.",
           },
         ]);
       }
@@ -664,6 +670,7 @@ export const AbsencePlanner = () => {
                     <th>Start</th>
                     <th>End</th>
                     <th>Reason </th>
+                    <th>Extent (hours per day)</th>
                   </tr>
                   {tableData.map((element, index) => {
                     return (
@@ -710,6 +717,7 @@ export const AbsencePlanner = () => {
                             )?.subject
                           }
                         </td>
+                        <td>{element.extent}</td>
                       </tr>
                     );
                   })}
@@ -756,13 +764,26 @@ export const AbsencePlanner = () => {
             </div>
             <div className="add-absence-row">
               <div>
-                <label htmlFor="reson-for-absence">
+                <label htmlFor="reason-for-absence">
                   Reason for absence&nbsp;
                 </label>
                 <AbsenceIssuesSelector
+                  id="reason-for-absence"
                   onChange={onSelectAbsenceIssue}
                   options={absenceIssueOptions}
                   defaultOption={absenceIssueOptions[0].id}
+                />
+              </div>
+              <div>
+                <label htmlFor="extent-of-absence">
+                  Extent of absence (hours per day)&nbsp;
+                </label>
+                <NumberInput
+                  id="extent-of-absence"
+                  min={0}
+                  max={8}
+                  onChange={setExtentOfAbsence}
+                  value={extentOfAbsence}
                 />
               </div>
             </div>
