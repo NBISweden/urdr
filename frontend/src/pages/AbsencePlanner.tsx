@@ -670,7 +670,7 @@ export const AbsencePlanner = () => {
                     <th>Start</th>
                     <th>End</th>
                     <th>Reason </th>
-                    <th>Extent</th>
+                    <th>Extent (hours per day)</th>
                   </tr>
                   {tableData.map((element, index) => {
                     return (
@@ -776,7 +776,7 @@ export const AbsencePlanner = () => {
               </div>
               <div>
                 <label htmlFor="extent-of-absence">
-                  Extent of absence&nbsp;
+                  Extent of absence (hours per day)&nbsp;
                 </label>
                 <NumberInput
                   id="extent-of-absence"
