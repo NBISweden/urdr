@@ -72,8 +72,8 @@ a pathname relative to the `backend` directory, and the default value is
 Finally, you can start Urdr by using:
 
 ```command
-docker-compose build
-docker-compose up
+docker compose build
+docker compose up
 ```
 
 ## Database migrations
@@ -134,9 +134,9 @@ Have in mind that these steps will also update existing dependencies according t
 Afterwards, you will have to rebuild the Docker container that runs the Node.js server. Do like this:
 
 ```command
-docker-compose down node-urdr --volumes
-docker-compose build node-urdr
-docker-compose up node-urdr
+docker compose down node-urdr --volumes
+docker compose build node-urdr
+docker compose up node-urdr
 ```
 
 If you only want to update dependencies, follow the same steps but skip adding a new dependency.
