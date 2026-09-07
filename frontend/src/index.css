@@ -8,6 +8,7 @@
   --highlight-today-color: hsl(186deg, 30%, 73%);
   --very-light-gray-background: hsl(0deg 0% 97%);
   --header-height: 80px;
+  --footer-offset: 4rem;
   --total-row-padding: 60px;
 }
 
@@ -192,7 +193,7 @@ Other button classes are defined further down together with other classes for th
 
 .spreadsheet {
   min-height: 100vh;
-  margin-bottom: 5rem;
+  margin-bottom: calc(var(--footer-offset) + 1rem);
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -915,7 +916,7 @@ Other button classes are defined further down together with other classes for th
 
 .total-row {
   background-color: var(--very-light-gray-background);
-  bottom: 2rem;
+  bottom: var(--footer-offset);
   margin-bottom: 2rem;
   position: sticky;
   padding: 1rem 1.5rem var(--total-row-padding);
