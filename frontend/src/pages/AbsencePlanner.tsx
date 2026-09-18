@@ -36,7 +36,7 @@ import {
   isWeekend,
 } from "date-fns";
 import enGB from "date-fns/locale/en-GB";
-import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { ClimbingBoxLoader } from "react-spinners";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
 import { NumberInput } from "../components/NumberInput";
