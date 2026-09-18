@@ -12,9 +12,10 @@
     "build:dev": "vite build --mode development",
     "watch": "vite build --watch",
     "serve": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit"
   },
   "devDependencies": {
+    "@types/node": "^26.6.1",
     "@types/react": "^19.2.18",
     "@vitejs/plugin-react": "^6.1.1",
     "typescript": "^5",
