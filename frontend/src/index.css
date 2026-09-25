@@ -749,18 +749,31 @@ Other button classes are defined further down together with other classes for th
 }
 
 .toast-box {
-  width: 20rem;
-  height: 5rem;
+  min-width: 20rem;
+  min-height: 5rem;
   margin-top: 0.75rem;
   box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
   border-radius: 4px;
-  padding: 0.2rem;
-  padding-left: 1rem;
+  padding: 0.2rem 2.5rem 0.2rem 1rem;
+  position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: start;
+  justify-content: center;
+  align-items: center;
   animation-duration: 1s;
   animation-name: slidein;
+}
+
+.toast-content {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding-right: 1.5rem;
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .toast-success {
@@ -784,6 +797,9 @@ Other button classes are defined further down together with other classes for th
 }
 
 .toast-button {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
   background-color: transparent;
   border: none;
   color: inherit;
