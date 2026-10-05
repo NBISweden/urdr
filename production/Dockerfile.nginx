@@ -31,4 +31,4 @@ RUN npm run build
 FROM nginx:1.29.8-alpine
 
 RUN mkdir -p /app/dist
-COPY --from=bundler --chown=www-data:www-data /home/node/app/public/ /app/dist
+COPY --from=bundler --chown=www-data:www-data /home/node/app/dist/ /app/dist
