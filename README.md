@@ -72,8 +72,8 @@ a pathname relative to the `backend` directory, and the default value is
 Finally, you can start Urdr by using:
 
 ```command
-docker-compose build
-docker-compose up
+docker compose build
+docker compose up
 ```
 
 ## Database migrations
@@ -114,6 +114,16 @@ In order to run the node-urdr server in a Docker container, you don't need to in
 - Move to the `/frontend` directory
 - Run `npm ci`.
 
+### Building with Vite
+
+The frontend is built with [Vite](https://vite.dev/). Its configuration is in `frontend/vite.config.ts`. The following scripts can be run from the `frontend` directory:
+
+- `npm start` runs the dev server on port 4242. When running in Docker, use the nginx server on port 4567 instead, which also handles hot reloading.
+- `npm run build` creates a production build in `frontend/dist/`.
+- `npm run typecheck` checks the types. The build only removes the types, so type errors do not make it fail.
+
+Static files that should be copied to the build as they are, such as favicons, go in `frontend/public/`.
+
 ### Installing and updating packages
 
 In order to avoid dependency differences between local environments we create our `package-lock.json` file in a separate Docker container.
@@ -123,7 +133,7 @@ If you want to add a new dependency to the project:
 - add it in the `package.json` file using semantic versioning. We usually specify versions using the Caret (^) to automatically include minor releases, for example
 
 ```json
-"typescript": "^4.5.5"
+"typescript": "^5"
 ```
 
 - move to the `frontend` folder and run `./update-package-lock`. A new `package-lock.json` file will be created.
@@ -134,9 +144,9 @@ Have in mind that these steps will also update existing dependencies according t
 Afterwards, you will have to rebuild the Docker container that runs the Node.js server. Do like this:
 
 ```command
-docker-compose down node-urdr --volumes
-docker-compose build node-urdr
-docker-compose up node-urdr
+docker compose down node-urdr --volumes
+docker compose build node-urdr
+docker compose up node-urdr
 ```
 
 If you only want to update dependencies, follow the same steps but skip adding a new dependency.

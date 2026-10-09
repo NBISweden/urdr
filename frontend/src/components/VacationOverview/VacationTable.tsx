@@ -98,7 +98,7 @@ export const VacationTable: React.FC<Props> = ({
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map((user) => (
                   <tr key={user.id}>
-                    <td className="user-name">{user.name}</td>
+                    <td className="user-name"><span className="capped-hoverable-text">{user.name}</span></td>
                     {weeks.map((week) => (
                       <td key={week.week}>
                         <div className="week-day-cell">

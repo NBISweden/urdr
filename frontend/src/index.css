@@ -8,6 +8,7 @@
   --highlight-today-color: hsl(186deg, 30%, 73%);
   --very-light-gray-background: hsl(0deg 0% 97%);
   --header-height: 80px;
+  --footer-offset: 4rem;
   --total-row-padding: 60px;
 }
 
@@ -58,6 +59,7 @@ body {
   color: hsl(0deg 0% 15%);
   margin-bottom: 120px;
   justify-content: center;
+  background: var(--very-light-gray-background);
   min-height: calc(100vh - 120px);
   width: 100%;
   height: 100%;
@@ -191,7 +193,7 @@ Other button classes are defined further down together with other classes for th
 
 .spreadsheet {
   min-height: 100vh;
-  margin-bottom: 5rem;
+  margin-bottom: calc(var(--footer-offset) + 1rem);
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -446,19 +448,49 @@ Other button classes are defined further down together with other classes for th
   border-radius: 6px;
   padding: 0.5em;
   position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .tooltip-box::after {
   content: "";
   position: absolute;
+  border-width: 5px;
+  border-style: solid;
+}
+
+.tooltip-box-top {
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.tooltip-box-top::after {
   top: 100%;
   left: 50%;
   margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
+  border-color: hsl(0deg 0% 0%) transparent transparent transparent;
+}
+
+.tooltip-box-top-start {
+  bottom: 125%;
+  left: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box-top-start::after {
+  top: 100%;
+  left: 8px;
+  border-color: hsl(0deg 0% 0%) transparent transparent transparent;
+}
+
+.tooltip-box-top-end {
+  bottom: 125%;
+  right: 0;
+  white-space: nowrap;
+}
+
+.tooltip-box-top-end::after {
+  top: 100%;
+  right: 8px;
   border-color: hsl(0deg 0% 0%) transparent transparent transparent;
 }
 
@@ -717,18 +749,31 @@ Other button classes are defined further down together with other classes for th
 }
 
 .toast-box {
-  width: 20rem;
-  height: 5rem;
+  min-width: 20rem;
+  min-height: 5rem;
   margin-top: 0.75rem;
   box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
   border-radius: 4px;
-  padding: 0.2rem;
-  padding-left: 1rem;
+  padding: 0.2rem 2.5rem 0.2rem 1rem;
+  position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: start;
+  justify-content: center;
+  align-items: center;
   animation-duration: 1s;
   animation-name: slidein;
+}
+
+.toast-content {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding-right: 1.5rem;
+}
+
+.toast-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .toast-success {
@@ -752,6 +797,9 @@ Other button classes are defined further down together with other classes for th
 }
 
 .toast-button {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
   background-color: transparent;
   border: none;
   color: inherit;
@@ -802,7 +850,7 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(0deg 0% 97%);
   padding: 0 3rem 3rem;
   position: relative;
-  height: 650vh;
+  min-height: calc(100vh - var(--header-height));
 }
 
 @media (max-width: 700px) and (orientation: portrait) {
@@ -884,7 +932,7 @@ Other button classes are defined further down together with other classes for th
 
 .total-row {
   background-color: var(--very-light-gray-background);
-  bottom: 2rem;
+  bottom: var(--footer-offset);
   margin-bottom: 2rem;
   position: sticky;
   padding: 1rem 1.5rem var(--total-row-padding);
@@ -931,7 +979,6 @@ Other button classes are defined further down together with other classes for th
 
 .bar-chart-section {
   height: 100%;
-  padding-left: 0.3rem;
 }
 
 .bar-chart-section p {
@@ -942,6 +989,7 @@ Other button classes are defined further down together with other classes for th
 
 .bar-chart-label {
   width: 100%;
+  padding-left: 0.3rem;
   overflow: hidden;
 }
 
@@ -1041,7 +1089,7 @@ Other button classes are defined further down together with other classes for th
 .vacation-table th {
   box-shadow: 0 1px 0 0 hsl(0deg 0% 35%); /* looks like a border but stays during scroll */
   position: sticky;
-  top: 0;
+  top: var(--header-height);
   background-color: hsl(0deg 0% 97%);
   z-index: 2;
 }
@@ -1057,27 +1105,45 @@ Other button classes are defined further down together with other classes for th
 .vacation-table .right-header {
   width: 0;
   box-shadow: none;
-  top: 1.7rem;
+  top: calc(var(--header-height) + 1.7rem);
 }
 
 .vacation-table .left-header {
-  top: 1.7rem;
+  top: calc(var(--header-height) + 1.7rem);
 }
 
 .vacation-table .user-name {
   max-width: 11.25rem;
-  word-wrap: break-word;
-  white-space: normal;
+  white-space: nowrap;
+}
+
+.vacation-table .user-name .capped-hoverable-text {
+  position: relative;
+  display: block;
+  min-width: 100%;
+  padding: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-color: rgba(255, 255, 255, 0);
+  transition: background-color 0.2s;
+}
+
+.vacation-table .user-name:hover .capped-hoverable-text {
+  z-index: 1;
+  display: inline-block;
+  overflow: visible;
+  text-overflow: unset;
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .vacation-table .week-header {
+  top: calc(var(--header-height) + 1.7rem);
   width: 4rem;
   min-width: 4rem;
   max-width: 4rem;
   text-align: center;
   padding: 0.5rem;
   vertical-align: middle;
-  top: 1.7rem;
 }
 
 .week-day-cell {
@@ -1138,11 +1204,8 @@ Other button classes are defined further down together with other classes for th
 }
 
 .table-wrapper {
-  overflow-x: auto;
   max-width: 100%;
   margin: 0.75rem auto;
-  overflow-y: auto;
-  max-height: 80vh;
 }
 
 .group-select-wrapper {

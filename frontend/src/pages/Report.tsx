@@ -46,7 +46,7 @@ import {
 import { TimeTravel } from "../components/TimeTravel";
 import { AuthContext } from "../components/AuthProvider";
 import { useParams } from "react-router-dom";
-import ClimbingBoxLoader from "react-spinners/ClimbingBoxLoader";
+import { ClimbingBoxLoader } from "react-spinners";
 import warning from "../icons/exclamation-triangle.svg";
 import check from "../icons/check.svg";
 import up from "../icons/caret-up-fill.svg";

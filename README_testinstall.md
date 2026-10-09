@@ -16,14 +16,14 @@ This means that especially the urdr-web container for the frontend must be built
 
 Suggestions for DNS names: urdr-test.nbis.se and urdr-test-redmine.nbis.se
 
-Build like this from the urdr repo, path usually urdr/production/, setting TAG to the production container version to re-build for test:
+Build like this from the urdr repository, path usually urdr/production/, setting TAG to the production container version to re-build for test:
 
 ```command
     $ cat > urdr.env <<END
     PUBLIC_API_URL="https://urdr-test.nbis.se"
     PUBLIC_REDMINE_URL="https://urdr-test-redmine.nbis.se"
     END
-    $ TAG="1.0.4" docker-compose --env-file urdr.env build nginx 
+    $ TAG="1.0.4" docker compose --env-file urdr.env build nginx
 ```
 
 Connect to the VM using:
@@ -43,7 +43,7 @@ newgrp docker
 sudo snap disable docker
 sudo snap enable docker
 sudo apt install python3-pip
-pip3 install docker-compose
+pip3 install docker compose
 sudo groupadd urdr
 sudo useradd -u 1001 -g 1001 -m urdr
 ```
@@ -75,7 +75,7 @@ Update docker-compose.override.yml for redmine to listen on all interfaces (0.0.
 Bring up the postgres server and redmine with:
 
 ```command
-docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
 ```
 
 ## Setup Urdr
@@ -133,7 +133,7 @@ PUBLIC_API_URL="http://localhost:4567"
 Start the urdr containers with:
 
 ```command
-docker-compose -f docker-compose.yml up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 ## Setup nginx proxy and SSL certificates

@@ -32,19 +32,19 @@ To build the needed images do:
 
 ```shell
 cd production
-TAG=latest docker-compose --env-file urdr.env build --no-cache
+TAG=latest docker compose --env-file urdr.env build --no-cache
 ```
 
 To start the actual services do:
 
 ```shell
-TAG=latest docker-compose up -d
+TAG=latest docker compose up -d
 ```
 
 To check logs:
 
 ```shell
-docker-compose logs
+docker compose logs
 cat /var/log/nginx/error.log
 cat /var/log/nginx/access.log
 ```
