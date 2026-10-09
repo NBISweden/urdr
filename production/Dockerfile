@@ -8,13 +8,11 @@ WORKDIR /go
 COPY ./ .
 
 # hadolint ignore=DL3018
-RUN apk --no-cache add \
-    clang \
-    musl-dev=~1.2
+RUN apk --no-cache add build-base
 
 ENV GOPATH=$PWD
 ENV CGO_ENABLED=1
-ENV CC=clang
+ENV CC=cc
 RUN go build -ldflags "-linkmode external -extldflags -static" -o ./urdr ./cmd
 
 FROM scratch
