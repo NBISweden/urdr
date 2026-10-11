@@ -5,6 +5,8 @@ import {
   startOfMonth,
   endOfMonth,
   format as formatDate,
+  getISOWeek,
+  getISOWeekYear,
   isMonday,
   isSameMonth,
 } from "date-fns";
@@ -73,6 +75,7 @@ export const EuReport = () => {
   );
   const [rows, setRows] = useState<IssueRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hoveredWeek, setHoveredWeek] = useState<string | null>(null);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
 
   const days = getReportableWorkingDays(month, endOfMonth(month));
@@ -174,6 +177,18 @@ export const EuReport = () => {
     return hours ? `${Math.round(hours * 100) / 100}` : "";
   };
 
+  const weekKey = (day: Date) => {
+    return `${getISOWeekYear(day)}-${getISOWeek(day)}`;
+  };
+
+  // Every day of a week leads to the same place, so the whole week
+  // highlights together rather than the single day under the pointer.
+  const dayHeaderClass = (day: Date, index: number) => {
+    return hoveredWeek === weekKey(day)
+      ? `${dayCellClass(day, index)} eu-report-week-hovered`
+      : dayCellClass(day, index);
+  };
+
   const getColumnTotal = (date: string) => {
     return rows.reduce((sum, row) => sum + (row.hoursByDate[date] ?? 0), 0);
   };
@@ -191,6 +206,12 @@ export const EuReport = () => {
     const newMonth = startOfMonth(newDate);
     setMonth(newMonth);
     navigate(`/eu-report/${newMonth.getFullYear()}/${newMonth.getMonth() + 1}`);
+  };
+
+  // The weekly report is where hours actually get edited, so a date is a
+  // way in to the week it belongs to.
+  const handleDayClick = (day: Date) => {
+    navigate(`/report/${getISOWeekYear(day)}/${getISOWeek(day)}`);
   };
 
   const handleCloseToast = (index: number) => {
@@ -224,8 +245,22 @@ export const EuReport = () => {
                 <tr>
                   <th className="eu-report-issue-cell">Issue</th>
                   {days.map((day, index) => (
-                    <th key={day.getTime()} className={dayCellClass(day, index)}>
-                      {formatDate(day, "d")}
+                    <th
+                      key={day.getTime()}
+                      className={dayHeaderClass(day, index)}
+                    >
+                      <button
+                        type="button"
+                        className="eu-report-day-button"
+                        title={`Report time for week ${getISOWeek(day)}`}
+                        onClick={() => handleDayClick(day)}
+                        onMouseEnter={() => setHoveredWeek(weekKey(day))}
+                        onMouseLeave={() => setHoveredWeek(null)}
+                        onFocus={() => setHoveredWeek(weekKey(day))}
+                        onBlur={() => setHoveredWeek(null)}
+                      >
+                        {formatDate(day, "d")}
+                      </button>
                     </th>
                   ))}
                   <th className="eu-report-total-cell">Total</th>

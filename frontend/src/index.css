@@ -1414,6 +1414,29 @@ Other button classes are defined further down together with other classes for th
   min-width: 3.5rem;
 }
 
+/* The button carries the cell's padding so the whole header cell is
+   clickable, not just the digits. */
+.eu-report-table thead .eu-report-day-cell {
+  padding: 0;
+}
+
+/* Looks like the plain date it replaces, but takes you to that week. */
+.eu-report-day-button {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* Set on every header cell of the week being pointed at or focused. */
+.eu-report-week-hovered {
+  background-color: hsl(186deg 30% 94%);
+}
+
 /* Marks the weekend that the weekday-only columns skip over. */
 .eu-report-week-start {
   border-left: 1px solid hsl(0deg 0% 15%);
