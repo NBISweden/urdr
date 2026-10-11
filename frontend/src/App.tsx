@@ -26,6 +26,8 @@ import { EditPeriodDialogProvider } from "./components/EditPeriodDialogProvider"
 export const App = () => {
   const currentYear: number = getISOWeekYear(new Date());
   const currentWeek: number = getISOWeek(new Date());
+  const thisMonthYear: number = new Date().getFullYear();
+  const thisMonth: number = new Date().getMonth() + 1;
 
   return (
     <>
@@ -87,11 +89,20 @@ export const App = () => {
                     }
                   />
                   <Route
-                    path="/eu-report"
+                    path="/eu-report/:year/:month"
                     element={
                       <ProtectedRoute>
                         <EuReport />
                       </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/eu-report"
+                    element={
+                      <Navigate
+                        replace
+                        to={`/eu-report/${thisMonthYear}/${thisMonth}`}
+                      />
                     }
                   />
                   <Route path="*" element={<NotFound />} />
