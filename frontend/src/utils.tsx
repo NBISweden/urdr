@@ -308,6 +308,19 @@ export const getWeeksBetweenDates = (
   return weeks;
 };
 
+// Group entries into buckets, keyed by whatever keyFunc returns for each one.
+export const groupEntries = <T,>(
+  entries: T[],
+  keyFunc: (e: T) => string
+): { [x: string]: T[] } => {
+  return entries.reduce<{ [x: string]: T[] }>((acc, entry) => {
+    const key = keyFunc(entry);
+    acc[key] = acc[key] || [];
+    acc[key].push(entry);
+    return acc;
+  }, {});
+};
+
 export const getReportableWorkingDays = (
   frDate: Date,
   toDate: Date
