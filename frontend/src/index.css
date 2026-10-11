@@ -164,6 +164,15 @@ Other button classes are defined further down together with other classes for th
   z-index: 9999 !important;
 }
 
+/* Spelled-out month names read better ranged left than centred. The
+   selector matches the library's own depth so it wins regardless of the
+   order the stylesheets end up in. */
+.month-picker-calendar .react-datepicker__month .react-datepicker__month-text {
+  width: 6em;
+  padding-left: 0.5em;
+  text-align: left;
+}
+
 /* stylelint-enable selector-class-pattern */
 
 .usr-header,
@@ -1341,6 +1350,14 @@ Other button classes are defined further down together with other classes for th
 .apply-dates-button {
   height: 3rem;
   width: 8rem;
+}
+
+/* EU REPORT */
+
+/* A text input defaults to 20 characters wide, which leaves the longest
+   month and year sitting in a lot of empty space. */
+.month-picker-input {
+  width: 9rem;
 }
 
 /* NOT FOUND */
