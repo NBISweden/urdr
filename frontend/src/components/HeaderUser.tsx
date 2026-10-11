@@ -41,6 +41,9 @@ export const HeaderUser = ({ username }: { username: string }) => {
         </button>
         {isMenuOpen && (
           <div className="nav-menu-dropdown">
+            <a className="nav-menu-item" href="/eu-report">
+              EU report
+            </a>
             <button type="button" className="nav-menu-item" onClick={logout}>
               Log out
             </button>

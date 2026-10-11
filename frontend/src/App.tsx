@@ -5,6 +5,7 @@ import { Report } from "./pages/Report";
 import { Help } from "./pages/Help";
 import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { VacationOverview } from "./pages/VacationOverview";
+import { EuReport } from "./pages/EuReport";
 import { NotFound } from "./pages/NotFound";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -82,6 +83,14 @@ export const App = () => {
                     element={
                       <ProtectedRoute>
                         <VacationOverview />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/eu-report"
+                    element={
+                      <ProtectedRoute>
+                        <EuReport />
                       </ProtectedRoute>
                     }
                   />
