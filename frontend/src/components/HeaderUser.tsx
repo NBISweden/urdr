@@ -5,7 +5,7 @@ import { AuthContext } from "../components/AuthProvider";
 export const HeaderUser = ({ username }: { username: string }) => {
   const { logoutBackend, setUser } = React.useContext(AuthContext);
 
-  const logout = async (e) => {
+  const logout = async () => {
     const logout = await logoutBackend();
     if (logout) setUser(null);
   };

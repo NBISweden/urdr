@@ -11,6 +11,7 @@ import { BarChart } from "../components/BarChart";
 
 export const Help = () => {
   const context = React.useContext(AuthContext);
+  const issueInputRef = React.useRef<HTMLInputElement>(null);
   const exampleIAP: IssueActivityPair = {
     activity: {
       id: 1,
@@ -19,6 +20,10 @@ export const Help = () => {
     issue: {
       id: 1,
       subject: "Test issue",
+      project: {
+        id: 1,
+        name: "Test project",
+      },
     },
     custom_name: "Test custom name",
     is_hidden: false,
@@ -98,11 +103,12 @@ export const Help = () => {
           days={[new Date()]}
           rowHours={[1]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 1}
+          getRowSum={() => "1"}
           onToggleHide={() => {}}
           isFav={true}
           onToggleFav={() => {}}
           onFavNameUpdate={() => {}}
+          onFavNameSave={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <p className="help-info">
@@ -118,11 +124,12 @@ export const Help = () => {
           days={[new Date()]}
           rowHours={[2]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 2}
+          getRowSum={() => "2"}
           onToggleHide={() => {}}
           isFav={false}
           onToggleFav={() => {}}
           onFavNameUpdate={() => {}}
+          onFavNameSave={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Hidden rows</h2>
@@ -142,11 +149,12 @@ export const Help = () => {
           days={[new Date()]}
           rowHours={[3]}
           rowEntries={[exampleEntry]}
-          getRowSum={() => 3}
+          getRowSum={() => "3"}
           onToggleHide={() => {}}
           isHidden={true}
           onToggleFav={() => {}}
           onFavNameUpdate={() => {}}
+          onFavNameSave={() => {}}
           onCellUpdate={() => {}}
         ></Row>
         <h2 className="help-subtitle">Adding new rows</h2>
@@ -157,7 +165,12 @@ export const Help = () => {
           row"-button, a new row will be appended to the bottom of the list of
           recent rows.
         </p>
-        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
+        <QuickAdd
+          addIssueActivity={() => {}}
+          toastList={[]}
+          onToastListUpdate={() => {}}
+          issueInputRef={issueInputRef}
+        ></QuickAdd>
         <h2 className="help-subtitle">The sum row</h2>
         <p className="help-info">
           A cell in the sum row shows the sum of all time entries logged on

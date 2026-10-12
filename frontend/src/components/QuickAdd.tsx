@@ -15,12 +15,12 @@ export const QuickAdd = ({
   addIssueActivity: (pair: IssueActivityPair) => void;
   toastList: ToastMsg[];
   onToastListUpdate: (newToast: ToastMsg) => void;
-  issueInutRef: React.RefObject<HTMLInputElement>;
+  issueInputRef: React.RefObject<HTMLInputElement>;
 }) => {
   const [activities, setActivities] = useState<IdName[]>([]);
   const [issue, setIssue] = useState<Issue>(null);
   const [activity, setActivity] = useState<IdName>();
-  const [search, setSearch] = useState({
+  const [search, setSearch] = useState<{ text: string; suggestions: Issue[] }>({
     text: "",
     suggestions: [],
   });
@@ -175,7 +175,7 @@ export const QuickAdd = ({
     return foundIssues;
   };
 
-  const handleAdd = (e) => {
+  const handleAdd = () => {
     if (issue === null) {
       onToastListUpdate({
         type: "warning",
@@ -195,10 +195,10 @@ export const QuickAdd = ({
     }
   };
 
-  const handleSetActivity = (e) => {
-    const id = e.target.value;
-    const activity = activities.find((e) => {
-      return e.id == id;
+  const handleSetActivity = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = Number(e.target.value);
+    const activity = activities.find((a) => {
+      return a.id === id;
     });
     setActivity(activity);
   };

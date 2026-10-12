@@ -5,7 +5,6 @@ import { Toast } from "../components/Toast";
 import {
   ToastMsg,
   TimeEntry,
-  IssueActivityPair,
   FetchedTimeEntry,
   IdName,
   AbsenceInterval,
@@ -35,7 +34,7 @@ import {
   startOfWeek,
   isWeekend,
 } from "date-fns";
-import enGB from "date-fns/locale/en-GB";
+import { enGB } from "date-fns/locale/en-GB";
 import { ClimbingBoxLoader } from "react-spinners";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
@@ -354,15 +353,8 @@ export const AbsencePlanner = () => {
     let allAbsenceTimeEntries: FetchedTimeEntry[] = [];
 
     const absenceTimeEntryPromises = absenceIssueOptions.map(async (issue) => {
-      const absence_pair: IssueActivityPair = {
-        issue: issue,
-        activity: activity,
-        custom_name: "",
-        is_hidden: false,
-      };
-
       const absenceTimeEntries = await getTimeEntries(
-        absence_pair,
+        { issue, activity },
         fromDate,
         toDate,
         context,
@@ -644,10 +636,6 @@ export const AbsencePlanner = () => {
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
             size={17}
-            width={4}
-            height={6}
-            radius={4}
-            margin={4}
           />
         </LoadingOverlay>
       )}

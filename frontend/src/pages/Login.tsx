@@ -12,7 +12,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const { onLogin } = React.useContext(AuthContext);
 
-  const authenticateRedmine = async (event) => {
+  const authenticateRedmine = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event?.preventDefault();
     const loginResponse = await onLogin(username, password);
 

@@ -1,6 +1,6 @@
 import React from "react";
 import DatePicker from "react-datepicker";
-import enGB from "date-fns/locale/en-GB";
+import { enGB } from "date-fns/locale/en-GB";
 
 type Props = {
     onWeekDateChange: (newDate: Date) => void;

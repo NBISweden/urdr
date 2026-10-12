@@ -9,17 +9,27 @@ import { ModalDialog } from "./ModalDialog";
 
 const ConfirmDialog = createContext(null);
 
-export const ConfirmDialogProvider = ({ children }) => {
-  const [state, setState] = useState<{}>({ isOpen: false });
-  const handlerFunction = useRef<(choice: boolean) => void>();
+export interface ConfirmOptions {
+  title: string;
+  content?: string;
+  confirmButtonLabel: string;
+}
+
+const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
+
+export const ConfirmDialogProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, setState] = useState<ConfirmOptions & { isOpen: boolean }>(
+    closedState
+  );
+  const handlerFunction = useRef<((choice: boolean) => void) | undefined>(undefined);
 
   const confirm = useCallback(
-    (forwarded) => {
+    (forwarded: ConfirmOptions) => {
       return new Promise((resolve) => {
         setState({ ...forwarded, isOpen: true });
         handlerFunction.current = (choice: boolean) => {
           resolve(choice);
-          setState({ isOpen: false });
+          setState(closedState);
         };
       });
     },

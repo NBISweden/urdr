@@ -6,25 +6,30 @@ import React, {
   useContext,
 } from "react";
 import { ModalDialog } from "./ModalDialog";
+import { ConfirmOptions } from "./ConfirmDialogProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import sv from "date-fns/locale/sv";
+import { sv } from "date-fns/locale/sv";
 import { dateFormat, isWeekday } from "../utils";
 
 const EditPeriodDialog = createContext(null);
 
-export const EditPeriodDialogProvider = ({ children }) => {
+const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
+
+export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNode }) => {
   const [updatedAbsenceStartDate, setUpdatedAbsenceStartDate] =
-    useState<Date>(undefined);
+    useState<Date | undefined>(undefined);
   const [updatedAbsenceEndDate, setUpdatedAbsenceEndDate] =
-    useState<Date>(undefined);
-  const [state, setState] = useState<{}>({ isOpen: false });
+    useState<Date | undefined>(undefined);
+  const [state, setState] = useState<ConfirmOptions & { isOpen: boolean }>(
+    closedState
+  );
   const handlerFunction =
     useRef<
-      (selection: { choice: boolean; startDate: Date; endDate: Date }) => void
-    >();
+      ((selection: { choice: boolean; startDate: Date; endDate: Date }) => void) | undefined
+    >(undefined);
 
-  const UpdateAbsenceRangesContainer = (): JSX.Element => (
+  const UpdateAbsenceRangesContainer = (): React.JSX.Element => (
     <div>
       <p>Please enter below the new start and end date of your absence.</p>
       <hr></hr>
@@ -79,18 +84,22 @@ export const EditPeriodDialogProvider = ({ children }) => {
   );
 
   const selectDates = useCallback(
-    (forwarded) => {
+    ({
+      startDate,
+      endDate,
+      ...options
+    }: ConfirmOptions & { startDate: Date; endDate: Date }) => {
       return new Promise((resolve) => {
-        setState({ ...forwarded, isOpen: true });
-        setUpdatedAbsenceStartDate(forwarded.startDate);
-        setUpdatedAbsenceEndDate(forwarded.endDate);
+        setState({ ...options, isOpen: true });
+        setUpdatedAbsenceStartDate(startDate);
+        setUpdatedAbsenceEndDate(endDate);
         handlerFunction.current = (selection: {
           choice: boolean;
           startDate: Date;
           endDate: Date;
         }) => {
           resolve(selection);
-          setState({ isOpen: false });
+          setState(closedState);
         };
       });
     },

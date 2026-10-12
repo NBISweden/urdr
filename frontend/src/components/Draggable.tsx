@@ -2,7 +2,7 @@ import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-export const Draggable = ({ id, children }) => {
+export const Draggable = ({ id, children }: { id: string; children: React.ReactNode }) => {
   const {
     attributes,
     listeners,
@@ -12,7 +12,7 @@ export const Draggable = ({ id, children }) => {
     isDragging,
   } = useSortable({ id });
 
-  const style = {
+  const style: React.CSSProperties = {
     transition,
     transform: CSS.Transform.toString(transform),
     visibility: isDragging ? "hidden" : "visible",

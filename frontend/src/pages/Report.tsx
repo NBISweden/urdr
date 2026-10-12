@@ -54,7 +54,7 @@ import down from "../icons/caret-down-fill.svg";
 import info from "../icons/info-circle-fill.svg";
 import { BarChart } from "../components/BarChart";
 
-const beforeUnloadHandler = (event) => {
+const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
   event.preventDefault();
   event.returnValue = "";
 };
@@ -678,10 +678,6 @@ export const Report = () => {
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
             size={17}
-            width={4}
-            height={6}
-            radius={4}
-            margin={4}
           />
         </LoadingOverlay>
       )}

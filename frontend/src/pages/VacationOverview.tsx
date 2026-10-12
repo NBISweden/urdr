@@ -214,10 +214,6 @@ export const VacationOverview = () => {
             color="hsl(76deg 55% 53%)"
             loading={loadingVacationData}
             size={17}
-            width={4}
-            height={6}
-            radius={4}
-            margin={4}
           />
         </LoadingOverlay>
       )}
