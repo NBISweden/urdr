@@ -42,6 +42,22 @@ services:
       - ./frontend:/home/node/app/
       - exclude:/home/node/app/node_modules
 
+  redmine-mock:
+    profiles:
+      - mock
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["go", "run", "./cmd/mock-redmine"]
+    container_name: redmine-mock
+    volumes:
+      - ./backend/:/app
+      - cache:/tmp/.cache
+    expose:
+      - "3000"
+    ports:
+      - 3000:3000
+
   nginx:
     image: nginx:1.25.1-alpine
     volumes:
