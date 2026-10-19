@@ -71,7 +71,7 @@ function segmentDateBlocks<T extends {spent_on: Date}>(sortedEntries: T[]): T[][
   return sortedEntries.reduce<T[][]>((acc, entry) => {
     const lastSegment = acc[acc.length - 1];
     const lastEntry = lastSegment[lastSegment.length - 1];
-    if (!lastEntry || areConsecutive(lastEntry.spent_on, entry.spent_on)) {
+    if (!lastEntry || areConsecutive(entry.spent_on, lastEntry.spent_on)) {
       lastSegment.push(entry)
     } else {
       acc.push([entry])
