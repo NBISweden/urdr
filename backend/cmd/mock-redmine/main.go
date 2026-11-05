@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -90,6 +91,19 @@ var issues = []issue{
 	{6997, "Other absence", idName{1, "NBIS Administration"}},
 }
 
+// The people the mock reports time for. Dev User is the one you log
+// in as; the others exist so the vacation overview has a group to
+// show. The IDs and names have to match backend/sql/mock-users-groups.sql,
+// because that is where the overview reads the roster from before
+// asking Redmine for each member's absences by ID.
+var (
+	mockUser   = idName{mockUserID, mockUserName}
+	mockAda    = idName{2, "Ada Lindgren"}
+	mockBjorn  = idName{3, "Björn Castillo"}
+	mockCarmen = idName{4, "Carmen Dahl"}
+	mockElias  = idName{5, "Elias Nyqvist"}
+)
+
 type store struct {
 	mu      sync.Mutex
 	entries []timeEntry
@@ -110,6 +124,12 @@ func issueById(id int) *issue {
 func (s *store) add(day time.Time, issueId int, activityId int,
 	hours float64, comments string) {
 
+	s.addFor(mockUser, day, issueId, activityId, hours, comments)
+}
+
+func (s *store) addFor(user idName, day time.Time, issueId int,
+	activityId int, hours float64, comments string) {
+
 	issue := issueById(issueId)
 	stamp := day.Format(time.RFC3339)
 
@@ -117,7 +137,7 @@ func (s *store) add(day time.Time, issueId int, activityId int,
 		Id:        s.nextId,
 		Project:   issue.Project,
 		Issue:     issueRef{Id: issueId},
-		User:      idName{mockUserID, mockUserName},
+		User:      user,
 		Activity:  idName{activityId, activityNames[activityId]},
 		Hours:     hours,
 		Comments:  comments,
@@ -180,6 +200,54 @@ func (s *store) seed() {
 
 	log.Printf("seeded %d time entries between %s and %s",
 		len(s.entries), first.Format(dateFormat), today.Format(dateFormat))
+
+	s.seedAbsencePlans()
+}
+
+// absenceWeeks books a whole-day absence for a user on every weekday of
+// "weeks" consecutive weeks, starting "firstWeek" weeks after the given
+// Monday.
+func (s *store) absenceWeeks(user idName, monday time.Time,
+	firstWeek int, weeks int, issueId int) {
+
+	start := monday.AddDate(0, 0, firstWeek*7)
+
+	for offset := 0; offset < weeks*7; offset++ {
+		day := start.AddDate(0, 0, offset)
+		if day.Weekday() == time.Saturday || day.Weekday() == time.Sunday {
+			continue
+		}
+		s.addFor(user, day, issueId, 19, 8, "")
+	}
+}
+
+// seedAbsencePlans books planned absences for the whole mock group over
+// the fourteen weeks the vacation overview displays. That window starts
+// at the Monday of the current week and runs forwards, so none of the
+// time seeded above — which stops at today — ever appears in it.
+func (s *store) seedAbsencePlans() {
+	now := time.Now()
+	monday := time.Date(now.Year(), now.Month(), now.Day(),
+		12, 0, 0, 0, time.Local)
+	for monday.Weekday() != time.Monday {
+		monday = monday.AddDate(0, 0, -1)
+	}
+
+	s.absenceWeeks(mockUser, monday, 1, 1, 6995)
+	s.absenceWeeks(mockAda, monday, 2, 2, 6995)
+	s.absenceWeeks(mockCarmen, monday, 5, 1, 6995)
+	s.absenceWeeks(mockCarmen, monday, 9, 1, 6995)
+	s.absenceWeeks(mockElias, monday, 11, 2, 6995)
+
+	// The overview only counts parental leave reported as whole
+	// eight-hour days, so these are one standing day a week.
+	for week := 0; week < 14; week++ {
+		friday := monday.AddDate(0, 0, week*7+4)
+		s.addFor(mockBjorn, friday, 6992, 19, 8, "")
+	}
+
+	log.Printf("seeded planned absences for the mock group over the "+
+		"fourteen weeks from %s", monday.Format(dateFormat))
 }
 
 func sendJSON(w http.ResponseWriter, status int, body any) {
@@ -218,6 +286,24 @@ func accountHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// requestedUserId resolves the "user_id" parameter to a user ID. The
+// Urdr backend prepends its own "user_id=me" and then appends the
+// client's query string, so the parameter arrives twice whenever the
+// client asks about somebody else; Redmine lets the last one win, and
+// so do we. Anything unrecognised means the logged-in user.
+func requestedUserId(query url.Values) int {
+	values := query["user_id"]
+	if len(values) == 0 {
+		return mockUserID
+	}
+
+	id, err := strconv.Atoi(values[len(values)-1])
+	if err != nil {
+		return mockUserID
+	}
+	return id
+}
+
 func getTimeEntriesHandler(w http.ResponseWriter, r *http.Request) {
 	if !authenticated(w, r) {
 		return
@@ -227,6 +313,7 @@ func getTimeEntriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	issueId, _ := strconv.Atoi(query.Get("issue_id"))
 	activityId, _ := strconv.Atoi(query.Get("activity_id"))
+	userId := requestedUserId(query)
 	from := query.Get("from")
 	to := query.Get("to")
 
@@ -235,6 +322,9 @@ func getTimeEntriesHandler(w http.ResponseWriter, r *http.Request) {
 
 	var matched []timeEntry
 	for _, entry := range db.entries {
+		if entry.User.Id != userId {
+			continue
+		}
 		if issueId != 0 && entry.Issue.Id != issueId {
 			continue
 		}
