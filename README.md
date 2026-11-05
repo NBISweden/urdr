@@ -42,9 +42,10 @@ named `redmine_db.dump`, and it should be placed in that repository's
 
 Instead of running a real local Redmine, you can run the bundled mock,
 which serves the handful of Redmine endpoints that the Urdr backend
-proxies to. It keeps its time entries in memory and re-seeds a
-realistic previous-plus-current month of reported time every time it
-starts.
+proxies to. It keeps its time entries in memory and re-seeds them
+every time it starts: a realistic previous-plus-current month of
+reported time, and planned absences across the fourteen weeks ahead
+that the vacation overview displays.
 
 Set `REDMINE_URL="http://redmine-mock:3456"` in `urdr.env` and start
 the stack with the `mock` profile:
@@ -53,10 +54,39 @@ the stack with the `mock` profile:
 docker compose --profile mock up
 ```
 
-Log in with user `dev`, password `dev`. Note that the database scripts
-described under "Urdr setup" below cannot be run against the mock; the
-backend database starts out empty, which is fine for most frontend
-work.
+Log in with user `dev`, password `dev`.
+
+The "Urdr setup" section below ends with two scripts that fill the
+backend database, and both of them query Redmine's PostgreSQL database
+directly, so neither can be pointed at the mock. Load
+`backend/sql/mock-users-groups.sql` in place of
+`update-users-groups.sh`. There is no stand-in for
+`update-invalid_entry.sh`; without it the backend does not know which
+issue and activity combinations Redmine rejects, which little in
+development depends on.
+
+The groups are the part you notice. Urdr reads them from its own
+tables rather than over Redmine's REST API, so no mock Redmine can
+supply them however complete it is, and the vacation overview stays
+an empty grid until the fixture is loaded. It names the same people
+the mock reports time for.
+
+Give the mock a database of its own, so those rows do not land on top
+of users and groups copied from the real Redmine. In `urdr.env`:
+
+```shell
+BACKEND_DB_PATH="./mock-database.db"
+```
+
+Then create it:
+
+```shell
+sqlite3 backend/mock-database.db <backend/sql/schema.sql
+sqlite3 backend/mock-database.db <backend/sql/mock-users-groups.sql
+```
+
+Reloading the second file is harmless; its inserts replace rather than
+conflict.
 
 ### Screenshot runs
 
