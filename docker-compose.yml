@@ -53,10 +53,12 @@ services:
     volumes:
       - ./backend/:/app
       - cache:/tmp/.cache
+    # Not Redmine's own 3000: that port is taken by several other NBIS
+    # development stacks, so the mock keeps out of their way.
     expose:
-      - "3000"
+      - "3456"
     ports:
-      - 3000:3000
+      - 3456:3456
 
   screenshots:
     profiles:

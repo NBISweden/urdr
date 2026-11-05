@@ -46,7 +46,7 @@ proxies to. It keeps its time entries in memory and re-seeds a
 realistic previous-plus-current month of reported time every time it
 starts.
 
-Set `REDMINE_URL="http://redmine-mock:3000"` in `urdr.env` and start
+Set `REDMINE_URL="http://redmine-mock:3456"` in `urdr.env` and start
 the stack with the `mock` profile:
 
 ```shell

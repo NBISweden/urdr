@@ -520,7 +520,7 @@ func main() {
 
 	port := os.Getenv("MOCK_REDMINE_PORT")
 	if port == "" {
-		port = "3000"
+		port = "3456"
 	}
 
 	log.Printf("mock Redmine listening on :%s (log in with %q / %q)",
