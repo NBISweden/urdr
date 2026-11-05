@@ -42,6 +42,39 @@ services:
       - ./frontend:/home/node/app/
       - exclude:/home/node/app/node_modules
 
+  redmine-mock:
+    profiles:
+      - mock
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: ["go", "run", "./cmd/mock-redmine"]
+    container_name: redmine-mock
+    volumes:
+      - ./backend/:/app
+      - cache:/tmp/.cache
+    expose:
+      - "3000"
+    ports:
+      - 3000:3000
+
+  screenshots:
+    profiles:
+      - screenshots
+    # This version has to be the same as the one in e2e/package.json
+    image: mcr.microsoft.com/playwright:v1.49.1-noble
+    container_name: urdr-screenshots
+    # The frontend is built with PUBLIC_API_URL=http://localhost:4567,
+    # so the browser must reach the stack on the host's localhost.
+    network_mode: host
+    working_dir: /work
+    command: sh -c 'npm ci --no-audit --no-fund && npm run --silent screenshots'
+    environment:
+      - BASE_URL=http://localhost:4567
+    volumes:
+      - ./e2e:/work
+      - e2e-node-modules:/work/node_modules
+
   nginx:
     image: nginx:1.25.1-alpine
     volumes:
@@ -57,3 +90,4 @@ services:
 volumes:
   exclude: null
   cache:
+  e2e-node-modules:
