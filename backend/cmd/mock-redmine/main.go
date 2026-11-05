@@ -258,7 +258,10 @@ func getTimeEntriesHandler(w http.ResponseWriter, r *http.Request) {
 		return matched[i].Id > matched[j].Id
 	})
 
-	offset, _ := strconv.Atoi(query.Get("offset"))
+	offset, err := strconv.Atoi(query.Get("offset"))
+	if err != nil || offset < 0 {
+		offset = 0
+	}
 	limit, err := strconv.Atoi(query.Get("limit"))
 	if err != nil || limit <= 0 {
 		limit = 25
