@@ -51,6 +51,17 @@ export const Help = () => {
     created_on: "2020-01-01",
     updated_on: "2020-01-01",
   };
+  // Props shared by the example rows below
+  const exampleRowProps = {
+    topic: exampleIAP,
+    days: [new Date()],
+    rowEntries: [exampleEntry],
+    onToggleHide: () => {},
+    onToggleFav: () => {},
+    onFavNameUpdate: () => {},
+    onFavNameSave: () => {},
+    onCellUpdate: () => {},
+  };
   return (
     <>
       <header className="page-header">
@@ -99,18 +110,11 @@ export const Help = () => {
         </p>
         <Row
           key={1}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[1]}
-          rowEntries={[exampleEntry]}
           getRowSum={() => "1"}
-          onToggleHide={() => {}}
           isFav={true}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onFavNameSave={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <p className="help-info">
           The next one is a recent row. The issues shown here are the ones you
           have most recently logged time on, based on the week you are currently
@@ -120,18 +124,11 @@ export const Help = () => {
         </p>
         <Row
           key={2}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[2]}
-          rowEntries={[exampleEntry]}
           getRowSum={() => "2"}
-          onToggleHide={() => {}}
           isFav={false}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onFavNameSave={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <h2 className="help-subtitle">Hidden rows</h2>
         <p className="help-info">
           Below all rows that are visible by default you find a button saying
@@ -145,18 +142,11 @@ export const Help = () => {
         </p>
         <Row
           key={3}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[3]}
-          rowEntries={[exampleEntry]}
           getRowSum={() => "3"}
-          onToggleHide={() => {}}
           isHidden={true}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onFavNameSave={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <h2 className="help-subtitle">Adding new rows</h2>
         <p className="help-info">
           In order to add a new row, you first find an issue by using its id or
