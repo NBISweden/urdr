@@ -1,5 +1,5 @@
 import "../index.css";
-import React, { useState, useMemo, useContext, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { getISOWeek, startOfWeek} from "date-fns";
 import {
   getGroups,
@@ -12,7 +12,7 @@ import {
 } from "../components/VacationOverview/utils";
 import { GroupSelect } from "../components/VacationOverview/GroupSelect";
 import { VacationTable } from "../components/VacationOverview/VacationTable";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { Group } from "../model";
 import { HeaderUser } from "../components/HeaderUser";
 import { ClimbingBoxLoader } from "react-spinners";
@@ -32,14 +32,14 @@ export const VacationOverview = () => {
   const today = new Date();
   const [startDate, setStartDate] = useState<Date>(today);
   const [fetchedWeeks, setFetchedWeeks] = useState<number[]>([]);
-  const context = useContext(AuthContext);
+  const context = useAuth();
 
   useEffect(() => {
     const fetchGroupData = async () => {
       const groups = await getGroups(context);
       setGroups(groups);
 
-      const groupId = await getSavedGroup(context);
+      const groupId = (await getSavedGroup(context)) ?? null;
       setSavedGroup(groupId);
 
       const selectedGroup = selectGroup(groups, groupId);
@@ -53,6 +53,9 @@ export const VacationOverview = () => {
   const monthGroups = useMemo(() => groupWeeksByMonth(weeks), [weeks]);
 
   const getAbsenceData = async (timespan: WeekInfo[]) => {
+    if (!selectedGroupData) {
+      throw new Error("No group selected");
+    }
     const userIds = selectedGroupData.users.map((user) => ({
       id: user.id,
     }));
@@ -143,7 +146,7 @@ export const VacationOverview = () => {
     let newMonday: Date;
     if (direction == "back") {
       newMonday = startOfWeek(newDate, { weekStartsOn: 1 });
-    } else if (direction == "forward") {
+    } else {
       newMonday = startOfWeek(
         // we want to fetch data for the new week at the end of the displayed 14 weeks
         new Date(newDate.getTime() + 13 * 7 * 24 * 60 * 60 * 1000),

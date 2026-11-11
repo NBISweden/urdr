@@ -22,7 +22,7 @@ export function NumberInput({max, min, value, onChange, id}: NumberInputProps) {
         setValueStr(event.target.value)
       }}
       onBlur={() => {
-        const result = Math.max(min, Math.min(max, parseFloat(valueStr)));
+        const result = Math.max(min ?? -Infinity, Math.min(max ?? Infinity, parseFloat(valueStr)));
         if (isNaN(result)) {
           setValueStr(String(value))
         } else {

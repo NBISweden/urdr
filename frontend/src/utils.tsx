@@ -154,7 +154,7 @@ export const useViewport = () => {
 
 // Hook to escape a certain DOM element by clicking outside of it or pressing Escape
 export const useEscaper = (
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement | null>,
   callback: () => void
 ) => {
   useEffect(() => {
@@ -188,9 +188,9 @@ export const getTimeEntries = async (
   issueActivity: { issue: Id; activity: Id } | undefined,
   from_date: Date,
   to_date: Date,
-  context: any,
+  context: AuthContextValue,
   user_id?: string
-) => {
+): Promise<FetchedTimeEntry[]> => {
   // The ofset param is used to get all time_entries
   // from the api, as the limit per batch is 100
   let offset: number = 0;
@@ -228,9 +228,7 @@ export const getTimeEntries = async (
       gotTotal = true;
     }
   }
-  if (allEntries) return allEntries;
-
-  return null;
+  return allEntries;
 };
 
 export const reportTime = async (

@@ -7,13 +7,15 @@ import React, {
 } from "react";
 import { ModalDialog } from "./ModalDialog";
 
-const ConfirmDialog = createContext(null);
-
 export interface ConfirmOptions {
   title: string;
   content?: string;
   confirmButtonLabel: string;
 }
+
+type Confirm = (options: ConfirmOptions) => Promise<boolean>;
+
+const ConfirmDialog = createContext<Confirm | null>(null);
 
 const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
 
@@ -25,7 +27,7 @@ export const ConfirmDialogProvider = ({ children }: { children: React.ReactNode 
 
   const confirm = useCallback(
     (forwarded: ConfirmOptions) => {
-      return new Promise((resolve) => {
+      return new Promise<boolean>((resolve) => {
         setState({ ...forwarded, isOpen: true });
         handlerFunction.current = (choice: boolean) => {
           resolve(choice);
@@ -56,6 +58,10 @@ export const ConfirmDialogProvider = ({ children }: { children: React.ReactNode 
   );
 };
 
-export const useConfirm = () => {
-  return useContext(ConfirmDialog);
+export const useConfirm = (): Confirm => {
+  const confirm = useContext(ConfirmDialog);
+  if (!confirm) {
+    throw new Error("useConfirm must be used within a ConfirmDialogProvider");
+  }
+  return confirm;
 };

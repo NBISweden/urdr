@@ -45,7 +45,8 @@ export const TimeTravel = ({
 
   // Date changed using the date picker
   // Year for the url must be calculated w getISOWeekYear to handle year transitions.
-  const handleDateChange = (dates: Date[]) => {
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    if (!dates[0]) return;
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
     navigate(`/report/${getISOWeekYear(dates[0])}/${getISOWeek(dates[0])}`);

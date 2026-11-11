@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../components/AuthProvider";
 import { getTimeEntries } from "../utils";
 import { FetchedTimeEntry } from "../model";
 import { Tooltip } from "./Tooltip";
@@ -9,7 +9,7 @@ export const BarChart = ({ loading }: { loading: boolean }) => {
     [key: string]: { hours: number; name: string };
   }>({});
   const [total, setTotal] = useState<number>(0);
-  const context = useContext(AuthContext);
+  const context = useAuth();
   const today = new Date();
   const startDate = new Date(`January 1, ${today.getFullYear()}`);
   const endDate = new Date(`December 31, ${today.getFullYear()}`);

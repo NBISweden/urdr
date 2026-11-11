@@ -1,10 +1,10 @@
-import React, { useContext } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import React from "react";
+import { useAuth } from "../components/AuthProvider";
 import { Link } from "react-router-dom";
 import "../index.css";
 
 export const NotFound = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
 
   return (
     <main className="not-found-wrapper">

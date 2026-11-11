@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { LoginHeader } from "../components/LoginHeader";
 import { LoginError } from "../components/LoginError";
 import "../index.css";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 
 export const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorCode, setErrorCode] = useState<null | number>(null);
   const navigate = useNavigate();
-  const { onLogin } = React.useContext(AuthContext);
+  const { onLogin } = useAuth();
 
   const authenticateRedmine = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event?.preventDefault();

@@ -1,6 +1,6 @@
 import "../index.css";
 import React from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { HeaderUser } from "../components/HeaderUser";
 import { Row } from "../components/Row";
 import { Cell } from "../components/Cell";
@@ -10,7 +10,7 @@ import weektravel from "../images/weektravel.png";
 import { BarChart } from "../components/BarChart";
 
 export const Help = () => {
-  const context = React.useContext(AuthContext);
+  const context = useAuth();
   const issueInputRef = React.useRef<HTMLInputElement>(null);
   const exampleIAP: IssueActivityPair = {
     activity: {

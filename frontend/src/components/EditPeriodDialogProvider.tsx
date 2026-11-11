@@ -12,7 +12,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import { sv } from "date-fns/locale/sv";
 import { dateFormat, isWeekday } from "../utils";
 
-const EditPeriodDialog = createContext(null);
+export interface PeriodSelection {
+  choice: boolean;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}
+
+type SelectDates = (
+  options: ConfirmOptions & { startDate: Date; endDate: Date }
+) => Promise<PeriodSelection>;
+
+const EditPeriodDialog = createContext<SelectDates | null>(null);
 
 const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
 
@@ -24,10 +34,9 @@ export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNo
   const [state, setState] = useState<ConfirmOptions & { isOpen: boolean }>(
     closedState
   );
-  const handlerFunction =
-    useRef<
-      ((selection: { choice: boolean; startDate: Date; endDate: Date }) => void) | undefined
-    >(undefined);
+  const handlerFunction = useRef<
+    ((selection: PeriodSelection) => void) | undefined
+  >(undefined);
 
   const UpdateAbsenceRangesContainer = (): React.JSX.Element => (
     <div>
@@ -41,8 +50,8 @@ export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNo
           selected={
             updatedAbsenceStartDate ? updatedAbsenceStartDate : undefined
           }
-          onChange={(date: Date) => {
-            setUpdatedAbsenceStartDate(date);
+          onChange={(date: Date | null) => {
+            setUpdatedAbsenceStartDate(date ?? undefined);
           }}
           showWeekNumbers
           locale={sv}
@@ -64,8 +73,8 @@ export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNo
           filterDate={isWeekday}
           dateFormat={dateFormat}
           selected={updatedAbsenceEndDate ? updatedAbsenceEndDate : undefined}
-          onChange={(date: Date) => {
-            setUpdatedAbsenceEndDate(date);
+          onChange={(date: Date | null) => {
+            setUpdatedAbsenceEndDate(date ?? undefined);
           }}
           showWeekNumbers
           locale={sv}
@@ -89,15 +98,11 @@ export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNo
       endDate,
       ...options
     }: ConfirmOptions & { startDate: Date; endDate: Date }) => {
-      return new Promise((resolve) => {
+      return new Promise<PeriodSelection>((resolve) => {
         setState({ ...options, isOpen: true });
         setUpdatedAbsenceStartDate(startDate);
         setUpdatedAbsenceEndDate(endDate);
-        handlerFunction.current = (selection: {
-          choice: boolean;
-          startDate: Date;
-          endDate: Date;
-        }) => {
+        handlerFunction.current = (selection: PeriodSelection) => {
           resolve(selection);
           setState(closedState);
         };
@@ -132,6 +137,10 @@ export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNo
   );
 };
 
-export const useSelectDates = () => {
-  return useContext(EditPeriodDialog);
+export const useSelectDates = (): SelectDates => {
+  const selectDates = useContext(EditPeriodDialog);
+  if (!selectDates) {
+    throw new Error("useSelectDates must be used within an EditPeriodDialogProvider");
+  }
+  return selectDates;
 };
