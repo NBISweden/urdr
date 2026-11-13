@@ -7,7 +7,7 @@ import left from "../icons/caret-left-fill.svg";
 import right from "../icons/caret-right-fill.svg";
 import { useNavigate } from "react-router-dom";
 import { isWeekday } from "../utils";
-import enGB from "date-fns/locale/en-GB";
+import { enGB } from "date-fns/locale/en-GB";
 
 /*
 TimeTravel
@@ -45,7 +45,8 @@ export const TimeTravel = ({
 
   // Date changed using the date picker
   // Year for the url must be calculated w getISOWeekYear to handle year transitions.
-  const handleDateChange = (dates: Date[]) => {
+  const handleDateChange = (dates: [Date | null, Date | null]) => {
+    if (!dates[0]) return;
     setCurrentWeek(getISOWeek(dates[0]));
     onWeekTravel(dates[0]);
     navigate(`/report/${getISOWeekYear(dates[0])}/${getISOWeek(dates[0])}`);
@@ -74,7 +75,10 @@ export const TimeTravel = ({
   };
 
   // Date picker
-  const CustomDatePickerInput = forwardRef(({ onClick }, ref) => (
+  const CustomDatePickerInput = forwardRef<
+    HTMLButtonElement,
+    { onClick?: React.MouseEventHandler<HTMLButtonElement> }
+  >(({ onClick }, ref) => (
     <button onClick={onClick} className="week-button" ref={ref}>
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,6 @@
 import React from "react";
 import DatePicker from "react-datepicker";
-import enGB from "date-fns/locale/en-GB";
+import { enGB } from "date-fns/locale/en-GB";
 
 type Props = {
     onWeekDateChange: (newDate: Date) => void;
@@ -20,7 +20,9 @@ export const WeekPicker : React.FC<Props> = ({
             <DatePicker
                 id="week-picker"
                 selected={startDate}
-                onChange={(date: Date) => onWeekDateChange(date)}
+                onChange={(date: Date | null) => {
+                    if (date) onWeekDateChange(date);
+                }}
                 dateFormat="I - R"
                 locale={enGB}
                 showWeekNumbers

@@ -1,12 +1,12 @@
-import React, { ReactChild, useState } from "react";
+import React, { useState } from "react";
 
 export const Tooltip = ({
   content,
   children,
   position = "top",
 }: {
-  content: string | JSX.Element;
-  children: ReactChild;
+  content: React.ReactNode;
+  children: React.ReactNode;
   position?: "top" | "top-start" | "top-end";
 }) => {
   const [visible, setVisible] = useState(false);

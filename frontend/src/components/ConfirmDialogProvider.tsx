@@ -7,19 +7,31 @@ import React, {
 } from "react";
 import { ModalDialog } from "./ModalDialog";
 
-const ConfirmDialog = createContext(null);
+export interface ConfirmOptions {
+  title: string;
+  content?: string;
+  confirmButtonLabel: string;
+}
 
-export const ConfirmDialogProvider = ({ children }) => {
-  const [state, setState] = useState<{}>({ isOpen: false });
-  const handlerFunction = useRef<(choice: boolean) => void>();
+type Confirm = (options: ConfirmOptions) => Promise<boolean>;
+
+const ConfirmDialog = createContext<Confirm | null>(null);
+
+const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
+
+export const ConfirmDialogProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, setState] = useState<ConfirmOptions & { isOpen: boolean }>(
+    closedState
+  );
+  const handlerFunction = useRef<((choice: boolean) => void) | undefined>(undefined);
 
   const confirm = useCallback(
-    (forwarded) => {
-      return new Promise((resolve) => {
+    (forwarded: ConfirmOptions) => {
+      return new Promise<boolean>((resolve) => {
         setState({ ...forwarded, isOpen: true });
         handlerFunction.current = (choice: boolean) => {
           resolve(choice);
-          setState({ isOpen: false });
+          setState(closedState);
         };
       });
     },
@@ -46,6 +58,10 @@ export const ConfirmDialogProvider = ({ children }) => {
   );
 };
 
-export const useConfirm = () => {
-  return useContext(ConfirmDialog);
+export const useConfirm = (): Confirm => {
+  const confirm = useContext(ConfirmDialog);
+  if (!confirm) {
+    throw new Error("useConfirm must be used within a ConfirmDialogProvider");
+  }
+  return confirm;
 };

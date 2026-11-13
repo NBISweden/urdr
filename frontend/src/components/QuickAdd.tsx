@@ -3,7 +3,7 @@ import { IdName, Issue, IssueActivityPair, ToastMsg } from "../model";
 import { getApiEndpoint, useDebounce } from "../utils";
 import x from "../icons/x.svg";
 import check from "../icons/check.svg";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { PUBLIC_API_URL, headers, useEscaper } from "../utils";
 
 export const QuickAdd = ({
@@ -15,19 +15,22 @@ export const QuickAdd = ({
   addIssueActivity: (pair: IssueActivityPair) => void;
   toastList: ToastMsg[];
   onToastListUpdate: (newToast: ToastMsg) => void;
-  issueInutRef: React.RefObject<HTMLInputElement>;
+  issueInputRef: React.RefObject<HTMLInputElement | null>;
 }) => {
   const [activities, setActivities] = useState<IdName[]>([]);
-  const [issue, setIssue] = useState<Issue>(null);
+  const [issue, setIssue] = useState<Issue | null>(null);
   const [activity, setActivity] = useState<IdName>();
-  const [search, setSearch] = useState({
+  const [search, setSearch] = useState<{
+    text: string | undefined;
+    suggestions: Issue[];
+  }>({
     text: "",
     suggestions: [],
   });
   const [isAutoCompleteVisible, setIsAutoCompleteVisible] = useState(false);
 
   const debouncedSearch = useDebounce(search, 500);
-  const context = React.useContext(AuthContext);
+  const context = useAuth();
 
   const isNumber = (s: string) => {
     return Number.isInteger(Number(s));
@@ -46,7 +49,7 @@ export const QuickAdd = ({
       );
       if (!didCancel && result) {
         setActivities(result.time_entry_activities ? result.time_entry_activities : []);
-        setActivity(activity ? activity : (Array.isArray(result.time_entry_activities) && result.time_entry_activities.length > 0) ? result.time_entry_activities[0] : null);
+        setActivity(activity ? activity : (Array.isArray(result.time_entry_activities) && result.time_entry_activities.length > 0) ? result.time_entry_activities[0] : undefined);
       }
     };
 
@@ -116,8 +119,9 @@ export const QuickAdd = ({
   const suggestionSelected = (selection: Issue) => {
     setIssue(selection);
     // Update input box with selected issue
-    let element = issueInputRef.current;
-    element.value = selection.id.toString();
+    if (issueInputRef.current) {
+      issueInputRef.current.value = selection.id.toString();
+    }
     setIsAutoCompleteVisible(false);
   };
 
@@ -175,8 +179,8 @@ export const QuickAdd = ({
     return foundIssues;
   };
 
-  const handleAdd = (e) => {
-    if (issue === null) {
+  const handleAdd = () => {
+    if (issue === null || activity === undefined) {
       onToastListUpdate({
         type: "warning",
         timeout: 5000,
@@ -195,10 +199,10 @@ export const QuickAdd = ({
     }
   };
 
-  const handleSetActivity = (e) => {
-    const id = e.target.value;
-    const activity = activities.find((e) => {
-      return e.id == id;
+  const handleSetActivity = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = Number(e.target.value);
+    const activity = activities.find((a) => {
+      return a.id === id;
     });
     setActivity(activity);
   };
@@ -220,11 +224,16 @@ export const QuickAdd = ({
   };
 
   const getSuggestionsLength = () => {
-    return suggestionsRef.current.childNodes.length;
+    return suggestionsRef.current?.childNodes.length ?? 0;
   };
 
-  const suggestionsRef = useRef(null);
+  const suggestionsRef = useRef<HTMLUListElement>(null);
   useEscaper(suggestionsRef, handleHideAutocomplete);
+
+  const focusSuggestion = (index: number) => {
+    const button = suggestionsRef.current?.children[index]?.firstElementChild;
+    if (button instanceof HTMLElement) button.focus();
+  };
 
   const handleInputToAutocompleteFocus = (event: any) => {
     event.preventDefault();
@@ -234,9 +243,7 @@ export const QuickAdd = ({
         let suggestionIndex = 0;
         event.key == "ArrowUp" ? sugLen - 1 : 0;
 
-        suggestionsRef.current.childNodes[
-          suggestionIndex
-        ].childNodes[0].focus();
+        focusSuggestion(suggestionIndex);
       }
     }
   };
@@ -250,11 +257,11 @@ export const QuickAdd = ({
         let targetIndex: number =
           event.key == "ArrowUp" ? sourceIndex - 1 : sourceIndex + 1;
         if (targetIndex >= 0 && targetIndex < sugLen) {
-          suggestionsRef.current.childNodes[targetIndex].childNodes[0].focus();
+          focusSuggestion(targetIndex);
         } else if (targetIndex < 0) {
-          issueInputRef.current.focus();
+          issueInputRef.current?.focus();
         } else if (targetIndex >= sugLen) {
-          suggestionsRef.current.childNodes[0].childNodes[0].focus();
+          focusSuggestion(0);
         }
       }
     }

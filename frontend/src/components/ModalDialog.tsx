@@ -23,16 +23,16 @@ export const ModalDialog = ({
   confirmButtonLabel: string;
   onCancel: () => void;
   onConfirm: () => void;
-  children: JSX.Element;
+  children?: React.ReactNode;
 }) => {
   // Autofocus on cancel button when opening dialog
-  const cancelButton = useRef(null);
+  const cancelButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    cancelButton.current.focus();
+    cancelButton.current?.focus();
   });
 
   // Close the dialog when pressing escape
-  const modal = useRef(null);
+  const modal = useRef<HTMLElement>(null);
   useEscaper(modal, () => onCancel());
 
   return (

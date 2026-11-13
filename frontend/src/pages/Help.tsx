@@ -1,6 +1,6 @@
 import "../index.css";
 import React from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { HeaderUser } from "../components/HeaderUser";
 import { Row } from "../components/Row";
 import { Cell } from "../components/Cell";
@@ -10,7 +10,8 @@ import weektravel from "../images/weektravel.png";
 import { BarChart } from "../components/BarChart";
 
 export const Help = () => {
-  const context = React.useContext(AuthContext);
+  const context = useAuth();
+  const issueInputRef = React.useRef<HTMLInputElement>(null);
   const exampleIAP: IssueActivityPair = {
     activity: {
       id: 1,
@@ -19,6 +20,10 @@ export const Help = () => {
     issue: {
       id: 1,
       subject: "Test issue",
+      project: {
+        id: 1,
+        name: "Test project",
+      },
     },
     custom_name: "Test custom name",
     is_hidden: false,
@@ -45,6 +50,17 @@ export const Help = () => {
     spent_on: "2020-01-01",
     created_on: "2020-01-01",
     updated_on: "2020-01-01",
+  };
+  // Props shared by the example rows below
+  const exampleRowProps = {
+    topic: exampleIAP,
+    days: [new Date()],
+    rowEntries: [exampleEntry],
+    onToggleHide: () => {},
+    onToggleFav: () => {},
+    onFavNameUpdate: () => {},
+    onFavNameSave: () => {},
+    onCellUpdate: () => {},
   };
   return (
     <>
@@ -94,17 +110,11 @@ export const Help = () => {
         </p>
         <Row
           key={1}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[1]}
-          rowEntries={[exampleEntry]}
-          getRowSum={() => 1}
-          onToggleHide={() => {}}
+          getRowSum={() => "1"}
           isFav={true}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <p className="help-info">
           The next one is a recent row. The issues shown here are the ones you
           have most recently logged time on, based on the week you are currently
@@ -114,17 +124,11 @@ export const Help = () => {
         </p>
         <Row
           key={2}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[2]}
-          rowEntries={[exampleEntry]}
-          getRowSum={() => 2}
-          onToggleHide={() => {}}
+          getRowSum={() => "2"}
           isFav={false}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <h2 className="help-subtitle">Hidden rows</h2>
         <p className="help-info">
           Below all rows that are visible by default you find a button saying
@@ -138,17 +142,11 @@ export const Help = () => {
         </p>
         <Row
           key={3}
-          topic={exampleIAP}
-          days={[new Date()]}
+          {...exampleRowProps}
           rowHours={[3]}
-          rowEntries={[exampleEntry]}
-          getRowSum={() => 3}
-          onToggleHide={() => {}}
+          getRowSum={() => "3"}
           isHidden={true}
-          onToggleFav={() => {}}
-          onFavNameUpdate={() => {}}
-          onCellUpdate={() => {}}
-        ></Row>
+        />
         <h2 className="help-subtitle">Adding new rows</h2>
         <p className="help-info">
           In order to add a new row, you first find an issue by using its id or
@@ -157,7 +155,12 @@ export const Help = () => {
           row"-button, a new row will be appended to the bottom of the list of
           recent rows.
         </p>
-        <QuickAdd addIssueActivity={() => {}}></QuickAdd>
+        <QuickAdd
+          addIssueActivity={() => {}}
+          toastList={[]}
+          onToastListUpdate={() => {}}
+          issueInputRef={issueInputRef}
+        ></QuickAdd>
         <h2 className="help-subtitle">The sum row</h2>
         <p className="help-info">
           A cell in the sum row shows the sum of all time entries logged on

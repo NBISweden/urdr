@@ -1,7 +1,7 @@
 import { addDays, addWeeks, format, getISOWeek, startOfWeek } from "date-fns";
 import { sv } from "date-fns/locale";
 import { WeekInfo, MonthGroup } from "./types";
-import { IdName, IssueActivityPair, Group, UserSetting } from "../../model";
+import { IdName, Group, UserSetting } from "../../model";
 import { getTimeEntries, getApiEndpoint, PUBLIC_API_URL } from "../../utils";
 
 export const getGroups = async (context: any) => {
@@ -129,15 +129,8 @@ const getAbsenceTimeEntries = async (
 ) => {
   const activity: IdName = { id: 19, name: "Absence (Vacation/VAB/Other)" };
 
-  const absence_pair: IssueActivityPair = {
-    issue: absenceIssue,
-    activity,
-    custom_name: "",
-    is_hidden: false,
-  };
-
   const entries = await getTimeEntries(
-    absence_pair,
+    { issue: absenceIssue, activity },
     fromDate,
     toDate,
     context,

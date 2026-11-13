@@ -60,7 +60,7 @@ export const Row = ({
             <button
               type="button"
               className="star-button"
-              onClick={() => onToggleHide(topic)}
+              onClick={() => onToggleHide?.(topic)}
               title={"Stop hiding"}
             >
               <img
@@ -74,7 +74,7 @@ export const Row = ({
             <button
               type="button"
               className="star-button"
-              onClick={() => onToggleHide(topic)}
+              onClick={() => onToggleHide?.(topic)}
               title={"Hide this row"}
             >
               <img

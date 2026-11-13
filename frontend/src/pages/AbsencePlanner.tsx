@@ -1,11 +1,10 @@
 import "../index.css";
 import React, { useState } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { Toast } from "../components/Toast";
 import {
   ToastMsg,
   TimeEntry,
-  IssueActivityPair,
   FetchedTimeEntry,
   IdName,
   AbsenceInterval,
@@ -35,7 +34,7 @@ import {
   startOfWeek,
   isWeekend,
 } from "date-fns";
-import enGB from "date-fns/locale/en-GB";
+import { enGB } from "date-fns/locale/en-GB";
 import { ClimbingBoxLoader } from "react-spinners";
 import { HeaderUser } from "../components/HeaderUser";
 import { LoadingOverlay } from "../components/LoadingOverlay";
@@ -81,8 +80,8 @@ function segmentDateBlocks<T extends {spent_on: Date}>(sortedEntries: T[]): T[][
 }
 
 export const AbsencePlanner = () => {
-  const [startDate, setStartDate] = useState<Date>(undefined);
-  const [endDate, setEndDate] = useState<Date>(undefined);
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [toastList, setToastList] = useState<ToastMsg[]>([]);
 
   const [selectedIssue, setSelectedIssue] = useState<{
@@ -95,9 +94,9 @@ export const AbsencePlanner = () => {
   const [tableData, setTableData] = useState<AbsenceInterval[]>([]);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
   const [groups, setGroups] = useState<Group[]>([]);
-  const context = React.useContext(AuthContext);
-  const confirm: ({}) => any = useConfirm();
-  const selectDates: ({}) => any = useSelectDates();
+  const context = useAuth();
+  const confirm = useConfirm();
+  const selectDates = useSelectDates();
 
 
   const today = startOfDay(new Date());
@@ -171,8 +170,7 @@ export const AbsencePlanner = () => {
     oldEndDate: Date,
     issueId: number
   ) => {
-    const selection: { choice: boolean; startDate: Date; endDate: Date } =
-      await selectDates({
+    const selection = await selectDates({
         title: "Change your absence period",
         confirmButtonLabel: "Update",
         startDate: oldStartDate,
@@ -354,15 +352,8 @@ export const AbsencePlanner = () => {
     let allAbsenceTimeEntries: FetchedTimeEntry[] = [];
 
     const absenceTimeEntryPromises = absenceIssueOptions.map(async (issue) => {
-      const absence_pair: IssueActivityPair = {
-        issue: issue,
-        activity: activity,
-        custom_name: "",
-        is_hidden: false,
-      };
-
       const absenceTimeEntries = await getTimeEntries(
-        absence_pair,
+        { issue, activity },
         fromDate,
         toDate,
         context,
@@ -443,8 +434,8 @@ export const AbsencePlanner = () => {
     return false;
   };
 
-  const reportAbsence = async () => {
-    const reportable_days = getReportableWorkingDays(startDate, endDate);
+  const reportAbsence = async (fromDate: Date, toDate: Date) => {
+    const reportable_days = getReportableWorkingDays(fromDate, toDate);
     if (reportable_days.length === 0) {
       setToastList([
         ...toastList,
@@ -535,9 +526,8 @@ export const AbsencePlanner = () => {
   };
 
   const onAddAbsenceButton = async () => {
-    const areDatesValid: boolean = validateDates();
-
-    if (areDatesValid) {
+    // validateDates() shows a toast when a date is missing, so it must run first
+    if (validateDates() && startDate && endDate) {
       const reportedEntries: FetchedTimeEntry[] = await getReportedEntries(
         startOfWeek(startDate),
         endOfWeek(endDate)
@@ -557,7 +547,7 @@ export const AbsencePlanner = () => {
         endDate
       );
       if (!tooManyHoursToReport && duplicateEntries.length === 0) {
-        await reportAbsence();
+        await reportAbsence(startDate, endDate);
       } else if (tooManyHoursToReport) {
         setToastList([
           ...toastList,
@@ -587,7 +577,7 @@ export const AbsencePlanner = () => {
     const selectedIssue = absenceIssueOptions.find((issue) => {
       return issue.id == issueId;
     });
-    setSelectedIssue(selectedIssue);
+    if (selectedIssue) setSelectedIssue(selectedIssue);
   };
 
   const FromDatePicker = () => (
@@ -595,9 +585,9 @@ export const AbsencePlanner = () => {
       id="fromDate"
       dateFormat={dateFormat}
       selected={startDate ? startDate : undefined}
-      onChange={(date: Date) => {
-        setStartDate(date);
-        document.getElementById("toDate").focus();
+      onChange={(date: Date | null) => {
+        setStartDate(date ?? undefined);
+        document.getElementById("toDate")?.focus();
       }}
       showWeekNumbers
       showYearDropdown
@@ -618,9 +608,9 @@ export const AbsencePlanner = () => {
       id="toDate"
       dateFormat={dateFormat}
       selected={endDate ? endDate : undefined}
-      onChange={(date: Date) => {
-        setEndDate(date);
-        document.getElementById("addAbsence").focus();
+      onChange={(date: Date | null) => {
+        setEndDate(date ?? undefined);
+        document.getElementById("addAbsence")?.focus();
       }}
       showWeekNumbers
       showYearDropdown
@@ -644,10 +634,6 @@ export const AbsencePlanner = () => {
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
             size={17}
-            width={4}
-            height={6}
-            radius={4}
-            margin={4}
           />
         </LoadingOverlay>
       )}

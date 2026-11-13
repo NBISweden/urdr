@@ -1,11 +1,11 @@
 import "../index.css";
 import React, { useState } from "react";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 
 export const HeaderUser = ({ username }: { username: string }) => {
-  const { logoutBackend, setUser } = React.useContext(AuthContext);
+  const { logoutBackend, setUser } = useAuth();
 
-  const logout = async (e) => {
+  const logout = async () => {
     const logout = await logoutBackend();
     if (logout) setUser(null);
   };

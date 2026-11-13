@@ -44,7 +44,7 @@ import {
   reportTime,
 } from "../utils";
 import { TimeTravel } from "../components/TimeTravel";
-import { AuthContext } from "../components/AuthProvider";
+import { useAuth } from "../components/AuthProvider";
 import { useParams } from "react-router-dom";
 import { ClimbingBoxLoader } from "react-spinners";
 import warning from "../icons/exclamation-triangle.svg";
@@ -54,7 +54,7 @@ import down from "../icons/caret-down-fill.svg";
 import info from "../icons/info-circle-fill.svg";
 import { BarChart } from "../components/BarChart";
 
-const beforeUnloadHandler = (event) => {
+const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
   event.preventDefault();
   event.returnValue = "";
 };
@@ -78,8 +78,8 @@ export const Report = () => {
   const [showHidden, setShowHidden] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTotalHours, setShowTotalHours] = useState(false);
-  const [draggedFav, setDraggedFav] = useState(null);
-  const context = React.useContext(AuthContext);
+  const [draggedFav, setDraggedFav] = useState<IssueActivityPair | null>(null);
+  const context = useAuth();
   const urlparams = useParams();
   const gitBranch = process.env.GIT_BRANCH;
   const gitHash = process.env.GIT_HASH;
@@ -517,7 +517,7 @@ export const Report = () => {
     const activeFav = favorites.find(
       (fav) => `${fav.issue.id}${fav.activity.id}` === active.id
     );
-    setDraggedFav(activeFav);
+    setDraggedFav(activeFav ?? null);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -555,8 +555,8 @@ export const Report = () => {
   const findRowHours = (rowTopic: IssueActivityPair) => {
     let rowHours: number[] = [];
     currentWeekArray.map((day) => {
-      let hours: number = null;
-      let entry: TimeEntry | FetchedTimeEntry = newTimeEntries?.find(
+      let hours = 0;
+      let entry: TimeEntry | FetchedTimeEntry | undefined = newTimeEntries?.find(
         (entry) =>
           entry.spent_on === formatDate(day, dateFormat) &&
           entry.issue_id === rowTopic.issue.id &&
@@ -648,8 +648,8 @@ export const Report = () => {
       (pair) =>
         pair.activity.id === item.activity.id && pair.issue.id === item.issue.id
     );
-    const index = pairs.indexOf(removed);
-    pairs.splice(index, 1);
+    if (!removed) return pairs;
+    pairs.splice(pairs.indexOf(removed), 1);
     return pairs;
   };
 
@@ -665,9 +665,9 @@ export const Report = () => {
     ]);
   };
 
-  if (context.user === null) return <></>;
+  const issueInputRef = useRef<HTMLInputElement>(null);
 
-  const issueInputRef = useRef(null);
+  if (context.user === null) return <></>;
 
   // Main content
   return (
@@ -678,10 +678,6 @@ export const Report = () => {
             color="hsl(76deg 55% 53%)"
             loading={isLoading}
             size={17}
-            width={4}
-            height={6}
-            radius={4}
-            margin={4}
           />
         </LoadingOverlay>
       )}
@@ -704,7 +700,7 @@ export const Report = () => {
               handleSave();
             } else if (e.key.toLowerCase() === "a" && e.ctrlKey) {
               e.preventDefault();
-              issueInputRef.current.focus();
+              issueInputRef.current?.focus();
             }
           }}
         >

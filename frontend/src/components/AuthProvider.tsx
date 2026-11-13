@@ -4,10 +4,28 @@ import { PUBLIC_API_URL } from "../utils";
 import { Buffer } from "buffer";
 import { useNavigate } from "react-router-dom";
 
-export const AuthContext = React.createContext(null);
+export interface AuthContextValue {
+  user: User | null | undefined;
+  setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
+  onLogin: (
+    username: string,
+    password: string
+  ) => Promise<User | number | undefined>;
+  logoutBackend: () => Promise<boolean>;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = React.useState();
+export const AuthContext = React.createContext<AuthContextValue | null>(null);
+
+export const useAuth = (): AuthContextValue => {
+  const context = React.useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = React.useState<User | null>();
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -24,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     else window.localStorage.removeItem("user");
   }, [user]);
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (username: string, password: string) => {
     // We are not doing account linking
     let headers = new Headers();
     headers.set("Accept", "application/json");
@@ -33,7 +51,7 @@ export const AuthProvider = ({ children }) => {
       "Authorization",
       "Basic " + Buffer.from(`${username}:${password}`).toString("base64")
     );
-    let errorCode: number;
+    let errorCode: number | undefined;
     const user: User = await fetch(`${PUBLIC_API_URL}/api/login`, {
       method: "POST",
       credentials: "include",
@@ -74,7 +92,7 @@ export const AuthProvider = ({ children }) => {
     return logout;
   };
 
-  const value = {
+  const value: AuthContextValue = {
     user,
     setUser: setUser,
     onLogin: handleLogin,

@@ -6,25 +6,39 @@ import React, {
   useContext,
 } from "react";
 import { ModalDialog } from "./ModalDialog";
+import { ConfirmOptions } from "./ConfirmDialogProvider";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import sv from "date-fns/locale/sv";
+import { sv } from "date-fns/locale/sv";
 import { dateFormat, isWeekday } from "../utils";
 
-const EditPeriodDialog = createContext(null);
+export interface PeriodSelection {
+  choice: boolean;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}
 
-export const EditPeriodDialogProvider = ({ children }) => {
+type SelectDates = (
+  options: ConfirmOptions & { startDate: Date; endDate: Date }
+) => Promise<PeriodSelection>;
+
+const EditPeriodDialog = createContext<SelectDates | null>(null);
+
+const closedState = { isOpen: false, title: "", confirmButtonLabel: "" };
+
+export const EditPeriodDialogProvider = ({ children }: { children: React.ReactNode }) => {
   const [updatedAbsenceStartDate, setUpdatedAbsenceStartDate] =
-    useState<Date>(undefined);
+    useState<Date | undefined>(undefined);
   const [updatedAbsenceEndDate, setUpdatedAbsenceEndDate] =
-    useState<Date>(undefined);
-  const [state, setState] = useState<{}>({ isOpen: false });
-  const handlerFunction =
-    useRef<
-      (selection: { choice: boolean; startDate: Date; endDate: Date }) => void
-    >();
+    useState<Date | undefined>(undefined);
+  const [state, setState] = useState<ConfirmOptions & { isOpen: boolean }>(
+    closedState
+  );
+  const handlerFunction = useRef<
+    ((selection: PeriodSelection) => void) | undefined
+  >(undefined);
 
-  const UpdateAbsenceRangesContainer = (): JSX.Element => (
+  const UpdateAbsenceRangesContainer = (): React.JSX.Element => (
     <div>
       <p>Please enter below the new start and end date of your absence.</p>
       <hr></hr>
@@ -36,8 +50,8 @@ export const EditPeriodDialogProvider = ({ children }) => {
           selected={
             updatedAbsenceStartDate ? updatedAbsenceStartDate : undefined
           }
-          onChange={(date: Date) => {
-            setUpdatedAbsenceStartDate(date);
+          onChange={(date: Date | null) => {
+            setUpdatedAbsenceStartDate(date ?? undefined);
           }}
           showWeekNumbers
           locale={sv}
@@ -59,8 +73,8 @@ export const EditPeriodDialogProvider = ({ children }) => {
           filterDate={isWeekday}
           dateFormat={dateFormat}
           selected={updatedAbsenceEndDate ? updatedAbsenceEndDate : undefined}
-          onChange={(date: Date) => {
-            setUpdatedAbsenceEndDate(date);
+          onChange={(date: Date | null) => {
+            setUpdatedAbsenceEndDate(date ?? undefined);
           }}
           showWeekNumbers
           locale={sv}
@@ -79,18 +93,18 @@ export const EditPeriodDialogProvider = ({ children }) => {
   );
 
   const selectDates = useCallback(
-    (forwarded) => {
-      return new Promise((resolve) => {
-        setState({ ...forwarded, isOpen: true });
-        setUpdatedAbsenceStartDate(forwarded.startDate);
-        setUpdatedAbsenceEndDate(forwarded.endDate);
-        handlerFunction.current = (selection: {
-          choice: boolean;
-          startDate: Date;
-          endDate: Date;
-        }) => {
+    ({
+      startDate,
+      endDate,
+      ...options
+    }: ConfirmOptions & { startDate: Date; endDate: Date }) => {
+      return new Promise<PeriodSelection>((resolve) => {
+        setState({ ...options, isOpen: true });
+        setUpdatedAbsenceStartDate(startDate);
+        setUpdatedAbsenceEndDate(endDate);
+        handlerFunction.current = (selection: PeriodSelection) => {
           resolve(selection);
-          setState({ isOpen: false });
+          setState(closedState);
         };
       });
     },
@@ -123,6 +137,10 @@ export const EditPeriodDialogProvider = ({ children }) => {
   );
 };
 
-export const useSelectDates = () => {
-  return useContext(EditPeriodDialog);
+export const useSelectDates = (): SelectDates => {
+  const selectDates = useContext(EditPeriodDialog);
+  if (!selectDates) {
+    throw new Error("useSelectDates must be used within an EditPeriodDialogProvider");
+  }
+  return selectDates;
 };

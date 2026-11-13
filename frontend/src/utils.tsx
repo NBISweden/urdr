@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { TimeEntry } from "./model";
 export const PUBLIC_API_URL = process.env.PUBLIC_API_URL;
 export const PUBLIC_REDMINE_URL = process.env.PUBLIC_REDMINE_URL;
-import { IssueActivityPair, FetchedTimeEntry } from "./model";
+import { Id, FetchedTimeEntry } from "./model";
+import type { AuthContextValue } from "./components/AuthProvider";
 
 import {
   compareAsc,
@@ -11,6 +12,7 @@ import {
   eachDayOfInterval,
   endOfWeek,
   format as formatDate,
+  Interval,
   isBefore,
   isWeekend,
   isWithinInterval,
@@ -23,7 +25,10 @@ headers.set("Content-Type", "application/json");
 
 export const dateFormat = "yyyy-MM-dd";
 
-export const getApiEndpoint = async (endpoint, context) => {
+export const getApiEndpoint = async (
+  endpoint: string,
+  context: AuthContextValue
+) => {
   if (context.user === null) return null;
   let logout = false;
   let result = await fetch(`${PUBLIC_API_URL}${endpoint}`, {
@@ -54,9 +59,9 @@ const addDays = (date: Date, days: number) => {
 
 // Return array of all days in the same week as supplied date
 export const getFullWeek = (today: Date): Date[] => {
-  let fullWeek = [];
+  let fullWeek: Date[] = [];
   const todayDay = today.getDay(); // Sunday - Saturday : 0 - 6
-  let days = [];
+  let days: number[] = [];
   if (todayDay === 0) {
     days = [-6, -5, -4, -3, -2];
   } else if (todayDay === 1) {
@@ -113,8 +118,8 @@ export const getShortCustomDateString = (day: Date) => {
   return `${day.getDate()}/${day.getMonth() + 1}`;
 };
 
-export const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+export const useDebounce = <T,>(value: T, delay: number): T => {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
   React.useEffect(() => {
     // Update debounced value after delay
     const handler = setTimeout(() => {
@@ -149,7 +154,7 @@ export const useViewport = () => {
 
 // Hook to escape a certain DOM element by clicking outside of it or pressing Escape
 export const useEscaper = (
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement | null>,
   callback: () => void
 ) => {
   useEffect(() => {
@@ -180,12 +185,12 @@ export const useEscaper = (
 
 // Retrieve time entries via api
 export const getTimeEntries = async (
-  issueActivity: IssueActivityPair,
+  issueActivity: { issue: Id; activity: Id } | undefined,
   from_date: Date,
   to_date: Date,
-  context: any,
+  context: AuthContextValue,
   user_id?: string
-) => {
+): Promise<FetchedTimeEntry[]> => {
   // The ofset param is used to get all time_entries
   // from the api, as the limit per batch is 100
   let offset: number = 0;
@@ -223,9 +228,7 @@ export const getTimeEntries = async (
       gotTotal = true;
     }
   }
-  if (allEntries) return allEntries;
-
-  return null;
+  return allEntries;
 };
 
 export const reportTime = async (

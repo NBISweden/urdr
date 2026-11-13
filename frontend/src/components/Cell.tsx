@@ -25,7 +25,7 @@ export const Cell = ({
   onBlurRow: () => void;
 }) => {
   const [showCommentArea, setShowCommentArea] = useState<boolean>(false);
-  const [areaComments, setAreaComments] = useState<string>(null);
+  const [areaComments, setAreaComments] = useState<string | null>(null);
   const onCommentButtonClick = () => {
     setShowCommentArea(true);
   };

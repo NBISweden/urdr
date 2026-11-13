@@ -1,6 +1,7 @@
 import React from "react";
 
 interface AbsenceIssuesSelectorProps {
+  id?: string;
   onChange: React.ChangeEventHandler<HTMLSelectElement>;
   options: { id: number; subject: string }[];
   defaultOption: number;
@@ -8,6 +9,7 @@ interface AbsenceIssuesSelectorProps {
 }
 
 export function AbsenceIssuesSelector({
+  id,
   onChange,
   options,
   defaultOption,
@@ -15,6 +17,7 @@ export function AbsenceIssuesSelector({
 }: AbsenceIssuesSelectorProps) {
   return (
     <select
+      id={id}
       defaultValue={defaultOption}
       className={className}
       name="reason-for-absence"
