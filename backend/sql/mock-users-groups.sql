@@ -1,10 +1,6 @@
 -- Mock users and groups, for use with the mock Redmine.
 --
--- The real counterpart of this file is update-users-groups.sh, which
--- copies users, groups and memberships out of the Redmine instance's
--- PostgreSQL database.  Urdr reads group membership from its own
--- tables rather than from Redmine's REST API, so a mock Redmine has no
--- way to supply it and the rows are written out by hand here instead.
+-- Thes replaces update-users-groups.sh in the mock
 --
 -- The IDs and names have to match the roster in
 -- backend/cmd/mock-redmine/main.go, because the vacation overview

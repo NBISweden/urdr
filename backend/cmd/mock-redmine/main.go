@@ -93,9 +93,7 @@ var issues = []issue{
 
 // The people the mock reports time for. Dev User is the one you log
 // in as; the others exist so the vacation overview has a group to
-// show. The IDs and names have to match backend/sql/mock-users-groups.sql,
-// because that is where the overview reads the roster from before
-// asking Redmine for each member's absences by ID.
+// show. The IDs and names have to match backend/sql/mock-users-groups.sql.
 var (
 	mockUser   = idName{mockUserID, mockUserName}
 	mockAda    = idName{2, "Ada Lindgren"}
@@ -222,9 +220,7 @@ func (s *store) absenceWeeks(user idName, monday time.Time,
 }
 
 // seedAbsencePlans books planned absences for the whole mock group over
-// the fourteen weeks the vacation overview displays. That window starts
-// at the Monday of the current week and runs forwards, so none of the
-// time seeded above — which stops at today — ever appears in it.
+// the fourteen weeks the vacation overview displays. Starting next Monday.
 func (s *store) seedAbsencePlans() {
 	now := time.Now()
 	monday := time.Date(now.Year(), now.Month(), now.Day(),
