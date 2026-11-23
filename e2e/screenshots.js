@@ -19,7 +19,8 @@ const pages = [
   { name: 'report', path: '/report' },
   { name: 'absence', path: '/absence' },
   { name: 'vacation', path: '/vacation' },
-  { name: 'help', path: '/help' }
+  { name: 'help', path: '/help' },
+  { name: 'eu-report', path: '/eu-report' }
 ]
 
 // The stack may still be starting up; Vite's first page load after a
