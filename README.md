@@ -10,10 +10,21 @@
 
 ## Development setup
 
-### Local Redmine setup
 
-As a prerequisite for running Urdr during development, you need to run
-a local installation of Redmine. The NBIS Redmine installation is
+### Redmine
+
+There are two alternatives for local development, one is to run a complete
+local redmine setup, the other is to use the light weight mock redmine service.
+The mock redmine service was developed with AI to ease development and to make
+super extra sure that no real data is touched and make it very easy to restore
+the "redmine" data to a known state that is easy to review.
+
+The screenshot runs only work with the mock redmine, since it needs credentials
+to login with to properly capture the views.
+
+#### Local Redmine setup
+
+To run a local installation of Redmine. The NBIS Redmine installation is
 currently maintained in the
 [ops-redmine repository](https://github.com/NBISweden/ops-redmine).
 
@@ -26,6 +37,58 @@ The setup of Redmine includes importing a database dump of Redmine
 in your local Redmine database. The database dump file should be
 named `redmine_db.dump`, and it should be placed in that repository's
 `initdb.d` directory.
+
+#### Mock Redmine (alternative)
+
+Instead of running a real local Redmine, you can run the bundled mock,
+which serves the handful of Redmine endpoints that the Urdr backend
+proxies to. It keeps its time entries in memory and re-seeds them
+every time it starts: a realistic previous-plus-current month of
+reported time, and planned absences across the fourteen weeks ahead
+that the vacation overview displays.
+
+Set `REDMINE_URL="http://redmine-mock:3456"` in `urdr.env` and start
+the stack with the `mock` profile:
+
+```shell
+docker compose --profile mock up
+```
+
+Log in with user `dev`, password `dev`.
+
+The "Urdr setup" section below ends with instructions on how to initialize the
+backed database. Skip all of that and run this instead:
+
+Give the mock a database of its own, so those rows do not land on top
+of users and groups copied from the real Redmine. In `urdr.env`:
+
+```shell
+BACKEND_DB_PATH="./mock-database.db"
+```
+
+Then create it:
+
+```shell
+sqlite3 backend/mock-database.db <backend/sql/schema.sql
+sqlite3 backend/mock-database.db <backend/sql/mock-users-groups.sql
+```
+
+Reloading the second file is harmless; its inserts replace rather than
+conflict.
+
+### Screenshot runs
+
+With the stack running, this captures a full-page screenshot of every page
+listed in the `pages` array in `e2e/screeshots.js`. The screenshots are stored
+in `e2e/shots/` (log in happens with the mock's `dev`/`dev` by default;
+override with `URDR_USER` / `URDR_PASSWORD`):
+
+```shell
+docker compose --profile screenshots run --rm screenshots
+```
+
+The playwright version in `e2e/package.json` must match the image tag
+of the `screenshots` service in `docker-compose.yml`.
 
 ### Urdr setup
 

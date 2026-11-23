@@ -10,3 +10,5 @@
 ops-redmine/
 frontend/dist/
 frontend/.vite-cache/
+/e2e/node_modules/
+/e2e/shots/

@@ -1,0 +1,11 @@
+{
+  "name": "urdr-e2e",
+  "private": true,
+  "description": "Screenshot runs against the dev stack; keep the playwright version in sync with the image tag in docker-compose.yml.",
+  "scripts": {
+    "screenshots": "node screenshots.js"
+  },
+  "devDependencies": {
+    "playwright": "1.49.1"
+  }
+}
