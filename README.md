@@ -47,26 +47,19 @@ every time it starts: a realistic previous-plus-current month of
 reported time, and planned absences across the fourteen weeks ahead
 that the vacation overview displays.
 
-Set `REDMINE_URL="http://redmine-mock:3456"` in `urdr.env` and start
-the stack with the `mock` profile:
-
-```shell
-docker compose --profile mock up
-```
-
-Log in with user `dev`, password `dev`.
-
 The "Urdr setup" section below ends with instructions on how to initialize the
-backed database. Skip all of that and run this instead:
+backend database. Skip all of that and follow these steps instead.
 
-Give the mock a database of its own, so those rows do not land on top
-of users and groups copied from the real Redmine. In `urdr.env`:
+Point Urdr at the mock, and give the mock a database of its own so
+its rows do not land on top of users and groups copied from the real
+Redmine. In `urdr.env`:
 
 ```shell
+REDMINE_URL="http://redmine-mock:3456"
 BACKEND_DB_PATH="./mock-database.db"
 ```
 
-Then create it:
+Create the database before starting the stack:
 
 ```shell
 sqlite3 backend/mock-database.db <backend/sql/schema.sql
@@ -75,6 +68,27 @@ sqlite3 backend/mock-database.db <backend/sql/mock-users-groups.sql
 
 Reloading the second file is harmless; its inserts replace rather than
 conflict.
+
+Then start the stack with the `mock` profile:
+
+```shell
+docker compose --profile mock up
+```
+
+Log in with user `dev`, password `dev`.
+
+If the stack was started before the database was created, the backend
+container has created `backend/mock-database.db` itself, owned by
+`root`, and both `sqlite3` commands fail with `attempt to write a
+readonly database` (the first also reports `table ... already
+exists`). To fix that, take ownership of the file, run both commands
+again, and restart the stack:
+
+```shell
+sudo chown "$USER":"$USER" backend/mock-database.db
+sqlite3 backend/mock-database.db <backend/sql/schema.sql
+sqlite3 backend/mock-database.db <backend/sql/mock-users-groups.sql
+```
 
 ### Screenshot runs
 
