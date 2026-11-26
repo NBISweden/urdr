@@ -20,6 +20,7 @@ import {
   areConsecutive,
   getWeeksBetweenDates,
   getApiEndpoint,
+  groupEntries,
 } from "../utils";
 import {
   format as formatDate,
@@ -56,15 +57,6 @@ export const absenceIssueOptions: { id: number; subject: string }[] = [
   { id: 6995, subject: "Vacation" },
   { id: 6997, subject: "Other absence" },
 ];
-
-function groupEntries<T>(entries: T[], keyFunc: (e: T) => string): {[x: string]: T[]} {
-  return entries.reduce<{[x: string]: T[]}>((acc, entry) => {
-    const key = keyFunc(entry)
-    acc[key] = acc[key] || [];
-    acc[key].push(entry);
-    return acc;
-  }, {})
-}
 
 function segmentDateBlocks<T extends {spent_on: Date}>(sortedEntries: T[]): T[][] {
   return sortedEntries.reduce<T[][]>((acc, entry) => {

@@ -5,6 +5,7 @@ import { Report } from "./pages/Report";
 import { Help } from "./pages/Help";
 import { AbsencePlanner } from "./pages/AbsencePlanner";
 import { VacationOverview } from "./pages/VacationOverview";
+import { EuReport } from "./pages/EuReport";
 import { NotFound } from "./pages/NotFound";
 import { AuthProvider } from "./components/AuthProvider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -25,6 +26,8 @@ import { EditPeriodDialogProvider } from "./components/EditPeriodDialogProvider"
 export const App = () => {
   const currentYear: number = getISOWeekYear(new Date());
   const currentWeek: number = getISOWeek(new Date());
+  const thisMonthYear: number = new Date().getFullYear();
+  const thisMonth: number = new Date().getMonth() + 1;
 
   return (
     <>
@@ -83,6 +86,23 @@ export const App = () => {
                       <ProtectedRoute>
                         <VacationOverview />
                       </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/eu-report/:year/:month"
+                    element={
+                      <ProtectedRoute>
+                        <EuReport />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/eu-report"
+                    element={
+                      <Navigate
+                        replace
+                        to={`/eu-report/${thisMonthYear}/${thisMonth}`}
+                      />
                     }
                   />
                   <Route path="*" element={<NotFound />} />

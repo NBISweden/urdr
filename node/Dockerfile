@@ -30,7 +30,7 @@ RUN mkdir /home/node/app
 
 WORKDIR /home/node
 COPY --chown=node:node frontend/package.json frontend/package-lock.json ./
-COPY --chown=node:node,--chmod=755 node/entrypoint.sh ./
+COPY --chown=node:node --chmod=755 node/entrypoint.sh ./
 
 RUN npm ci
 

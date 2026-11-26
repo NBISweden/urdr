@@ -1,9 +1,15 @@
 import "../index.css";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "../components/AuthProvider";
+import { useEscaper } from "../utils";
+import down from "../icons/caret-down-fill.svg";
 
 export const HeaderUser = ({ username }: { username: string }) => {
   const { logoutBackend, setUser } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEscaper(menuRef, () => setIsMenuOpen(false));
 
   const logout = async () => {
     const logout = await logoutBackend();
@@ -12,8 +18,6 @@ export const HeaderUser = ({ username }: { username: string }) => {
 
   return (
     <nav className="nav-wrapper">
-      <div className="nav-user">{username}</div>
-      <div className="nav-bar">|</div>
       <a className="nav-item" href="/help">
         Help
       </a>
@@ -26,9 +30,26 @@ export const HeaderUser = ({ username }: { username: string }) => {
       <a className="nav-item" href="/vacation">
           Vacation Overview
       </a>
-      <button type="button" className="nav-item" onClick={logout}>
-        Log out
-      </button>
+      <div className="nav-menu" ref={menuRef}>
+        <button
+          type="button"
+          className="nav-user nav-menu-toggle"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {username}
+          <img className="nav-menu-caret" src={down} alt="" />
+        </button>
+        {isMenuOpen && (
+          <div className="nav-menu-dropdown">
+            <a className="nav-menu-item" href="/eu-report">
+              EU report
+            </a>
+            <button type="button" className="nav-menu-item" onClick={logout}>
+              Log out
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

@@ -164,6 +164,15 @@ Other button classes are defined further down together with other classes for th
   z-index: 9999 !important;
 }
 
+/* Spelled-out month names read better ranged left than centred. The
+   selector matches the library's own depth so it wins regardless of the
+   order the stylesheets end up in. */
+.month-picker-calendar .react-datepicker__month .react-datepicker__month-text {
+  width: 6em;
+  padding-left: 0.5em;
+  text-align: left;
+}
+
 /* stylelint-enable selector-class-pattern */
 
 .usr-header,
@@ -279,11 +288,50 @@ Other button classes are defined further down together with other classes for th
   background-color: hsl(76deg 55% 77%);
 }
 
-.nav-bar {
-  padding: 0.3rem 0.8rem;
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nav-menu-caret {
+  height: 0.7rem;
+}
+
+.nav-menu-dropdown {
+  position: absolute;
+  z-index: 102;
+  top: calc(100% + 0.3rem);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+  padding: 0.3rem 0;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 5px 15px 0 hsla(0, 0%, 0%, 0.15);
+}
+
+.nav-menu-item {
+  padding: 0.4rem 0.8rem;
   border: none;
   color: hsl(185deg 92% 11%);
   background-color: transparent;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.nav-menu-item:hover {
+  background-color: hsl(76deg 55% 77%);
+  color: hsl(185deg 92% 11%);
 }
 
 .nav-item {
@@ -1303,6 +1351,120 @@ Other button classes are defined further down together with other classes for th
   height: 3rem;
   width: 8rem;
 }
+
+/* EU REPORT */
+
+/* A text input defaults to 20 characters wide, which leaves the longest
+   month and year sitting in a lot of empty space. */
+.month-picker-input {
+  width: 9rem;
+}
+
+.eu-report-title {
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-left: 2rem;
+  color: hsl(186deg 92% 11%);
+}
+
+.eu-report-info {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+}
+
+/* A month is around 22 weekday columns, so the grid scrolls sideways
+   underneath a pinned issue column. */
+.eu-report-scroll {
+  overflow-x: auto;
+  margin-top: 1rem;
+  background-color: white;
+}
+
+.eu-report-table {
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+/* The EU report's grid and the absence planner's calendar are
+   different tables, so these can never match the same element as
+   .calendar-table tr:last-of-type td. stylelint compares them on
+   source order alone, and no placement satisfies both. */
+/* stylelint-disable no-descending-specificity */
+.eu-report-table th,
+.eu-report-table td {
+  border-bottom: 1px solid hsl(0deg 0% 90%);
+  padding: 0.4rem 0.6rem;
+  font-weight: normal;
+}
+/* stylelint-enable no-descending-specificity */
+
+.eu-report-issue-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: white;
+  text-align: left;
+  max-width: 24rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eu-report-day-cell {
+  text-align: right;
+  min-width: 3.5rem;
+}
+
+/* The button carries the cell's padding so the whole header cell is
+   clickable, not just the digits. */
+.eu-report-table thead .eu-report-day-cell {
+  padding: 0;
+}
+
+/* Looks like the plain date it replaces, but takes you to that week. */
+.eu-report-day-button {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* Set on every header cell of the week being pointed at or focused. */
+.eu-report-week-hovered {
+  background-color: hsl(186deg 30% 94%);
+}
+
+/* Marks the weekend that the weekday-only columns skip over. */
+.eu-report-week-start {
+  border-left: 1px solid hsl(0deg 0% 15%);
+}
+
+.eu-report-total-cell {
+  text-align: right;
+  min-width: 4rem;
+  border-left: 1px solid hsl(0deg 0% 90%);
+}
+
+.eu-report-table thead th {
+  border-bottom: 2px solid hsl(0deg 0% 80%);
+  color: hsl(185deg 92% 11%);
+}
+
+/* The EU report's grid and the absence planner's calendar are
+   different tables, so these can never match the same element as
+   .calendar-table tr:last-of-type td. stylelint compares them on
+   source order alone, and no placement satisfies both. */
+/* stylelint-disable no-descending-specificity */
+.eu-report-table tfoot th,
+.eu-report-table tfoot td {
+  border-top: 2px solid hsl(0deg 0% 80%);
+  border-bottom: none;
+  font-weight: bold;
+}
+/* stylelint-enable no-descending-specificity */
 
 /* NOT FOUND */
 
